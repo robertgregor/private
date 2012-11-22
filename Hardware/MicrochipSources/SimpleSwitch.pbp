@@ -1,0 +1,271 @@
+'@  __config _INTRC_OSC_NOCLKOUT & _WDT_ON & _MCLRE_OFF & _CP_OFF & _CPD_OFF & _FCMEN_OFF & _IESO_OFF & _BOR_ON & _PWRTE_ON
+                 
+@ DEVICE PIC16F690,INTRC_OSC_NOCLKOUT
+@ DEVICE PIC16F690,WDT_ON
+@ DEVICE PIC16F690,MCLR_OFF
+@ DEVICE PIC16F690,CPD_OFF
+@ DEVICE PIC16F690,BOD_ON
+@ DEVICE PIC16F690,PWRT_ON
+
+'EEPROM_MAP
+'0 - channel number
+'1,2,3,4,5 bank name
+'6 - device_id
+'7 - 0 switch on when applied power
+'8 timeout
+
+EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
+
+INCLUDE "RFM70.pbp"
+
+ DEFINE OSC 8
+
+ OSCCON = %01110000 ' Internal 8MHz osc
+ ANSEL = 0
+ ANSELH = 0
+ CM1CON0 = 0
+ CM2CON0 = 0
+ 
+ 'interrupt for timer
+    INTCON = %10100000  'T01 enabled PEIE disabled.
+    PIE1 = %00000000    'USART disabled
+    OPTION_REG = %00000111
+
+on interrupt goto intManagement
+ENABLE
+'-----------init----------------------------------------------------------------
+TRISA = %00000000 'Set PORTA to all output
+TRISB = %00010000 'Set , SDI input
+TRISC = %00000100 'Set IRQ input, 
+
+RES var PORTC.1
+RELAY VAR PORTA.5
+i VAR BYTE 'loop counter
+j var byte
+ci var byte
+configure var byte
+temp_byte_int var byte
+temp_byte var byte
+temp1_byte var byte
+temp2_byte var byte
+temp3_byte var byte
+temp4_byte var byte
+temp_word var word
+EEPROMBYTE      VAR BYTE
+EEPROMPOSITION  VAR BYTE
+seconds  var     byte    ' Define second variable
+ticks   var     byte    ' Define pieces of seconds variable
+l1counter var byte
+conversionSuccess VAR BYTE
+
+clear
+input RES
+output relay
+if 0 == 1 then
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    write 6, 0
+    write 7, 0
+    write 8, 0
+    END
+endif
+READ 6, device_id
+read 7, temp_byte
+if (temp_byte == 0) then 
+    high relay
+else
+    low relay
+endif
+gosub initModule
+
+commonSettings:
+gosub commonRXTX
+
+'============Main Rx============================================================
+Main_rx:
+gosub setup_rx 'setup Rx
+pause 2 'delay for Rx starting
+Ce=1 'set nRF24L01 in Rx mode
+irqLoop:
+'Check for data to send
+if (temp_data[0] != 0) then
+    if (configure == 1) then
+        gosub commonRXTX
+        configure = 0
+    endif
+    gosub sendData
+    temp_data[0] = 0
+    GOTO main_rx
+endif
+If Irq !=0 then irqLoop 'wait until IRQ, active low
+Ce=0
+lop:
+data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
+num_byte=payloadLength
+gosub spi_read
+temp_data[0] = 0
+if (data_in[1] == device_id) then
+    if (data_in[2] == "c") then    
+        if (data_in[3] == "=") then
+            'OK it is configure
+            write 0, data_in[9] 'channel
+            write 1, data_in[4] 'password 0
+            write 2, data_in[5] 'password 1
+            write 3, data_in[6] 'password 2
+            write 4, data_in[7] 'password 3
+            write 5, data_in[8] 'password 4
+            write 6, data_in[10]'device id
+            pause 10
+            device_id = data_in[10]
+            configure = 1
+            gosub sendDataOK
+        endif
+    elseif (data_in[2] == "l") then
+        if (data_in[3] == "1") then
+            if (data_in[4] == "c") then
+                if (data_in[5] == "o") then
+                    write 7, 0
+                    gosub sendDataOK
+                endif
+                if (data_in[5] == "f") then
+                    write 7, 1
+                    gosub sendDataOK
+                endif
+                if (data_in[5] == "t") then
+                    if (data_in[6] == "=") then
+                        i = 7
+                        gosub convertInputData
+                        if (conversionSuccess == 1) then
+                            write 8, temp_byte
+                            gosub sendDataOK
+                        endif
+                    endif
+                endif                
+            elseif (data_in[4] == "o") then
+                if (data_in[5] == "f") then
+                    seconds = 0
+                    read 8, l1counter
+                    high relay
+                    gosub sendDataOK
+                else
+                    high relay
+                    l1counter = 0
+                    gosub sendDataOK
+                endif
+            elseif (data_in[4] == "f") then
+                LOW relay
+                gosub sendDataOK
+            endif
+        endif
+    elseif (data_in[2] == "s") then
+            temp_data[0] = "3"
+            temp_data[1] = "|"
+            temp_data[2] = RELAY + $30
+            temp_data[3] = "|"
+            read 7, temp_data[4]
+            temp_data[4] = temp_data[4] + $30        
+            temp_data[5] = "|"
+            read 8, temp_byte
+            gosub convertNoToStr
+            temp_data[6] = temp3_byte
+            temp_data[7] = temp2_byte
+            temp_data[8] = temp1_byte
+            temp_data[9] = "|"
+            temp_byte = l1counter
+            gosub convertNoToStr
+            temp_data[10] = temp3_byte
+            temp_data[11] = temp2_byte
+            temp_data[12] = temp1_byte
+            temp_data[13] = 13    
+            temp_data[14] = 10    
+    elseif (data_in[2] == "p") then
+            if (data_in[3] == "n") then
+                gosub sendDataOK
+            endif
+    endif
+    if (temp_data[0] == 0) then
+        temp_data[0] = "E"
+        temp_data[1] = "R"
+        temp_data[2] = "R"
+        temp_data[3] = "O"
+        temp_data[4] = "R"
+        temp_data[5] = 13
+        temp_data[6] = 10
+    endif
+endif
+
+data_out[0]=Fifo_status 'Read FIFO status
+num_byte=1
+gosub spi_read
+val= data_in[1] 'FIFO status register
+if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
+data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
+data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
+num_byte=1
+gosub spi_write
+pause 2 'wait 2ms Rx<->Tx
+GOTO Main_rx
+end
+
+disable
+intManagement:
+        if (INTCON.2 == 1) then
+           ticks = ticks + 1      ' Count pieces of seconds
+           If ticks < 31 Then tiexit
+           ticks = 0
+           seconds = seconds + 1
+           if seconds <= 58 then tiexit
+           seconds = 0
+           if (l1counter > 0) then
+               l1counter = l1counter - 1
+               if (l1counter == 0) then
+                    low relay
+               endif
+           endif           
+           tiexit: 
+        endif
+        INTCON.7 = 1
+resume
+enable
+
+sendDataOK:
+    temp_data[0] = "O"
+    temp_data[1] = "K"
+    temp_data[2] = 13
+    temp_data[3] = 10
+return
+
+convertInputData:
+    conversionSuccess = 0
+    TEMP_BYTE="a"
+    for ci=0 to 2    
+        TEMP1_BYTE = "a"
+        TEMP2_BYTE = data_in[i]
+        if (TEMP2_BYTE == "|") then return
+        GOSUB lookupChar
+        if (TEMP1_BYTE == "a") then return 
+        if (ci==0) then 
+            TEMP_BYTE = TEMP1_BYTE
+            conversionSuccess = 1 
+        else 
+            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
+            conversionSuccess = 1
+        endif
+        i = i + 1
+    next ci
+return
+
+lookupChar:
+    LOOKDOWN temp2_byte,["0123456789"], temp1_byte
+RETURN
+
+convertNoToStr:
+        temp3_byte = (temp_byte DIG 2) + $30
+        temp2_byte = (temp_byte DIG 1) + $30
+        temp1_byte = (temp_byte DIG 0) + $30
+return
+
