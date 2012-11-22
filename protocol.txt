@@ -1,0 +1,79 @@
+USB stick
+
+AT+c=ch<ENTER> - ch - channel number 1 - 83
+AT+p=ABCDE<ENTER> - ABCDE - password exactly 5 characters
+AT+a=nnn<ENTER> - add new device device id nnn = 1 - 255
+AT+ddd=Cmd - specific device command ddd = device Id, Cmd = command
+
+Light/Alarm controller
+
+ala - alarm On In this mode the senzor will notify the Computer one time about the intrusion
+ald - alarm deactivation
+alce=nnn - alarm configuration enter alarm timeout nnn = 0 to 255 seconds
+alcl=nnn - alarm configuration leave alarm timeout nnn = 0 to 255 seconds
+
+l1o - light 1 on
+l1of - light 1 on and off after timeout period
+l1f - light 1 off
+l1co - configure light 1 to swith on when applied power
+l1cf - configure light 1 to stay off when applied power
+l1cd - configure light 1 to switch on when movement detected
+l1cc - cancel light 1 to switch on when movement detected
+l1ct=nnn - configure light 1 timeout nnn = 0 to 255 minutes (0 means forewer) minutes
+pn - check weather the device is up and runing (ping command)
+sa - return status 1|a|Alarm|sensor|alenter|alleave
+	Alarm 0 disabled, 1 enabled, 2 activated, 3 leave timeout running, 4 enter timeout running
+	sensor - 0 nothing detected, 1 detected
+	alenter - enter alarm timeout in seconds
+	alleave - leave alarm timeout in seconds
+sc - return status 1|c|light|power|onWhenMovement|configuredTimeout|currentTimeout
+	light 0 off, 1 on
+	power 0 on when applied power, 1 stay off when applied power
+	onWhenMovement 1 - on when movement detected 0 no action
+	configuredTimeout - no of minutes, when l1 will go off, 0 forewer
+	currentTimeout - current light 1 timeout in minutes, 0 - never switch off
+	
+
+Temperature sensor
+
+pn - check weather the device is up and runing (ping command)
+s - return status 2|temperature|battery|frequency
+	temperature format - always sign, 2 decimals degree celsius, dot, 2 decimals, e.g +23.32 or -02.32 or +02.20
+	battery voltage e.g. 2.9 or 3.0
+	frequency - frequency in seconds to send status. Longer value, longer battery life
+m=nnn - set the frequency and put to the sleep mode. 1 means 10 seconds, 255 means 2550 seconds. Needs to be set to put the device to sleep mode!!!
+	If not set, or set to 0, then no sleep - usefull for testing, but consume lot of power and batery will be quicly empty.
+
+If in sleep mode, the command should be send within 2 seconds, after the status is send. Othervise the system is in sleep mode
+and radio is off.
+
+Simple switch
+
+pn - check weather the device is up and runing (ping command)
+l1o - light 1 on
+l1of - light 1 on and off after timeout period
+l1f - light 1 off
+l1co - configure light 1 to swith on when applied power
+l1cf - configure light 1 to stay off when applied power
+l1ct=nnn - configure light 1 timeout nnn = 0 to 255 minutes (0 means forewer) minutes
+s - return status 3|light|power|configuredTimeout|currentTimeout
+	light 0 off, 1 on
+	power 0 on when applied power, 1 stay off when applied power
+	onWhenMovement 1 - on when movement detected 0 no action
+	configuredTimeout - no of minutes, when l1 will go off, 0 forewer
+	currentTimeout - current light 1 timeout in minutes, 0 - never switch off
+
+
+
+raspberry setup:
+
+Edit /boot/cmdline.txt
+
+From:
+dwc_otg.lpm_enable=0 rpitestmode=1 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait
+to:
+dwc_otg.lpm_enable=0 rpitestmode=1 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait
+
+Edit /etc/innitab 
+comment out:
+2:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100

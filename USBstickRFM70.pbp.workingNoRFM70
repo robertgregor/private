@@ -1,0 +1,603 @@
+'@  __config _INTRC_OSC_NOCLKOUT & _WDT_ON & _MCLRE_OFF & _CP_OFF & _CPD_OFF & _FCMEN_OFF & _IESO_OFF & _BOR_ON & _PWRTE_ON
+
+@ DEVICE PIC16F690,INTRC_OSC_NOCLKOUT
+@ DEVICE PIC16F690,WDT_ON
+@ DEVICE PIC16F690,MCLR_OFF
+@ DEVICE PIC16F690,CPD_OFF
+@ DEVICE PIC16F690,BOD_ON
+@ DEVICE PIC16F690,PWRT_ON
+
+'EEPROM_MAP
+'0 - channel number
+'1,2,3,4,5 bank name
+
+EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
+
+ DEFINE OSC 8
+ DEFINE HSER_RCSTA 90h
+ DEFINE HSER_TXSTA 24h
+ DEFINE HSER_SPBRG 51
+ DEFINE HSER_CLROERR 1
+
+ OSCCON = %01110000 ' Internal 8MHz osc
+ ANSEL = 0
+ ANSELH = 0
+ CM1CON0 = 0
+ CM2CON0 = 0
+ 
+'interrupt for timer
+INTCON = %11100000
+PIE1 = %00100000
+OPTION_REG = %00000111
+
+on interrupt goto intManagement
+ENABLE
+'-----------init----------------------------------------------------------------
+TRISA = %00000000 'Set PORTA to all output, RA0 input
+TRISB = %00010000 'Set , SDI input
+TRISC = %00000100 'Set IRQ input, 
+
+'-----------variables & settings------------------------------------------------
+SSPEN VAR SSPCON.5 'SSP Enable bit
+CKP VAR SSPCON.4 'Clock Polarity Select
+SMP VAR SSPSTAT.7 'Data input sample phase
+CKE VAR SSPSTAT.6 'Clock Edge Select bit
+SSPIF VAR PIR1.3 'SPI interrupt flag
+ser_lcd VAR PORTB.7 'LCD output
+Ce var PORTA.2 'CE pin nRF24L01
+CSN VAR PORTC.0 'CSN pin nRF24L01
+Irq VAR PORTC.2 'IRQ pin nRF24L01
+i VAR BYTE 'loop counter
+j var byte
+k var byte
+w VAR BYTE
+payloadLength con 22
+payloadLengthD con 23
+manageSerial var byte
+temp_byte_int var byte
+temp_byte var byte
+temp1_byte var byte
+temp2_byte var byte
+temp3_byte var byte
+temp4_byte var byte
+ser_data var byte[payloadLength]
+TEMP_data var byte[payloadLength]
+EEPROMBYTE      VAR BYTE
+EEPROMBYTEREAD  VAR BYTE
+EEPROMPOSITION  VAR BYTE
+ei              var byte
+num_byte var byte 'temp value
+val var byte 'temp value
+ticks var byte
+seconds var byte
+minutes var byte
+Pack_count VAR word 'number of packets sent
+dat var word 'unscaled ADC data
+data_out VAR BYTE[payloadLengthD] 'data sent
+data_in var Byte[payloadLengthD] 'data received
+comm_party var word 'communication party
+comm_data var word 'communication data
+'----------nRF24L01 interrupt flags---------------------------------------------
+Idle_int con $00 'Idle no interrupt pending
+Max_rt con $10 'Max # of Tx retrans interrupt
+Tx_inter con $30 'Tx interrupted
+Rx_ds con $40 'Rx data received
+'----------SPI(nRF24L01) commands-----------------------------------------------
+Read_reg con $00 'def read command to register
+Write_reg CON $20 'def write command to register
+Rd_rx_pload con $61 'def Rx payload register address
+Wr_tx_pload con $A0 'def Tx payload register address
+Flush_tx con $E1 'def flush Tx register command
+Flush_rx con $E2 'def flush Rx register command
+Reuse_tx_pl con $E3 'def reuse Tx payload register command
+Nop_comm con $FF 'def No operation
+'----------SPI(nRF24L01) registers addresses------------------------------------
+Config_nrf con $00 'Config register address
+En_aa con $01 'enable auto acknowledgment register address
+En_rxaddr con $02 'enable RX addresses register address
+Setup_aw con $03 'setup address width register address
+Setup_retr con $04 'setup auto retrans register address
+Rf_ch con $05 'RF channel register address
+Rf_setup con $06 'RF setup register address
+Stat_us con $07 'Status register address
+Observe_tx con $08 'Observe TX register address
+Cd con $09 'Carrier detect register address
+Rx_addr_p0 con $0A 'RX address pipe0 register address
+Rx_addr_p1 con $0B 'RX address pipe1 register address
+Rx_addr_p2 con $0C 'RX address pipe2 register address
+Rx_addr_p3 con $0D 'RX address pipe3 register address
+Rx_addr_p4 con $0E 'RX address pipe4 register address
+Rx_addr_p5 con $0F 'RX address pipe5 register address
+Tx_addr con $10 'TX address register address
+Rx_pw_p0 con $11 'RX payload width pipe0 register address
+Rx_pw_p1 con $12 'RX payload width pipe1 register address
+Rx_pw_p2 con $13 'RX payload width pipe2 register address
+Rx_pw_p3 con $14 'RX payload width pipe3 register address
+Rx_pw_p4 con $15 'RX payload width pipe4 register address
+Rx_pw_p5 con $16 'RX payload width pipe5 register address
+Fifo_status con $17 'FIFO status register register address
+clear
+pause 500
+'----------SPI settings---------------------------------------------------------
+SSPEN = 1 'enable SPI pins
+SSPCON.0=1 'SPI rate=OSC/16
+CKP = 0 'clock idle low
+CKE = 1 'transmit on active to idle
+SSPIF = 0 'clear buffer full status
+SMP = 0 'sample in middle of data
+'--------------SPI init---------------------------------------------------------
+Ce=1 'init spi pins
+pause 10 'wait 10 ms hardware is stable
+Ce=0 'set CE pin low disable Rx
+CSN=0 'set CSN pin low
+Pack_count=0 'number of packets sent
+'--------------Common RX-TX settings--------------------------------------------
+commonSettings:
+GOSUB commonRXTX
+'============Main Rx============================================================
+Main_rx:
+gosub setup_rx 'setup Rx
+pause 2 'delay for Rx starting
+Ce=1 'set nRF24L01 in Rx mode
+irqLoop:
+'receive serial data
+if (manageSerial==1) then
+    manageserial = 0
+    if ((ser_data[0] == "C" OR ser_data[0] == "c") AND ser_data[1] == "=") THEN 'channel
+        i=2
+        GOSUB convertInputData
+        GOSUB saveChannel
+        GOSUB commonSettings
+    elseif ((ser_data[0] == "P" OR ser_data[0] == "p") AND ser_data[1] == "=") THEN 'password
+        GOSUB savePwd
+        GOSUB commonSettings
+    elseif ((ser_data[0] == "A" OR ser_data[0] == "a") AND ser_data[1] == "=") THEN 'add device
+        i=2
+        GOSUB convertInputData
+        if (temp_byte != 0) then
+            gosub addNewDevice
+        else
+            gosub printError
+        endif
+    elseif ((ser_data[0] == "S" OR ser_data[0] == "s")) THEN 'print config
+        GOSUB printConfig
+    else
+        i=0
+        gosub convertInputData
+        if (temp_byte == "a") then
+            gosub printError
+        elseif (ser_data[i] != "=") then
+            gosub printError
+        else
+            ser_data[0] = temp_byte
+            for j = 1 to payloadLength
+                ser_data[j]=ser_data[i + 1]
+                if ser_data[j] == 10 then endCycleS
+                i = i + 1
+            next j
+            :endCycleS
+        GOSUB commonRXTX
+        gosub debounce
+        GOSUB sendData
+        gosub debounce
+        endif
+    endif
+    GOTO Main_rx:
+endif
+If Irq !=0 then irqLoop 'wait until IRQ, active low
+' high led 'debug led
+Ce=0
+lop:
+data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
+num_byte=payloadLength
+gosub spi_read
+HSEROUT["+", DEC data_in[1], " "]
+for w=2 to payloadLength
+    HSEROUT[data_in[w]]
+    if (data_in[w]) == 10 then goto contInRcv
+next w
+contInRcv:
+data_out[0]=Fifo_status 'Read FIFO status
+num_byte=1
+gosub spi_read
+val= data_in[1] 'FIFO status register
+if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
+endRx:
+data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
+data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
+num_byte=1
+gosub spi_write
+GOTO Main_rx
+end
+
+disable
+intManagement:
+        if (INTCON.2 == 1) then
+           ticks = ticks + 1      ' Count pieces of seconds
+           If ticks < 31 Then tiexit
+           ticks = 0
+           seconds = seconds + 1
+           if seconds <= 58 then tiexit
+           seconds = 0
+           minutes = minutes + 1
+           tiexit: 
+           INTCON.2 = 0
+        else 
+            if (PIR1.5 == 1) then
+                 if (manageSerial == 1) then mainInt
+                 if (RCSTA.2 == 1) then
+                    hserin[temp_byte_int]
+                 endif
+                 HSERIN 100, mainInt, [wait ("AT+"), STR ser_data\payloadLength\10]
+                 manageSerial = 1
+                 :mainInt
+            ENDIF
+        endif
+        INTCON.7 = 1
+resume
+enable
+
+cleanSerialPort:
+    while (PIR1.5==1) 
+        hserin [temp_byte]
+    wend
+return
+
+commonRXTX:
+data_out[0]=Write_reg+Rx_addr_p0 'Rx address for pipe0
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
+num_byte=5
+gosub spi_write
+data_out[0]=Write_reg+En_aa 'enable auto ACK pipe0
+data_out[1]=$01 '1 enable, 0 disable
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+En_rxaddr 'enable Rx address pipe0
+data_out[1]=$01
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+Rf_ch 'Set RF channel
+READ 0, data_out[1] 'number of channel used
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+Rx_pw_p0 'Set Rx pload width pipe0
+data_out[1]=payloadLength 'number of bytes used in data sent
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm, 1Mbps
+data_out[1]=%00110111
+num_byte=1
+gosub spi_write
+' configure bank 1
+temp_byte = 1
+gosub setBank
+temp_byte = 0 : temp1_byte = $40 : temp2_byte = $4B : temp3_byte = $01 : temp4_byte = $E2
+gosub conf4bytes
+temp_byte = 1 : temp1_byte = $C0 : temp2_byte = $4B : temp3_byte = $00 : temp4_byte = $00
+gosub conf4bytes
+temp_byte = 2 : temp1_byte = $D0 : temp2_byte = $FC : temp3_byte = $8C : temp4_byte = $02
+gosub conf4bytes
+temp_byte = 3 : temp1_byte = $99 : temp2_byte = $00 : temp3_byte = $39 : temp4_byte = $41
+gosub conf4bytes
+temp_byte = 4 : temp1_byte = $B9 : temp2_byte = $9E : temp3_byte = $86 : temp4_byte = $0B
+gosub conf4bytes
+temp_byte = 5 : temp1_byte = $24 : temp2_byte = $06 : temp3_byte = $7F : temp4_byte = $A6
+gosub conf4bytes
+for k = 6 TO 11
+    temp_byte = k : temp1_byte = $00 : temp2_byte = $00 : temp3_byte = $00 : temp4_byte = $00
+    gosub conf4bytes
+next k
+temp_byte = 12 : temp1_byte = $00 : temp2_byte = $12 : temp3_byte = $73 : temp4_byte = $00
+gosub conf4bytes
+temp_byte = 13 : temp1_byte = $36 : temp2_byte = $b4 : temp3_byte = $80 : temp4_byte = $00
+gosub conf4bytes
+data_out[0]=Write_reg+$0E
+data_out[1]=$41
+data_out[2]=$20
+data_out[3]=$08
+data_out[4]=$04
+data_out[5]=$81
+data_out[6]=$20
+data_out[7]=$CF
+data_out[8]=$F7
+data_out[9]=$FE
+data_out[10]=$FF
+data_out[11]=$FF
+num_byte=11
+gosub spi_write
+temp_byte = 0
+gosub setBank
+return
+
+conf4bytes:
+data_out[0]=Write_reg+temp_byte
+data_out[1]=temp1_byte
+data_out[2]=temp2_byte
+data_out[3]=temp3_byte
+data_out[4]=temp4_byte
+num_byte=4
+gosub spi_write
+return
+
+setBank:
+data_out[0]=Read_reg+$07
+num_byte=1
+gosub spi_read
+if (temp_byte != (data_in[0] & $80)) then
+    'not good bank used switch it
+    data_out[0]=$50
+    data_out[1]=$53    
+    num_byte=1
+    gosub spi_write
+endif
+return
+
+sendData:
+pause 2
+gosub debounce
+data_out[0]=Flush_tx 'flush TX_fifo buffer
+num_byte=0
+gosub spi_write
+data_out[0]=Write_reg+Stat_us 'reset IRQ bits
+data_out[1]=%00110000
+num_byte=1
+gosub spi_write
+gosub setup_tx 'setup Tx
+data_out[0]=Wr_tx_pload 'put 32 bytes data in Tx pload buffer
+for w = 1 to payloadLength
+    data_out[w]=ser_data[w-1]
+    if data_out[w] == 10 then contSendX1
+next w
+:contSendX1
+num_byte=payloadLength
+gosub spi_write
+pauseus 500 'pause 500 us
+Ce=1 'CE=1 (toggle) transmit FIFO buffer
+Pauseus 500 'pause 500 us
+Ce=0
+Pause 10
+trans_irq:
+If Irq !=0 then trans_irq 'wait until IRQ, active low
+data_out[0]=Stat_us 'read status register
+num_byte=1
+gosub spi_read
+val=data_in[0]&%01110000 'mask the IRQ bits STATUS byte
+if (val = Max_rt) then gosub max_retry 'maximum TX retries
+if (val = Tx_inter) then gosub tx_int 'Tx interrupted
+data_out[0]=Write_reg+Stat_us
+data_out[1]=%00100000 'clear TX_DS IRQ bit
+num_byte=1
+gosub spi_write
+pause 2
+gosub debounce
+return
+
+'============Subroutines========================================================
+printError:
+    HSEROUT["ERROR",10]
+return
+
+printOK:
+    HSEROUT["OK",10]
+return
+
+writeEeprom:
+for ei = 0 to 10
+    WRITE EEPROMPOSITION, EEPROMBYTE
+    READ EEPROMPOSITION, EEPROMBYTEREAD
+    if (EEPROMBYTE == EEPROMBYTEREAD) then RETURN 
+next ei
+RETURN
+
+debounce:
+Ce=0
+pauseus 500
+Ce=1
+pauseus 500
+Ce=0
+pauseus 500
+return
+
+spi_write:
+CSN=0
+For w = 0 to num_byte 'loop for # byte
+SSPBUF=data_out[w] 'send array variable
+GoSub buffer_ok 'wait until buffer ready
+Next w 'next location
+CSN=1
+return
+
+spi_read:
+CSN=0
+For w = 0 to num_byte 'loop for # byte
+SSPBUF = data_out[0] 'write to SSPBUF to start clock
+GoSub buffer_ok 'wait for receipt
+data_in[w] = SSPBUF 'store received character in array
+Next w 'get next byte
+CSN=1
+Return
+buffer_ok:
+IF SSPIF = 0 Then buffer_ok 'wait for SPI interupt flag
+SSPIF = 0 'reset flag
+Return
+
+max_retry:
+data_out[0]=Flush_tx 'flush TX buffer
+num_byte=0
+gosub spi_write
+data_out[0]=Write_reg+Stat_us
+data_out[1]=%00010000 'clear MAX_RT IRQ bit
+num_byte=1
+gosub spi_write
+return
+
+tx_int:
+data_out[0]=Flush_tx 'flush TX buffer
+num_byte=0
+gosub spi_write
+data_out[0]=Write_reg+Stat_us
+data_out[1]=%00110000 'clear TX_DS & MAX_RT IRQ bit
+num_byte=1
+gosub spi_write
+return
+
+setup_rx:
+data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
+data_out[1]=$0F
+num_byte=1
+gosub spi_write
+return
+
+setup_tx:
+data_out[0]=Write_reg+Tx_addr 'Tx address
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
+num_byte=5
+gosub spi_write
+data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
+data_out[1]= 10 '3x re-transmit (default)
+num_byte=1
+Gosub spi_write
+data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled
+data_out[1]=$0E
+num_byte=1
+gosub spi_write
+return
+
+convertInputData:
+    TEMP_BYTE="a"
+    for k=0 to 2    
+        TEMP1_BYTE = "a"
+        TEMP2_BYTE = ser_data[i]
+        if (TEMP2_BYTE == "|") then return
+        GOSUB lookupChar
+        if (TEMP1_BYTE == "a") then return 
+        if (k==0) then 
+            TEMP_BYTE = TEMP1_BYTE 
+        else 
+            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE 
+        endif
+        i = i + 1
+    next k
+return
+
+lookupChar:
+    LOOKDOWN temp2_byte,["0123456789"], temp1_byte
+RETURN
+
+saveChannel:
+    if (temp_byte == "a") then
+        gosub printError
+        return
+    endif
+    EEPROMPOSITION = 0
+    EEPROMBYTE = temp_byte
+    GOSUB writeEeprom
+    gosub printOK
+return
+
+savePwd:
+    for k=2 to 6
+        if (ser_data[k] == 0) then 
+            GOSUB printError
+            return
+        endif
+    next k
+    if (ser_data[7] == 0) then    
+        for k=2 to 6
+            EEPROMPOSITION = k-1
+            EEPROMBYTE = ser_data[k]
+            GOSUB writeEeprom
+        next k
+        gosub printOK
+    else 
+        gosub printError
+    endif
+return
+
+addNewDevice:
+read 0, TEMP_data[5]
+READ 1, TEMP_data[0]
+READ 2, TEMP_data[1]
+READ 3, TEMP_data[2]
+READ 4, TEMP_data[3]
+READ 5, TEMP_data[4]
+EEPROMPOSITION = 0
+EEPROMBYTE = 40
+GOSUB writeEeprom
+EEPROMPOSITION = 1
+EEPROMBYTE = "R"
+GOSUB writeEeprom
+EEPROMPOSITION = 2
+EEPROMBYTE = "O"
+GOSUB writeEeprom
+EEPROMPOSITION = 3
+EEPROMBYTE = "B"
+GOSUB writeEeprom
+EEPROMPOSITION = 4
+EEPROMBYTE = "I"
+GOSUB writeEeprom
+EEPROMPOSITION = 5
+EEPROMBYTE = "K"
+GOSUB writeEeprom
+'send channel, password, deviceId
+ser_data[0] = 0
+ser_data[1] = "c"
+ser_data[2] = "="
+ser_data[3] = TEMP_data[0] 'password
+ser_data[4] = TEMP_data[1]
+ser_data[5] = TEMP_data[2]
+ser_data[6] = TEMP_data[3]
+ser_data[7] = TEMP_data[4]
+ser_data[8] = TEMP_data[5] 'channel
+ser_data[9] = temp_byte 'deviceId
+GOSUB commonRXTX
+gosub debounce
+gosub sendData
+gosub debounce
+'restore the original value
+EEPROMPOSITION = 0
+EEPROMBYTE = TEMP_data[5]
+GOSUB writeEeprom
+EEPROMPOSITION = 1
+EEPROMBYTE = TEMP_data[0]
+GOSUB writeEeprom
+EEPROMPOSITION = 2
+EEPROMBYTE = TEMP_data[1]
+GOSUB writeEeprom
+EEPROMPOSITION = 3
+EEPROMBYTE = TEMP_data[2]
+GOSUB writeEeprom
+EEPROMPOSITION = 4
+EEPROMBYTE = TEMP_data[3]
+GOSUB writeEeprom
+EEPROMPOSITION = 5
+EEPROMBYTE = TEMP_data[4]
+GOSUB writeEeprom
+GOSUB commonRXTX
+return
+
+printConfig:
+    read 0, temp_byte
+    HSEROUT["+Channel:",DEC temp_byte,10]
+    HSEROUT["+Password:"]
+    read 1, temp_byte
+    HSEROUT[temp_byte]
+    read 2, temp_byte
+    HSEROUT[temp_byte]
+    read 3, temp_byte
+    HSEROUT[temp_byte]
+    read 4, temp_byte
+    HSEROUT[temp_byte]
+    read 5, temp_byte
+    HSEROUT[temp_byte]
+    HSEROUT[10]
+return
+

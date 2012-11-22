@@ -1,0 +1,315 @@
+'-----------variables & settings------------------------------------------------
+SSPEN VAR SSPCON.5 'SSP Enable bit
+CKP VAR SSPCON.4 'Clock Polarity Select
+SMP VAR SSPSTAT.7 'Data input sample phase
+CKE VAR SSPSTAT.6 'Clock Edge Select bit
+SSPIF VAR PIR1.3 'SPI interrupt flag
+Ce var PORTA.2 'CE pin nRF24L01
+CSN VAR PORTC.0 'CSN pin nRF24L01
+Irq VAR PORTC.2 'IRQ pin nRF24L01
+payloadLength con 22
+payloadLengthD con 23
+num_byte var byte 'temp value
+val var byte 'temp value
+Pack_count VAR word 'number of packets sent
+data_out VAR BYTE[payloadLengthD] 'data sent
+data_in var Byte[payloadLengthD] 'data received
+temp_data var byte[payloadLength]
+w var byte
+k VAR byte
+temp_byte_rfm var byte
+temp1_byte_rfm var byte
+temp2_byte_rfm var byte
+temp3_byte_rfm var byte
+temp4_byte_rfm var byte
+device_id var byte
+
+'----------nRF24L01 interrupt flags---------------------------------------------
+Idle_int con $00 'Idle no interrupt pending
+Max_rt con $10 'Max # of Tx retrans interrupt
+Tx_inter con $30 'Tx interrupted
+Rx_ds con $40 'Rx data received
+'----------SPI(nRF24L01) commands-----------------------------------------------
+Read_reg con $00 'def read command to register
+Write_reg CON $20 'def write command to register
+Rd_rx_pload con $61 'def Rx payload register address
+Wr_tx_pload con $A0 'def Tx payload register address
+Flush_tx con $E1 'def flush Tx register command
+Flush_rx con $E2 'def flush Rx register command
+Reuse_tx_pl con $E3 'def reuse Tx payload register command
+Nop_comm con $FF 'def No operation
+'----------SPI(nRF24L01) registers addresses------------------------------------
+Config_nrf con $00 'Config register address
+En_aa con $01 'enable auto acknowledgment register address
+En_rxaddr con $02 'enable RX addresses register address
+Setup_aw con $03 'setup address width register address
+Setup_retr con $04 'setup auto retrans register address
+Rf_ch con $05 'RF channel register address
+Rf_setup con $06 'RF setup register address
+Stat_us con $07 'Status register address
+Observe_tx con $08 'Observe TX register address
+Cd con $09 'Carrier detect register address
+Rx_addr_p0 con $0A 'RX address pipe0 register address
+Rx_addr_p1 con $0B 'RX address pipe1 register address
+Rx_addr_p2 con $0C 'RX address pipe2 register address
+Rx_addr_p3 con $0D 'RX address pipe3 register address
+Rx_addr_p4 con $0E 'RX address pipe4 register address
+Rx_addr_p5 con $0F 'RX address pipe5 register address
+Tx_addr con $10 'TX address register address
+Rx_pw_p0 con $11 'RX payload width pipe0 register address
+Rx_pw_p1 con $12 'RX payload width pipe1 register address
+Rx_pw_p2 con $13 'RX payload width pipe2 register address
+Rx_pw_p3 con $14 'RX payload width pipe3 register address
+Rx_pw_p4 con $15 'RX payload width pipe4 register address
+Rx_pw_p5 con $16 'RX payload width pipe5 register address
+Fifo_status con $17 'FIFO status register register address
+
+goto endRFM70
+initModule:
+pause 500
+'----------SPI settings---------------------------------------------------------
+SSPEN = 1 'enable SPI pins
+SSPCON.0=1 'SPI rate=OSC/16
+CKP = 0 'clock idle low
+CKE = 1 'transmit on active to idle
+SSPIF = 0 'clear buffer full status
+SMP = 0 'sample in middle of data
+'--------------SPI init---------------------------------------------------------
+Ce=1 'init spi pins
+pause 10 'wait 10 ms hardware is stable
+Ce=0 'set CE pin low disable Rx
+CSN=0 'set CSN pin low
+Pack_count=0 'number of packets sent
+return
+
+commonRXTX:
+data_out[0]=Write_reg+Rx_addr_p0 'Rx address for pipe0
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
+num_byte=5
+gosub spi_write
+data_out[0]=Write_reg+En_aa 'enable auto ACK pipe0
+data_out[1]=$01 '1 enable, 0 disable
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+En_rxaddr 'enable Rx address pipe0
+data_out[1]=$01
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+Rf_ch 'Set RF channel
+READ 0, data_out[1] 'number of channel used
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+Rx_pw_p0 'Set Rx pload width pipe0
+data_out[1]=payloadLength 'number of bytes used in data sent
+num_byte=1
+gosub spi_write
+data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm, 1Mbps
+data_out[1]=%00110111
+num_byte=1
+gosub spi_write
+' configure bank 1
+temp_byte_rfm = 1
+gosub setBank
+temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
+gosub conf4bytes
+temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
+gosub conf4bytes
+temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
+gosub conf4bytes
+temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
+gosub conf4bytes
+temp_byte_rfm = 4 : temp1_byte_rfm = $B9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
+gosub conf4bytes
+temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+gosub conf4bytes
+for k = 6 TO 11
+    temp_byte_rfm = k : temp1_byte_rfm = $00 : temp2_byte_rfm = $00 : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
+    gosub conf4bytes
+next k
+temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+gosub conf4bytes
+temp_byte_rfm = 13 : temp1_byte_rfm = $36 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+gosub conf4bytes
+data_out[0]=Write_reg+$0E
+data_out[1]=$41
+data_out[2]=$20
+data_out[3]=$08
+data_out[4]=$04
+data_out[5]=$81
+data_out[6]=$20
+data_out[7]=$CF
+data_out[8]=$F7
+data_out[9]=$FE
+data_out[10]=$FF
+data_out[11]=$FF
+num_byte=11
+gosub spi_write
+temp_byte_rfm = 0
+gosub setBank
+return
+
+setBank:
+data_out[0]=Read_reg+$07
+num_byte=1
+gosub spi_read
+if (temp_byte_rfm != (data_in[0] & $80)) then
+    'not good bank used switch it
+    data_out[0]=$50
+    data_out[1]=$53    
+    num_byte=1
+    gosub spi_write
+endif
+return
+
+conf4bytes:
+data_out[0]=Write_reg+temp_byte_rfm
+data_out[1]=temp1_byte_rfm
+data_out[2]=temp2_byte_rfm
+data_out[3]=temp3_byte_rfm
+data_out[4]=temp4_byte_rfm
+num_byte=4
+gosub spi_write
+return
+
+sendData:
+GOSUB debounce
+pause 2
+gosub debounce
+data_out[0]=Flush_tx 'flush TX_fifo buffer
+num_byte=0
+gosub spi_write
+data_out[0]=Write_reg+Stat_us 'reset IRQ bits
+data_out[1]=%00110000
+num_byte=1
+gosub spi_write
+gosub setup_tx 'setup Tx
+data_out[0]=Wr_tx_pload 'put 10 bytes data in Tx pload buffer
+data_out[1]=device_id
+for w = 2 to payloadLength+2
+    data_out[w]=temp_data[w-2]
+    if data_out[w] == 10 then contSendX1
+next w
+:contSendX1
+num_byte=payloadLength
+gosub spi_write
+pauseus 500 'pause 500 us
+Ce=1 'CE=1 (toggle) transmit FIFO buffer
+Pauseus 500 'pause 500 us
+Ce=0
+Pause 10
+trans_irq:
+If Irq !=0 then trans_irq 'wait until IRQ, active low
+data_out[0]=Stat_us 'read status register
+num_byte=1
+gosub spi_read
+val=data_in[0]&%01110000 'mask the IRQ bits STATUS byte
+if (val = Max_rt) then gosub max_retry 'maximum TX retries
+if (val = Tx_inter) then gosub tx_int 'Tx interrupted
+data_out[0]=Write_reg+Stat_us
+data_out[1]=%00100000 'clear TX_DS IRQ bit
+num_byte=1
+gosub spi_write
+pause 2
+gosub debounce
+pause 2
+GOSUB debounce
+return
+
+'============Subroutines========================================================
+debounce:
+Ce=0
+pauseus 500
+Ce=1
+pauseus 500
+Ce=0
+pauseus 500
+return
+
+spi_write:
+CSN=0
+For w = 0 to num_byte 'loop for # byte
+SSPBUF=data_out[w] 'send array variable
+GoSub buffer_ok 'wait until buffer ready
+Next w 'next location
+CSN=1
+return
+
+spi_read:
+CSN=0
+For w = 0 to num_byte 'loop for # byte
+    SSPBUF = data_out[0] 'write to SSPBUF to start clock
+    GoSub buffer_ok 'wait for receipt
+data_in[w] = SSPBUF 'store received character in array
+Next w 'get next byte
+CSN=1
+Return
+buffer_ok:
+IF SSPIF = 0 Then buffer_ok 'wait for SPI interupt flag
+SSPIF = 0 'reset flag
+Return
+
+max_retry:
+data_out[0]=Flush_tx 'flush TX buffer
+num_byte=0
+gosub spi_write
+data_out[0]=Write_reg+Stat_us
+data_out[1]=%00010000 'clear MAX_RT IRQ bit
+num_byte=1
+gosub spi_write
+return
+
+tx_int:
+data_out[0]=Flush_tx 'flush TX buffer
+num_byte=0
+gosub spi_write
+data_out[0]=Write_reg+Stat_us
+data_out[1]=%00110000 'clear TX_DS & MAX_RT IRQ bit
+num_byte=1
+gosub spi_write
+return
+
+setup_rx:
+pause 2
+gosub debounce
+pause 2
+GOSUB debounce
+data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
+data_out[1]=$0F
+num_byte=1
+gosub spi_write
+pause 2
+gosub debounce
+pause 2
+GOSUB debounce
+return
+
+setup_sleep:
+data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=0, CRC=2, enabled
+data_out[1]=%00001101
+num_byte=1
+gosub spi_write
+return
+
+setup_tx:
+data_out[0]=Write_reg+Tx_addr 'Tx address
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
+num_byte=5
+gosub spi_write
+data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
+data_out[1]= 10 '3x re-transmit (default)
+num_byte=1
+Gosub spi_write
+data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled
+data_out[1]=$0E
+num_byte=1
+gosub spi_write
+return
+:endRFM70
