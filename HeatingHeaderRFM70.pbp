@@ -70,6 +70,7 @@ temp_byte_int var byte
 temp_byte var byte
 temp1_byte var byte
 temp2_byte var byte
+temp3_byte var byte
 temp_word var word
 temperature var word
 seconds  var    byte    ' Define second variable
@@ -141,28 +142,8 @@ if (normalMode == 1) then
       normalMode = 2
        seconds = 0
        ticks = 0
-      'ok send temperature wait for the response 4 seconds and sleep 10 minutes
+      'ok send status wait for the response 2 seconds and sleep sleep_time seconds
       gosub sendTemperature
-      'OK, if the expected temperature is set set the head
-      if (temperatureExp != 0) then
-          if (temperature.11 != 1) then
-             temp_byte = (((temp_data[3]*10) + temp_data[4])*2)
-             if (temp_data[6] > 4) then temp_byte = temp_byte + 1
-             if (temperatureExp > temp_byte) then
-                temp2_byte = temperatureExp - temp_byte
-                if (temp2_byte > 2) then
-                    temp_byte = 100
-                elseif (temp2_byte == 2) then
-                    temp_byte = 50
-                elseif (temp2_byte == 1) then
-                    temp_byte = 20
-                endif
-             else
-                temp_byte = 0
-             endif
-             gosub setValveToPosition                         
-          endif
-      endif
     endif
 endif
 'Check for data to send
@@ -180,6 +161,32 @@ if (temp_data[0] != 0) then
     GOTO main_rx
 endif
 if (normalMode == 3) then
+        'OK, if the expected temperature is set set the head
+        if (temperatureExp != 0) then
+         if (temperature.11 != 1) then                          
+             if (temperatureExp > temp3_byte) then
+                temp2_byte = temperatureExp - temp3_byte
+                if (temp3_byte < 7) then
+                    temp_byte = 0
+                elseif (temp2_byte == 2) then
+                    temp_byte = 50
+                elseif (temp2_byte == 1) then
+                    temp_byte = 80
+                else
+                    temp_byte = 0
+                endif
+             else
+                temp_byte = 100
+             endif
+             gosub setValveToPosition                         
+             sendCurrPosFlag2 = 0
+         else
+            'temperature is minus open the valve
+            temp_byte = 0          
+            gosub setValveToPosition                                 
+            sendCurrPosFlag2 = 0
+         endif
+        endif      
       disable
       INTCON = 0
       PIE1 = 0
@@ -206,6 +213,7 @@ if (configure == 2) then
     gosub adaptHead
     if (errorFlag == 1) then
         errorFlag = 0
+        gosub motorStop
         gosub sendError
     else 
         TEMP_data[1] = "e"
@@ -268,12 +276,12 @@ if (data_in[1] == device_id) then
                 temperatureExp = temp_byte
                 gosub sendDataOK
             endif
-        elseif (data_in[2] == "a") then
+        endif
+    elseif (data_in[2] == "a") then
             if (data_in[3] == "d") then
                 configure = 2
                 gosub sendDataOK
             endif
-        endif
     ELSEif (data_in[2] == "s") then    
             gosub sendTemperature
     elseif (data_in[2] == "p") then
@@ -320,8 +328,8 @@ intManagement:
                 'read adc if motor is running and stop if it's blocked
                 if (motorRunning > 0) then
                     adcin 7, testAnInterrupt
-                    if (testAnInterrupt < ((motorValNoPower / 100)*95)) then
-                        if (motorAnVal > (testAnInterrupt + 500*motorStrengthConstant)) then
+                    if (testAnInterrupt < ((motorValNoPower / 100)*97)) then
+                        if (motorAnVal > (testAnInterrupt + 300*motorStrengthConstant)) then
                             motorAnDownCount = motorAnDownCount + 1
                             if (motorAnDownCount > 1) then
                                 if (motorRunning == 1) then motorFullRangeCurrentTicks = motorFullRangeTicks
@@ -436,7 +444,7 @@ Wait_Up:
    OWOUT HEATING_SENSOR, 1, [$CC, $BE] 'Skip ROM search & read scratchpad memory
    OWIN HEATING_SENSOR, 2, [temperature.Lowbyte, temperature.Highbyte] 'Read two bytes / end comms
    low HEATING_SENSOR_power
-   temp_data[0] = "t"
+   temp_data[0] = "4"
    temp_data[1] = "|"
    if (temperature.11 == 1) then
         temp_data[2] = "-"
@@ -444,18 +452,16 @@ Wait_Up:
         TempC = DIV32 10
         temp_data[3] = (TempC DIG 4) + $30
         temp_data[4] = (TempC DIG 3) + $30
-        temp_data[5] = "."
-        temp_data[6] = (TempC DIG 2) + $30
    else
-        temp_data[2] = "+"
         Dummy = 625 * temperature
         TempC = DIV32 10
         TempC  = (temperature & $0FF0) >> 4 ' Mask middle 8-bits, shift into lower byte
         Float = ((temperature.Lowbyte & $0F) * 625) ' Lower 4-bits of result * 625
-        temp_data[3] = (TempC DIG 1) + $30
-        temp_data[4] = (TempC DIG 0) + $30
-        temp_data[5] = "."
-        temp_data[6] = (Float DIG 3) + $30
+        temp_data[2] = (TempC DIG 1) + $30
+        temp_data[3] = (TempC DIG 0) + $30
+        temp_data[4] = (Float DIG 3) + $30
+        temp3_byte = TempC.lowbyte * 2
+        if (temp_data[4] > 4) then temp3_byte = temp3_byte + 1
    endif
         'read baterry        
         VRCON.4 = 1 ; Turn 0.6V reference ON
@@ -463,22 +469,35 @@ Wait_Up:
         ADCIN 13, temp_word ; get VP6 analog reading (10-bit)
         VRCON.4 = 0 ; Turn 0.6V reference OFF
         VDD = 6138 / temp_word ; convert to voltage ve vdd je 25 = 2,5 V        
-        temp_data[7] = "|"
-        temp_data[8] = (VDD DIG 1) + $30
-        temp_data[9] = "."
-        temp_data[10] = (VDD DIG 0) + $30
-        i = 11
+        temp_data[5] = "|"
+        temp_data[6] = (VDD DIG 1) + $30
+        temp_data[7] = (VDD DIG 0) + $30
+        temp_data[8] = "|"
+        read 9, temp_byte
+        i=9
+        gosub printByteToTempByte
+        temp_data[12] = "|"
+        i=12
+        temp_byte = temperatureExp
+        gosub print2LastBytesToTempByte
+        i=15
         gosub printFullRangeTicks
 return
 
 printFullRangeTicks:
         temp_data[i] = "|"
         temp_byte = (motorFullRangeCurrentTicks * 10) / (motorFullRangeTicks / 10)
-        temp_data[i+1] = (temp_byte DIG 2) + $30
-        temp_data[i+2] = (temp_byte DIG 1) + $30
-        temp_data[i+3] = (temp_byte DIG 0) + $30
-        temp_data[i+4] = 13
-        temp_data[i+5] = 10
+        i=i+1
+        gosub printByteToTempByte
+        temp_data[i+3] = 13
+        temp_data[i+4] = 10
+return
+
+printByteToTempByte:        
+        temp_data[i] = (temp_byte DIG 2) + $30
+print2LastBytesToTempByte:
+        temp_data[i+1] = (temp_byte DIG 1) + $30
+        temp_data[i+2] = (temp_byte DIG 0) + $30
 return
 
 MotorOpenHead:

@@ -8,7 +8,7 @@ Ce var PORTA.2 'CE pin nRF24L01
 CSN VAR PORTC.0 'CSN pin nRF24L01
 Irq VAR PORTC.2 'IRQ pin nRF24L01
 payloadLength con 22
-payloadLengthD con 23
+payloadLengthD con 24
 num_byte var byte 'temp value
 val var byte 'temp value
 Pack_count VAR word 'number of packets sent
@@ -189,7 +189,7 @@ gosub spi_write
 gosub setup_tx 'setup Tx
 data_out[0]=Wr_tx_pload 'put 10 bytes data in Tx pload buffer
 data_out[1]=device_id
-for w = 2 to payloadLength+2
+for w = 2 to payloadLength+1
     data_out[w]=temp_data[w-2]
     if data_out[w] == 10 then contSendX1
 next w

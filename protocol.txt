@@ -64,6 +64,36 @@ s - return status 3|light|power|configuredTimeout|currentTimeout
 	currentTimeout - current light 1 timeout in minutes, 0 - never switch off
 
 
+Heating header
+
+pn - check weather the device is up and runing (ping command)
+ad - adaptation of the header. Each valve has different ranges of the open / close borders. This command will measure the time between the close / open and
+    adapt the header to the valve. It needs to be run at the begining and then each two weeks.
+s - return status 4|temperature|battery|frequency|expected temperature|openAngle
+	temperature format - 3 decimals degree celsius, e.g 233 = 23.3 or -23 = -23 or 022 = 2.2
+	battery voltage e.g. 29 = 2.9 or 30 3.0. Below 2.8, the hardware starts to work not correctly.
+	frequency - frequency in seconds to send status. Longer value, longer battery life
+	expected temperature - the value set with command t: 23.5 celsius = 47, or 17 celsius = 34
+	openAngle - Current open angle in % 100 - means close, 0 means fully open
+m=nnn - set the frequency and put to the sleep mode. 1 means 10 seconds, 255 means 2550 seconds. Needs to be set to put the device to sleep mode!!!
+	If not set, or set to 0, then no sleep - usefull for testing and configuration, but consume lot of power and batery will be quicly empty.
+t=nnn - Expected temperature - if set, the header is running in self managed mode - each frequency period checks the current temperature, and if it is lower, open the
+    valve and then sleep another period. The value is temperature * 2, it means, that 23.5 celsius = 47, or 17 celsius = 34.
+    If it is set to 0, then valve is operated manually: each frequency period the valve send status, then you have 2 seconds to send l command to set the open angle of the valve.
+l=nnn Set manually the valve to expected position allowed range is 100 closed, 0 fully open.
+
+    Asynchronous messages: As - adaptation start, Ae - adaptation end, l|nnn after the valve is moved to correct position, the actual current position is sent. 
+        
+    Quick startup:
+    1. Insert battery
+    2. Test the communication AT+0=pn<ENTER>
+    3. Assign the device ID: AT+a=9<ENTER>  Id is 9. Adaptation start. As is printed after while Ae is printed with the Valve position 100 - fully closed
+    
+    Self managed mode                                                                       Manual mode
+    4. AT+9=t=45<ENTER> set temperature in room to 22,5 celsius                             AT+9=t=0<ENTER> manual mode, temperature is 0
+    5. AT+m=60<ENTER>    sleep 10 minutes                                                   AT+m=60<ENTER>    sleep 10 minutes
+    After 10 minutes the status is sent, you have to answer after the valve is set l|100    After 10 minutes the status is sent, sent back the new position
+    6. AT+t=34<ENTER> Lower the temperature for the night                                   AT+l=50<ENTER> Opened 50 percent.
 
 raspberry setup:
 
