@@ -178,13 +178,11 @@ if (normalMode == 3) then
              else
                 temp_byte = 100
              endif
-             gosub setValveToPosition                         
-             sendCurrPosFlag2 = 0
+             gosub setValveBeforeSleep
          else
             'temperature is minus open the valve
             temp_byte = 0          
-            gosub setValveToPosition                                 
-            sendCurrPosFlag2 = 0
+            gosub setValveBeforeSleep
          endif
         endif      
       disable
@@ -382,6 +380,17 @@ setValveToPosition:
       else
           sendCurrPosFlag2 = 1
       endif
+return
+
+setValveBeforeSleep:
+             gosub setValveToPosition
+             backRun:
+             if (motorRunning > 0) then backRun
+             gosub sendCurrentPosition
+             gosub sendData
+             TEMP_data[0] = 0
+             sendCurrPosFlag2 = 0
+
 return
 
 sendCurrentPosition:
