@@ -55,8 +55,9 @@ EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
 ticks   var     byte    ' Define pieces of seconds variable
-l1counter var byte
+counter var byte
 conversionSuccess VAR BYTE
+timeout_value var byte
 
 clear
 input RES
@@ -75,14 +76,8 @@ if 0 == 1 then
     END
 endif
 READ 6, device_id
-read 7, temp_byte
-if (temp_byte == 0) then 
-    high relay
-else
-    low relay
-endif
+read 7, timeout_value
 gosub initModule
-
 commonSettings:
 gosub commonRXTX
 
@@ -125,64 +120,40 @@ if (data_in[1] == device_id) then
             configure = 1
             gosub sendDataOK
         endif
-    elseif (data_in[2] == "l") then
-        if (data_in[3] == "1") then
-            if (data_in[4] == "c") then
-                if (data_in[5] == "o") then
-                    write 7, 0
-                    gosub sendDataOK
-                endif
-                if (data_in[5] == "f") then
-                    write 7, 1
-                    gosub sendDataOK
-                endif
-                if (data_in[5] == "t") then
-                    if (data_in[6] == "=") then
-                        i = 7
-                        gosub convertInputData
-                        if (conversionSuccess == 1) then
-                            write 8, temp_byte
-                            gosub sendDataOK
-                        endif
-                    endif
-                endif                
-            elseif (data_in[4] == "o") then
-                if (data_in[5] == "f") then
-                    seconds = 0
-                    read 8, l1counter
-                    high relay
-                    gosub sendDataOK
-                else
-                    high relay
-                    l1counter = 0
-                    gosub sendDataOK
-                endif
-            elseif (data_in[4] == "f") then
-                LOW relay
-                gosub sendDataOK
+    elseif (data_in[2] == "b") then
+        if (data_in[3] == "t") then
+            if (data_in[4] == "=") then
+                i = 5
+                gosub convertInputData
+                if (conversionSuccess == 1) then
+                     write 7, temp_byte
+                     timeout_value = temp_byte
+                     gosub sendDataOK
+                endif                                   
             endif
+        endif    
+    elseif (data_in[2] == "b") then
+        if (data_in[3] == "d") then
+            counter = timeout_value
+            gosub blindsDown
+        elseif (data_in[3] == "u") then
+            counter = timeout_value
+            gosub blindsup            
         endif
     elseif (data_in[2] == "s") then
-            temp_data[0] = "3"
+            temp_data[0] = "5"
             temp_data[1] = "|"
-            temp_data[2] = RELAY + $30
+            temp_data[2] = RELAY_DOWN + $30
             temp_data[3] = "|"
-            read 7, temp_data[4]
-            temp_data[4] = temp_data[4] + $30        
-            temp_data[5] = "|"
-            read 8, temp_byte
+            temp_data[4] = RELAY_UP + $30
+            temp_data[5] = "|"            
+            read 7, temp_byte
             gosub convertNoToStr
             temp_data[6] = temp3_byte
             temp_data[7] = temp2_byte
             temp_data[8] = temp1_byte
-            temp_data[9] = "|"
-            temp_byte = l1counter
-            gosub convertNoToStr
-            temp_data[10] = temp3_byte
-            temp_data[11] = temp2_byte
-            temp_data[12] = temp1_byte
-            temp_data[13] = 13    
-            temp_data[14] = 10    
+            temp_data[9] = 13    
+            temp_data[10] = 10    
     elseif (data_in[2] == "p") then
             if (data_in[3] == "n") then
                 gosub sendDataOK
@@ -221,10 +192,10 @@ intManagement:
            seconds = seconds + 1
            if seconds <= 58 then tiexit
            seconds = 0
-           if (l1counter > 0) then
-               l1counter = l1counter - 1
-               if (l1counter == 0) then
-                    low relay
+           if (counter > 0) then
+               counter = counter - 1
+               if (counter == 0) then
+                    GOSUB stopBlinds
                endif
            endif           
            tiexit: 
@@ -232,6 +203,25 @@ intManagement:
         INTCON.7 = 1
 resume
 enable
+
+stopBlinds:
+    low RELAY_DOWN
+    low RELAY_UP
+return
+
+blindsUp:
+    gosub stopBlinds
+    pause 100
+    high RELAY_DOWN
+    low RELAY_UP
+return
+
+blindsDown:
+    gosub stopBlinds
+    pause 100
+    LOW RELAY_DOWN
+    HIGH RELAY_UP
+return
 
 sendDataOK:
     temp_data[0] = "O"
