@@ -81,6 +81,9 @@ READ 6, device_id
 read 7, timeout_value
 timeout_value = timeout_value * 30
 gosub initModule
+gosub stopBlindsSilent
+output PORTA.5
+output PORTA.4
 commonSettings:
 gosub commonRXTX
 
@@ -135,15 +138,17 @@ if (data_in[1] == device_id) then
                 endif                                   
             endif
         endif    
-    elseif (data_in[2] == "b") then
         if (data_in[3] == "d") then
-            counter = timeout_value
+            'counter = timeout_value
+            counter = 0
             gosub blindsDown
             currentCounter = 100
+            gosub sendDataOK
         elseif (data_in[3] == "u") then
-            counter = timeout_value
+            counter = 3000
             gosub blindsup            
             currentCounter = 0
+            gosub sendDataOK
         elseif (data_in[3] == "m") then
             if (data_in[4] == "=") then
                 i = 5
@@ -155,11 +160,13 @@ if (data_in[1] == device_id) then
                         gosub computeCounter
                         gosub blindsDown
                         currentCounter = temp_byte
+                        gosub sendDataOK
                     else
                         temp2_byte = currentCounter - temp_byte
                         gosub computeCounter
                         gosub blindsUp
                         currentCounter = temp_byte
+                        gosub sendDataOK
                     endif
                   endif  
                 endif                                                   
@@ -218,15 +225,16 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           if (counter > 0) then
-               counter = counter - 1
-               if (counter == 0) then
-                    GOSUB stopBlinds
-               endif
-           endif           
+           'if (counter > 0) then
+           '    counter = counter - 1
+           '    if (counter == 0) then
+           '         GOSUB stopBlinds
+           '    endif
+           'endif           
            If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
+           if ((seconds //5) == 0) then gosub sendDataOK
            if seconds <= 58 then tiexit
            seconds = 0
            tiexit: 
@@ -241,15 +249,20 @@ stopBlinds:
     gosub sendCurrentPosition
 return
 
+stopBlindsSilent:
+    low RELAY_DOWN
+    low RELAY_UP
+return
+
 blindsUp:
-    gosub stopBlinds
+    gosub stopBlindsSilent
     pause 100
     high RELAY_DOWN
     low RELAY_UP
 return
 
 blindsDown:
-    gosub stopBlinds
+    gosub stopBlindsSilent
     pause 100
     LOW RELAY_DOWN
     HIGH RELAY_UP
