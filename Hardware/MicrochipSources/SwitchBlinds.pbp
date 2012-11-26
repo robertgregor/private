@@ -51,14 +51,16 @@ temp2_byte var byte
 temp3_byte var byte
 temp4_byte var byte
 temp_word var word
+temp2_word var word
+temp3_word var word
 EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
 ticks   var     byte    ' Define pieces of seconds variable
-counter var byte
+counter var word
 conversionSuccess VAR BYTE
-timeout_value var byte
-
+timeout_value var word
+currentCounter var word
 clear
 input RES
 output RELAY_DOWN
@@ -77,6 +79,7 @@ if 0 == 1 then
 endif
 READ 6, device_id
 read 7, timeout_value
+timeout_value = timeout_value * 30
 gosub initModule
 commonSettings:
 gosub commonRXTX
@@ -127,7 +130,7 @@ if (data_in[1] == device_id) then
                 gosub convertInputData
                 if (conversionSuccess == 1) then
                      write 7, temp_byte
-                     timeout_value = temp_byte
+                     timeout_value = temp_byte * 30
                      gosub sendDataOK
                 endif                                   
             endif
@@ -136,9 +139,31 @@ if (data_in[1] == device_id) then
         if (data_in[3] == "d") then
             counter = timeout_value
             gosub blindsDown
+            currentCounter = 100
         elseif (data_in[3] == "u") then
             counter = timeout_value
             gosub blindsup            
+            currentCounter = 0
+        elseif (data_in[3] == "m") then
+            if (data_in[4] == "=") then
+                i = 5
+                gosub convertInputData
+                if (conversionSuccess == 1) then
+                  if (temp_byte < 101) then
+                    if (temp_byte > currentCounter) then
+                        temp2_byte = temp_byte - currentCounter
+                        gosub computeCounter
+                        gosub blindsDown
+                        currentCounter = temp_byte
+                    else
+                        temp2_byte = currentCounter - temp_byte
+                        gosub computeCounter
+                        gosub blindsUp
+                        currentCounter = temp_byte
+                    endif
+                  endif  
+                endif                                                   
+            endif
         endif
     elseif (data_in[2] == "s") then
             temp_data[0] = "5"
@@ -147,13 +172,19 @@ if (data_in[1] == device_id) then
             temp_data[3] = "|"
             temp_data[4] = RELAY_UP + $30
             temp_data[5] = "|"            
-            read 7, temp_byte
+            temp_byte = timeout_value / 30
             gosub convertNoToStr
             temp_data[6] = temp3_byte
             temp_data[7] = temp2_byte
             temp_data[8] = temp1_byte
-            temp_data[9] = 13    
-            temp_data[10] = 10    
+            temp_data[9] = "|"            
+            temp_byte = currentCounter
+            gosub convertNoToStr
+            temp_data[10] = temp3_byte
+            temp_data[11] = temp2_byte
+            temp_data[12] = temp1_byte
+            temp_data[13] = 13    
+            temp_data[14] = 10    
     elseif (data_in[2] == "p") then
             if (data_in[3] == "n") then
                 gosub sendDataOK
@@ -187,17 +218,17 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           If ticks < 31 Then tiexit
-           ticks = 0
-           seconds = seconds + 1
-           if seconds <= 58 then tiexit
-           seconds = 0
            if (counter > 0) then
                counter = counter - 1
                if (counter == 0) then
                     GOSUB stopBlinds
                endif
            endif           
+           If ticks < 31 Then tiexit
+           ticks = 0
+           seconds = seconds + 1
+           if seconds <= 58 then tiexit
+           seconds = 0
            tiexit: 
         endif
         INTCON.7 = 1
@@ -207,6 +238,7 @@ enable
 stopBlinds:
     low RELAY_DOWN
     low RELAY_UP
+    gosub sendCurrentPosition
 return
 
 blindsUp:
@@ -228,6 +260,18 @@ sendDataOK:
     temp_data[1] = "K"
     temp_data[2] = 13
     temp_data[3] = 10
+return
+
+sendCurrentPosition:
+    temp_data[0] = "l"
+    temp_data[1] = "|"
+    temp_byte = currentCounter
+    gosub convertNoToStr
+    temp_data[2] = temp3_byte
+    temp_data[3] = temp2_byte
+    temp_data[4] = temp1_byte
+    temp_data[5] = 13
+    temp_data[6] = 10
 return
 
 convertInputData:
@@ -260,3 +304,9 @@ convertNoToStr:
         temp1_byte = (temp_byte DIG 0) + $30
 return
 
+computeCounter:
+    disable
+    temp_word = timeout_value * temp2_byte
+    counter = div32 100
+    enable
+return

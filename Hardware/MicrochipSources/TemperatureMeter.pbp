@@ -262,8 +262,10 @@ Wait_Up:
    temp_data[1] = "|"
    if (temperature.11 = 1) then
         temp_data[2] = "-"
+        disable
         Dummy = 625 * (~temperature+1)
         TempC = DIV32 10
+        enable
         temp_data[3] = (TempC DIG 4) + $30
         temp_data[4] = (TempC DIG 3) + $30
         temp_data[5] = "."
@@ -271,8 +273,10 @@ Wait_Up:
         temp_data[7] = (TempC DIG 1) + $30
    else
         temp_data[2] = "+"
+        disable
         Dummy = 625 * temperature
         TempC = DIV32 10
+        enable
         TempC  = (temperature & $0FF0) >> 4 ' Mask middle 8-bits, shift into lower byte
         Float = ((temperature.Lowbyte & $0F) * 625) ' Lower 4-bits of result * 625
         temp_data[3] = (TempC DIG 1) + $30
