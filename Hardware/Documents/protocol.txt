@@ -95,6 +95,32 @@ l=nnn Set manually the valve to expected position allowed range is 100 closed, 0
     After 10 minutes the status is sent, you have to answer after the valve is set l|100    After 10 minutes the status is sent, sent back the new position
     6. AT+t=34<ENTER> Lower the temperature for the night                                   AT+l=50<ENTER> Opened 50 percent.
 
+Blinds controller
+
+pn - check weather the device is up and runing (ping command)
+s - return status 5|down|up|timeout value|current opening
+	down - 1 if currently moving down
+	up - 1 if currently moving up
+	timeout value - number of configured timeout in sec. This value is the 100 % time to open the blinds
+	current opening - Blinds opening in %. 0 means fully open, 100 means fully closed. In manual mode always 0.
+
+Position managed mode:
+
+bt=nnn - configure number of seconds, when the blind is moving fully from open position to closed position.
+bu - blinds up moving to fully open position
+bd - blinds down moving to fully closed position
+bs - blinds stop stop movements
+bm=nnn - Move to the nnn position. nnn is the percentage between open and close. 0 - fully open, 100 - fully closed
+
+Asynchronous messages: l|nnn percentage of opening.
+
+Manual mode:
+
+u - start to move up
+d - start to move down
+e - stop to move
+
+
 raspberry setup:
 
 Edit /boot/cmdline.txt
