@@ -10,8 +10,7 @@
 'EEPROM_MAP
 '0 - channel number
 '1,2,3,4,5 bank name
-'6 - device_id
-'7 timeout
+'6 device id
 
 EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
 
@@ -37,9 +36,9 @@ TRISA = %00000000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input, 
 
-RES var PORTC.1
 RELAY_DOWN VAR PORTA.5
 RELAY_UP VAR PORTA.4
+
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
@@ -49,7 +48,6 @@ temp_byte var byte
 temp1_byte var byte
 temp2_byte var byte
 temp3_byte var byte
-temp4_byte var byte
 temp_word var word
 temp2_word var word
 temp3_word var word
@@ -58,13 +56,19 @@ EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
 ticks   var     byte    ' Define pieces of seconds variable
 counter var word
+initialCounter var word
+initialPercent var byte
 conversionSuccess VAR BYTE
 timeout_value var word
-currentCounter var word
+currentCounter var byte
+currentDirection var byte
+
 clear
-input RES
-output RELAY_DOWN
-output RELAY_UP
+read 6, device_id
+read 7, timeout_value
+timeout_value = timeout_value * 30
+
+
 if 0 == 1 then
     write 0, 40
     write 1, "R"
@@ -74,16 +78,13 @@ if 0 == 1 then
     write 5, "K"
     write 6, 0
     write 7, 0
-    write 8, 0
     END
 endif
-READ 6, device_id
-read 7, timeout_value
-timeout_value = timeout_value * 30
-gosub initModule
-gosub stopBlindsSilent
+
 output PORTA.5
 output PORTA.4
+gosub initModule
+
 commonSettings:
 gosub commonRXTX
 
@@ -121,8 +122,8 @@ if (data_in[1] == device_id) then
             write 4, data_in[7] 'password 3
             write 5, data_in[8] 'password 4
             write 6, data_in[10]'device id
-            pause 10
             device_id = data_in[10]
+            pause 10
             configure = 1
             gosub sendDataOK
         endif
@@ -137,16 +138,20 @@ if (data_in[1] == device_id) then
                      gosub sendDataOK
                 endif                                   
             endif
-        endif    
-        if (data_in[3] == "d") then
-            'counter = timeout_value
-            counter = 0
+        elseif (timeout_value == 0) then
+            'timeout not set send error
+        elseif (data_in[3] == "d") then
+            counter = timeout_value
+            initialcounter = counter
             gosub blindsDown
+            initialPercent = currentCounter
             currentCounter = 100
             gosub sendDataOK
         elseif (data_in[3] == "u") then
-            counter = 3000
-            gosub blindsup            
+            counter = timeout_value
+            initialCounter = counter
+            gosub blindsup
+            initialPercent = currentCounter            
             currentCounter = 0
             gosub sendDataOK
         elseif (data_in[3] == "m") then
@@ -155,21 +160,52 @@ if (data_in[1] == device_id) then
                 gosub convertInputData
                 if (conversionSuccess == 1) then
                   if (temp_byte < 101) then
-                    if (temp_byte > currentCounter) then
+                    if (temp_byte == currentCounter) then
+                        gosub sendDataOK
+                        counter = 4
+                    elseif (temp_byte > currentCounter) then
                         temp2_byte = temp_byte - currentCounter
+                        initialPercent = currentCounter
                         gosub computeCounter
+                        initialCounter = counter
                         gosub blindsDown
                         currentCounter = temp_byte
                         gosub sendDataOK
                     else
                         temp2_byte = currentCounter - temp_byte
+                        initialPercent = currentCounter
                         gosub computeCounter
+                        initialCounter = counter
                         gosub blindsUp
                         currentCounter = temp_byte
                         gosub sendDataOK
                     endif
                   endif  
                 endif                                                   
+            endif
+        elseif (data_in[3] == "s") then
+            if (currentDirection != 0) then
+                temp_word = initialCounter - counter
+                disable
+                temp_word = temp_word * 100
+                temp2_word = DIV32 timeout_value
+                enable
+                if (currentDirection == 1) then
+                    temp3_word = initialPercent + temp2_word
+                    if (temp3_word > 100 ) then temp3_word = 100
+                    currentCounter = temp3_word
+                elseif (currentDirection == 2) then
+                    if (initialPercent > temp2_word) then
+                        currentCounter = initialPercent - temp2_word
+                    else
+                        currentCounter = 0
+                    endif
+                endif
+                gosub sendDataOK
+                counter = 4
+            else
+                gosub sendDataOK            
+                counter = 4
             endif
         endif
     elseif (data_in[2] == "s") then
@@ -196,6 +232,15 @@ if (data_in[1] == device_id) then
             if (data_in[3] == "n") then
                 gosub sendDataOK
             endif
+    elseif (data_in[2] == "u") then
+        gosub blindsUp
+        gosub sendDataOK        
+    elseif (data_in[2] == "d") then
+        gosub blindsDown
+        gosub sendDataOK
+    elseif (data_in[2] == "e") then
+        gosub stopBlindsSilent
+        gosub sendDataOK
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"
@@ -203,8 +248,7 @@ if (data_in[1] == device_id) then
         temp_data[2] = "R"
         temp_data[3] = "O"
         temp_data[4] = "R"
-        temp_data[5] = 13
-        temp_data[6] = 10
+        temp_data[5] = 10
     endif
 endif
 
@@ -225,19 +269,19 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           'if (counter > 0) then
-           '    counter = counter - 1
-           '    if (counter == 0) then
-           '         GOSUB stopBlinds
-           '    endif
-           'endif           
+           if (counter > 0) then
+               counter = counter - 1
+               if (counter == 0) then
+                    GOSUB stopBlinds
+               endif
+           endif
            If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
-           if ((seconds //5) == 0) then gosub sendDataOK
            if seconds <= 58 then tiexit
            seconds = 0
            tiexit: 
+           INTCON.2 = 0
         endif
         INTCON.7 = 1
 resume
@@ -247,11 +291,13 @@ stopBlinds:
     low RELAY_DOWN
     low RELAY_UP
     gosub sendCurrentPosition
+    currentDirection = 0
 return
 
 stopBlindsSilent:
     low RELAY_DOWN
     low RELAY_UP
+    currentDirection = 0
 return
 
 blindsUp:
@@ -259,6 +305,7 @@ blindsUp:
     pause 100
     high RELAY_DOWN
     low RELAY_UP
+    currentDirection = 2
 return
 
 blindsDown:
@@ -266,13 +313,7 @@ blindsDown:
     pause 100
     LOW RELAY_DOWN
     HIGH RELAY_UP
-return
-
-sendDataOK:
-    temp_data[0] = "O"
-    temp_data[1] = "K"
-    temp_data[2] = 13
-    temp_data[3] = 10
+    currentDirection = 1
 return
 
 sendCurrentPosition:
@@ -285,6 +326,19 @@ sendCurrentPosition:
     temp_data[4] = temp1_byte
     temp_data[5] = 13
     temp_data[6] = 10
+return
+
+computeCounter:
+    disable
+    temp_word = timeout_value * temp2_byte
+    counter = div32 100
+    enable
+return
+
+sendDataOK:
+    temp_data[0] = "O"
+    temp_data[1] = "K"
+    temp_data[2] = 10
 return
 
 convertInputData:
@@ -315,11 +369,4 @@ convertNoToStr:
         temp3_byte = (temp_byte DIG 2) + $30
         temp2_byte = (temp_byte DIG 1) + $30
         temp1_byte = (temp_byte DIG 0) + $30
-return
-
-computeCounter:
-    disable
-    temp_word = timeout_value * temp2_byte
-    counter = div32 100
-    enable
 return
