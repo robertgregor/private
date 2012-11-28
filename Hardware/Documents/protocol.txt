@@ -91,9 +91,9 @@ l=nnn Set manually the valve to expected position allowed range is 100 closed, 0
     
     Self managed mode                                                                       Manual mode
     4. AT+9=t=45<ENTER> set temperature in room to 22,5 celsius                             AT+9=t=0<ENTER> manual mode, temperature is 0
-    5. AT+m=60<ENTER>    sleep 10 minutes                                                   AT+m=60<ENTER>    sleep 10 minutes
+    5. AT+9=m=60<ENTER>    sleep 10 minutes                                                   AT+9=m=60<ENTER>    sleep 10 minutes
     After 10 minutes the status is sent, you have to answer after the valve is set l|100    After 10 minutes the status is sent, sent back the new position
-    6. AT+t=34<ENTER> Lower the temperature for the night                                   AT+l=50<ENTER> Opened 50 percent.
+    6. AT+9=t=34<ENTER> Lower the temperature for the night                                   AT+9=l=50<ENTER> Opened 50 percent.
 
 Blinds controller
 
@@ -119,6 +119,77 @@ Manual mode:
 u - start to move up
 d - start to move down
 e - stop to move
+
+
+Battery thermostat
+
+pn - check weather the device is up and runing (ping command)
+s - return status 6|temperature|battery|frequency|expected temperature|relay|treshold
+	temperature format - 3 decimals degree celsius, e.g 233 = 23.3 or -23 = -23 or 022 = 2.2
+	battery voltage e.g. 29 = 2.9 or 30 3.0. Below 2.8, the hardware starts to work not correctly.
+	frequency - frequency in seconds to send status. Longer value, longer battery life
+	expected temperature - the value set with command t: 23.5 celsius = 47, or 17 celsius = 34
+	relay - Current state of the relay 0 - off, 1 on
+	treshold - Current treshold 0 - 9
+m=nnn - set the frequency and put to the sleep mode. 1 means 10 seconds, 255 means 2550 seconds. Needs to be set to put the device to sleep mode!!!
+	If not set, or set to 0, then no sleep - usefull for testing and configuration, but consume lot of power and batery will be quicly empty.
+t=nnn - Expected temperature - if set, the header is running in self managed mode - each frequency period checks the current temperature, and if it is lower, open the
+    valve and then sleep another period. The value is temperature * 2, it means, that 23.5 celsius = 47, or 17 celsius = 34.
+    If it is set to 0, then relay is operated manually: each frequency period the relay send status, then you have 2 seconds to send l command to set the open angle of the valve.
+r=n  -  Treshhold 0 - 9. For the self managed mode, the treshhold could be set. It means that relay will go off when currentTemperature + treshold / 10 > expected temperature and will
+	go on, when currentTemperature - treshold / 10 < expected temperature
+
+        
+    Quick startup:
+    1. Insert battery
+    2. Test the communication AT+0=pn<ENTER>
+    3. Assign the device ID: AT+a=9<ENTER>  Id is 9.
+    
+    Self managed mode                                                                       Manual mode
+    4. AT+9=t=45<ENTER> set temperature in room to 22,5 celsius
+    5. AT+9=r=5<ENTER> set treshold to 0,5 degree celsius                                   AT+9=t=0<ENTER> manual mode, temperature is 0
+    6. AT+9=m=60<ENTER>    sleep 10 minutes                                                 AT+9=m=60<ENTER>    sleep 10 minutes
+    After 10 minutes the status is sent, you have to answer till 2 seconds		    After 10 minutes the status is sent, sent back the position of the relay
+    7. AT+9=t=34<ENTER> Lower the temperature for the night                                 AT+9=o<ENTER> Swith relay on
+
+Manual mode:
+o - start to move up
+f - start to move down
+
+
+Thermostat
+
+pn - check weather the device is up and runing (ping command)
+s - return status 6|temperature|frequency|expected temperature|relay|treshold
+	temperature format - 3 decimals degree celsius, e.g 233 = 23.3 or -23 = -23 or 022 = 2.2
+	frequency - frequency in seconds to send status. Longer value, longer battery life
+	expected temperature - the value set with command t: 23.5 celsius = 47, or 17 celsius = 34
+	relay - Current state of the relay 0 - off, 1 on
+	treshold - Current treshold 0 - 9
+m=nnn - set the frequency of the notifications and relay changes. 1 means 10 seconds, 255 means 2550 seconds.
+	If not set, or set to 0, then no relay changes - Manual mode
+t=nnn - Expected temperature - if set, the header is running in self managed mode - each frequency period checks the current temperature, and if it is lower, switch on the
+    	relay. The value is temperature * 2, it means, that 23.5 celsius = 47, or 17 celsius = 34.
+	If it is set to 0, then relay is operated manually.
+r=n  -  Treshhold 0 - 9. For the self managed mode, the treshhold could be set. It means that relay will go off when currentTemperature + treshold / 10 > expected temperature and will
+	go on, when currentTemperature - treshold / 10 < expected temperature
+
+        
+    Quick startup:
+    1. Put the power
+    2. Test the communication AT+0=pn<ENTER>
+    3. Assign the device ID: AT+a=9<ENTER>  Id is 9.
+    
+    Self managed mode                                                                       Manual mode
+    4. AT+9=t=45<ENTER> set temperature in room to 22,5 celsius
+    5. AT+9=r=5<ENTER> set treshold to 0,5 degree celsius                                   AT+9=t=0<ENTER> manual mode, temperature is 0
+    6. AT+9=m=60<ENTER>    wait 10 minutes                                                  AT+9=m=60<ENTER>    sleep 10 minutes
+    After 10 minutes the status is sent	again						    After 10 minutes the status is sent
+    7. AT+9=t=34<ENTER> Lower the temperature for the night                                 AT+9=o<ENTER> Swith relay on if necessary
+
+Manual mode:
+o - start to move up
+f - start to move down
 
 
 raspberry setup:

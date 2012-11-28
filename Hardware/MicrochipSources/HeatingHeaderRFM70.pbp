@@ -469,7 +469,7 @@ Wait_Up:
         temp_data[3] = (TempC DIG 0) + $30
         temp_data[4] = (Float DIG 3) + $30
         temp3_byte = TempC.lowbyte * 2
-        if (temp_data[4] > 4) then temp3_byte = temp3_byte + 1
+        if ((temp_data[4] - $30) > 4) then temp3_byte = temp3_byte + 1
    endif
         'read baterry        
         VRCON.4 = 1 ; Turn 0.6V reference ON
