@@ -317,7 +317,9 @@ intManagement:
            if ((ticks // 5) = 0) then
                 'read adc if motor is running and stop if it's blocked
                 if (motorRunning > 0) then
+                    input MOTOR_ANALOG
                     adcin 7, testAnInterrupt
+                    output MOTOR_ANALOG
                     if (testAnInterrupt < ((motorValNoPower / 100)*97)) then
                         if (motorAnVal > (testAnInterrupt + 300*motorStrengthConstant)) then
                             motorAnDownCount = motorAnDownCount + 1
