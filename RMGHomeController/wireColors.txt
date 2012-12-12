@@ -1,0 +1,21 @@
+Kabel kuchyn, predsin, loznice
+modra = +12V
+bila  = alm kuchyn
+------------------
+oranzova = alm predsin
+bila  =  alm loznice
+------------------
+seda   1
+bila   2    rolety kontroller
+--------
+zelena 3
+
+kabel obyvak, Jasminka
+oranzova +12 V
+bila     alm obyvak
+zluta    alm jasminka
+
+kabel pokojik
+oranzova +12 V
+bila     alm
+

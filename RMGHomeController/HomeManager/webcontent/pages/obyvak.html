@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="main.css" />
+<link rel="stylesheet" type="text/css" href="tabcontent.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Obyvak</title>
+
+<script type="text/javascript" src="../scripts/tabcontent.js"></script>
+<script type="text/javascript" src="../scripts/lights.js"></script>
+<script type="text/javascript" src="../scripts/blindswindows.js"></script>
+<script type="text/javascript" src="../scripts/alarms.js"></script>
+<script type="text/javascript" src="../scripts/heating.js"></script>
+
+</head>
+
+<body class="bodya">
+
+<ul id="roomtabs" class="shadetabs">
+<li><a href="#" rel="lights" class="selected">Svetlo</a></li>
+<li><a href="#" rel="blinds">Roleta</a></li>
+<li><a href="#" rel="alarm">Alarm</a></li>
+<li><a href="#" rel="heating">Topeni</a></li>
+</ul>
+
+<div style="border:1px solid gray; width:760px; margin-bottom: 1em; padding: 1px">
+
+<div id="lights">
+
+<p class="componentTitle">&nbsp;</p>
+<script>
+writeLightTable("4");
+</script>
+</div>
+
+<div id="blinds" class="tabcontent">
+<p class="componentTitle">&nbsp;</p>
+<script>
+writeBlindsTable("9");
+</script>
+<BR/>
+</div>
+
+<div id="alarm" class="tabcontent">
+<p class="componentTitle">&nbsp;</p>
+<script>
+writeAlarmTable("4");
+</script>
+</div>
+
+<div id="heating" class="tabcontent">
+     <p class="componentTitle">&nbsp;</p>
+    <script>
+        writeHeatingTable("9");
+    </script>
+</div>
+
+</div>
+
+<script type="text/javascript">
+var countries=new ddtabcontent("roomtabs");
+countries.setpersist(false);
+countries.setselectedClassTarget("link"); //"link" or "linkparent"
+countries.init();
+        document.body.onmousedown = function() {
+            mouseDown = 1; 
+        } 
+        document.body.onmouseup = function() {
+            mouseDown = 0; 
+        }
+</script>
+<div id="waitingBar" style="position:absolute;"></div>
+</body>
+</html>

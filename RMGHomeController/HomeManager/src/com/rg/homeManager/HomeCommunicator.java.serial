@@ -1,0 +1,239 @@
+package com.rg.homeManager;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import gnu.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+
+/**
+ *
+ * @author pt596
+ */
+public class HomeCommunicator extends Thread  { 
+
+    private AlarmManager alarmManager = null;
+    BufferedReader dataInputStream = null;
+    DataOutputStream dataOutputStream = null;
+    String receivedDataString = null;
+    String currentPIN = "";
+    boolean running = false;
+    String port = "";
+    SerialPort serialPort;
+    long ioHomeControlPowerTimeout = 12000;
+    private String ioHomeControlPowerOn =  "GET /ePINNvprpvplplpu";
+    private String ioHomeControlPowerOff = "GET /ePINNvprpvplplpd";
+    private boolean ioHomeControlOn = false;
+    private long ioCounter = 0;
+    private String oldIOCommand = "";
+
+
+    public HomeCommunicator(String port) {
+         this.port = port;
+         connect();
+    }
+    private void connect() {
+        try {
+            Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+            while (portList.hasMoreElements()) {
+	      CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
+	      if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+		if (portId.getName().equals(port)) {
+		    WebAdm.message("Found port " + port);
+                    serialPort = (SerialPort) portId.open("HomeController", 2000);
+                    dataOutputStream = new DataOutputStream(serialPort.getOutputStream());
+                    dataInputStream = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
+                    serialPort.setSerialPortParams(115200, 
+					       SerialPort.DATABITS_8, 
+					       SerialPort.STOPBITS_1, 
+					       SerialPort.PARITY_NONE);
+                }
+              }
+            }            
+        } catch (Exception e) {
+            WebAdm.message("Error when tried to connect: "+e.getMessage());
+            return;
+        }
+        try {
+            dataOutputStream.write("GET /! HTTP/1.0\n".getBytes());
+            dataOutputStream.flush();
+            Thread.sleep(1000);
+            char[] b = new char[255];
+            dataInputStream.read(b);
+            String resp = new String(b);
+            resp = resp.substring(resp.indexOf("<BODY>")+6, resp.indexOf("<BODY>") + 10);
+            currentPIN = resp;
+            running = true;
+            WebAdm.message("Communication with the home controller established. Current PIN="+currentPIN);            
+        } catch (Exception e) {
+                WebAdm.message("Error when tried to read PIN: "+e.getMessage());            
+        }
+    }
+    
+    public void disconnect() {
+        running = false;
+        try {
+            Thread.sleep(50);
+        } catch (Exception e) {}
+        try { dataOutputStream.close(); } catch (Throwable e) {}
+        try { dataInputStream.close(); } catch (Throwable e) {}
+        try {
+             serialPort.close();
+        } catch (Throwable e) {}
+        WebAdm.message("Streams closed.");
+    }
+    
+    private void switchIOHomeControlOn() {
+        try {
+            sendHTTPCommand(ioHomeControlPowerOn);
+            ioHomeControlOn = true;
+            ioCounter = 0;
+            Thread.sleep(3000);
+        } catch (Exception e) {
+            ioHomeControlOn = false;
+            WebAdm.message("Error, when tried to switch on IOHomeControlRelay: "+e.getMessage());
+        }
+    }
+    private void switchIOHomeControlOff() {
+        try {
+            sendHTTPCommand(ioHomeControlPowerOff);
+            ioHomeControlOn = false;
+            Thread.sleep(3000);
+        } catch (Exception e) {
+            WebAdm.message("Error, when tried to switch off IOHomeControlRelay: "+e.getMessage());
+        }        
+    }
+    private String modifyIOHomeControlCommand(String cmd) {
+        String retCmd = "";
+        String[] token = cmd.split(" ");
+        if (token[1].startsWith("/e")) {
+            //It is IO homecontrol command
+            String deviceCommand = token[1].substring(0, token[1].length() - 1);
+            if (deviceCommand.equals(oldIOCommand)) {
+                retCmd = token[0] + " " + token[1].substring(0, 6) + "m" +token[1].substring(token[1].length()-1);
+            } else {
+                retCmd = cmd;
+            }
+            oldIOCommand = deviceCommand;
+        } else {
+            retCmd = cmd;
+        }
+        if (retCmd.indexOf("HTTP/1.0") == -1) retCmd += " HTTP/1.0\n";
+        if (!retCmd.endsWith("\n")) retCmd += "\n";
+        return retCmd;
+    }    
+    public String lightOn(String id) throws IOException {
+        String cmd = "GET /b"+currentPIN+"?a="+id+"&b=0 HTTP/1.0\n";
+        return sendHTTPCommand(cmd);
+    }
+    public String lightOff(String id) throws IOException {
+        String cmd = "GET /c"+currentPIN+"?a="+id+" HTTP/1.0\n";
+        return sendHTTPCommand(cmd);
+    }
+    public String lightOffAfterPeriod(String id, String period) throws IOException {
+        String cmd = "GET /b"+currentPIN+"?a="+id+"&b="+period+" HTTP/1.0\n";
+        return sendHTTPCommand(cmd);
+    }
+    public String sendHTTPCommand(String command) throws IOException {        
+            String realCmd = command.replaceAll("PINN", currentPIN);
+            if (realCmd.indexOf("|") != -1) {
+                StringTokenizer st = new StringTokenizer(realCmd, "|");
+                String resp = "";
+                while (st.hasMoreTokens())
+                    resp = sendHTTPCommand(st.nextToken());
+                return resp;
+            }
+            if (realCmd.indexOf("HTTP/1.0") == -1) realCmd += " HTTP/1.0\n";
+            if (!realCmd.endsWith("\n")) realCmd += "\n";
+            WebAdm.message("Going to send command to BT: "+realCmd);
+            if ((realCmd.startsWith("GET /e") || realCmd.startsWith("get /e")) && !(ioHomeControlPowerOn.equals(command) || ioHomeControlPowerOff.equals(command))){
+                //io home control command, reset the counter
+                ioCounter = 0;
+                if (!ioHomeControlOn) switchIOHomeControlOn();
+            }
+            realCmd = modifyIOHomeControlCommand(realCmd);
+            try {
+                receivedDataString = "";
+                System.err.println("Writting cmd:"+realCmd);
+                dataOutputStream.write(realCmd.getBytes());
+                dataOutputStream.flush();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ee) {
+                    return "";
+                }
+            } catch (Exception e) {
+                disconnect();
+                connect();
+                receivedDataString = "";
+                dataOutputStream.write(realCmd.getBytes());
+                dataOutputStream.flush();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ee) {
+                    return "";
+                }                
+            }
+            WebAdm.message("Read data back answer from BT: "+receivedDataString);
+            return receivedDataString;            
+    }
+    
+    public void executeSchedulerCommand(String cmd) {
+        try {
+            sendHTTPCommand(cmd);
+        } catch (Exception e) {
+            WebAdm.message("Error when tried to execute scheduler command: "+e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    public void run() {
+        long sleepTime = 50;
+        long currentIOHomeControlCounter = ioHomeControlPowerTimeout / sleepTime;
+        if (dataInputStream == null) return;
+        while (running) {
+            try {
+               Thread.sleep(sleepTime);
+               if ((++ioCounter > currentIOHomeControlCounter) && ioHomeControlOn) {
+                   //Ok, timeout expired, switch io homecontrol off
+                   switchIOHomeControlOff();
+               }
+               String line = "";
+               if (dataInputStream.ready()) {
+                   line = dataInputStream.readLine();
+                   if (line.startsWith("A|")) {
+                       try {
+                            String tokens[] = line.split("\\|");
+                            int currentChange = (Integer.parseInt(tokens[1]) ^ Integer.parseInt(tokens[2])) & Integer.parseInt(tokens[1]);
+                            WebAdm.message("Received alarm change: "+Integer.toBinaryString(currentChange));
+                            if (alarmManager != null) alarmManager.fireAlarm(currentChange);
+                       } catch (Exception eee) {
+                           WebAdm.message("Error parsing alarm data: "+eee.getClass().getName() + ": " + eee.getMessage());
+                       }
+                   } else {
+                        receivedDataString += line;
+                   }
+               }
+            } catch (InterruptedException e) {
+                disconnect();
+                return;
+            } catch (Exception ee) {
+                WebAdm.message(ee.getClass().getName() + ": " + ee.getMessage());
+            }
+        }
+    }
+    
+    public void destroy () {
+        disconnect();
+    }
+
+    public AlarmManager getAlarmManager() {
+        return alarmManager;
+    }
+
+    public void setAlarmManager(AlarmManager alarmManager) {
+        this.alarmManager = alarmManager;
+    }
+}

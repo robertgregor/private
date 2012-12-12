@@ -1,0 +1,167 @@
+@ DEVICE PIC16F690,INTRC_OSC_NOCLKOUT
+@ DEVICE PIC16F690,WDT_ON
+@ DEVICE PIC16F690,MCLR_OFF
+@ DEVICE PIC16F690,CPD_OFF
+@ DEVICE PIC16F690,BOD_ON
+@ DEVICE PIC16F690,PWRT_ON
+
+'io home control middle     rc0
+'                soft up    rc1
+'                soft down  rc2
+'                soft left  rc3
+'                up         rc4
+'                soft right rc5
+'                down       rc6
+
+'new rc2, rc1, rc0, ra2, rc5, ra4, ra5 
+
+ DEFINE OSC 8
+ DEFINE HSER_RCSTA 90h
+ DEFINE HSER_TXSTA 24h
+ DEFINE HSER_SPBRG 51
+ DEFINE HSER_CLROERR 1
+ OSCCON = %01110000 ' Internal 8MHz osc
+ ANSEL = 0
+ ANSELH = 0
+ CM1CON0 = 0
+ CM2CON0 = 0
+ 
+COMMAND var byte[80]
+ticks var byte
+seconds var byte
+manageSerial var byte 
+temp_byte_int var byte
+i var byte
+j var byte
+ 
+ 'interrupt for timer
+INTCON = %11100000
+PIE1 = %00100000
+OPTION_REG = %00000111
+
+
+
+on interrupt goto intManagement
+ENABLE
+:startLoop
+if (manageSerial == 1) then
+            for i=5 TO 80
+                if command[i]==" " THEN goto exitloop2
+                if command[i] == "p" THEN
+                    gosub pause100
+                    gosub pause100                    
+                endif
+                if command[i] == "m" THEN
+                    high PORTC.2
+                    gosub pause100
+                    low PORTC.2
+                    gosub pause100                    
+                endif
+                if command[i] == "x" THEN 'middle long press
+                    high PORTC.2
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    low PORTC.2
+                    gosub pause100                    
+                endif                                
+                if command[i] == "u" THEN
+                    high PORTC.1
+                    gosub pause100
+                    low PORTC.1
+                    gosub pause100                    
+                endif
+                if command[i] == "y" THEN 'middle long press
+                    high PORTC.1
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    low PORTC.1
+                    gosub pause100                    
+                endif                                
+                if command[i] == "d" THEN
+                    high PORTC.0
+                    gosub pause100
+                    low PORTC.0
+                    gosub pause100                    
+                endif
+                if command[i] == "z" THEN 'middle long press
+                    high PORTC.0
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    low PORTC.0
+                    gosub pause100                    
+                endif                                                
+                if command[i] == "l" THEN
+                    high PORTA.2
+                    gosub pause100
+                    low PORTA.2
+                    gosub pause100                    
+                endif
+                if command[i] == "r" THEN
+                    high PORTC.5
+                    gosub pause100
+                    low PORTC.5
+                    gosub pause100                    
+                endif
+                if command[i] == "s" THEN
+                    high PORTA.4
+                    gosub pause100
+                    low PORTA.4
+                    gosub pause100                    
+                endif
+                if command[i] == "v" THEN
+                    high PORTA.5
+                    gosub pause100
+                    low PORTA.5
+                    gosub pause100                    
+                endif                
+            next i
+            :exitloop2
+    manageSerial = 0
+    HSEROUT["OK",10]
+endif
+goto startLoop
+end
+
+disable
+intManagement:
+        if (INTCON.2 == 1) then
+           ticks = ticks + 1      ' Count pieces of seconds
+           If ticks < 31 Then tiexit
+           ticks = 0
+           seconds = seconds + 1
+           if seconds <= 58 then tiexit
+           seconds = 0
+           tiexit: 
+           INTCON.2 = 0
+        else 
+            if (PIR1.5 == 1) then
+                 if (manageSerial == 1) then mainInt
+                 if (RCSTA.2 == 1) then
+                    hserin[temp_byte_int]
+                 endif
+                 HSERIN 100, mainInt, [wait ("ET /"), STR COMMAND\80\$2F]
+                 manageSerial = 1
+                 :mainInt
+            ENDIF
+        endif
+        INTCON.7 = 1
+resume
+enable
+
+:pause100
+    for j=0 to 200
+        pause 1
+    next j 
+return

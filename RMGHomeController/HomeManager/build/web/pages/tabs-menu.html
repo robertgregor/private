@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" >
+<html>
+<head>
+<title>Robert a Michaela Gregorovi</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="tabs.css" />
+<style>
+
+body
+{ 
+    margin: 1px; 
+    font-size:100%;
+    font-family: arial, sans;
+    background-color: #FFF;
+}
+
+.legal
+{
+    text-align:center;
+    font-size: 80%;
+    color: #666;
+}
+
+.darken
+{
+	backround-color:#EEE;
+}
+
+</style>
+
+<script type="text/javascript">
+
+function loadit( element)
+{
+
+	var tabs=document.getElementById('tabs').getElementsByTagName("a");
+	for (var i=0; i < tabs.length; i++)
+	{
+		if(tabs[i].href == element.href) 
+			tabs[i].className="selected";
+		else
+			tabs[i].className="";
+	}
+}
+
+</script>
+
+
+</head>
+
+
+<body>
+<div id="content">
+<div id="tabs" style="width:755px;">
+<ul>
+     <li><a href="byt.html" class="selected" target="mainFrame"  onclick="loadit(this)" >Cely byt</a></li>
+     <li><a href="nahore.html" target="mainFrame"  onclick="loadit(this)" >Nahore</a></li>
+     <li><a href="jasminka.html" target="mainFrame"  onclick="loadit(this)" >Jasminka</a></li>
+     <li><a href="kancelar.html" target="mainFrame" onclick="loadit(this)" >Kancelar</a></li>
+     <li><a href="obyvak.html" target="mainFrame" onclick="loadit(this)" >Obyvak</a></li>
+     <li><a href="loznice.html" target="mainFrame" onclick="loadit(this)" >Loznice</a></li>
+     <li><a href="staraKuchyn.html" target="mainFrame" onclick="loadit(this)" >StaraKuchyn</a></li>
+     <li><a href="predsin.html" target="mainFrame" onclick="loadit(this)" >Predsin</a></li>
+     <li><a href="ostatni.html" target="mainFrame" onclick="loadit(this)" >Ostatni</a></li>
+     <li><a href="weather.html" target="mainFrame" onclick="loadit(this)" >Pocasi</a></li>
+
+
+</ul>
+</div>
+
+
+<p><br>
+  <br>
+</p>
+</div>
+</body>
+</html>
