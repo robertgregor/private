@@ -1,0 +1,34 @@
+.schtable { border-collapse: collapse; }
+.schtd { border: 1px solid #000000; background-color: black; font: x-small; color: white; font-weight: bolder;}
+.schtdns { border: 1px solid #000000; background-color: green;}
+.schtds { border: 1px solid #000000; background-color: blue;}
+.lightstd {color:white;background-color:darkgreen;border:2px solid white;padding:5px;}
+.lightsth {font-size:10px;color:white;}
+.lightsbutton {font-size:10px;color:green;width:100px;height:25px;}
+.linktd {color:white;background-color:darkgreen;border:2px solid white;padding:1px;font-size:10px;color:white;font-weight:bolder;text-decoration:underline}
+.progressBar {background-color:white;border:2px solid black;}
+.componentTitle {width:100%;background-color:blue;font-size:10px;color:white;font-weight:bolder;}
+.alarmConfigTable {width:100%;background-color:green;font-size:10px;color:white;font-weight:bolder;}
+.alarmTrDark {width:100%;background-color:darkgreen;font-size:10px;color:white;font-weight:bolder;}
+.alarmTr {width:100%;background-color:green;font-size:10px;color:white;font-weight:bolder;}
+.alarmInput {width:90%;font-size:10px;}
+.schtdsblack { border: 1px solid #000000; background-color: black; color:white;}
+.schtdswhite { border: 1px solid #000000; background-color: white; color:black;}
+.schtdslightblue { border: 1px solid #000000; background-color: lightblueblue; color:black;}
+.schtdsblue { border: 1px solid #000000; background-color: blue; color:white;}
+.schtdsdarkblue { border: 1px solid #000000; background-color: darkblue; color:white;}
+.schtdslightgreen { border: 1px solid #000000; background-color: lightgreen; color:black;}
+.schtdsgreen { border: 1px solid #000000; background-color: green; color:white;}
+.schtdsdarkgreen { border: 1px solid #000000; background-color: darkgreen; color:white;}
+.schtdslightpink { border: 1px solid #000000; background-color: lightpink; color:black;}
+.schtdspink { border: 1px solid #000000; background-color: pink; color:black;}
+.schtdsdarkpink { border: 1px solid #000000; background-color: darksalmon; color:black;}
+.schtdslightyellow { border: 1px solid #000000; background-color: lightgoldenrodyellow; color:black;}
+.schtdsyellow { border: 1px solid #000000; background-color: yellow; color:black;}
+.schtdsdarkyellow { border: 1px solid #000000; background-color: gold; color:black;}
+.schtdsorange { border: 1px solid #000000; background-color: orange; color:black;}
+.schtdslightred { border: 1px solid #000000; background-color: lightcoral; color:black;}
+.schtdsred { border: 1px solid #000000; background-color: red; color:black;}
+.schtdsdarkred { border: 1px solid #000000; background-color: darkred; color:black;}
+.schtdsorangered { border: 1px solid #000000; background-color: orangered; color:black;}
+.bodya { margin: 1px; margin-top:0; font-size:100%; font-family: arial, sans; font-size: x-small; background-color: #FFF;}

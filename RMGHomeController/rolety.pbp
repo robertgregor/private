@@ -1,0 +1,288 @@
+DEFINE OSC 4
+'hserin definition
+DEFINE HSER_RCSTA 90h
+DEFINE HSER_TXSTA 24h 
+DEFINE HSER_SPBRG 25 'DEFINE HSER_BAUD 9600 on 4 Mhz
+DEFINE HSER_CLROERR 1 
+
+clear
+EEPROM  0, [0]
+'variables
+symbol outputDown1 = portb.0
+symbol outputUp1 = porta.1
+symbol outputDown2 = porta.2
+symbol outputUp2 = portb.3
+symbol outputDown3 = portb.4
+symbol outputUp3 = portb.5
+symbol inputState = porta.0
+symbol activity_led = porta.4
+symbol light = porta.3
+previousInputState var byte
+curtainsRunningPeriodShort var byte
+curtainsRunningPeriodLong var byte
+curtainsState var byte
+i var byte
+inti var byte
+curtainsCounter var byte[4] '0 - 2 seconds, 3 light in minutes
+command var byte[30]
+temp_byte var byte
+temp1_byte var byte
+temp2_byte var byte
+
+'variables for timer
+ticks   var     byte    ' Define pieces of seconds variable
+second  var     byte
+'interrupt for timer 
+OPTION_REG = %11010111
+INTCON = $a0 'enable TMR0 interrupts and global interrupt 
+PIE1 = 0
+CMCON = 7
+On Interrupt Goto intManagement
+
+Enable
+
+curtainsRunningPeriodShort = 30
+curtainsRunningPeriodLong = 40
+INPUT inputState
+OUTPUT outputDown1
+OUTPUT outputUp1
+OUTPUT outputDown2
+OUTPUT outputUp2
+OUTPUT outputDown3
+OUTPUT outputUp3
+Output activity_led
+LOW outputDown1
+low outputUp1
+low outputDown2
+low outputUp2
+lOW outputDown3
+low outputUp3
+for i=0 to 3
+    curtainsCounter[i] = 0
+next i
+previousInputState = inputState 
+while 1
+:main
+    if (inputState == 1) then
+        if (previousInputState == 0) then
+            previousInputState = 1
+            'do something because the event occured
+            READ 0, curtainsstate
+            if (outputDown1 == 1) OR (outputUp1 == 1) OR (outputDown2 == 1) OR (outputUp2 == 1) OR (outputDown3 == 1) OR (outputUp3 == 1) THEN
+                low outputDown1
+                LOW outputUp1
+                low outputDown2
+                LOW outputUp2
+                low outputDown3
+                LOW outputUp3
+                PAUSE 500
+            ENDif            
+            if (curtainsstate == 0) then
+                low outputDown1
+                high outputUp1
+                low outputDown2
+                high outputUp2
+                low outputDown3
+                high outputUp3
+                WRITE 0, 1
+            ELSE
+                HIGH outputDown1
+                LOW outputUp1
+                HIGH outputDown2
+                LOW outputUp2
+                HIGH outputDown3
+                LOW outputUp3
+                WRITE 0, 0
+            endif
+            curtainsCounter[0] = curtainsRunningPeriodShort
+            curtainsCounter[1] = curtainsRunningPeriodLong
+            curtainsCounter[2] = curtainsRunningPeriodShort        
+        endif
+    endif
+    if (inputState == 0) then
+        if (previousInputState == 1) then
+            previousInputState = 0
+            LOW outputDown1
+            LOW outputUp1
+            LOW outputDown2
+            LOW outputUp2
+            LOW outputDown3
+            LOW outputUp3
+        endif
+    endif
+    HSERIN 100, main, [wait ("ET /"), STR COMMAND\30\$2F]
+    if (command[0] == "1") then
+        if (outputUp1 == 1) OR (outputDown1 == 1) then
+            LOW outputUp1
+            LOW outputDown1
+            PAUSE 500
+        endif
+        high outputUp1
+        LOW outputDown1
+        curtainsCounter[0] = curtainsRunningPeriodShort    
+    endif
+    if (command[0] == "2") then
+        if (outputUp1 == 1) OR (outputDown1 == 1) then
+            LOW outputUp1
+            LOW outputDown1
+            PAUSE 500
+        endif
+        LOW outputUp1    
+        HIGH outputDown1
+        curtainsCounter[0] = curtainsRunningPeriodShort
+    endif
+    if (command[0] == "3") then
+        if (outputUp2 == 1) OR (outputDown2 == 1) then
+            LOW outputUp2
+            LOW outputDown2
+            PAUSE 500
+        endif
+        high outputUp2
+        LOW outputDown2
+        curtainsCounter[1] = curtainsRunningPeriodLong
+    endif
+    if (command[0] == "4") then
+        if (outputUp2 == 1) OR (outputDown2 == 1) then
+            LOW outputUp2
+            LOW outputDown2
+            PAUSE 500
+        endif
+        LOW outputUp2    
+        HIGH outputDown2
+        curtainsCounter[1] = curtainsRunningPeriodLong
+    endif
+    if (command[0] == "5") then
+        if (outputUp3 == 1) OR (outputDown3 == 1) then
+            LOW outputUp3
+            LOW outputDown3
+            PAUSE 500
+        endif
+        high outputUp3
+        LOW outputDown3
+        curtainsCounter[2] = curtainsRunningPeriodShort    
+    endif
+    if (command[0] == "6") then
+        if (outputUp3 == 1) OR (outputDown3 == 1) then
+            LOW outputUp3
+            LOW outputDown3
+            PAUSE 500
+        endif
+        LOW outputUp3    
+        HIGH outputDown3
+        curtainsCounter[2] = curtainsRunningPeriodShort    
+    endif
+    if (command[0] == "7") then
+         for i = 0 to 25
+            if (command[i] == "a") then
+                GOSUB convertInputData
+                if (temp_byte == 1) THEN
+                            LOW outputDown1
+                            LOW outputUp1
+                            goto main                
+                endif
+                if (temp_byte == 2) THEN
+                            LOW outputDown2
+                            LOW outputUp2
+                            goto main
+                endif
+                if (temp_byte == 3) THEN
+                            LOW outputDown3
+                            LOW outputUp3
+                            goto main
+                endif
+            endif
+         NEXT i
+         LOW outputDown1
+         LOW outputUp1
+         LOW outputDown2
+         LOW outputUp2
+         LOW outputDown3
+         LOW outputUp3
+    endif
+    if (command[0] == "8") then
+        high light
+        for i = 0 to 25
+            if (command[i] == "a") then
+                    GOSUB convertInputData
+                    curtainsCounter[3] = TEMP_BYTE
+                    goto main
+            endif
+        next i
+        curtainsCounter[3] = 0
+    endif
+    if (command[0] == "9") then
+        lOw light
+    endif
+    Hserout ["HTTP/1.0 200 OK", 13, 10]
+    Hserout ["Content-Type: text/html", 13, 10, "Connection: close", 13, 10, 13, 10]
+    HSEROUT ["OK"]
+WEND
+END
+
+disable
+intManagement:
+        if (INTCON.2 == 1) then
+           ticks = ticks + 1      ' Count pieces of seconds
+           If ticks < 15 Then tiexit
+           toggle ACTIVITY_LED
+           ticks = 0 'One second elasped
+           second = second + 1           
+           for inti = 0 to 2
+                if curtainsCounter[inti] > 0 then
+                    curtainsCounter[inti] = curtainsCounter[inti] - 1
+                    if curtainsCounter[inti] == 0 then
+                        if (inti == 0) then
+                            LOW outputDown1
+                            LOW outputUp1
+                        endif
+                        if (inti == 1) then
+                            LOW outputDown2
+                            LOW outputUp2
+                        endif
+                        if (inti == 2) then
+                            LOW outputDown3
+                            LOW outputUp3
+                        endif
+                    endif
+                endif
+           next inti
+           if second > 58 then
+                second = 0
+                if curtainsCounter[3] > 0 then
+                   curtainsCounter[3] = curtainsCounter[3] - 1
+                   if curtainsCounter[3] == 0 then
+                        low light
+                   endif 
+                endif
+           endif
+        endif
+        tiexit: 
+        INTCON.2 = 0
+        INTCON.7 = 1
+resume
+
+enable
+convertInputData:
+    TEMP1_BYTE = 0
+    TEMP2_BYTE = COMMAND[i+2]
+    GOSUB lookupChar
+    TEMP_BYTE = TEMP1_BYTE
+    TEMP1_BYTE = "a"
+    TEMP2_BYTE = COMMAND[i+3]
+    GOSUB lookupChar
+    if TEMP1_BYTE <> "a" then 
+        TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
+    else
+        return
+    endif
+    TEMP1_BYTE = "a"
+    TEMP2_BYTE = COMMAND[i+4]
+    GOSUB lookupChar    
+    if TEMP1_BYTE <> "a" then 
+        TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
+    endif
+return
+lookupChar:
+    LOOKDOWN temp2_byte,["0123456789ABCDEF"], temp1_byte
+RETURN
+
