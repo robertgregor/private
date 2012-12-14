@@ -44,28 +44,22 @@ TRISA = %00100000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
 TRISC = %00001100 'Set IRQ input, 
 
-HEATING_SENSOR var PORTA.5
-HEATING_SENSOR_power var PORTA.4
+HEATING_SENSOR var PORTC.6
+HEATING_SENSOR_power var PORTC.1
 MOTOR_1 var PORTC.4
 MOTOR_2 var PORTC.5
-MOTOR_ANALOG VAR PORTC.3
+MOVE_SENSOR_POWER VAR PORTB.5
+MOVE_SENSOR VAR PORTA.5
 motorRunning VAR byte
-motorAnVal var word
-motorValNoPower var word
-motorAnDownCount VAR byte
-motorStrengthConstant var byte
-motorStrengthConstant = 1    'this should be configurable
 motorFullRangeTicks var word
 motorFullRangeCurrentTicks var word
 motorFullRangeExpectedTicks var word
-testAnInterrupt var word
 i VAR BYTE 'loop counter
 j var byte
 ic var byte
 VDD VAR WORD
 confSuccess var byte
 configure var byte
-manageSerial var byte
 temp_byte_int var byte
 temp_byte var byte
 temp1_byte var byte
@@ -74,7 +68,6 @@ temp3_byte var byte
 temp_word var word
 temperature var word
 seconds  var    byte    ' Define second variable
-secondsMotorRunningProtection var byte
 ticks   var     byte    ' Define pieces of seconds variable
 dat var word 'unscaled ADC data
 normalMode VAR byte
@@ -90,9 +83,11 @@ temperatureExp var byte
 
 clear
 output heating_sensor_power
+output MOVE_SENSOR_POWER
 output motor_1
 output motor_2
 input heating_sensor
+input MOVE_SENSOR
 read 9, sleep_period
 read 6, device_id
 read 10, temperatureExp
@@ -113,6 +108,7 @@ if 1 == 0 then
     END
 endif
 low HEATING_SENSOR_power
+low MOVE_SENSOR_POWER
 GOSUB MotorStop
 normalMode = 0
 READ 7, motorFullRangeTicks.HighByte
@@ -300,45 +296,9 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           'keep position of valve           
-           if (normalmode < 4) then
-               if (motorRunning == 1) then
-                    if (motorFullRangeCurrentTicks != 65535) then motorFullRangeCurrentTicks = motorFullRangeCurrentTicks + 1
-                    gosub manageMotorStopInt
-               endif
-               if (motorRunning == 2) then
-                    if (motorFullRangeCurrentTicks != 0) then motorFullRangeCurrentTicks = motorFullRangeCurrentTicks - 1
-                    gosub manageMotorStopInt
-               endif           
-           endif
-           if (normalmode == 4) then
-                motorFullRangeTicks = motorFullRangeTicks + 1
-           endif
-           if ((ticks // 5) = 0) then
-                'read adc if motor is running and stop if it's blocked
-                if (motorRunning > 0) then
-                    input MOTOR_ANALOG
-                    adcin 7, testAnInterrupt
-                    output MOTOR_ANALOG
-                    if (testAnInterrupt < ((motorValNoPower / 100)*97)) then
-                        if (motorAnVal > (testAnInterrupt + 300*motorStrengthConstant)) then
-                            motorAnDownCount = motorAnDownCount + 1
-                            if (motorAnDownCount > 1) then
-                                if (motorRunning == 1) then motorFullRangeCurrentTicks = motorFullRangeTicks
-                                if (motorRunning == 2) then motorFullRangeCurrentTicks = 0
-                                gosub motorstopInt
-                            endif
-                        else
-                            motorAnVal = testAnInterrupt
-                            motorAnDownCount = 0
-                        endif
-                    endif
-                endif
-           endif
            If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
-           secondsMotorRunningProtection = secondsMotorRunningProtection + 1
            if seconds <= 58 then tiexit
            seconds = 0
            tiexit: 
@@ -511,21 +471,15 @@ print2LastBytesToTempByte:
 return
 
 MotorOpenHead:
-    ADCIN 7, motorValNoPower
     LOW MOTOR_1
     HIGH MOTOR_2
     motorRunning = 2
-    motorAnVal = 0
-    motorAnDownCount = 0
 return
 
 motorCloseHead:
-    ADCIN 7, motorValNoPower
     LOW MOTOR_2
     HIGH MOTOR_1
     motorRunning = 1
-    motorAnVal = 0
-    motorAnDownCount = 0
 return
 
 motorStop:
@@ -538,23 +492,9 @@ adaptHead:
     errorFlag = 0
     normalmode = 5
     gosub motorOpenHead
-    secondsMotorRunningProtection = 0
-  closingAdapt:
-    if (secondsMotorRunningProtection > 200) then
-        errorFlag = 1
-        RETURN
-    endif
-    if (motorRunning != 0) then goto closingAdapt
     normalmode = 4
     motorFullRangeTicks = 0
     gosub motorCloseHead
-    secondsMotorRunningProtection = 0
-  openingAdapt:
-    if (secondsMotorRunningProtection > 200) then
-        errorFlag = 1
-        RETURN
-    endif
-    if (motorRunning != 0) then goto openingAdapt
     seconds = 0
     write 7, motorFullRangeTicks.highbyte
     write 8, motorFullRangeTicks.LOWbyte
