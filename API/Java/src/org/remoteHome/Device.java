@@ -1,5 +1,6 @@
 package org.remoteHome;
 
+
 /**
  * This is the interface for all hardware devices. All the devices should implement this interface
  * 
@@ -12,6 +13,7 @@ interface Device {
      */
     int HeatingHeader = 4;
     int SimpleSwitch = 3;
+    
     
     
    /**
