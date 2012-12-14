@@ -6103,6 +6103,81 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="switch-dil">
+<description>&lt;b&gt;DIL Switches and Code Switches&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="SD4-01">
+<description>&lt;b&gt;DIL/CODE SWITCH&lt;/b&gt;&lt;p&gt;
+Mors</description>
+<wire x1="2.032" y1="-3.175" x2="2.032" y2="3.175" width="0.254" layer="21"/>
+<wire x1="-2.032" y1="3.175" x2="-2.032" y2="-3.175" width="0.254" layer="21"/>
+<wire x1="-0.635" y1="-1.27" x2="0.635" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="0.635" y1="1.27" x2="-0.635" y2="1.27" width="0.254" layer="21"/>
+<wire x1="-0.635" y1="1.27" x2="-0.635" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="0.635" y1="-1.27" x2="0.635" y2="1.27" width="0.254" layer="21"/>
+<wire x1="-2.032" y1="-3.175" x2="-0.762" y2="-3.175" width="0.254" layer="21"/>
+<wire x1="2.032" y1="-3.175" x2="0.762" y2="-3.175" width="0.254" layer="21"/>
+<wire x1="0.762" y1="-3.175" x2="-0.762" y2="-3.175" width="0.254" layer="51"/>
+<wire x1="2.032" y1="3.175" x2="0.762" y2="3.175" width="0.254" layer="21"/>
+<wire x1="-2.032" y1="3.175" x2="-0.762" y2="3.175" width="0.254" layer="21"/>
+<wire x1="-0.762" y1="3.175" x2="0.762" y2="3.175" width="0.254" layer="51"/>
+<wire x1="0.508" y1="-1.016" x2="-0.508" y2="-1.016" width="0.254" layer="21"/>
+<wire x1="-0.508" y1="-0.254" x2="0.508" y2="-0.254" width="0.254" layer="21"/>
+<pad name="1" x="0" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="2" x="0" y="3.81" drill="0.8128" shape="long" rot="R90"/>
+<text x="-0.381" y="-2.667" size="0.9906" layer="21" ratio="12">1</text>
+<text x="-2.3622" y="-3.1242" size="1.27" layer="25" ratio="10" rot="R90">&gt;NAME</text>
+<text x="3.6322" y="-3.1496" size="1.27" layer="27" ratio="10" rot="R90">&gt;VALUE</text>
+<text x="-1.651" y="1.7018" size="0.9906" layer="21" ratio="12">ON</text>
+<rectangle x1="-0.381" y1="-3.937" x2="0.381" y2="-3.175" layer="51"/>
+<rectangle x1="-0.381" y1="3.175" x2="0.381" y2="3.937" layer="51"/>
+</package>
+</packages>
+<symbols>
+<symbol name="DIP01">
+<wire x1="-1.905" y1="5.08" x2="-1.905" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="-1.905" y1="5.08" x2="1.905" y2="5.08" width="0.4064" layer="94"/>
+<wire x1="1.905" y1="5.08" x2="1.905" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="-1.905" y1="-5.08" x2="1.905" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="0.508" y1="-2.54" x2="-0.508" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-0.508" y1="2.54" x2="0.508" y2="2.54" width="0.1524" layer="94"/>
+<wire x1="0.508" y1="2.54" x2="0.508" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-0.508" y1="-2.54" x2="-0.508" y2="2.54" width="0.1524" layer="94"/>
+<text x="-2.54" y="-5.08" size="1.778" layer="95" rot="R90">&gt;NAME</text>
+<text x="4.445" y="-5.08" size="1.778" layer="96" rot="R90">&gt;VALUE</text>
+<text x="-0.127" y="-4.064" size="0.9906" layer="94" ratio="14">1</text>
+<text x="-0.889" y="3.175" size="0.9906" layer="94" ratio="14">ON</text>
+<rectangle x1="-0.254" y1="-2.286" x2="0.254" y2="0" layer="94"/>
+<pin name="2" x="0" y="7.62" visible="pad" length="short" direction="pas" rot="R270"/>
+<pin name="1" x="0" y="-7.62" visible="pad" length="short" direction="pas" rot="R90"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="SD4-01" prefix="S" uservalue="yes">
+<description>&lt;b&gt;DIL/CODE SWITCH&lt;/b&gt;</description>
+<gates>
+<gate name="1" symbol="DIP01" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SD4-01">
+<connects>
+<connect gate="1" pin="1" pad="1"/>
+<connect gate="1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -6138,6 +6213,7 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <part name="PAD6" library="wirepad" deviceset="WIREPAD" device="SMD5-2,5"/>
 <part name="PAD7" library="wirepad" deviceset="WIREPAD" device="SMD5-2,5"/>
 <part name="R7" library="resistor" deviceset="R-EU_" device="R1206" value="100 K"/>
+<part name="S1" library="switch-dil" deviceset="SD4-01" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -6169,14 +6245,16 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <instance part="PAD6" gate="G$1" x="-22.86" y="104.14"/>
 <instance part="PAD7" gate="G$1" x="-22.86" y="93.98"/>
 <instance part="R7" gate="G$1" x="-10.16" y="137.16" rot="R90"/>
+<instance part="S1" gate="1" x="137.16" y="48.26"/>
 </instances>
 <busses>
 </busses>
 <nets>
 <net name="N$5" class="0">
 <segment>
-<wire x1="132.08" y1="30.48" x2="177.8" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="30.48" x2="137.16" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="U$2" gate="G$1" pin="VSS"/>
+<wire x1="137.16" y1="30.48" x2="177.8" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="66.04" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="GND"/>
 <wire x1="172.72" y1="68.58" x2="177.8" y2="68.58" width="0.1524" layer="91"/>
@@ -6213,6 +6291,9 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <wire x1="-15.24" y1="93.98" x2="-15.24" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="-15.24" y1="30.48" x2="58.42" y2="30.48" width="0.1524" layer="91"/>
 <junction x="58.42" y="30.48"/>
+<pinref part="S1" gate="1" pin="1"/>
+<wire x1="137.16" y1="40.64" x2="137.16" y2="30.48" width="0.1524" layer="91"/>
+<junction x="137.16" y="30.48"/>
 </segment>
 </net>
 <net name="N$18" class="0">
@@ -6499,6 +6580,16 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <wire x1="-10.16" y1="104.14" x2="-20.32" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="-5.08" y1="127" x2="-10.16" y2="127" width="0.1524" layer="91"/>
 <junction x="-10.16" y="127"/>
+</segment>
+</net>
+<net name="N$10" class="0">
+<segment>
+<pinref part="S1" gate="1" pin="2"/>
+<wire x1="137.16" y1="55.88" x2="137.16" y2="142.24" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="RA4/AN3/T1G/OSC2/CLKOUT"/>
+<wire x1="137.16" y1="142.24" x2="121.92" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="121.92" y1="142.24" x2="121.92" y2="119.38" width="0.1524" layer="91"/>
+<junction x="121.92" y="119.38"/>
 </segment>
 </net>
 </nets>
