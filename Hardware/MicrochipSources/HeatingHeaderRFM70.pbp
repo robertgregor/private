@@ -54,7 +54,6 @@ motorAnVal var word
 motorValNoPower var word
 motorAnDownCount VAR byte
 motorStrengthConstant var byte
-motorStrengthConstant = 1    'this should be configurable
 motorFullRangeTicks var word
 motorFullRangeCurrentTicks var word
 motorFullRangeExpectedTicks var word
@@ -318,10 +317,11 @@ intManagement:
                 'read adc if motor is running and stop if it's blocked
                 if (motorRunning > 0) then
                     input MOTOR_ANALOG
-                    adcin 7, testAnInterrupt
+                    ADCIN 7, testAnInterrupt
                     output MOTOR_ANALOG
+                    high MOTOR_ANALOG
                     if (testAnInterrupt < ((motorValNoPower / 100)*97)) then
-                        if (motorAnVal > (testAnInterrupt + 300*motorStrengthConstant)) then
+                        if (motorAnVal > (testAnInterrupt + 300)) then
                             motorAnDownCount = motorAnDownCount + 1
                             if (motorAnDownCount > 1) then
                                 if (motorRunning == 1) then motorFullRangeCurrentTicks = motorFullRangeTicks
@@ -348,8 +348,8 @@ intManagement:
 resume
 
 manageMotorStopInt:
-   if (motorFullRangeCurrentTicks == motorFullRangeExpectedTicks) then 
-        gosub motorStopInt
+   if (motorFullRangeCurrentTicks == motorFullRangeExpectedTicks) then
+            gosub motorStopInt
    endif
 return
 
@@ -364,9 +364,9 @@ enable
 
 setValveToPosition:
       motorFullRangeExpectedTicks = (motorFullRangeTicks / 100) * temp_byte
-      if (temp_byte == 100) then motorFullRangeExpectedTicks = motorFullRangeTicks 
       if (motorFullRangeExpectedTicks != motorFullRangeCurrentTicks) THEN
           if (motorFullRangeExpectedTicks > motorFullRangeCurrentTicks) then
+              if (temp_byte == 100) then motorFullRangeExpectedTicks = motorFullRangeTicks + 1200 
               GOSUB MotorCloseHead            
           else
               GOSUB MotorOpenHead            
@@ -497,6 +497,7 @@ return
 printFullRangeTicks:
         temp_data[i] = "|"
         temp_byte = (motorFullRangeCurrentTicks * 10) / (motorFullRangeTicks / 10)
+        if (temp_byte > 100) then temp_byte = 100
         i=i+1
         gosub printByteToTempByte
         temp_data[i+3] = 13
@@ -510,22 +511,27 @@ print2LastBytesToTempByte:
         temp_data[i+2] = (temp_byte DIG 0) + $30
 return
 
-MotorOpenHead:
+MotorOpenHeadGeneral:
+    input MOTOR_ANALOG
     ADCIN 7, motorValNoPower
-    LOW MOTOR_1
-    HIGH MOTOR_2
-    motorRunning = 2
+    output MOTOR_ANALOG
+    high MOTOR_ANALOG
     motorAnVal = 0
     motorAnDownCount = 0
 return
 
+MotorOpenHead:
+    gosub MotorOpenHeadGeneral
+    LOW MOTOR_1
+    HIGH MOTOR_2
+    motorRunning = 2
+return
+
 motorCloseHead:
-    ADCIN 7, motorValNoPower
+    gosub MotorOpenHeadGeneral
     LOW MOTOR_2
     HIGH MOTOR_1
     motorRunning = 1
-    motorAnVal = 0
-    motorAnDownCount = 0
 return
 
 motorStop:
