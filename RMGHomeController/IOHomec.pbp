@@ -5,16 +5,6 @@
 @ DEVICE PIC16F690,BOD_ON
 @ DEVICE PIC16F690,PWRT_ON
 
-'io home control middle     rc0
-'                soft up    rc1
-'                soft down  rc2
-'                soft left  rc3
-'                up         rc4
-'                soft right rc5
-'                down       rc6
-
-'new rc2, rc1, rc0, ra2, rc5, ra4, ra5 
-
  DEFINE OSC 8
  DEFINE HSER_RCSTA 90h
  DEFINE HSER_TXSTA 24h
@@ -39,7 +29,7 @@ INTCON = %11100000
 PIE1 = %00100000
 OPTION_REG = %00000111
 
-
+high PORTC.7
 
 on interrupt goto intManagement
 ENABLE
@@ -51,31 +41,20 @@ if (manageSerial == 1) then
                     gosub pause100
                     gosub pause100                    
                 endif
-                if command[i] == "m" THEN
+                if command[i] == "l" THEN
                     high PORTC.2
                     gosub pause100
                     low PORTC.2
                     gosub pause100                    
                 endif
                 if command[i] == "x" THEN 'middle long press
-                    high PORTC.2
-                    gosub pause100
-                    gosub pause100
-                    gosub pause100
-                    gosub pause100
-                    gosub pause100
-                    gosub pause100
-                    low PORTC.2
-                    gosub pause100                    
-                endif                                
-                if command[i] == "u" THEN
                     high PORTC.1
                     gosub pause100
-                    low PORTC.1
-                    gosub pause100                    
-                endif
-                if command[i] == "y" THEN 'middle long press
-                    high PORTC.1
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
                     gosub pause100
                     gosub pause100
                     gosub pause100
@@ -85,24 +64,53 @@ if (manageSerial == 1) then
                     low PORTC.1
                     gosub pause100                    
                 endif                                
-                if command[i] == "d" THEN
+                if command[i] == "m" THEN
+                    high PORTC.1
+                    gosub pause100
+                    low PORTC.1
+                    gosub pause100                    
+                endif
+                if command[i] == "y" THEN 'down long press
+                    high PORTA.4
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    low PORTA.4
+                    gosub pause100                    
+                endif                                
+                if command[i] == "v" THEN
                     high PORTC.0
                     gosub pause100
                     low PORTC.0
                     gosub pause100                    
                 endif
-                if command[i] == "z" THEN 'middle long press
-                    high PORTC.0
+                if command[i] == "z" THEN 'up long press
+                    high PORTA.5
                     gosub pause100
                     gosub pause100
                     gosub pause100
                     gosub pause100
                     gosub pause100
                     gosub pause100
-                    low PORTC.0
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    gosub pause100
+                    low PORTA.5
                     gosub pause100                    
                 endif                                                
-                if command[i] == "l" THEN
+                if command[i] == "s" THEN
                     high PORTA.2
                     gosub pause100
                     low PORTA.2
@@ -114,17 +122,41 @@ if (manageSerial == 1) then
                     low PORTC.5
                     gosub pause100                    
                 endif
-                if command[i] == "s" THEN
+                if command[i] == "d" THEN
                     high PORTA.4
                     gosub pause100
                     low PORTA.4
                     gosub pause100                    
                 endif
-                if command[i] == "v" THEN
+                if command[i] == "u" THEN
                     high PORTA.5
                     gosub pause100
                     low PORTA.5
                     gosub pause100                    
+                endif
+                if command[i] == "a" THEN 'up
+                    high PORTA.5
+                endif                
+                if command[i] == "b" THEN
+                    LOW PORTA.5
+                endif                
+                if command[i] == "e" THEN 'down
+                    high PORTA.4
+                endif                
+                if command[i] == "f" THEN
+                    LOW PORTA.4
+                endif                
+                if command[i] == "g" THEN 'middle
+                    high PORTC.1
+                endif                
+                if command[i] == "h" THEN
+                    LOW PORTC.1
+                endif                
+                if command[i] == "i" THEN
+                    high PORTC.7
+                endif                
+                if command[i] == "j" THEN
+                    LOW PORTC.7
                 endif                
             next i
             :exitloop2

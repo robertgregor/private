@@ -1,7 +1,8 @@
 'spinace RA0 - RA5 , RE0 - RE2
 'Alarm vstupy rb0 - rb7
 'rolety rc0
-'io home control rc1
+'io home control rc1 ' serout
+'io home control rc2 ' serin
 'led             rd1
 'siren relay     rd0
 'Bluetooth AT+NAMEname
@@ -366,7 +367,7 @@ sendHttpAnswer501:
     gosub sendHttpAnswerHeaders
 return
 sendHttpAnswerEnd:
-    HSEROUT ["</BODY></HTML>"]
+    HSEROUT ["</BODY></HTML>",13,10]
 return
 
 cleanInputBuffers:
@@ -502,38 +503,24 @@ manageHttpCommand:
             DEBUG "GET /"
             for i=0 to 30
                 DEBUG command[i] 'serout PORTC.0, 2, [command[i]]
-                if (command[i] == $2F) then goto afterRolety
+                if (command[i] == " ") then goto afterRolety
             next i
             :afterRolety
+            debug "HTTP/1.0"
+            DEBUG 10
             LOW PORTC.0
          endif         
          if command[0] == "e" THEN ' io homecontrol m-middle,u-up,d-down,l-left,r-right,s-softup,v-softdown,p-pause e.g. GET /e0000udlrsv
-            serout PORTC.1,2,["GET /"]
-            for i=0 to 50
-                serout PORTC.1,2,[command[i]]
-                if (command[i] == $2F) then goto afterIOHome
+            serout PORTC.2,2,["GET /"]
+            for i=0 to 80
+                serout PORTC.2,2,[command[i]]
+                if (command[i] == " ") then goto afterIOHome
             next i
             :afterIOHome
-            LOW PORTC.1
+            serout PORTC.2,2,["HTTP/1.0",10]
+            serin2 PORTC.1,2,20000,ioend,[temp_byte]
+            :ioend
          endif
-         if command[0] == "q" THEN ' set io off
-            LOW PORTC.1
-            LOW PORTC.2
-            LOW PORTC.3
-            LOW PORTC.4
-            LOW PORTC.5
-            LOW PORTD.2
-            LOW PORTD.3
-         ENDIF         
-         if command[0] == "r" THEN ' set io on
-            HIGH PORTC.1
-            HIGH PORTC.2
-            HIGH PORTC.3
-            HIGH PORTC.4
-            HIGH PORTC.5
-            HIGH PORTD.2
-            HIGH PORTD.3
-         ENDIF         
          if command[0] == "l" THEN ' siren on
             high PORTD.0
          endif
