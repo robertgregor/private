@@ -24,9 +24,9 @@ public class HomeCommunicator extends Thread  {
     Socket socket;
     long ioHomeControlPowerTimeout = 300000;
     long ioHomeControlPowerLongTimeout = 3600000;    
-    private String ioHomeControlPowerOn =  "GET /ePINNvprpvplplpu HTTP/1.0\n";
+    private String ioHomeControlPowerOn =  "GET /ePINNvprpvplpu HTTP/1.0\n";
     private String ioHomeControlRemotecontrollerPowerOn =  "GET /ePINNi HTTP/1.0\n";
-    private String ioHomeControlPowerOff = "GET /ePINNvprpvplplpdpppppppppj HTTP/1.0\n";
+    private String ioHomeControlPowerOff = "GET /ePINNvprpvplpdpppj HTTP/1.0\n";
     private boolean ioHomeControlOn = false;
     private long ioCounter = 0;
     private String oldIOCommand = "";
