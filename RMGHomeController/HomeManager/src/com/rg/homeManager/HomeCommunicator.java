@@ -24,7 +24,7 @@ public class HomeCommunicator extends Thread  {
     Socket socket;
     long ioHomeControlPowerTimeout = 300000;
     long ioHomeControlPowerLongTimeout = 3600000;    
-    private String ioHomeControlPowerOn =  "GET /ePINNvprpvplpu HTTP/1.0\n";
+    private String ioHomeControlPowerOn =  "GET /ePINNipppppppppppppppppppppppppppu HTTP/1.0\n";
     private String ioHomeControlRemotecontrollerPowerOn =  "GET /ePINNi HTTP/1.0\n";
     private String ioHomeControlPowerOff = "GET /ePINNvprpvplpdpppj HTTP/1.0\n";
     private boolean ioHomeControlOn = false;
@@ -143,21 +143,20 @@ public class HomeCommunicator extends Thread  {
                         try {
                             WebAdm.message("IOHomeControlRelay is going on.");
                             receivedDataString = "";
-                            String ioOncmd = ioHomeControlRemotecontrollerPowerOn.replaceAll("PINN", currentPIN);                            
+                            String ioOncmd = ioHomeControlPowerOn.replaceAll("PINN", currentPIN);                            
                             dataOutputStream.write(ioOncmd.getBytes());
                             dataOutputStream.flush();
-                            lock.wait(15000);
+                            lock.wait(12000);
                             WebAdm.message("Answer from remote controller on: "+receivedDataString);
-                            Thread.sleep(5000); //wait for remote control to start
-                            ioOncmd = ioHomeControlPowerOn.replaceAll("PINN", currentPIN);
-                            ioOncmd = modifyIOHomeControlCommand(ioOncmd);
-                            receivedDataString = "";
-                            dataOutputStream.write(realCmd.getBytes());
-                            dataOutputStream.flush();
-                            lock.wait(5000);
+                            //Thread.sleep(11000); //wait for remote control to start
+                            //String ioSystCmd = ioHomeControlPowerOn.replaceAll("PINN", currentPIN);
+                            //receivedDataString = "";
+                            //dataOutputStream.write(ioSystCmd.getBytes());
+                            //dataOutputStream.flush();
+                            //lock.wait(3000);
                             ioHomeControlOn = true;
                             ioCounter = 0;
-                            WebAdm.message("Answer from IO switch: "+receivedDataString);
+                            //WebAdm.message("Answer from IO main switch: "+receivedDataString);
                         } catch (Exception e) {
                             ioHomeControlOn = false;
                             WebAdm.message("Error, when tried to switch on IOHomeControlRelay: "+e.getMessage());
