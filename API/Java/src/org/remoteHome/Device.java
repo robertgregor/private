@@ -11,8 +11,12 @@ interface Device {
     /**
      * This device type is heating header.
      */
-    int HeatingHeader = 4;
-    int SimpleSwitch = 3;
+    public static int HeatingHeader = 4;
+
+    /**
+     * This device type is simple switch
+     */
+    public static int SimpleSwitch = 3;
     
     
     

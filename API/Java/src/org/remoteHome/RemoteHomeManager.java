@@ -6,10 +6,6 @@ package org.remoteHome;
 
 import java.lang.Integer;
 import java.util.HashMap;
-import org.remoteHome.devices.HeatingHeaderDevice;
-import org.remoteHome.devices.SimpleSwitchDevice;
-import org.remoteHome.exception.RemoteHomeConnectionException;
-import org.remoteHome.exception.RemoteHomeManagerException;
 
 /**
  *

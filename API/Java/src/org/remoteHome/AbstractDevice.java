@@ -31,7 +31,7 @@ public abstract class AbstractDevice implements Device {
      * 
      * @param deviceId is device id of the hardware device assigned with AT+a=id command
      */
-    public void setDeviceId(int deviceId) {
+    protected void setDeviceId(int deviceId) {
         this.deviceId = deviceId;
     }
     
