@@ -4,29 +4,38 @@
  */
 package org.remoteHome;
 
-import java.lang.Integer;
 import java.util.HashMap;
 
 /**
  *
- * @author pt596
+ * @author Robert Gregor
+ * 
+ * This is the main class of the API.
  */
 public class RemoteHomeManager {
     
-    private HashMap<Integer, Device> devices = new HashMap<Integer, Device>();
+    private HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
     private RemoteHomeCommunicator comm;
     
     public RemoteHomeManager(String host, String port) throws RemoteHomeConnectionException {
         comm = new RemoteHomeCommunicator(host, port, this);
     }
     
-    public Device getRemoteHomeDevice(int deviceId, String deviceName, int deviceType) throws RemoteHomeManagerException {
-        if (deviceType == Device.HeatingHeader) {
+    public AbstractDevice getRemoteHomeDevice(int deviceId, String deviceName, int deviceType) throws RemoteHomeManagerException {
+        if (deviceType == AbstractDevice.HeatingHeader) {
             HeatingHeaderDevice device = new HeatingHeaderDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
             return device;
-        } else if (deviceType == Device.SimpleSwitch) {
+        } else if (deviceType == AbstractDevice.SimpleSwitch) {
             SimpleSwitchDevice device = new SimpleSwitchDevice(this, deviceId, deviceName);
+            devices.put(deviceId, device);
+            return device;
+        } else if (deviceType == AbstractDevice.TemperatureSensor) {
+            TemperatureSensorDevice device = new TemperatureSensorDevice(this, deviceId, deviceName);
+            devices.put(deviceId, device);
+            return device;
+        } else if (deviceType == AbstractDevice.LightAlarmDevice) {
+            LightAlarmDevice device = new LightAlarmDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
             return device;
         } else {
@@ -38,7 +47,7 @@ public class RemoteHomeManager {
            String tokens[] = data.split(" ");
            //device Id, skip + sign
            Integer deviceId = Integer.parseInt(tokens[0].substring(1));
-           Device targetDevice = devices.get(deviceId);
+           AbstractDevice targetDevice = devices.get(deviceId);
            if (targetDevice != null) {
                targetDevice.manageAsynchronousCommand(tokens[1].split("\\|"));
            }
@@ -48,4 +57,8 @@ public class RemoteHomeManager {
         comm.sendCommand(deviceId, command);
     }
 
+    public String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
+        return comm.sendCommandWithAnswer(deviceId, command);
+    }
+    
 }

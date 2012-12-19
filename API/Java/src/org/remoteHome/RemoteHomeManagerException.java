@@ -11,7 +11,17 @@ public class RemoteHomeManagerException extends Exception {
      * This constant represent the case, when the device Id, has been provided, however, it doesn't exist in the system.
      */
     public static final int UNKNOWN_DEVICE = 1;  
-    
+
+   /**
+     * Wrong parameter value
+     */
+    public static final int WRONG_PARAMETER_VALUE = 2;  
+
+   /**
+     * Wrong device type
+     */
+    public static final int WRONG_DEVICE_TYPE = 3;  
+
     private int type;
 
    /**
@@ -31,7 +41,7 @@ public class RemoteHomeManagerException extends Exception {
     }
     
    /**
-     * @returns Text message representing the error.
+     * @return Text message representing the error.
      */    
 
     @Override
@@ -39,12 +49,16 @@ public class RemoteHomeManagerException extends Exception {
         switch (type) {
             case UNKNOWN_DEVICE:
                     return "Unknown device type.";
+            case WRONG_PARAMETER_VALUE:
+                    return "Invalid parameter value: "+super.getMessage();
+            case WRONG_DEVICE_TYPE:
+                    return "Invalid device type: "+super.getMessage();
             default:
                 return super.getMessage();
         }        
     }
    /**
-     * @returns type of the exception, which matches with one of the static constant in this class.
+     * @return type of the exception, which matches with one of the static constant in this class.
      */    
     public int getType() {
         return type;

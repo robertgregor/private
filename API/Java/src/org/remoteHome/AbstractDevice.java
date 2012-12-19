@@ -1,12 +1,34 @@
 package org.remoteHome;
 
+import java.io.Serializable;
+
 /**
  * This is the implementation class for all hardware devices. All the devices should extend this class.
  * 
  * @author Robert Gregor
  */
-public abstract class AbstractDevice implements Device {
+public abstract class AbstractDevice implements Serializable {
     
+    /**
+     * This device type is heating header.
+     */
+    public static int HeatingHeader = 4;
+
+    /**
+     * This device type is simple switch
+     */
+    public static int SimpleSwitch = 3;
+    
+    /**
+     * This device type is simple switch
+     */
+    public static int TemperatureSensor = 2;
+
+    /**
+     * This device type is simple switch
+     */
+    public static int LightAlarmDevice = 1;
+
     /**
      * This is device id of the hardware device assigned with AT+a=id command
      */
@@ -58,4 +80,14 @@ public abstract class AbstractDevice implements Device {
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
     }
+    
+  /**
+    * This method is called by the Remote home manager. If you register your device to receive the asynchronous events, 
+    * the communication class will call this method to set the values of the specific device type.
+    * Please note, that this method is called in the same thread as the receiving thread, so the implementation should be fast enough to return as soon as possible.
+    * @param items the items after the space. The detailed list is described in the communication protocol.
+    * 
+    * @author Robert Gregor
+    */
+    protected abstract void manageAsynchronousCommand(String[] items);
 }

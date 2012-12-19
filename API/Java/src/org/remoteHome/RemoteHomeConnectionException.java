@@ -46,7 +46,7 @@ public class RemoteHomeConnectionException extends Exception {
     }
 
    /**
-     * @returns Text message representing the error.
+     * @return Text message representing the error.
      */    
 
     @Override
@@ -65,7 +65,7 @@ public class RemoteHomeConnectionException extends Exception {
         }        
     }
    /**
-     * @returns type of the exception, which matches with one of the static constant in this class.
+     * @return type of the exception, which matches with one of the static constant in this class.
      */    
     public int getType() {
         return type;

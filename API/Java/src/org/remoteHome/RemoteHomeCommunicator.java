@@ -20,6 +20,8 @@ class RemoteHomeCommunicator extends Thread  {
     BufferedReader dataInputStream = null;
     DataOutputStream dataOutputStream = null;
     String dataReceived = "";
+    boolean cmdWithResponse = false;
+    int cmdWithResponseId = 0;
 
     protected RemoteHomeCommunicator(String host, String port, RemoteHomeManager manager) throws RemoteHomeConnectionException {
         this.host = host;
@@ -49,6 +51,18 @@ class RemoteHomeCommunicator extends Thread  {
         try {
              socket.close();
         } catch (Throwable e) {}
+    }
+    
+    protected synchronized String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
+        cmdWithResponse = true;
+        cmdWithResponseId = deviceId;
+        try {
+            sendCommand(deviceId, command);
+            return dataReceived;
+        } finally {
+            cmdWithResponse = false;
+            cmdWithResponseId = 0;
+        }
     }
     
     protected synchronized void sendCommand(int deviceId, String command) throws RemoteHomeConnectionException {
@@ -82,8 +96,24 @@ class RemoteHomeCommunicator extends Thread  {
                             notify();
                         }
                     } else {
-                        //asynchronous command
-                        manager.manageAsynchronousCommand(dataReceived);
+                        //asynchronous command? yes or not? get id first
+                        String tokens[] = dataReceived.split(" ");
+                        //device Id, skip + sign
+                        int devId = Integer.parseInt(tokens[0].substring(1));
+                        if (!cmdWithResponse) {
+                            //Oki, asynchronous command
+                            manager.manageAsynchronousCommand(dataReceived);
+                        } else {
+                            if (devId == cmdWithResponseId) {
+                                //OK, it is response for the "command with response"
+                                synchronized(this) {
+                                    notify();
+                                }
+                            } else {
+                                //Asynchronous command
+                                manager.manageAsynchronousCommand(dataReceived);
+                            }
+                        }
                     }
                 }
             } catch (InterruptedException e) {
