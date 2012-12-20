@@ -77,7 +77,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
     }
     
     /**
-     * This method will update the values in the this object from the hardware device
+     * This method will update the values in this object from the hardware device
      * 
      * @throws RemoteHomeConnectionException if there is a problem with communication
      * @throws RemoteHomeManagerException if the type of the device doesn't belongs to the answer received back.

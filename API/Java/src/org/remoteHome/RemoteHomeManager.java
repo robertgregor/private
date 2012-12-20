@@ -1,13 +1,22 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.remoteHome;
 
 import java.util.HashMap;
 
 /**
  *
+ * This is the main starting point of the remote-home API. To be able to use it, you have to plug the USB communicator or Raspberry shield.<BR/>
+ * Then install ser2net. Configure it and start it.<BR/><BR/>
+ * 
+ * Quick howto for raspberry:<BR/>
+ * <ul>
+ * <li>Edit /boot/cmdline.txt<BR/>From: dwc_otg.lpm_enable=0 rpitestmode=1 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait<br/>
+ * to:dwc_otg.lpm_enable=0 rpitestmode=1 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait</li>
+ * <li>Edit /etc/innitab<br/>comment out:&nbsp;2:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100</li>
+ * <li>Install ser2net:<br/>&nbsp;&nbsp;Archlinux: pacman -S ser2net<br/>&nbsp;&nbsp;Raspbian/Debian: sudo apt-get install ser2net</li>
+ * <li>Edit config file: vi /etc/ser2net.conf and add the following:<br/>2000:raw:0:/dev/ttyAMA0:9600 8DATABITS NONE 1STOPBIT<br/>2001:telnet:0:/dev/ttyAMA0:9600 8DATABITS NONE 1STOPBIT</li>
+ * <li>Restart ser2net: cd /etc/rc.d&nbsp;./ser2net restart</li>
+ * </ul>
+ * 
  * @author Robert Gregor
  * 
  * This is the main class of the API.
@@ -38,6 +47,10 @@ public class RemoteHomeManager {
             LightAlarmDevice device = new LightAlarmDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
             return device;
+        } else if (deviceType == AbstractDevice.BlindsControllerDevice) {
+            BlindsControllerDevice device = new BlindsControllerDevice(this, deviceId, deviceName);
+            devices.put(deviceId, device);
+            return device;            
         } else {
             throw new RemoteHomeManagerException(RemoteHomeManagerException.UNKNOWN_DEVICE);
         }

@@ -143,7 +143,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
                 m.sendCommand(getDeviceId(),"m="+getExpectedFrequency()/10);
                 setManageFrequencyAuto(false);
             }
-        } catch (RemoteHomeConnectionException e) {
+        } catch (Exception e) {
             //there is no way how to report this exception
         }
     }
@@ -174,11 +174,15 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     }
 
     /**
-     * Expected temperature value should be set by external system in order to trigger the tepmerature change
+     * Expected temperature value should be set by external system in order to trigger the temperature change
      * Also the manageTemperatureAuto method should be set to true.
      * @param expectedTemperature the expectedTemperature to set
+     * @throws RemoteHomeManagerException if the range is outside 0 - 400 ( means 0 - 40 degree celsius )
      */
-    public void setExpectedTemperature(int expectedTemperature) {
+    public void setExpectedTemperature(int expectedTemperature) throws RemoteHomeManagerException {
+        if ((expectedOpenAngle < 0) || (expectedOpenAngle > 400)) {
+            throw new RemoteHomeManagerException("The value should be 0 - 400", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        }
         this.expectedTemperature = expectedTemperature;
         setManageTemperatureAuto(true);
     }
@@ -242,8 +246,12 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     /**
      * Expected open angle value should be set by external system in order to trigger the value change
      * @param expectedOpenAngle the expectedOpenAngle to set
+     * @throws RemoteHomeManagerException if the value is not between 0 - 100
      */
-    public void setExpectedOpenAngle(int expectedOpenAngle) {
+    public void setExpectedOpenAngle(int expectedOpenAngle) throws RemoteHomeManagerException {
+        if ((expectedOpenAngle < 0) || (expectedOpenAngle > 100)) {
+            throw new RemoteHomeManagerException("The value should be 0 - 100", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        }
         this.expectedOpenAngle = expectedOpenAngle;
         setManageOpenAngleAuto(true);
     }
@@ -284,8 +292,12 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * Expected frequency in seconds value should be set by external system in order to trigger the value change
      * Also the manageOpenAngleAuto method should be set to true.
      * @return the expectedFrequency
+     * @throws RemoteHomeManagerException if the value is not between 0 - 2550
      */
-    public int getExpectedFrequency() {
+    public int getExpectedFrequency() throws RemoteHomeManagerException {
+        if ((expectedOpenAngle < 0) || (expectedOpenAngle > 2550)) {
+            throw new RemoteHomeManagerException("The value should be 0 - 2550", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        }
         return expectedFrequency;
     }
 

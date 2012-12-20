@@ -30,6 +30,11 @@ public abstract class AbstractDevice implements Serializable {
     public static int LightAlarmDevice = 1;
 
     /**
+     * This device type is blinds controller
+     */
+    public static int BlindsControllerDevice = 5;
+
+    /**
      * This is device id of the hardware device assigned with AT+a=id command
      */
     private int deviceId = 0;    
@@ -79,6 +84,14 @@ public abstract class AbstractDevice implements Serializable {
      */
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
+    }
+  /**
+    * This method will check, if the device is alive. Please note that for battery powerred devices, this command most likely fail, because the devices sleep
+    * most of the time.
+    * @throws RemoteHomeConnectionException if the device is not reachable.
+    */
+    public void pingDevice() throws RemoteHomeConnectionException {
+        m.sendCommand(getDeviceId(), "pn");
     }
     
   /**

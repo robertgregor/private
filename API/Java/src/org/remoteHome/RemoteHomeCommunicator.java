@@ -80,7 +80,15 @@ class RemoteHomeCommunicator extends Thread  {
                 if (dataReceived.indexOf("ERROR") > 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.ERROR_FROM_DEVICE);
                 if (dataReceived.length() == 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.NO_RESPONSE_FROM_DEVICE);
         } catch (IOException e) {
-             throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);            
+            //OK, try to reconnect
+            disconnect();
+            try {
+                connect();
+            } catch (Exception ee) {
+                //OK, so now throw the exception
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
+            }
+            sendCommand(deviceId, command);
         }
     }
     @Override
