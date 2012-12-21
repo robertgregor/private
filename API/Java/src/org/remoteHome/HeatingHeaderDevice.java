@@ -45,7 +45,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     private int temperature; 
 
     /**
-     * Expected temperature value should be set by external system in order to trigger the tepmerature change
+     * Expected temperature value should be set by external system in order to trigger the temperature change
      * Also the manageTemperatureAuto method should be set to true.
      */
     private int expectedTemperature;
@@ -180,7 +180,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * @throws RemoteHomeManagerException if the range is outside 0 - 400 ( means 0 - 40 degree celsius )
      */
     public void setExpectedTemperature(int expectedTemperature) throws RemoteHomeManagerException {
-        if ((expectedOpenAngle < 0) || (expectedOpenAngle > 400)) {
+        if ((expectedTemperature < 0) || (expectedTemperature > 400)) {
             throw new RemoteHomeManagerException("The value should be 0 - 400", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
         this.expectedTemperature = expectedTemperature;
@@ -292,12 +292,8 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * Expected frequency in seconds value should be set by external system in order to trigger the value change
      * Also the manageOpenAngleAuto method should be set to true.
      * @return the expectedFrequency
-     * @throws RemoteHomeManagerException if the value is not between 0 - 2550
      */
-    public int getExpectedFrequency() throws RemoteHomeManagerException {
-        if ((expectedOpenAngle < 0) || (expectedOpenAngle > 2550)) {
-            throw new RemoteHomeManagerException("The value should be 0 - 2550", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
-        }
+    public int getExpectedFrequency() {
         return expectedFrequency;
     }
 
@@ -305,8 +301,12 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * Expected frequency in seconds value should be set by external system in order to trigger the value change
      * Also the manageOpenAngleAuto method should be set to true.
      * @param expectedFrequency the expectedFrequency to set
+     * @throws RemoteHomeManagerException if the value is not between 0 - 2550
      */
-    public void setExpectedFrequency(int expectedFrequency) {
+    public void setExpectedFrequency(int expectedFrequency) throws RemoteHomeManagerException {
+        if ((expectedFrequency < 0) || (expectedFrequency > 2550)) {
+            throw new RemoteHomeManagerException("The value should be 0 - 2550", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        }
         this.expectedFrequency = expectedFrequency;
         setManageFrequencyAuto(true);
     }

@@ -113,7 +113,7 @@ if (normalMode == 1) then
     if (sleep_period != 0) then
           normalMode = 2
            seconds = sleep_period
-          'ok send temperature wait for the response 4 seconds and sleep 10 minutes
+          'ok send temperature
           gosub sendTemperature
     endif
 endif
@@ -268,7 +268,7 @@ Wait_Up:
    IF Busy = 0 THEN goto Wait_Up            'Still busy..?, Wait_Up..!
    OWOUT HEATING_SENSOR, 1, [$CC, $BE] 'Skip ROM search & read scratchpad memory
    OWIN HEATING_SENSOR, 2, [temperature.Lowbyte, temperature.Highbyte] 'Read two bytes / end comms
-   temp_data[0] = "t"
+   temp_data[0] = "6"
    temp_data[1] = "|"
    if (temperature.11 == 1) then
         temp_data[2] = "-"

@@ -35,6 +35,15 @@ public abstract class AbstractDevice implements Serializable {
     public static int BlindsControllerDevice = 5;
 
     /**
+     * This device type is thermostat, connected to power line
+     */
+    public static int Thermostat = 6;
+    
+    /**
+     * This device type is battery thermostat, connected to power line
+     */
+    public static int BatteryThermostat = 7;
+    /**
      * This is device id of the hardware device assigned with AT+a=id command
      */
     private int deviceId = 0;    

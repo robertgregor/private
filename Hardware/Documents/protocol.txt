@@ -124,7 +124,9 @@ e - stop to move
 Battery thermostat
 
 pn - check weather the device is up and runing (ping command)
-s - return status 6|temperature|battery|frequency|expected temperature|relay|treshold
+o - Switch on the relay
+f - Switch off the relay
+s - return status 7|temperature|battery|frequency|expected temperature|relay|treshold
 	temperature format - 3 decimals degree celsius, e.g 233 = 23.3 or -23 = -23 or 022 = 2.2
 	battery voltage e.g. 29 = 2.9 or 30 3.0. Below 2.8, the hardware starts to work not correctly.
 	frequency - frequency in seconds to send status. Longer value, longer battery life
@@ -160,6 +162,8 @@ f - start to move down
 Thermostat
 
 pn - check weather the device is up and runing (ping command)
+o - Switch on the relay
+f - Switch off the relay
 s - return status 6|temperature|frequency|expected temperature|relay|treshold
 	temperature format - 3 decimals degree celsius, e.g 233 = 23.3 or -23 = -23 or 022 = 2.2
 	frequency - frequency in seconds to send status. Longer value, longer battery life
