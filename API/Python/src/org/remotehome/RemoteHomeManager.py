@@ -10,4 +10,3 @@ class RemoteHomeManager(object):
         Constructor
         '''
 
-
