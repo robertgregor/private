@@ -18,9 +18,13 @@
 
 INCLUDE "RFM70.pbp"
 
-EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,44,0,0,0,0,0]
 
  DEFINE OSC 8
+ DEFINE HSER_TXSTA 24h
+ DEFINE HSER_SPBRG 51
+ DEFINE HSER_CLROERR 1
+
  DEFINE ADC_BITS 10 ' ADCIN resolution (Bits)
  DEFINE ADC_CLOCK 3 ' ADC clock source (Fosc/32)
  DEFINE ADC_SAMPLEUS 50 ' ADC sampling time (uSec)
@@ -35,24 +39,27 @@ EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
  'interrupt for timer
  INTCON = %10100000
  PIE1 = %00000000
- OPTION_REG = %00000111
+ OPTION_REG = %00000100
 
 on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
-TRISA = %00100000 'Set PORTA to all output
+TRISA = %00110000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
 TRISC = %00001100 'Set IRQ input, 
 
-HEATING_SENSOR var PORTC.6
+HEATING_SENSOR var PORTA.4
 HEATING_SENSOR_power var PORTC.1
 MOTOR_1 var PORTC.4
 MOTOR_2 var PORTC.5
-MOVE_SENSOR_POWER VAR PORTB.5
+MOVE_SENSOR_POWER VAR PORTC.3
 MOVE_SENSOR VAR PORTA.5
+MOVE_SENSOR_PREVIOUS var byte
 motorRunning VAR byte
 motorFullRangeTicks var word
 motorFullRangeCurrentTicks var word
+motorTicksSecond var word
+motorTicks var word
 motorFullRangeExpectedTicks var word
 i VAR BYTE 'loop counter
 j var byte
@@ -108,7 +115,6 @@ if 1 == 0 then
     END
 endif
 low HEATING_SENSOR_power
-low MOVE_SENSOR_POWER
 GOSUB MotorStop
 normalMode = 0
 READ 7, motorFullRangeTicks.HighByte
@@ -193,24 +199,35 @@ if (normalMode == 3) then
       normalMode = 1
       goto commonSettings
 endif
+if (configure == 3) then
+    if (motorRunning == 0) then
+        configure = 4
+        gosub motorCloseHead        
+    endif
+endif
+if (configure == 4) then
+    if (motorRunning == 0) then
+        'adaptation end
+        motorFullRangeTicks = motorTicks
+        write 7, motorFullRangeTicks.highbyte
+        write 8, motorFullRangeTicks.LOWbyte
+        hserout ["AdTicks:",dec motorTicks,13,10]
+        TEMP_data[0] = "A"
+        TEMP_data[1] = "e"
+        TEMP_data[2] = 13
+        TEMP_data[3] = 10
+        gosub setModeBasedOnSleepPeriod
+        configure = 0
+    endif
+endif
 if (configure == 2) then
     read 6, device_id
     TEMP_data[0] = "A"
     TEMP_data[1] = "s"
     TEMP_data[2] = 13
     TEMP_data[3] = 10
-    gosub sendData
-    gosub adaptHead
-    if (errorFlag == 1) then
-        errorFlag = 0
-        gosub motorStop
-        gosub sendError
-    else 
-        TEMP_data[1] = "e"
-    endif
-    gosub sendData
-    configure = 0
-    GOTO main_rx
+    configure = 3
+    gosub motorOpenHead
 endif
 if (normalMode == 2) then
     if (seconds > 1) then
@@ -220,6 +237,7 @@ if (normalMode == 2) then
         endif      
     endif
 endif
+if configure > 2 then irqLoop 
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
@@ -270,6 +288,7 @@ if (data_in[1] == device_id) then
             endif
     ELSEif (data_in[2] == "s") then    
             gosub sendTemperature
+            gosub motorCloseHead
     elseif (data_in[2] == "p") then
             if (data_in[3] == "n") then
                 gosub sendDataOK
@@ -292,35 +311,11 @@ pause 2 'wait 2ms Rx<->Tx
 GOTO Main_rx
 end
 
-disable
-intManagement:
-        if (INTCON.2 == 1) then
-           ticks = ticks + 1      ' Count pieces of seconds
-           If ticks < 31 Then tiexit
-           ticks = 0
-           seconds = seconds + 1
-           if seconds <= 58 then tiexit
-           seconds = 0
-           tiexit: 
-           INTCON.2 = 0
-        endif
-        INTCON.7 = 1
-resume
-
-manageMotorStopInt:
+manageMotorStop:
    if (motorFullRangeCurrentTicks == motorFullRangeExpectedTicks) then 
-        gosub motorStopInt
+        gosub motorStop
    endif
 return
-
-motorStopInt:
-    low MOTOR_1
-    low MOTOR_2
-    motorRunning = 0
-    sendCurrPosFlag = 1
-return
-
-enable
 
 setValveToPosition:
       motorFullRangeExpectedTicks = (motorFullRangeTicks / 100) * temp_byte
@@ -401,7 +396,7 @@ RETURN
 
 sendTemperature:
     high HEATING_SENSOR_power
-    pause 50
+    pause 2
    'read current temperature    
    OWOUT HEATING_SENSOR, 1, [$CC, $44] 'Skip ROM search & do temp conversion
 Wait_Up:
@@ -471,34 +466,34 @@ print2LastBytesToTempByte:
 return
 
 MotorOpenHead:
-    LOW MOTOR_1
-    HIGH MOTOR_2
+    HIGH MOTOR_1
+    LOW MOTOR_2
     motorRunning = 2
+    gosub setRunningValues
 return
 
 motorCloseHead:
-    LOW MOTOR_2
-    HIGH MOTOR_1
+    HIGH MOTOR_2
+    LOW MOTOR_1
     motorRunning = 1
+    gosub setRunningValues
+return
+
+setRunningValues:
+    high MOVE_SENSOR_power
+    motorTicksSecond = 0
+    motorTicks = 0
+    ticks = 0
+    seconds = 0
+    high MOVE_SENSOR_power    
 return
 
 motorStop:
     low MOTOR_1
     low MOTOR_2
     motorRunning = 0
-return
-
-adaptHead:
-    errorFlag = 0
-    normalmode = 5
-    gosub motorOpenHead
-    normalmode = 4
-    motorFullRangeTicks = 0
-    gosub motorCloseHead
-    seconds = 0
-    write 7, motorFullRangeTicks.highbyte
-    write 8, motorFullRangeTicks.LOWbyte
-    gosub setModeBasedOnSleepPeriod
+    LOW MOVE_SENSOR_power
+    sendCurrPosFlag = 1
 return
 
 setModeBasedOnSleepPeriod:
@@ -508,3 +503,33 @@ setModeBasedOnSleepPeriod:
         normalmode = 1
     endif
 return
+
+disable
+intManagement:
+        if (INTCON.2 == 1) then
+           ticks = ticks + 1      ' Count pieces of seconds
+           if (motorRunning != 0) then
+                if (MOVE_SENSOR != MOVE_SENSOR_PREVIOUS) then
+                    motorTicks = motorTicks + 1
+                    MOVE_SENSOR_PREVIOUS = MOVE_SENSOR
+                endif
+                if ((ticks // 60) == 0) then
+                    hserout["X:",DEC motorTicks - motorTicksSecond,13,10]
+                    if ((motorTicks - motorTicksSecond) < 15) then
+                        gosub motorStop
+                        sendCurrPosFlag = 0
+                    endif
+                    motorTicksSecond = motorTicks                                        
+                endif
+           endif
+           If ticks < 241 Then tiexit
+           ticks = 0
+           seconds = seconds + 1
+           if seconds <= 58 then tiexit
+           seconds = 0
+           tiexit: 
+           INTCON.2 = 0
+        endif
+        INTCON.7 = 1
+resume
+
