@@ -15219,6 +15219,81 @@ Source: http://ww1.microchip.com/downloads/en/DeviceDoc/22049b.pdf</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="switch-dil">
+<description>&lt;b&gt;DIL Switches and Code Switches&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="SD4-01">
+<description>&lt;b&gt;DIL/CODE SWITCH&lt;/b&gt;&lt;p&gt;
+Mors</description>
+<wire x1="2.032" y1="-3.175" x2="2.032" y2="3.175" width="0.254" layer="21"/>
+<wire x1="-2.032" y1="3.175" x2="-2.032" y2="-3.175" width="0.254" layer="21"/>
+<wire x1="-0.635" y1="-1.27" x2="0.635" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="0.635" y1="1.27" x2="-0.635" y2="1.27" width="0.254" layer="21"/>
+<wire x1="-0.635" y1="1.27" x2="-0.635" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="0.635" y1="-1.27" x2="0.635" y2="1.27" width="0.254" layer="21"/>
+<wire x1="-2.032" y1="-3.175" x2="-0.762" y2="-3.175" width="0.254" layer="21"/>
+<wire x1="2.032" y1="-3.175" x2="0.762" y2="-3.175" width="0.254" layer="21"/>
+<wire x1="0.762" y1="-3.175" x2="-0.762" y2="-3.175" width="0.254" layer="51"/>
+<wire x1="2.032" y1="3.175" x2="0.762" y2="3.175" width="0.254" layer="21"/>
+<wire x1="-2.032" y1="3.175" x2="-0.762" y2="3.175" width="0.254" layer="21"/>
+<wire x1="-0.762" y1="3.175" x2="0.762" y2="3.175" width="0.254" layer="51"/>
+<wire x1="0.508" y1="-1.016" x2="-0.508" y2="-1.016" width="0.254" layer="21"/>
+<wire x1="-0.508" y1="-0.254" x2="0.508" y2="-0.254" width="0.254" layer="21"/>
+<pad name="1" x="0" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="2" x="0" y="3.81" drill="0.8128" shape="long" rot="R90"/>
+<text x="-0.381" y="-2.667" size="0.9906" layer="21" ratio="12">1</text>
+<text x="-2.3622" y="-3.1242" size="1.27" layer="25" ratio="10" rot="R90">&gt;NAME</text>
+<text x="3.6322" y="-3.1496" size="1.27" layer="27" ratio="10" rot="R90">&gt;VALUE</text>
+<text x="-1.651" y="1.7018" size="0.9906" layer="21" ratio="12">ON</text>
+<rectangle x1="-0.381" y1="-3.937" x2="0.381" y2="-3.175" layer="51"/>
+<rectangle x1="-0.381" y1="3.175" x2="0.381" y2="3.937" layer="51"/>
+</package>
+</packages>
+<symbols>
+<symbol name="DIP01">
+<wire x1="-1.905" y1="5.08" x2="-1.905" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="-1.905" y1="5.08" x2="1.905" y2="5.08" width="0.4064" layer="94"/>
+<wire x1="1.905" y1="5.08" x2="1.905" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="-1.905" y1="-5.08" x2="1.905" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="0.508" y1="-2.54" x2="-0.508" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-0.508" y1="2.54" x2="0.508" y2="2.54" width="0.1524" layer="94"/>
+<wire x1="0.508" y1="2.54" x2="0.508" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-0.508" y1="-2.54" x2="-0.508" y2="2.54" width="0.1524" layer="94"/>
+<text x="-2.54" y="-5.08" size="1.778" layer="95" rot="R90">&gt;NAME</text>
+<text x="4.445" y="-5.08" size="1.778" layer="96" rot="R90">&gt;VALUE</text>
+<text x="-0.127" y="-4.064" size="0.9906" layer="94" ratio="14">1</text>
+<text x="-0.889" y="3.175" size="0.9906" layer="94" ratio="14">ON</text>
+<rectangle x1="-0.254" y1="-2.286" x2="0.254" y2="0" layer="94"/>
+<pin name="2" x="0" y="7.62" visible="pad" length="short" direction="pas" rot="R270"/>
+<pin name="1" x="0" y="-7.62" visible="pad" length="short" direction="pas" rot="R90"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="SD4-01" prefix="S" uservalue="yes">
+<description>&lt;b&gt;DIL/CODE SWITCH&lt;/b&gt;</description>
+<gates>
+<gate name="1" symbol="DIP01" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SD4-01">
+<connects>
+<connect gate="1" pin="1" pad="1"/>
+<connect gate="1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -15256,6 +15331,7 @@ Source: http://ww1.microchip.com/downloads/en/DeviceDoc/22049b.pdf</description>
 <part name="JP3" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="IC4" library="ds1820" deviceset="DS1820" device=""/>
 <part name="C6" library="resistor" deviceset="CPOL-EU" device="SMCA" value="1uF"/>
+<part name="S1" library="switch-dil" deviceset="SD4-01" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -15290,6 +15366,7 @@ Source: http://ww1.microchip.com/downloads/en/DeviceDoc/22049b.pdf</description>
 <instance part="JP3" gate="A" x="66.04" y="101.6"/>
 <instance part="IC4" gate="G$1" x="43.18" y="134.62"/>
 <instance part="C6" gate="G$1" x="139.7" y="45.72"/>
+<instance part="S1" gate="1" x="147.32" y="99.06"/>
 </instances>
 <busses>
 </busses>
@@ -15344,7 +15421,8 @@ Source: http://ww1.microchip.com/downloads/en/DeviceDoc/22049b.pdf</description>
 <wire x1="111.76" y1="30.48" x2="127" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="127" y1="30.48" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="30.48" x2="139.7" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="139.7" y1="30.48" x2="177.8" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="30.48" x2="144.78" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="30.48" x2="177.8" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="35.56" x2="71.12" y2="30.48" width="0.1524" layer="91"/>
 <junction x="71.12" y="30.48"/>
 <pinref part="R7" gate="G$1" pin="1"/>
@@ -15385,6 +15463,9 @@ Source: http://ww1.microchip.com/downloads/en/DeviceDoc/22049b.pdf</description>
 <pinref part="C6" gate="G$1" pin="-"/>
 <wire x1="139.7" y1="40.64" x2="139.7" y2="30.48" width="0.1524" layer="91"/>
 <junction x="139.7" y="30.48"/>
+<pinref part="S1" gate="1" pin="1"/>
+<wire x1="147.32" y1="91.44" x2="144.78" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="91.44" x2="144.78" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$11" class="0">
@@ -15683,6 +15764,16 @@ Source: http://ww1.microchip.com/downloads/en/DeviceDoc/22049b.pdf</description>
 <wire x1="-10.16" y1="78.74" x2="-10.16" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="JP1" gate="A" pin="3"/>
 <wire x1="-10.16" y1="55.88" x2="-20.32" y2="55.88" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="S1" gate="1" pin="2"/>
+<wire x1="147.32" y1="106.68" x2="149.86" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="149.86" y1="106.68" x2="149.86" y2="142.24" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="RC6/AN8/SS"/>
+<wire x1="149.86" y1="142.24" x2="86.36" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="142.24" x2="86.36" y2="119.38" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
