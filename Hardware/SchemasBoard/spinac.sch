@@ -15330,6 +15330,7 @@ Mors</description>
 <part name="JP1" library="pinhead" deviceset="PINHD-1X5" device=""/>
 <part name="JP3" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="IC4" library="ds1820" deviceset="DS1820" device=""/>
+<part name="C6" library="resistor" deviceset="CPOL-EU" device="SMCA" value="1uF"/>
 <part name="S1" library="switch-dil" deviceset="SD4-01" device=""/>
 </parts>
 <sheets>
@@ -15364,7 +15365,8 @@ Mors</description>
 <instance part="JP1" gate="A" x="-22.86" y="55.88" rot="R180"/>
 <instance part="JP3" gate="A" x="66.04" y="101.6"/>
 <instance part="IC4" gate="G$1" x="43.18" y="134.62"/>
-<instance part="S1" gate="1" x="30.48" y="106.68"/>
+<instance part="C6" gate="G$1" x="139.7" y="45.72"/>
+<instance part="S1" gate="1" x="147.32" y="99.06"/>
 </instances>
 <busses>
 </busses>
@@ -15405,7 +15407,7 @@ Mors</description>
 <wire x1="-20.32" y1="53.34" x2="-5.08" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$5" class="0">
+<net name="GND" class="0">
 <segment>
 <pinref part="B1" gate="G$1" pin="-"/>
 <wire x1="7.62" y1="48.26" x2="5.08" y2="48.26" width="0.1524" layer="91"/>
@@ -15418,7 +15420,9 @@ Mors</description>
 <wire x1="93.98" y1="30.48" x2="111.76" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="30.48" x2="127" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="127" y1="30.48" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="132.08" y1="30.48" x2="177.8" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="30.48" x2="139.7" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="30.48" x2="144.78" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="30.48" x2="177.8" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="35.56" x2="71.12" y2="30.48" width="0.1524" layer="91"/>
 <junction x="71.12" y="30.48"/>
 <pinref part="R7" gate="G$1" pin="1"/>
@@ -15452,20 +15456,16 @@ Mors</description>
 <pinref part="D3" gate="G$1" pin="A"/>
 <pinref part="JP2" gate="A" pin="3"/>
 <pinref part="JP3" gate="A" pin="3"/>
-<wire x1="63.5" y1="99.06" x2="30.48" y2="99.06" width="0.1524" layer="91"/>
-<wire x1="30.48" y1="99.06" x2="20.32" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="63.5" y1="99.06" x2="20.32" y2="99.06" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="99.06" x2="20.32" y2="68.58" width="0.1524" layer="91"/>
 <junction x="20.32" y="68.58"/>
+<label x="48.26" y="30.48" size="1.778" layer="95"/>
+<pinref part="C6" gate="G$1" pin="-"/>
+<wire x1="139.7" y1="40.64" x2="139.7" y2="30.48" width="0.1524" layer="91"/>
+<junction x="139.7" y="30.48"/>
 <pinref part="S1" gate="1" pin="1"/>
-<junction x="30.48" y="99.06"/>
-</segment>
-</net>
-<net name="N$7" class="0">
-<segment>
-<pinref part="JP1" gate="A" pin="4"/>
-<wire x1="-20.32" y1="58.42" x2="-15.24" y2="58.42" width="2.54" layer="91"/>
-<pinref part="K1" gate="2" pin="P"/>
-<wire x1="-15.24" y1="71.12" x2="-15.24" y2="58.42" width="2.54" layer="91"/>
+<wire x1="147.32" y1="91.44" x2="144.78" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="91.44" x2="144.78" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$11" class="0">
@@ -15536,7 +15536,6 @@ Mors</description>
 <wire x1="78.74" y1="63.5" x2="142.24" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="U$2" gate="G$1" pin="RB4/AN10/SDI/SDA"/>
 <wire x1="114.3" y1="119.38" x2="114.3" y2="132.08" width="0.1524" layer="91"/>
-<junction x="114.3" y="119.38"/>
 </segment>
 </net>
 <net name="N$17" class="0">
@@ -15547,16 +15546,6 @@ Mors</description>
 <pinref part="U$2" gate="G$1" pin="VDD"/>
 <wire x1="83.82" y1="66.04" x2="127" y2="66.04" width="0.1524" layer="91"/>
 <wire x1="127" y1="66.04" x2="127" y2="55.88" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="VDD"/>
-<wire x1="170.18" y1="68.58" x2="170.18" y2="66.04" width="0.1524" layer="91"/>
-<wire x1="170.18" y1="66.04" x2="170.18" y2="124.46" width="0.1524" layer="91"/>
-<wire x1="127" y1="66.04" x2="144.78" y2="66.04" width="0.1524" layer="91"/>
-<junction x="170.18" y="66.04"/>
-<junction x="127" y="66.04"/>
-<junction x="144.78" y="66.04"/>
-<wire x1="144.78" y1="66.04" x2="170.18" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="JP2" gate="A" pin="2"/>
-<wire x1="170.18" y1="124.46" x2="160.02" y2="124.46" width="0.1524" layer="91"/>
 <junction x="127" y="55.88"/>
 <wire x1="83.82" y1="66.04" x2="73.66" y2="66.04" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="66.04" x2="73.66" y2="93.98" width="0.1524" layer="91"/>
@@ -15566,6 +15555,19 @@ Mors</description>
 <pinref part="IC4" gate="G$1" pin="VDD"/>
 <wire x1="76.2" y1="142.24" x2="33.02" y2="142.24" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="142.24" x2="33.02" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="127" y1="55.88" x2="139.7" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="55.88" x2="147.32" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="147.32" y1="55.88" x2="147.32" y2="73.66" width="0.1524" layer="91"/>
+<pinref part="JP2" gate="A" pin="2"/>
+<pinref part="U$1" gate="G$1" pin="VDD"/>
+<wire x1="170.18" y1="68.58" x2="170.18" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="170.18" y1="73.66" x2="170.18" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="170.18" y1="124.46" x2="160.02" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="147.32" y1="73.66" x2="170.18" y2="73.66" width="0.1524" layer="91"/>
+<junction x="170.18" y="73.66"/>
+<pinref part="C6" gate="G$1" pin="+"/>
+<wire x1="139.7" y1="48.26" x2="139.7" y2="55.88" width="0.1524" layer="91"/>
+<junction x="139.7" y="55.88"/>
 </segment>
 </net>
 <net name="N$18" class="0">
@@ -15574,7 +15576,6 @@ Mors</description>
 <pinref part="U$2" gate="G$1" pin="RA0/AN0/C1IN+/ICSPDAT/ULPWU"/>
 <wire x1="144.78" y1="132.08" x2="132.08" y2="132.08" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="132.08" x2="132.08" y2="119.38" width="0.1524" layer="91"/>
-<junction x="132.08" y="119.38"/>
 <pinref part="JP2" gate="A" pin="4"/>
 <wire x1="160.02" y1="119.38" x2="144.78" y2="119.38" width="0.1524" layer="91"/>
 </segment>
@@ -15585,7 +15586,6 @@ Mors</description>
 <pinref part="U$2" gate="G$1" pin="RA1/AN1/C12IN0-/VREF/ICSPCLK"/>
 <wire x1="147.32" y1="134.62" x2="129.54" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="129.54" y1="134.62" x2="129.54" y2="119.38" width="0.1524" layer="91"/>
-<junction x="129.54" y="119.38"/>
 <pinref part="JP2" gate="A" pin="5"/>
 <wire x1="147.32" y1="116.84" x2="160.02" y2="116.84" width="0.1524" layer="91"/>
 </segment>
@@ -15605,7 +15605,6 @@ Mors</description>
 <wire x1="127" y1="139.7" x2="165.1" y2="139.7" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="CE"/>
 <wire x1="165.1" y1="139.7" x2="165.1" y2="68.58" width="0.1524" layer="91"/>
-<junction x="127" y="119.38"/>
 </segment>
 </net>
 <net name="N$20" class="0">
@@ -15617,7 +15616,6 @@ Mors</description>
 <pinref part="U$1" gate="G$1" pin="CSN"/>
 <wire x1="139.7" y1="81.28" x2="162.56" y2="81.28" width="0.1524" layer="91"/>
 <wire x1="162.56" y1="81.28" x2="162.56" y2="68.58" width="0.1524" layer="91"/>
-<junction x="101.6" y="119.38"/>
 </segment>
 </net>
 <net name="N$21" class="0">
@@ -15627,7 +15625,6 @@ Mors</description>
 <wire x1="96.52" y1="129.54" x2="152.4" y2="129.54" width="0.1524" layer="91"/>
 <wire x1="152.4" y1="129.54" x2="152.4" y2="68.58" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="IRQ"/>
-<junction x="96.52" y="119.38"/>
 </segment>
 </net>
 <net name="N$22" class="0">
@@ -15639,7 +15636,6 @@ Mors</description>
 <pinref part="U$1" gate="G$1" pin="SCK"/>
 <wire x1="154.94" y1="99.06" x2="160.02" y2="99.06" width="0.1524" layer="91"/>
 <wire x1="160.02" y1="99.06" x2="160.02" y2="68.58" width="0.1524" layer="91"/>
-<junction x="109.22" y="119.38"/>
 </segment>
 </net>
 <net name="N$23" class="0">
@@ -15651,7 +15647,6 @@ Mors</description>
 <wire x1="142.24" y1="76.2" x2="157.48" y2="76.2" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="MOSI"/>
 <wire x1="157.48" y1="76.2" x2="157.48" y2="68.58" width="0.1524" layer="91"/>
-<junction x="83.82" y="119.38"/>
 </segment>
 </net>
 <net name="N$26" class="0">
@@ -15695,7 +15690,6 @@ Mors</description>
 <pinref part="JP2" gate="A" pin="1"/>
 <wire x1="124.46" y1="137.16" x2="160.02" y2="137.16" width="0.1524" layer="91"/>
 <wire x1="160.02" y1="137.16" x2="160.02" y2="127" width="0.1524" layer="91"/>
-<junction x="124.46" y="119.38"/>
 </segment>
 </net>
 <net name="N$14" class="0">
@@ -15710,80 +15704,26 @@ Mors</description>
 <junction x="0" y="71.12"/>
 </segment>
 </net>
-<net name="N$28" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="RC6/AN8/SS"/>
-<junction x="86.36" y="119.38"/>
-</segment>
-</net>
-<net name="N$29" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="RC5/CCP1/P1A"/>
-<junction x="88.9" y="119.38"/>
-</segment>
-</net>
-<net name="N$30" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="RC4/C2OUT/P1B"/>
-<junction x="91.44" y="119.38"/>
-</segment>
-</net>
-<net name="N$31" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="RC3/AN7C12IN3-/P1C"/>
-<junction x="93.98" y="119.38"/>
-</segment>
-</net>
 <net name="N$32" class="0">
 <segment>
 <pinref part="U$2" gate="G$1" pin="RC1/AN5/C12IN1-"/>
-<junction x="99.06" y="119.38"/>
 <wire x1="99.06" y1="119.38" x2="99.06" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="99.06" y1="134.62" x2="73.66" y2="134.62" width="0.1524" layer="91"/>
-<wire x1="73.66" y1="134.62" x2="73.66" y2="101.6" width="0.1524" layer="91"/>
-<wire x1="73.66" y1="101.6" x2="66.04" y2="101.6" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$33" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="RB7/TX/CK"/>
-<junction x="106.68" y="119.38"/>
-<pinref part="S1" gate="1" pin="2"/>
-<wire x1="30.48" y1="114.3" x2="30.48" y2="144.78" width="0.1524" layer="91"/>
-<wire x1="30.48" y1="144.78" x2="106.68" y2="144.78" width="0.1524" layer="91"/>
-<wire x1="106.68" y1="144.78" x2="106.68" y2="119.38" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$34" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="RB5/AN11/RX/DT"/>
-<junction x="111.76" y="119.38"/>
+<wire x1="73.66" y1="134.62" x2="73.66" y2="109.22" width="0.1524" layer="91"/>
+<pinref part="JP3" gate="A" pin="2"/>
+<wire x1="63.5" y1="101.6" x2="55.88" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="101.6" x2="55.88" y2="109.22" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="109.22" x2="73.66" y2="109.22" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$35" class="0">
 <segment>
 <pinref part="U$2" gate="G$1" pin="RA4/AN3/T1G/OSC2/CLKOUT"/>
-<junction x="121.92" y="119.38"/>
 <pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="60.96" y1="116.84" x2="68.58" y2="116.84" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="116.84" x2="68.58" y2="139.7" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="139.7" x2="121.92" y2="139.7" width="0.1524" layer="91"/>
 <wire x1="121.92" y1="139.7" x2="121.92" y2="119.38" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$8" class="0">
-<segment>
-<pinref part="JP1" gate="A" pin="5"/>
-<pinref part="K1" gate="2" pin="S"/>
-<wire x1="-20.32" y1="60.96" x2="-20.32" y2="78.74" width="2.54" layer="91"/>
-</segment>
-</net>
-<net name="N$24" class="0">
-<segment>
-<pinref part="JP1" gate="A" pin="3"/>
-<pinref part="K1" gate="2" pin="O"/>
-<wire x1="-20.32" y1="55.88" x2="-10.16" y2="55.88" width="2.54" layer="91"/>
-<wire x1="-10.16" y1="55.88" x2="-10.16" y2="78.74" width="2.54" layer="91"/>
 </segment>
 </net>
 <net name="N$36" class="0">
@@ -15803,31 +15743,42 @@ Mors</description>
 <pinref part="IC4" gate="G$1" pin="DQ"/>
 </segment>
 </net>
+<net name="N$7" class="0">
+<segment>
+<pinref part="K1" gate="2" pin="S"/>
+<pinref part="JP1" gate="A" pin="5"/>
+<wire x1="-20.32" y1="78.74" x2="-20.32" y2="60.96" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$8" class="0">
+<segment>
+<pinref part="K1" gate="2" pin="P"/>
+<wire x1="-15.24" y1="71.12" x2="-15.24" y2="58.42" width="0.1524" layer="91"/>
+<pinref part="JP1" gate="A" pin="4"/>
+<wire x1="-15.24" y1="58.42" x2="-20.32" y2="58.42" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$24" class="0">
+<segment>
+<pinref part="K1" gate="2" pin="O"/>
+<wire x1="-10.16" y1="78.74" x2="-10.16" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="JP1" gate="A" pin="3"/>
+<wire x1="-10.16" y1="55.88" x2="-20.32" y2="55.88" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="S1" gate="1" pin="2"/>
+<wire x1="147.32" y1="106.68" x2="149.86" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="149.86" y1="106.68" x2="149.86" y2="142.24" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="RC6/AN8/SS"/>
+<wire x1="149.86" y1="142.24" x2="86.36" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="142.24" x2="86.36" y2="119.38" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
-<errors>
-<approved hash="104,1,71.12,48.26,IC1,S,N$13,,,"/>
-<approved hash="104,1,172.72,68.58,U$1,GND,N$5,,,"/>
-<approved hash="104,1,170.18,68.58,U$1,VDD,N$17,,,"/>
-<approved hash="104,1,132.08,66.04,U$2,VSS,N$5,,,"/>
-<approved hash="104,1,83.82,66.04,U$2,VDD,N$17,,,"/>
-<approved hash="108,1,-15.24,55.88,N$7,,,,,"/>
-<approved hash="110,1,132.08,66.04,N$17,N$5,,,,"/>
-<approved hash="111,1,170.18,67.31,N$17,,,,,"/>
-<approved hash="111,1,165.1,66.04,N$17,,,,,"/>
-<approved hash="111,1,162.56,66.04,N$17,,,,,"/>
-<approved hash="111,1,160.02,66.04,N$17,,,,,"/>
-<approved hash="111,1,157.48,66.04,N$17,,,,,"/>
-<approved hash="111,1,154.94,66.04,N$17,,,,,"/>
-<approved hash="111,1,152.4,66.04,N$17,,,,,"/>
-<approved hash="111,1,132.08,66.04,N$17,,,,,"/>
-<approved hash="115,1,-15.4771,53.2088,JP1,,,,,"/>
-<approved hash="115,1,160.257,123.321,JP2,,,,,"/>
-<approved hash="115,1,-16.184,38.1,F1,,,,,"/>
-<approved hash="115,1,70.6332,38.1,D3,,,,,"/>
-<approved hash="115,1,66.04,78.2532,D4,,,,,"/>
-</errors>
 </schematic>
 </drawing>
 </eagle>
