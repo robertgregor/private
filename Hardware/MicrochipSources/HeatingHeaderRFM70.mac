@@ -233,11 +233,61 @@ ADD?WCW macro Win, Cin, Wout
     endif
     endm
 
+ADD?WWW macro Win1, Win2, Wout
+    if ((Wout) == (Win1))
+        MOVE?BA Win2
+        CHK?RP  Wout
+        addwf   Wout, F
+        MOVE?BA (Win2) + 1
+        btfsc   STATUS, C
+        addlw   1
+        CHK?RP  Wout
+        addwf   (Wout) + 1, F
+    else
+      if ((Wout) == (Win2))
+        MOVE?BA Win1
+        CHK?RP  Wout
+        addwf   Wout, F
+        MOVE?BA (Win1) + 1
+        btfsc   STATUS, C
+        addlw   1
+        CHK?RP  Wout
+        addwf   (Wout) + 1, F
+      else
+        MOVE?BA Win1
+        CHK?RP  Win2
+        addwf   Win2, W
+        MOVE?AB Wout
+        MOVE?BA (Win1) + 1
+        btfsc   STATUS, C
+        addlw   1
+        CHK?RP  Win2
+        addwf   (Win2) + 1, W
+        MOVE?AB (Wout) + 1
+      endif
+    endif
+    endm
+
 DIV?CWW macro Cin, Win, Wout
         MOVE?CW Cin, R0
         MOVE?WW Win, R1
         L?CALL  DIV
         MOVE?AWW R0, Wout
+    endm
+DIV_USED = 1
+
+DIV?WCB macro Win, Cin, Bout
+    if ((Cin) == 2)
+        CHK?RP  Win
+        rrf     (Win) + 1, W
+        rrf     Win, W
+        MOVE?AB Bout
+    else
+        MOVE?WW Win, R0
+        MOVE?CW Cin, R1
+        L?CALL  DIV
+        MOVE?AB Bout
+    endif
     endm
 DIV_USED = 1
 
@@ -270,6 +320,14 @@ DIV?WWB macro Win1, Win2, Bout
         MOVE?WW Win2, R1
         L?CALL  DIV
         MOVE?AB Bout
+    endm
+DIV_USED = 1
+
+DIV?WWW macro Win1, Win2, Wout
+        MOVE?WW Win1, R0
+        MOVE?WW Win2, R1
+        L?CALL  DIV
+        MOVE?AWW R0, Wout
     endm
 DIV_USED = 1
 
@@ -439,6 +497,15 @@ CMPEQ?BWL macro Bin, Win, Label
     endm
 CMPEQW_USED = 1
 
+CMPEQ?TBL macro Regin, Bitin, Bin, Label
+        CLRWDT?
+        MOVE?BA Bin
+        CHK?RP  Regin
+        btfsc   Regin, Bitin
+        sublw   1
+        BIT?GOTO 1, STATUS, Z, Label
+    endm
+
 CMPEQ?TCL macro Regin, Bitin, Cin, Label
     if (((Cin) == 0) | ((Cin) == 1))
         CLRWDT?
@@ -479,13 +546,13 @@ CMPGE?BCL macro Bin, Cin, Label
     endif
     endm
 
-CMPGE?WWL macro Win1, Win2, Label
-        MOVE?WW Win1, R0
-        MOVE?WWA Win2, R1
-        L?CALL  CMPGE
+CMPGE?WBL macro Win, Bin, Label
+        MOVE?WW Win, R0
+        MOVE?BA Bin
+        L?CALL  CMPGEW
         BIT?GOTO 0, STATUS, Z, Label
     endm
-CMPGE_USED = 1
+CMPGEW_USED = 1
 
 CMPGT?BBL macro Bin1, Bin2, Label
         CLRWDT?
@@ -583,12 +650,6 @@ CMPNE?BCL macro Bin, Cin, Label
         sublw   Cin
         BIT?GOTO 0, STATUS, Z, Label
     else
-        L?GOTO  Label
-    endif
-    endm
-
-CMPNE?CCL macro Cin1, Cin2, Label
-    if ((Cin1) != (Cin2))
         L?GOTO  Label
     endif
     endm
@@ -829,10 +890,6 @@ Intchk  btfsc   INTCON, GIE
 label
     endm
 ONINT_USED = 1
-
-OUTPUT?T macro Regin, Bitin
-        MOVE?CT 0, ((Regin) + 80h), Bitin
-    endm
 
 OWPIN?T macro Regin, Bitin
         BIT?R1  Regin, Bitin

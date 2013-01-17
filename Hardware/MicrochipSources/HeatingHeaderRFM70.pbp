@@ -15,10 +15,11 @@
 '8 full range lowbyte
 '9 interval
 '10 temperature - it is temperature / 2
+'11 analog percentage
 
 INCLUDE "RFM70.pbp"
 
-EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,44,0,0,0,0,0]
+EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,44,95,0,0,0,0]
 
  DEFINE OSC 8
  DEFINE HSER_TXSTA 24h
@@ -31,8 +32,8 @@ EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,44,0,0,0,0,0]
  ADCON0.7 = 1
  
  OSCCON = %01110000 ' Internal 8MHz osc
- ANSEL = %10000000
- ANSELH = 0
+ ANSEL = 0
+ ANSELH = %00001000
  CM1CON0 = 0
  CM2CON0 = 0
  
@@ -45,8 +46,8 @@ on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00110000 'Set PORTA to all output
-TRISB = %00010000 'Set , SDI input
-TRISC = %00001100 'Set IRQ input, 
+TRISB = %00110000 'Set , SDI input
+TRISC = %00000100 'Set IRQ input, 
 
 HEATING_SENSOR var PORTA.4
 HEATING_SENSOR_power var PORTC.1
@@ -54,18 +55,23 @@ MOTOR_1 var PORTC.4
 MOTOR_2 var PORTC.5
 MOVE_SENSOR_POWER VAR PORTC.3
 MOVE_SENSOR VAR PORTA.5
-MOVE_SENSOR_PREVIOUS var byte
+ANALOG_INPUT_MOTOR VAR PORTB.5
+moveSensorPrevious var byte
 motorRunning VAR byte
 motorFullRangeTicks var word
-motorFullRangeCurrentTicks var word
+motorCurrentTicks var word
+motorExpectedTicks var word
 motorTicksSecond var word
-motorTicks var word
-motorFullRangeExpectedTicks var word
+motorAnalogValue var WORD
+motorAnalogValueTmp var WORD
+motorAnalogValueSeconds var WORD
+motorAnalogValueTmpTicks var WORD
+ANALOG_PERCENTAGE var byte
+mode var byte
+
 i VAR BYTE 'loop counter
 j var byte
-ic var byte
-VDD VAR WORD
-confSuccess var byte
+ci var byte
 configure var byte
 temp_byte_int var byte
 temp_byte var byte
@@ -73,93 +79,68 @@ temp1_byte var byte
 temp2_byte var byte
 temp3_byte var byte
 temp_word var word
-temperature var word
-seconds  var    byte    ' Define second variable
+temp_word_int var word
+seconds  var     byte   ' Define second variable
 ticks   var     byte    ' Define pieces of seconds variable
-dat var word 'unscaled ADC data
-normalMode VAR byte
-sendCurrPosFlag VAR byte
-sendCurrPosFlag2 var byte
+l1counter var byte
+conversionSuccess VAR BYTE
 Dummy       VAR BYTE
 TempC       VAR WORD
 Float       VAR WORD        
+temperature var word
 busy        var BIT
+VDD VAR WORD
 sleep_period var word
-errorFlag var byte
 temperatureExp var byte
 
 clear
-output heating_sensor_power
-output MOVE_SENSOR_POWER
-output motor_1
-output motor_2
-input heating_sensor
 input MOVE_SENSOR
-read 9, sleep_period
 read 6, device_id
+READ 7, motorFullRangeTicks.highbyte
+read 8, motorFullRangeTicks.lowbyte
+read 9, sleep_period
 read 10, temperatureExp
-
-'here the reset should be triggered
-if 1 == 0 then
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    write 8, 0
-    write 9, 0
-    write 10, 0
-    END
-endif
-low HEATING_SENSOR_power
-GOSUB MotorStop
-normalMode = 0
-READ 7, motorFullRangeTicks.HighByte
-READ 8, motorFullRangeTicks.LOWBYTE
+read 11, ANALOG_PERCENTAGE
+gosub motorStopInt
 gosub initModule
-'--------------Common RX-TX settings--------------------------------------------
+if (device_id != 0) then mode = 4
 commonSettings:
 gosub commonRXTX
+ 
 '============Main Rx============================================================
-if (device_id != 0) then
-    gosub setModeBasedOnSleepPeriod 
-endif
 Main_rx:
 gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
-if (sendCurrPosFlag == 1) then
-   sendCurrPosFlag = 0
-   gosub sendCurrentPosition
-endif
-if (normalMode == 1) then
+if (mode == 1) then
     if (sleep_period != 0) then
-      normalMode = 2
+       mode = 2
        seconds = 0
        ticks = 0
       'ok send status wait for the response 2 seconds and sleep sleep_time seconds
       gosub sendTemperature
     endif
 endif
+if (mode == 3) then
+      if (motorRunning == 0) then
+          gosub sendCurrentPosition
+          gosub setModeBasedOnSleepPeriod
+      endif
+endif
 'Check for data to send
 if (temp_data[0] != 0) then
     if (configure == 1) then
         gosub commonRXTX
-        configure = 2
+        mode = 4
+        configure = 0
     endif
     gosub sendData
-    TEMP_data[0] = 0
-    if (sendCurrPosFlag2 == 1) then
-        sendCurrPosFlag2 = 0
-        sendCurrPosFlag = 1
-    endif
+    temp_data[0] = 0
     GOTO main_rx
 endif
-if (normalMode == 3) then
+if (mode == 2) then
+    if (seconds > 2) then
         'OK, if the expected temperature is set set the head
       if (temperatureExp != 0) then
          if (temperature.11 != 1) then                          
@@ -170,9 +151,9 @@ if (normalMode == 3) then
                 elseif (temp2_byte == 3) then
                     temp_byte = 50
                 elseif (temp2_byte == 2) then
-                    temp_byte = 70
+                    temp_byte = 60
                 elseif (temp2_byte == 1) then
-                    temp_byte = 90
+                    temp_byte = 75
                 else
                     temp_byte = 0
                 endif
@@ -183,7 +164,20 @@ if (normalMode == 3) then
             'temperature is minus open the valve
             temp_byte = 0          
          endif
-        gosub setValveBeforeSleep
+         gosub setup_sleep
+         gosub setValveToPosition
+         dummy = 0
+         waitMotorStop:
+         if (motorRunning != 0) then
+                dummy = 1
+                goto waitMotorStop
+         endif
+         gosub commonRXTX
+         if (dummy == 1) then 
+             gosub sendCurrentPosition
+             gosub sendData
+             temp_data[0] = 0
+         endif
       endif      
       disable
       INTCON = 0
@@ -194,50 +188,46 @@ if (normalMode == 3) then
       seconds = 0
       ticks = 0
       INTCON = %10100000
-      OPTION_REG = %00000111
+      OPTION_REG = %00000100
       enable
-      normalMode = 1
+      mode = 1
       goto commonSettings
+   endif
 endif
-if (configure == 3) then
+if (mode == 4) then
+    temp_data[0] = "A"
+    temp_data[1] = "s"
+    temp_data[2] = 13
+    temp_data[3] = 10
+    motorAnalogValue = 0
+    motorAnalogValueSeconds = 0
+    motorAnalogValueTmpTicks = 0
+    motorAnalogValueTmp = 0
+    mode = 5    
+    gosub MotorOpenHead
+endif
+if (mode == 5) then
     if (motorRunning == 0) then
-        configure = 4
-        gosub motorCloseHead        
+        motorAnalogValue = 0
+        motorAnalogValueSeconds = 0
+        motorAnalogValueTmpTicks = 0
+        motorAnalogValueTmp = 0
+        mode = 6
+        motorCurrentTicks = 0
+        gosub MotorCloseHead
     endif
 endif
-if (configure == 4) then
+if (mode == 6) then
     if (motorRunning == 0) then
-        'adaptation end
-        motorFullRangeTicks = motorTicks
+        motorFullRangeTicks = motorCurrentTicks
         write 7, motorFullRangeTicks.highbyte
-        write 8, motorFullRangeTicks.LOWbyte
-        hserout ["AdTicks:",dec motorTicks,13,10]
+        write 8, motorFullRangeTicks.lowbyte
         TEMP_data[0] = "A"
         TEMP_data[1] = "e"
-        TEMP_data[2] = 13
-        TEMP_data[3] = 10
-        gosub setModeBasedOnSleepPeriod
-        configure = 0
+        gosub setModeBasedOnSleepPeriod    
     endif
 endif
-if (configure == 2) then
-    read 6, device_id
-    TEMP_data[0] = "A"
-    TEMP_data[1] = "s"
-    TEMP_data[2] = 13
-    TEMP_data[3] = 10
-    configure = 3
-    gosub motorOpenHead
-endif
-if (normalMode == 2) then
-    if (seconds > 1) then
-        if (motorRunning == 0) then
-            'go to sleep
-            normalMode = 3
-        endif      
-    endif
-endif
-if configure > 2 then irqLoop 
+if (mode > 2) then irqLoop
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
@@ -246,58 +236,63 @@ num_byte=payloadLength
 gosub spi_read
 temp_data[0] = 0
 if (data_in[1] == device_id) then
-    if (data_in[3] == "=") then
-        i = 4
-        gosub convertInputData
-        if (data_in[2] == "c") then    
+    if (data_in[2] == "c") then    
+        if (data_in[3] == "=") then
             'OK it is configure
-            write 0, data_in[9]
-            write 1, data_in[4]            
-            write 2, data_in[5]            
-            write 3, data_in[6]            
-            write 4, data_in[7]            
-            write 5, data_in[8]            
-            write 6, data_in[10]            
+            write 0, data_in[9] 'channel
+            write 1, data_in[4] 'password 0
+            write 2, data_in[5] 'password 1
+            write 3, data_in[6] 'password 2
+            write 4, data_in[7] 'password 3
+            write 5, data_in[8] 'password 4
+            write 6, data_in[10]'device id
+            device_id = data_in[10]
             pause 10
             configure = 1
-            device_id = data_in[10]
             gosub sendDataOK
-        elseif (confSuccess == 1) then                
-            if (data_in[2] == "l") then   
-                if (device_id != 0) then
-                    if (temp_byte < 101) then 
-                        gosub setValveToPosition
-                        gosub sendDataOK
-                    endif
-                endif
-            elseif (data_in[2] == "m") then   
-                write 9, temp_byte
-                sleep_period = temp_byte
-                gosub setModeBasedOnSleepPeriod
-                gosub sendDataOK
-            elseif (data_in[2] == "t") then 
-                write 10, temp_byte
-                temperatureExp = temp_byte
-                gosub sendDataOK
-            endif
         endif
-    elseif (data_in[2] == "a") then
-            if (data_in[3] == "d") then
-                configure = 2
-                gosub sendDataOK
-            endif
+    ELSEif (data_in[2] == "a") then
+            mode = 4
+            gosub sendDataOK
+    elseif (data_in[2] == "p") then
+            gosub sendDataOK
     ELSEif (data_in[2] == "s") then    
             gosub sendTemperature
-            gosub motorCloseHead
-    elseif (data_in[2] == "p") then
-            if (data_in[3] == "n") then
-                gosub sendDataOK
+    else
+        if (data_in[3] == "=") then
+            i = 4
+            gosub convertInputData
+        endif
+        if (data_in[2] == "l") then
+            if (temp_byte < 101) then 
+                  gosub setValveToPosition
+                  gosub sendDataOK
             endif
+        elseif (data_in[2] == "m") then   
+             write 9, temp_byte
+             sleep_period = temp_byte
+             gosub setModeBasedOnSleepPeriod
+             gosub sendDataOK
+        elseif (data_in[2] == "t") then 
+             write 10, temp_byte
+             temperatureExp = temp_byte
+             gosub sendDataOK
+        elseif (data_in[2] == "n") then 
+             write 11, temp_byte
+             ANALOG_PERCENTAGE = temp_byte
+             gosub sendDataOK
+        endif
     endif
     if (temp_data[0] == 0) then
-        gosub sendError
+        temp_data[0] = "E"
+        temp_data[1] = "R"
+        temp_data[2] = "R"
+        temp_data[3] = "O"
+        temp_data[4] = "R"
+        temp_data[5] = 10
     endif
 endif
+
 data_out[0]=Fifo_status 'Read FIFO status
 num_byte=1
 gosub spi_read
@@ -311,88 +306,164 @@ pause 2 'wait 2ms Rx<->Tx
 GOTO Main_rx
 end
 
-manageMotorStop:
-   if (motorFullRangeCurrentTicks == motorFullRangeExpectedTicks) then 
-        gosub motorStop
-   endif
+disable
+intManagement:
+        if (INTCON.2 == 1) then
+           ticks = ticks + 1      ' Count pieces of seconds
+           if (motorRunning != 0) then
+                if (MOVE_SENSOR != moveSensorPrevious) then
+                    if (motorRunning == 1) then 
+                        motorCurrentTicks = motorCurrentTicks + 1
+                    else
+                        motorCurrentTicks = motorCurrentTicks - 1
+                    endif
+                    moveSensorPrevious = MOVE_SENSOR
+                endif
+                if (motorCurrentTicks == motorExpectedTicks) then
+                    if (mode == 3) then
+                        gosub motorStopInt
+                    endif
+                endif
+                if ((ticks // 40) == 0) then
+                    if (mode > 3) then
+                            'headAdaptation
+                            ADCIN 11, temp_word_int
+                            motorAnalogValueTmp = motorAnalogValueTmp + temp_word_int
+                            motorAnalogValueTmpTicks = motorAnalogValueTmpTicks + 1                            
+                    endif
+                endif
+           endif
+           If ticks < 241 Then tiexit
+           if (motorRunning != 0) then
+                if (motorCurrentTicks == motorTicksSecond) then
+                    gosub motorStopInt
+                endif
+                motorTicksSecond = motorCurrentTicks 
+           endif
+           if (mode > 3) then
+               if (motorRunning != 0) then
+                  temp_word_int = (motorAnalogValueTmp / motorAnalogValueTmpTicks)*10
+                  if (seconds == 2) then                          
+                        motorAnalogValue = temp_word_int / 100
+                  endif
+                  motorAnalogValueTmp = 0
+                  motorAnalogValueTmpTicks = 0
+                  if (temp_word_int/motorAnalogValue) < ANALOG_PERCENTAGE then
+                      gosub motorStopInt  
+                  endif
+               endif
+           endif
+           ticks = 0
+           seconds = seconds + 1
+           if seconds <= 58 then tiexit
+           seconds = 0
+           tiexit: 
+           INTCON.2 = 0
+        endif
+        INTCON.7 = 1
+resume
+
+motorStopInt:
+        low MOTOR_1
+        low MOTOR_2
+        motorRunning = 0
+        LOW MOVE_SENSOR_power
 return
 
-setValveToPosition:
-      motorFullRangeExpectedTicks = (motorFullRangeTicks / 100) * temp_byte
-      if (temp_byte == 100) then motorFullRangeExpectedTicks = motorFullRangeTicks 
-      if (motorFullRangeExpectedTicks != motorFullRangeCurrentTicks) THEN
-          if (motorFullRangeExpectedTicks > motorFullRangeCurrentTicks) then
-              GOSUB MotorCloseHead            
-          else
-              GOSUB MotorOpenHead            
-          endif
-      else
-          sendCurrPosFlag2 = 1
-      endif
-return
-
-setValveBeforeSleep:
-             gosub setValveToPosition
-             if (motorRunning == 0) then
-                  sendCurrPosFlag2 = 0
-                  return
-             else
-                 backRun:
-                 if (motorRunning > 0) then backRun
-                 gosub sendCurrentPosition
-                 gosub sendData
-                 sendCurrPosFlag = 0
-             endif
-return
-
-sendCurrentPosition:
-    if (configure != 2) then
-      temp_data[0] = "l"
-      i=1
-      gosub printFullRangeTicks
-    endif
-return
-
-sendError:
-        temp_data[0] = "E"
-        temp_data[1] = "R"
-        temp_data[2] = "R"
-        temp_data[3] = "O"
-        temp_data[4] = "R"
-        temp_data[5] = 13
-        temp_data[6] = 10
-return
+enable
 
 sendDataOK:
     temp_data[0] = "O"
     temp_data[1] = "K"
-    temp_data[2] = 13
-    temp_data[3] = 10
+    temp_data[2] = 10
 return
 
 convertInputData:
-    TEMP_BYTE=0
-    confSuccess = 0
-    for ic=0 to 2    
+    conversionSuccess = 0
+    TEMP_BYTE="a"
+    for ci=0 to 2    
         TEMP1_BYTE = "a"
         TEMP2_BYTE = data_in[i]
         if (TEMP2_BYTE == "|") then return
         GOSUB lookupChar
         if (TEMP1_BYTE == "a") then return 
-        if (ic==0) then 
+        if (ci==0) then 
             TEMP_BYTE = TEMP1_BYTE
-            confSuccess = 1 
+            conversionSuccess = 1 
         else 
-            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE 
-            confSuccess = 1
+            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
+            conversionSuccess = 1
         endif
         i = i + 1
-    next ic
+    next ci
 return
 
 lookupChar:
     LOOKDOWN temp2_byte,["0123456789"], temp1_byte
 RETURN
+
+convertNoToStr:
+        temp3_byte = (temp_byte DIG 2) + $30
+        temp2_byte = (temp_byte DIG 1) + $30
+        temp1_byte = (temp_byte DIG 0) + $30
+return
+
+MotorOpenHead:
+    motorRunning = 2
+    HIGH MOTOR_1
+    LOW MOTOR_2
+    high MOVE_SENSOR_power
+    motorTicksSecond = 0
+    ticks = 0
+    seconds = 0
+return
+
+motorCloseHead:
+    motorRunning = 1
+    HIGH MOTOR_2
+    LOW MOTOR_1
+    high MOVE_SENSOR_power
+    motorTicksSecond = 0
+    ticks = 0
+    seconds = 0
+return
+
+setValveToPosition:
+      disable
+          temp_word = (motorFullRangeTicks * temp_byte) 
+          motorExpectedTicks = DIV32 100   
+      enable
+      mode = 3
+      if (motorExpectedTicks != motorCurrentTicks) THEN
+          if (motorExpectedTicks > motorCurrentTicks) then
+              GOSUB MotorCloseHead            
+          else
+              GOSUB MotorOpenHead            
+          endif
+      endif
+return
+
+sendCurrentPosition:
+      temp_data[0] = "l"
+      i=1
+      gosub printCurrentTicks
+return
+
+printCurrentTicks:
+        temp_data[i] = "|"
+        temp_byte = (motorCurrentTicks * 10) / (motorFullRangeTicks / 10)
+        i=i+1
+        gosub printByteToTempByte
+        temp_data[i+3] = 13
+        temp_data[i+4] = 10
+return
+
+printByteToTempByte:        
+        temp_data[i] = (temp_byte DIG 2) + $30
+print2LastBytesToTempByte:
+        temp_data[i+1] = (temp_byte DIG 1) + $30
+        temp_data[i+2] = (temp_byte DIG 0) + $30
+return
 
 sendTemperature:
     high HEATING_SENSOR_power
@@ -438,7 +509,7 @@ Wait_Up:
         temp_data[6] = (VDD DIG 1) + $30
         temp_data[7] = (VDD DIG 0) + $30
         temp_data[8] = "|"
-        temp_byte = sleep_period
+        temp_byte = sleep_period / 10
         i=9
         gosub printByteToTempByte
         temp_data[12] = "|"
@@ -446,90 +517,32 @@ Wait_Up:
         temp_byte = temperatureExp
         gosub print2LastBytesToTempByte
         i=15
-        gosub printFullRangeTicks
-return
-
-printFullRangeTicks:
-        temp_data[i] = "|"
-        temp_byte = (motorFullRangeCurrentTicks * 10) / (motorFullRangeTicks / 10)
-        i=i+1
-        gosub printByteToTempByte
-        temp_data[i+3] = 13
-        temp_data[i+4] = 10
-return
-
-printByteToTempByte:        
-        temp_data[i] = (temp_byte DIG 2) + $30
-print2LastBytesToTempByte:
-        temp_data[i+1] = (temp_byte DIG 1) + $30
-        temp_data[i+2] = (temp_byte DIG 0) + $30
-return
-
-MotorOpenHead:
-    HIGH MOTOR_1
-    LOW MOTOR_2
-    motorRunning = 2
-    gosub setRunningValues
-return
-
-motorCloseHead:
-    HIGH MOTOR_2
-    LOW MOTOR_1
-    motorRunning = 1
-    gosub setRunningValues
-return
-
-setRunningValues:
-    high MOVE_SENSOR_power
-    motorTicksSecond = 0
-    motorTicks = 0
-    ticks = 0
-    seconds = 0
-    high MOVE_SENSOR_power    
-return
-
-motorStop:
-    low MOTOR_1
-    low MOTOR_2
-    motorRunning = 0
-    LOW MOVE_SENSOR_power
-    sendCurrPosFlag = 1
+        gosub printCurrentTicks
 return
 
 setModeBasedOnSleepPeriod:
-    if (sleep_period == 0) then 
-        normalMode = 0
-    else     
-        normalmode = 1
+    if (device_id == 0) then
+        mode = 0
+    else 
+        if (sleep_period == 0) then 
+            mode = 0
+        else     
+            mode = 1
+        endif
     endif
 return
 
-disable
-intManagement:
-        if (INTCON.2 == 1) then
-           ticks = ticks + 1      ' Count pieces of seconds
-           if (motorRunning != 0) then
-                if (MOVE_SENSOR != MOVE_SENSOR_PREVIOUS) then
-                    motorTicks = motorTicks + 1
-                    MOVE_SENSOR_PREVIOUS = MOVE_SENSOR
-                endif
-                if ((ticks // 60) == 0) then
-                    hserout["X:",DEC motorTicks - motorTicksSecond,13,10]
-                    if ((motorTicks - motorTicksSecond) < 15) then
-                        gosub motorStop
-                        sendCurrPosFlag = 0
-                    endif
-                    motorTicksSecond = motorTicks                                        
-                endif
-           endif
-           If ticks < 241 Then tiexit
-           ticks = 0
-           seconds = seconds + 1
-           if seconds <= 58 then tiexit
-           seconds = 0
-           tiexit: 
-           INTCON.2 = 0
-        endif
-        INTCON.7 = 1
-resume
-
+resetValues:
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    write 6, 0
+    write 7, 0
+    write 8, 0
+    write 9, 0
+    write 10, 44
+    write 11, 90
+return
