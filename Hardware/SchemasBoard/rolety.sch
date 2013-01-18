@@ -15459,6 +15459,7 @@ Mors</description>
 <pinref part="T2" gate="G$1" pin="E"/>
 <wire x1="2.54" y1="116.84" x2="2.54" y2="121.92" width="0.1524" layer="91"/>
 <wire x1="2.54" y1="121.92" x2="20.32" y2="121.92" width="0.1524" layer="91"/>
+<junction x="144.78" y="30.48"/>
 </segment>
 </net>
 <net name="N$11" class="0">
@@ -15682,7 +15683,11 @@ Mors</description>
 <wire x1="147.32" y1="106.68" x2="149.86" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="149.86" y1="106.68" x2="149.86" y2="142.24" width="0.1524" layer="91"/>
 <wire x1="149.86" y1="142.24" x2="86.36" y2="142.24" width="0.1524" layer="91"/>
-<wire x1="86.36" y1="142.24" x2="86.36" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="142.24" x2="86.36" y2="119.38" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="RC6/AN8/SS"/>
+<junction x="86.36" y="119.38"/>
+<wire x1="86.36" y1="119.38" x2="86.36" y2="116.84" width="0.1524" layer="91"/>
+<junction x="147.32" y="106.68"/>
 </segment>
 </net>
 <net name="N$7" class="0">
