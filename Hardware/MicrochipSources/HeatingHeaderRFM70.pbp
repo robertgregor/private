@@ -181,12 +181,16 @@ if (mode == 2) then
       endif      
       disable
       INTCON = 0
+      OSCCON = %00010000
+      pause 1
       gosub setup_sleep
-      pause 10
+      pause 1
       sleep sleep_period * 10
-      pause 10
+      pause 1
       seconds = 0
       ticks = 0
+      OSCCON = %01110000
+      pause 1
       INTCON = %10100000
       OPTION_REG = %00000100
       enable
