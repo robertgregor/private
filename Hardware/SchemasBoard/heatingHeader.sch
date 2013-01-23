@@ -14079,53 +14079,52 @@ www.irf.com&lt;p&gt;
 </package>
 </packages>
 <symbols>
-<symbol name="N-MOS">
-<wire x1="-1.27" y1="0" x2="-0.254" y2="0.381" width="0.1524" layer="94"/>
-<wire x1="-0.254" y1="0.381" x2="-0.254" y2="-0.381" width="0.1524" layer="94"/>
-<wire x1="-0.254" y1="-0.381" x2="-1.27" y2="0" width="0.1524" layer="94"/>
-<wire x1="-1.27" y1="0" x2="-1.016" y2="0" width="0.1524" layer="94"/>
-<wire x1="-1.016" y1="0" x2="-0.889" y2="0" width="0.1524" layer="94"/>
-<wire x1="-0.889" y1="0" x2="0" y2="0" width="0.1524" layer="94"/>
-<wire x1="0" y1="0" x2="0" y2="-2.032" width="0.1524" layer="94"/>
-<wire x1="0" y1="-2.032" x2="0" y2="-2.794" width="0.1524" layer="94"/>
-<wire x1="-1.524" y1="0" x2="-1.27" y2="0" width="0.1524" layer="94"/>
+<symbol name="P-MOS">
+<wire x1="0" y1="0" x2="-1.016" y2="0.381" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="0.381" x2="-1.016" y2="-0.381" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="-0.381" x2="0" y2="0" width="0.1524" layer="94"/>
+<wire x1="0" y1="0" x2="0" y2="2.032" width="0.1524" layer="94"/>
+<wire x1="0" y1="2.032" x2="0" y2="2.794" width="0.1524" layer="94"/>
+<wire x1="-1.524" y1="0" x2="-0.508" y2="0" width="0.1524" layer="94"/>
+<wire x1="-0.508" y1="0" x2="-0.381" y2="0" width="0.1524" layer="94"/>
+<wire x1="-0.381" y1="0" x2="0" y2="0" width="0.1524" layer="94"/>
 <wire x1="-2.54" y1="2.54" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
-<wire x1="0" y1="3.048" x2="1.27" y2="3.048" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="3.048" x2="1.27" y2="0.762" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="0.762" x2="1.27" y2="0.508" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="0.508" x2="1.27" y2="-2.794" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="-2.794" x2="0" y2="-2.794" width="0.1524" layer="94"/>
-<wire x1="1.778" y1="0" x2="0.762" y2="0" width="0.1524" layer="94"/>
-<wire x1="0.762" y1="0" x2="1.27" y2="0.762" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="0.762" x2="1.778" y2="0" width="0.1524" layer="94"/>
-<wire x1="1.778" y1="0.762" x2="0.762" y2="0.762" width="0.1524" layer="94"/>
-<wire x1="-1.524" y1="2.032" x2="0" y2="2.032" width="0.1524" layer="94"/>
-<wire x1="0" y1="2.032" x2="0" y2="2.54" width="0.1524" layer="94"/>
+<wire x1="0" y1="-3.048" x2="1.27" y2="-3.048" width="0.1524" layer="94"/>
+<wire x1="1.27" y1="-3.048" x2="1.27" y2="-0.254" width="0.1524" layer="94"/>
+<wire x1="1.27" y1="-0.254" x2="1.27" y2="0" width="0.1524" layer="94"/>
+<wire x1="1.27" y1="0" x2="1.27" y2="2.794" width="0.1524" layer="94"/>
+<wire x1="1.27" y1="2.794" x2="0" y2="2.794" width="0.1524" layer="94"/>
+<wire x1="0.762" y1="-0.762" x2="1.778" y2="-0.762" width="0.1524" layer="94"/>
+<wire x1="1.778" y1="-0.762" x2="1.27" y2="0" width="0.1524" layer="94"/>
+<wire x1="1.27" y1="0" x2="0.762" y2="-0.762" width="0.1524" layer="94"/>
+<wire x1="0.762" y1="0" x2="1.778" y2="0" width="0.1524" layer="94"/>
 <wire x1="-1.524" y1="-2.032" x2="0" y2="-2.032" width="0.1524" layer="94"/>
-<wire x1="-1.016" y1="0" x2="-0.381" y2="-0.254" width="0.254" layer="94"/>
-<wire x1="-0.381" y1="-0.254" x2="-0.381" y2="0.254" width="0.254" layer="94"/>
-<wire x1="-0.381" y1="0.254" x2="-0.889" y2="0" width="0.254" layer="94"/>
-<wire x1="1.27" y1="0.508" x2="1.016" y2="0.127" width="0.254" layer="94"/>
-<wire x1="1.016" y1="0.127" x2="1.524" y2="0.127" width="0.254" layer="94"/>
-<wire x1="1.524" y1="0.127" x2="1.27" y2="0.508" width="0.254" layer="94"/>
-<circle x="0" y="-2.794" radius="0.3592" width="0" layer="94"/>
-<circle x="0" y="-2.032" radius="0.3592" width="0" layer="94"/>
-<circle x="0" y="3.048" radius="0.3592" width="0" layer="94"/>
+<wire x1="0" y1="-2.032" x2="0" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-1.524" y1="2.032" x2="0" y2="2.032" width="0.1524" layer="94"/>
+<wire x1="-0.381" y1="0" x2="-0.889" y2="-0.127" width="0.254" layer="94"/>
+<wire x1="-0.889" y1="-0.127" x2="-0.889" y2="0.127" width="0.254" layer="94"/>
+<wire x1="-0.889" y1="0.127" x2="-0.508" y2="0" width="0.254" layer="94"/>
+<wire x1="1.016" y1="-0.635" x2="1.524" y2="-0.635" width="0.254" layer="94"/>
+<wire x1="1.524" y1="-0.635" x2="1.27" y2="-0.254" width="0.254" layer="94"/>
+<wire x1="1.27" y1="-0.254" x2="1.016" y2="-0.635" width="0.254" layer="94"/>
+<circle x="0" y="2.794" radius="0.3592" width="0" layer="94"/>
+<circle x="0" y="2.032" radius="0.3592" width="0" layer="94"/>
+<circle x="0" y="-3.048" radius="0.3592" width="0" layer="94"/>
 <text x="2.54" y="0" size="1.778" layer="95">&gt;NAME</text>
 <text x="2.54" y="-2.54" size="1.778" layer="96">&gt;VALUE</text>
-<rectangle x1="-2.032" y1="1.27" x2="-1.524" y2="2.54" layer="94"/>
 <rectangle x1="-2.032" y1="-2.54" x2="-1.524" y2="-1.27" layer="94"/>
+<rectangle x1="-2.032" y1="1.27" x2="-1.524" y2="2.54" layer="94"/>
 <rectangle x1="-2.032" y1="-0.762" x2="-1.524" y2="0.762" layer="94"/>
-<pin name="G" x="-5.08" y="-2.54" visible="off" length="short" direction="pas"/>
-<pin name="D" x="0" y="5.08" visible="off" length="short" direction="pas" rot="R270"/>
-<pin name="S" x="0" y="-5.08" visible="off" length="short" direction="pas" rot="R90"/>
+<pin name="G" x="-5.08" y="2.54" visible="off" length="short" direction="pas"/>
+<pin name="D" x="0" y="-5.08" visible="off" length="short" direction="pas" rot="R90"/>
+<pin name="S" x="0" y="5.08" visible="off" length="short" direction="pas" rot="R270"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="BSS123" prefix="Q">
-<description>&lt;b&gt;N-CHANNEL MOS FET&lt;/b&gt;</description>
+<deviceset name="BSS84" prefix="Q">
+<description>&lt;b&gt;P-CHANNEL MOS FET&lt;/b&gt;</description>
 <gates>
-<gate name="G$1" symbol="N-MOS" x="0" y="0"/>
+<gate name="G$1" symbol="P-MOS" x="0" y="0"/>
 </gates>
 <devices>
 <device name="" package="SOT23">
@@ -14182,7 +14181,7 @@ www.irf.com&lt;p&gt;
 <part name="R8" library="resistor" deviceset="R-EU_" device="R2512W"/>
 <part name="C1" library="resistor" deviceset="CPOL-EU" device="SMCA" value="1uF"/>
 <part name="C2" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
-<part name="Q1" library="transistor-small-signal" deviceset="BSS123" device=""/>
+<part name="Q1" library="transistor-small-signal" deviceset="BSS84" device=""/>
 <part name="R6" library="resistor" deviceset="R-EU_" device="R1206W" value="4K7"/>
 </parts>
 <sheets>
@@ -14220,7 +14219,7 @@ www.irf.com&lt;p&gt;
 <instance part="R8" gate="G$1" x="17.78" y="134.62"/>
 <instance part="C1" gate="G$1" x="10.16" y="50.8"/>
 <instance part="C2" gate="G$1" x="25.4" y="50.8"/>
-<instance part="Q1" gate="G$1" x="0" y="78.74"/>
+<instance part="Q1" gate="G$1" x="0" y="78.74" rot="R180"/>
 <instance part="R6" gate="G$1" x="172.72" y="134.62"/>
 </instances>
 <busses>
@@ -14501,7 +14500,6 @@ www.irf.com&lt;p&gt;
 <wire x1="93.98" y1="45.72" x2="76.2" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="PAD1" gate="G$1" pin="P"/>
 <junction x="93.98" y="66.04"/>
-<wire x1="0" y1="66.04" x2="10.16" y2="66.04" width="0.1524" layer="91"/>
 <junction x="83.82" y="66.04"/>
 <wire x1="10.16" y1="66.04" x2="25.4" y2="66.04" width="0.1524" layer="91"/>
 <wire x1="25.4" y1="66.04" x2="83.82" y2="66.04" width="0.1524" layer="91"/>
@@ -14510,11 +14508,12 @@ www.irf.com&lt;p&gt;
 <wire x1="10.16" y1="53.34" x2="10.16" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="C2" gate="G$1" pin="1"/>
 <wire x1="25.4" y1="53.34" x2="25.4" y2="66.04" width="0.1524" layer="91"/>
-<junction x="10.16" y="66.04"/>
 <junction x="25.4" y="66.04"/>
 <junction x="170.18" y="66.04"/>
 <pinref part="Q1" gate="G$1" pin="S"/>
-<wire x1="0" y1="66.04" x2="0" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="0" y1="73.66" x2="0" y2="66.04" width="0.1524" layer="91"/>
+<wire x1="0" y1="66.04" x2="10.16" y2="66.04" width="0.1524" layer="91"/>
+<junction x="10.16" y="66.04"/>
 </segment>
 <segment>
 <pinref part="JP2" gate="A" pin="2"/>
@@ -14625,8 +14624,8 @@ www.irf.com&lt;p&gt;
 <wire x1="111.76" y1="142.24" x2="182.88" y2="142.24" width="0.1524" layer="91"/>
 <wire x1="182.88" y1="142.24" x2="182.88" y2="35.56" width="0.1524" layer="91"/>
 <pinref part="Q1" gate="G$1" pin="G"/>
-<wire x1="182.88" y1="35.56" x2="-5.08" y2="35.56" width="0.1524" layer="91"/>
-<wire x1="-5.08" y1="35.56" x2="-5.08" y2="76.2" width="0.1524" layer="91"/>
+<wire x1="182.88" y1="35.56" x2="5.08" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="5.08" y1="35.56" x2="5.08" y2="76.2" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
