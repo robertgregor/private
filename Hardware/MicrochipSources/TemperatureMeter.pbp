@@ -86,7 +86,12 @@ endif
 gosub initModule
 READ 7, temp_byte
 sleep_period = temp_byte * 10
-sleepMode = 0
+if (sleep_period != 0) then
+    if (device_id != 0) then
+        sleepMode = 1
+    endif
+endif
+low HEATING_SENSOR_power
 commonSettings:
 gosub commonRXTX
 
@@ -201,7 +206,9 @@ intManagement:
            if seconds <= 58 then tiexit
            seconds = 0
            if (sleep_period != 0) then
-               sleepMode = 1 
+               if (device_id != 0) then
+                   sleepMode = 1
+               endif
            endif
            tiexit: 
            INTCON.2 = 0
