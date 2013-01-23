@@ -2,10 +2,10 @@
                  
 @ DEVICE PIC16F690,INTRC_OSC_NOCLKOUT
 @ DEVICE PIC16F690,WDT_ON
-@ DEVICE PIC16F690,MCLR_OFF
+@ DEVICE PIC16F690,MCLR_ON
 @ DEVICE PIC16F690,CPD_OFF
-@ DEVICE PIC16F690,BOD_ON
-@ DEVICE PIC16F690,PWRT_ON
+@ DEVICE PIC16F690,BOD_OFF
+@ DEVICE PIC16F690,PWRT_OFF
 
 'EEPROM_MAP
 '0 - channel number
@@ -22,6 +22,7 @@ INCLUDE "RFM70.pbp"
  DEFINE ADC_CLOCK 3 ' ADC clock source (Fosc/32)
  DEFINE ADC_SAMPLEUS 50 ' ADC sampling time (uSec)
  ADCON0.7 = 1
+ ADCON0.0 = 0
 
  OSCCON = %01110000 ' Internal 8MHz osc
  ANSEL = 0
@@ -39,7 +40,10 @@ ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00000000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
-TRISC = %00000100 'Set IRQ input, 
+TRISC = %00000100 'Set IRQ input,
+WPUA = %11111111
+WPUB = %11111111
+ 
 
 HEATING_SENSOR var PORTA.5
 HEATING_SENSOR_power var PORTC.5
@@ -89,6 +93,7 @@ sleep_period = temp_byte * 10
 if (sleep_period != 0) then
     if (device_id != 0) then
         sleepMode = 1
+        gosub sendTemperature
     endif
 endif
 low HEATING_SENSOR_power
@@ -112,12 +117,12 @@ if (temp_data[0] != 0) then
     GOTO main_rx
 endif
 if (sleepMode == 1) then    
-      disable
+      disable    
       INTCON = 0
       gosub setup_sleep
-      pause 10
+      pause 1
       sleep sleep_period
-      pause 10
+      pause 1
       seconds = 57
       ticks = 0
       sleepmode = 0
