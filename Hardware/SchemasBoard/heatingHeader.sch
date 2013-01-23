@@ -14183,6 +14183,7 @@ www.irf.com&lt;p&gt;
 <part name="C1" library="resistor" deviceset="CPOL-EU" device="SMCA" value="1uF"/>
 <part name="C2" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="Q1" library="transistor-small-signal" deviceset="BSS123" device=""/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="R1206W" value="4K7"/>
 </parts>
 <sheets>
 <sheet>
@@ -14220,6 +14221,7 @@ www.irf.com&lt;p&gt;
 <instance part="C1" gate="G$1" x="10.16" y="50.8"/>
 <instance part="C2" gate="G$1" x="25.4" y="50.8"/>
 <instance part="Q1" gate="G$1" x="0" y="78.74"/>
+<instance part="R6" gate="G$1" x="172.72" y="134.62"/>
 </instances>
 <busses>
 </busses>
@@ -14364,8 +14366,12 @@ www.irf.com&lt;p&gt;
 <wire x1="124.46" y1="119.38" x2="124.46" y2="137.16" width="0.1524" layer="91"/>
 <pinref part="JP2" gate="A" pin="1"/>
 <wire x1="124.46" y1="137.16" x2="160.02" y2="137.16" width="0.1524" layer="91"/>
-<wire x1="160.02" y1="137.16" x2="160.02" y2="127" width="0.1524" layer="91"/>
+<wire x1="160.02" y1="137.16" x2="160.02" y2="134.62" width="0.1524" layer="91"/>
 <junction x="124.46" y="119.38"/>
+<pinref part="R6" gate="G$1" pin="1"/>
+<wire x1="160.02" y1="134.62" x2="160.02" y2="127" width="0.1524" layer="91"/>
+<wire x1="167.64" y1="134.62" x2="160.02" y2="134.62" width="0.1524" layer="91"/>
+<junction x="160.02" y="134.62"/>
 </segment>
 </net>
 <net name="N$30" class="0">
@@ -14515,6 +14521,10 @@ www.irf.com&lt;p&gt;
 <pinref part="U$1" gate="G$1" pin="VDD"/>
 <wire x1="170.18" y1="68.58" x2="170.18" y2="124.46" width="0.1524" layer="91"/>
 <wire x1="170.18" y1="124.46" x2="160.02" y2="124.46" width="0.1524" layer="91"/>
+<pinref part="R6" gate="G$1" pin="2"/>
+<wire x1="177.8" y1="134.62" x2="177.8" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="177.8" y1="124.46" x2="170.18" y2="124.46" width="0.1524" layer="91"/>
+<junction x="170.18" y="124.46"/>
 </segment>
 </net>
 <net name="N$6" class="0">
