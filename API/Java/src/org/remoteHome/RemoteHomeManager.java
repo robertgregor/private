@@ -1,5 +1,11 @@
 package org.remoteHome;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 /**
@@ -41,7 +47,8 @@ import java.util.HashMap;
 public class RemoteHomeManager {
     
     private HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
-    private RemoteHomeCommunicator comm;
+    transient private RemoteHomeCommunicator comm;
+    transient private File persistentFile;
     
     /**
      * 
@@ -50,7 +57,23 @@ public class RemoteHomeManager {
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      */
     public RemoteHomeManager(String host, String port) throws RemoteHomeConnectionException {
-        comm = new RemoteHomeCommunicator(host, port, this);
+        comm = new RemoteHomeCommunicator(host, port, this);        
+    }
+    /**
+     * 
+     * @param host hostname or IP address of the machine, to which is the communicator connected.
+     * @param port the TCP port, on which the ser2net or comport redirector is listening. (e.g. 2000)
+     * @param file the file to save the configuration and current status of the system.
+     * @throws RemoteHomeConnectionException if there is a problem with the connection
+     */
+    public RemoteHomeManager(String host, String port, String file) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        this(host, port);
+        persistentFile = new File(file);
+        try {
+            loadPersistentData();
+        } catch (Exception e) {
+            throw new RemoteHomeManagerException(e.getMessage(), RemoteHomeManagerException.SERIALIZATION_ERROR);
+        }
     }
     /**
      * 
@@ -112,5 +135,54 @@ public class RemoteHomeManager {
     public String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
         return comm.sendCommandWithAnswer(deviceId, command);
     }
-    
+    /*
+     * This method will join the communication thread, so the current thread will block
+     */
+    public void joinCommThread() throws RemoteHomeManagerException {
+        try {
+            comm.join();
+        } catch (InterruptedException e) {
+            return;
+        } finally {
+            comm.disconnect();
+            if (persistentFile != null) {
+                try {
+                    savePersistentData();
+                } catch (IOException e) {
+                    throw new RemoteHomeManagerException(e.getMessage(),RemoteHomeManagerException.SERIALIZATION_ERROR);
+                }
+            }
+        }
+    }
+    /*
+     * This method will load the configuration from the file
+     */
+    private void loadPersistentData() throws Exception {
+        if (persistentFile.exists()) {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(persistentFile));
+            devices = (HashMap<Integer, AbstractDevice>)ois.readObject();
+            ois.close();
+        }      
+    }
+    /*
+     * This method will save the configuration to the file on the disk.
+     */
+    public void savePersistentData() throws IOException {
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(persistentFile));
+        out.writeObject(devices);
+        out.close();
+    }
+    public static void main(String... args) throws Exception {
+        if ((args.length != 2) || (args.length != 3)) {        
+            System.out.println("Two parametrs host, port or 3 parameters host, port, file should be supplied.");
+            return;
+        }
+        if (args.length == 2) {
+            RemoteHomeManager manager = new RemoteHomeManager(args[0], args[1]);
+            manager.joinCommThread();
+        } else if (args.length == 3) {
+            RemoteHomeManager manager = new RemoteHomeManager(args[0], args[1], args[2]);
+            manager.joinCommThread();            
+        }
+    }    
 }
