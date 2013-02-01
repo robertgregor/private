@@ -22,6 +22,11 @@ public class RemoteHomeManagerException extends Exception {
      */
     public static final int WRONG_DEVICE_TYPE = 3;  
 
+   /**
+     * Wrong device type
+     */
+    public static final int SERIALIZATION_ERROR = 4;  
+
     private int type;
 
    /**
