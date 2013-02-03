@@ -20,6 +20,7 @@ EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
  DEFINE HSER_TXSTA 24h
  DEFINE HSER_SPBRG 51
  DEFINE HSER_CLROERR 1
+ 'DEFINE NO_CLRWDT 1
 
  OSCCON = %01110000 ' Internal 8MHz osc
  ANSEL = 0
@@ -35,16 +36,19 @@ OPTION_REG = %00000111
 on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
-TRISA = %00000000 'Set PORTA to all output, RA0 input
+TRISA = %00000000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
-TRISC = %00000100 'Set IRQ input, 
-
+TRISC = %00000100 'Set IRQ input,
+WPUA = %11111111
+WPUB = %11111111 
+resetButton var PORTA.5
 i VAR BYTE 'loop counter
 j var byte
 
 manageSerial var byte
 temp_byte_int var byte
 temp_byte var byte
+temp_word var word
 temp1_byte var byte
 temp2_byte var byte
 temp3_byte var byte
@@ -58,7 +62,6 @@ seconds var byte
 minutes var byte
 
 clear
-pause 500
 gosub initModule
 
 commonSettings:
@@ -70,6 +73,17 @@ pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
 'receive serial data
+'@CLEARWDT
+if (resetButton == 0) then
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    gosub printConfig
+    goto commonSettings
+endif
 if (manageSerial==1) then
     manageserial = 0
     if ((ser_data[0] == "C" OR ser_data[0] == "c") AND ser_data[1] == "=") THEN 'channel
@@ -190,6 +204,7 @@ printOK:
 return
 
 convertInputData:
+    temp_word = 0
     conversionSuccessfull = 0
     TEMP_BYTE="a"
     for ci=0 to 2    
@@ -199,13 +214,18 @@ convertInputData:
         GOSUB lookupChar
         if (TEMP1_BYTE == "a") then return 
         if (ci==0) then 
-            TEMP_BYTE = TEMP1_BYTE
+            TEMP_word = TEMP1_BYTE
         else 
-            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE 
+            TEMP_word = TEMP_word*10 + TEMP1_BYTE 
         endif
         conversionSuccessfull = 1
         i = i + 1
     next ci
+    if (TEMP_word > 255) then
+         conversionSuccessfull = 0
+    else
+        temp_byte = TEMP_word
+    endif
 return
 
 lookupChar:
@@ -223,7 +243,7 @@ return
 
 savePwd:
     for i=2 to 6
-        if (ser_data[i] == 0) or (ser_data[i] == 10) then 
+        if (ser_data[i] == 0) or (ser_data[i] == 10) or (ser_data[i] == 13) then 
             GOSUB printError
             return
         endif
@@ -262,7 +282,8 @@ temp_data[5] = ser_data[3]
 temp_data[6] = ser_data[4]
 temp_data[7] = ser_data[5] 'channel
 temp_data[8] = temp_byte 'deviceId
-temp_data[9] = 10
+temp_data[9] = 13
+temp_data[10] = 10
 GOSUB commonRXTX
 gosub debounce
 gosub sendData
@@ -279,7 +300,7 @@ return
 
 printConfig:
     read 0, temp_byte
-    HSEROUT["+Channel:",DEC temp_byte,10]
+    HSEROUT["+Channel:",DEC temp_byte,13,10]
     HSEROUT["+Password:"]
     read 1, temp_byte
     HSEROUT[temp_byte]
@@ -291,6 +312,6 @@ printConfig:
     HSEROUT[temp_byte]
     read 5, temp_byte
     HSEROUT[temp_byte]
-    HSEROUT[10]
+    HSEROUT[13,10]
 return
 

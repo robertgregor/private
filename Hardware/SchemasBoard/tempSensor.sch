@@ -11678,9 +11678,9 @@ Mors</description>
 <part name="IC1" library="ds1820" deviceset="DS1820" device=""/>
 <part name="LSP1" library="solpad" deviceset="LSP11" device=""/>
 <part name="LSP2" library="solpad" deviceset="LSP11" device=""/>
-<part name="C1" library="resistor" deviceset="C-EU" device="C2012"/>
+<part name="C1" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="S1" library="switch-dil" deviceset="SD4-01" device=""/>
-<part name="C2" library="resistor" deviceset="CPOL-EU" device="SMCA"/>
+<part name="C2" library="resistor" deviceset="CPOL-EU" device="SMCA" value="1uF"/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="R1206W" value="4K7"/>
 <part name="JP1" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="LSP3" library="solpad" deviceset="LSP11" device=""/>

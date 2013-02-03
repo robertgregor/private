@@ -2,7 +2,7 @@
                  
 @ DEVICE PIC16F690,INTRC_OSC_NOCLKOUT
 @ DEVICE PIC16F690,WDT_ON
-@ DEVICE PIC16F690,MCLR_OFF
+@ DEVICE PIC16F690,MCLR_ON
 @ DEVICE PIC16F690,CPD_ON
 @ DEVICE PIC16F690,BOD_OFF
 @ DEVICE PIC16F690,PWRT_OFF
@@ -54,6 +54,7 @@ HEATING_SENSOR_power var PORTC.1
 MOTOR_1 var PORTC.4
 MOTOR_2 var PORTC.5
 MOVE_SENSOR_POWER VAR PORTC.3
+'MOTOR_BRIDGE_POWER VAR PORTC.6
 MOVE_SENSOR VAR PORTA.5
 ANALOG_INPUT_MOTOR VAR PORTB.5
 moveSensorPrevious var byte
@@ -372,6 +373,7 @@ motorStopInt:
         low MOTOR_2
         motorRunning = 0
         LOW MOVE_SENSOR_power
+        'LOW MOTOR_BRIDGE_POWER
 return
 
 enable
@@ -413,6 +415,7 @@ convertNoToStr:
 return
 
 MotorOpenHead:
+    'HIGH MOTOR_BRIDGE_POWER
     motorRunning = 2
     HIGH MOTOR_1
     LOW MOTOR_2
@@ -423,6 +426,7 @@ MotorOpenHead:
 return
 
 motorCloseHead:
+    'HIGH MOTOR_BRIDGE_POWER
     motorRunning = 1
     HIGH MOTOR_2
     LOW MOTOR_1

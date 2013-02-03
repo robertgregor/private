@@ -66,7 +66,7 @@ Fifo_status con $17 'FIFO status register register address
 
 goto endRFM70
 initModule:
-pause 500
+pause 50
 '----------SPI settings---------------------------------------------------------
 SSPEN = 1 'enable SPI pins
 SSPCON.0=1 'SPI rate=OSC/16

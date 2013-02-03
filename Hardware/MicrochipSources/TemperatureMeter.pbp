@@ -38,7 +38,7 @@ INCLUDE "RFM70.pbp"
 on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
-TRISA = %00000000 'Set PORTA to all output
+TRISA = %00100000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input,
 WPUA = %11111111
