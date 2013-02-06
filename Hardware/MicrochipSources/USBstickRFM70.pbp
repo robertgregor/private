@@ -20,7 +20,6 @@ EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
  DEFINE HSER_TXSTA 24h
  DEFINE HSER_SPBRG 51
  DEFINE HSER_CLROERR 1
- 'DEFINE NO_CLRWDT 1
 
  OSCCON = %01110000 ' Internal 8MHz osc
  ANSEL = 0
@@ -60,7 +59,7 @@ ci var byte
 ticks var byte
 seconds var byte
 minutes var byte
-
+resetLabel:
 clear
 gosub initModule
 
@@ -72,17 +71,17 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
-'receive serial data
-'@CLEARWDT
 if (resetButton == 0) then
+    disable
     write 0, 40
     write 1, "R"
     write 2, "O"
     write 3, "B"
     write 4, "I"
     write 5, "K"
+    enable
     gosub printConfig
-    goto commonSettings
+    goto resetLabel
 endif
 if (manageSerial==1) then
     manageserial = 0
