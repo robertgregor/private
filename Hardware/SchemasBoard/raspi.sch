@@ -10756,6 +10756,8 @@ Source: www.farnell.com/datasheets/247.pdf</description>
 <part name="C1" library="rcl" deviceset="C-EU" device="C0805"/>
 <part name="C2" library="resistor" deviceset="CPOL-EU" device="SMCA"/>
 <part name="S2" library="switch-tact" deviceset="DTSM-3" device=""/>
+<part name="S1" library="switch-tact" deviceset="DTSM-3" device=""/>
+<part name="S3" library="switch-tact" deviceset="DTSM-3" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -10769,6 +10771,8 @@ Source: www.farnell.com/datasheets/247.pdf</description>
 <instance part="C1" gate="G$1" x="33.02" y="114.3"/>
 <instance part="C2" gate="G$1" x="40.64" y="114.3"/>
 <instance part="S2" gate="G$1" x="73.66" y="45.72"/>
+<instance part="S1" gate="G$1" x="7.62" y="60.96"/>
+<instance part="S3" gate="G$1" x="22.86" y="60.96"/>
 </instances>
 <busses>
 </busses>
@@ -10795,6 +10799,14 @@ Source: www.farnell.com/datasheets/247.pdf</description>
 <wire x1="73.66" y1="40.64" x2="73.66" y2="30.48" width="0.1524" layer="91"/>
 <junction x="73.66" y="30.48"/>
 <pinref part="S2" gate="G$1" pin="1"/>
+<pinref part="S1" gate="G$1" pin="1"/>
+<wire x1="66.04" y1="30.48" x2="22.86" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="30.48" x2="7.62" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="30.48" x2="7.62" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="S3" gate="G$1" pin="1"/>
+<wire x1="22.86" y1="55.88" x2="22.86" y2="30.48" width="0.1524" layer="91"/>
+<junction x="66.04" y="30.48"/>
+<junction x="22.86" y="30.48"/>
 </segment>
 <segment>
 <pinref part="C1" gate="G$1" pin="2"/>
@@ -10954,6 +10966,22 @@ Source: www.farnell.com/datasheets/247.pdf</description>
 <wire x1="60.96" y1="76.2" x2="60.96" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="60.96" y1="134.62" x2="111.76" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="134.62" x2="111.76" y2="119.38" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="S3" gate="G$1" pin="2"/>
+<wire x1="22.86" y1="66.04" x2="22.86" y2="81.28" width="0.1524" layer="91"/>
+<pinref part="JP1" gate="A" pin="3"/>
+<wire x1="22.86" y1="81.28" x2="40.64" y2="81.28" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$2" class="0">
+<segment>
+<pinref part="JP1" gate="A" pin="5"/>
+<pinref part="S1" gate="G$1" pin="2"/>
+<wire x1="40.64" y1="78.74" x2="7.62" y2="78.74" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="78.74" x2="7.62" y2="66.04" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

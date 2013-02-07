@@ -231,38 +231,6 @@ package type SS</description>
 </package>
 </packages>
 </library>
-<library name="switch-dil">
-<description>&lt;b&gt;DIL Switches and Code Switches&lt;/b&gt;&lt;p&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
-<packages>
-<package name="SD4-01">
-<description>&lt;b&gt;DIL/CODE SWITCH&lt;/b&gt;&lt;p&gt;
-Mors</description>
-<wire x1="2.032" y1="-3.175" x2="2.032" y2="3.175" width="0.254" layer="21"/>
-<wire x1="-2.032" y1="3.175" x2="-2.032" y2="-3.175" width="0.254" layer="21"/>
-<wire x1="-0.635" y1="-1.27" x2="0.635" y2="-1.27" width="0.254" layer="21"/>
-<wire x1="0.635" y1="1.27" x2="-0.635" y2="1.27" width="0.254" layer="21"/>
-<wire x1="-0.635" y1="1.27" x2="-0.635" y2="-1.27" width="0.254" layer="21"/>
-<wire x1="0.635" y1="-1.27" x2="0.635" y2="1.27" width="0.254" layer="21"/>
-<wire x1="-2.032" y1="-3.175" x2="-0.762" y2="-3.175" width="0.254" layer="21"/>
-<wire x1="2.032" y1="-3.175" x2="0.762" y2="-3.175" width="0.254" layer="21"/>
-<wire x1="0.762" y1="-3.175" x2="-0.762" y2="-3.175" width="0.254" layer="51"/>
-<wire x1="2.032" y1="3.175" x2="0.762" y2="3.175" width="0.254" layer="21"/>
-<wire x1="-2.032" y1="3.175" x2="-0.762" y2="3.175" width="0.254" layer="21"/>
-<wire x1="-0.762" y1="3.175" x2="0.762" y2="3.175" width="0.254" layer="51"/>
-<wire x1="0.508" y1="-1.016" x2="-0.508" y2="-1.016" width="0.254" layer="21"/>
-<wire x1="-0.508" y1="-0.254" x2="0.508" y2="-0.254" width="0.254" layer="21"/>
-<pad name="1" x="0" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
-<pad name="2" x="0" y="3.81" drill="0.8128" shape="long" rot="R90"/>
-<text x="-0.381" y="-2.667" size="0.9906" layer="21" ratio="12">1</text>
-<text x="-2.3622" y="-3.1242" size="1.27" layer="25" ratio="10" rot="R90">&gt;NAME</text>
-<text x="3.6322" y="-3.1496" size="1.27" layer="27" ratio="10" rot="R90">&gt;VALUE</text>
-<text x="-1.651" y="1.7018" size="0.9906" layer="21" ratio="12">ON</text>
-<rectangle x1="-0.381" y1="-3.937" x2="0.381" y2="-3.175" layer="51"/>
-<rectangle x1="-0.381" y1="3.175" x2="0.381" y2="3.937" layer="51"/>
-</package>
-</packages>
-</library>
 <library name="resistor">
 <description>&lt;b&gt;Resistors, Capacitors, Inductors&lt;/b&gt;&lt;p&gt;
 Based on the previous libraries:
@@ -1368,6 +1336,40 @@ Source: www.farnell.com/datasheets/247.pdf</description>
 </package>
 </packages>
 </library>
+<library name="switch-tact">
+<description>&lt;b&gt;Diptronics THMD &amp; SMD tact switches&lt;/b&gt;
+&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;DTS-3: 3.5x6mm THMD tact switch
+&lt;li&gt;DTS-6, DTS-64: 6x6mm THMD tact switch
+&lt;li&gt;DTSM-3: 3.5x6mm SMD tact switch
+&lt;li&gt;DTSM-6, DTSM-64: 6x6mm SMD tact switch
+&lt;/ul&gt;&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;Doublecheck before using!&lt;/b&gt;&lt;/p&gt;</description>
+<packages>
+<package name="DTSM-3">
+<wire x1="-3" y1="1.75" x2="3" y2="1.75" width="0.2032" layer="51"/>
+<wire x1="3" y1="1.75" x2="3" y2="-1.75" width="0.2032" layer="51"/>
+<wire x1="3" y1="-1.75" x2="-3" y2="-1.75" width="0.2032" layer="51"/>
+<wire x1="-3" y1="-1.75" x2="-3" y2="1.75" width="0.2032" layer="51"/>
+<wire x1="-1.5" y1="0.75" x2="1.5" y2="0.75" width="0.2032" layer="51"/>
+<wire x1="1.5" y1="0.75" x2="1.5" y2="-0.75" width="0.2032" layer="51"/>
+<wire x1="1.5" y1="-0.75" x2="-1.5" y2="-0.75" width="0.2032" layer="51"/>
+<wire x1="-1.5" y1="-0.75" x2="-1.5" y2="0.75" width="0.2032" layer="51"/>
+<wire x1="-3" y1="1.75" x2="-3" y2="1.25" width="0.2032" layer="21"/>
+<wire x1="-3" y1="1.75" x2="3" y2="1.75" width="0.2032" layer="21"/>
+<wire x1="3" y1="1.75" x2="3" y2="1.25" width="0.2032" layer="21"/>
+<wire x1="3" y1="-1.25" x2="3" y2="-1.75" width="0.2032" layer="21"/>
+<wire x1="3" y1="-1.75" x2="-3" y2="-1.75" width="0.2032" layer="21"/>
+<wire x1="-3" y1="-1.75" x2="-3" y2="-1.25" width="0.2032" layer="21"/>
+<wire x1="-1.25" y1="0.75" x2="1.25" y2="0.75" width="0.2032" layer="21"/>
+<wire x1="-1.25" y1="-0.75" x2="1.2" y2="-0.75" width="0.2032" layer="21"/>
+<smd name="1" x="-2.7" y="0" dx="2" dy="1.6" layer="1"/>
+<smd name="2" x="2.7" y="0" dx="2" dy="1.6" layer="1"/>
+<text x="-2.54" y="-3.81" size="1.27" layer="27">&gt;VALUE</text>
+<text x="-2.54" y="2.54" size="1.27" layer="25">&gt;NAME</text>
+</package>
+</packages>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -1561,14 +1563,9 @@ design rules under a new name.</description>
 <element name="PAD2" library="wirepad" package="5-1,8" value="WIREPADSMD5-1,8" x="7.62" y="3.81"/>
 <element name="PAD3" library="wirepad" package="5-1,8" value="WIREPADSMD5-1,8" x="10.16" y="3.81"/>
 <element name="PAD4" library="wirepad" package="5-1,8" value="WIREPADSMD5-1,8" x="12.7" y="3.81"/>
-<element name="S1" library="switch-dil" package="SD4-01" value="" x="9.800034375" y="16.987021875">
-<attribute name="OC_NEWARK" value="unknown" x="9.800034375" y="16.987021875" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="" x="9.800034375" y="16.987021875" size="1.778" layer="27" display="off"/>
-<attribute name="MF" value="" x="9.800034375" y="16.987021875" size="1.778" layer="27" display="off"/>
-<attribute name="OC_FARNELL" value="unknown" x="9.800034375" y="16.987021875" size="1.778" layer="27" display="off"/>
-</element>
 <element name="C1" library="resistor" package="C2012" value="100nF" x="2.3622" y="12.2809" rot="MR0"/>
 <element name="C2" library="resistor" package="SMC_A" value="1uF" x="13.9827" y="4.7752" rot="MR90"/>
+<element name="S2" library="switch-tact" package="DTSM-3" value="DTSM-3" x="1.4859" y="-11.4935"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -1576,7 +1573,6 @@ design rules under a new name.</description>
 <contactref element="U$1" pad="GND"/>
 <contactref element="JP2" pad="3"/>
 <contactref element="PAD4" pad="1"/>
-<contactref element="S1" pad="1"/>
 <wire x1="10.8458" y1="18.4531" x2="10.8712" y2="21.971" width="0.3048" layer="16"/>
 <wire x1="10.8712" y1="21.971" x2="10.287" y2="22.5552" width="0.3048" layer="16"/>
 <wire x1="10.287" y1="22.5552" x2="7.2517" y2="22.5552" width="0.3048" layer="16"/>
@@ -1611,6 +1607,10 @@ design rules under a new name.</description>
 <wire x1="12.7" y1="5.5100125" x2="13.136665625" y2="5.073346875" width="0.3048" layer="1"/>
 <wire x1="10.8458" y1="18.4531" x2="12.027790625" y2="17.5387" width="0.3048" layer="16"/>
 <wire x1="12.027790625" y1="17.5387" x2="13.488290625" y2="16.51" width="0.3048" layer="16"/>
+<contactref element="S2" pad="1"/>
+<wire x1="13.5636" y1="7.5819" x2="13.488290625" y2="16.51" width="0" layer="19" extent="16-16"/>
+<wire x1="2.44" y1="10.441" x2="12.7" y2="7.5819" width="0" layer="19" extent="16-16"/>
+<wire x1="-1.2141" y1="-11.4935" x2="12.0904" y2="3.8354" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$12">
 <contactref element="U$1" pad="MISO"/>
@@ -1807,13 +1807,13 @@ design rules under a new name.</description>
 <wire x1="1.7255" y1="22.7821" x2="1.7509" y2="22.0273" width="0.254" layer="16"/>
 </signal>
 <signal name="N$1">
-<contactref element="S1" pad="2"/>
 <contactref element="U$2" pad="2"/>
 <wire x1="6.3009" y1="14.7773" x2="6.2992" y2="14.779" width="0.254" layer="16"/>
 <wire x1="6.2992" y1="14.779" x2="6.2992" y2="16.2814" width="0.254" layer="16"/>
 <via x="6.2992" y="16.2814" extent="1-16" drill="0.6"/>
 <wire x1="6.2992" y1="16.2814" x2="9.800034375" y2="19.782234375" width="0.254" layer="1"/>
-<wire x1="9.800034375" y1="19.782234375" x2="9.800034375" y2="20.797021875" width="0.254" layer="1"/>
+<contactref element="S2" pad="2"/>
+<wire x1="4.1859" y1="-11.4935" x2="6.3009" y2="14.7773" width="0" layer="19" extent="1-16"/>
 </signal>
 </signals>
 </board>
