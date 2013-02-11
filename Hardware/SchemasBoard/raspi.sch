@@ -10942,10 +10942,10 @@ Source: www.farnell.com/datasheets/247.pdf</description>
 <net name="N$28" class="0">
 <segment>
 <wire x1="73.66" y1="50.8" x2="73.66" y2="139.7" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="RA4/AN3/T1G/OSC2/CLKOUT"/>
-<wire x1="73.66" y1="139.7" x2="121.92" y2="139.7" width="0.1524" layer="91"/>
-<wire x1="121.92" y1="139.7" x2="121.92" y2="119.38" width="0.1524" layer="91"/>
 <pinref part="S2" gate="G$1" pin="2"/>
+<pinref part="U$2" gate="G$1" pin="RA5/T1CKI/OSC1/CLKIN"/>
+<wire x1="73.66" y1="139.7" x2="119.38" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="119.38" y1="139.7" x2="119.38" y2="119.38" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$33" class="0">

@@ -35,7 +35,7 @@ OPTION_REG = %00000111
 on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
-TRISA = %00000000 'Set PORTA to all output
+TRISA = %00100000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input,
 WPUA = %11111111
@@ -81,6 +81,7 @@ if (resetButton == 0) then
     write 5, "K"
     enable
     gosub printConfig
+    pause 2000
     goto resetLabel
 endif
 if (manageSerial==1) then
@@ -88,8 +89,14 @@ if (manageSerial==1) then
     if ((ser_data[0] == "C" OR ser_data[0] == "c") AND ser_data[1] == "=") THEN 'channel
         i=2
         GOSUB convertInputData
-        GOSUB saveChannel
-        GOSUB commonSettings
+        hserout ["a:",dec temp_byte,13,10]
+        if (conversionSuccessfull == 1) then
+            write 0, temp_byte
+            gosub printOK
+            GOSUB commonSettings
+        else
+            gosub printError
+        endif
     elseif ((ser_data[0] == "P" OR ser_data[0] == "p") AND ser_data[1] == "=") THEN 'password
         GOSUB savePwd
         GOSUB commonSettings
@@ -195,11 +202,11 @@ return
 
 '============Subroutines========================================================
 printError:
-    HSEROUT["ERROR",10]
+    HSEROUT["ERROR",13,10]
 return
 
 printOK:
-    HSEROUT["OK",10]
+    HSEROUT["OK",13,10]
 return
 
 convertInputData:
@@ -231,18 +238,9 @@ lookupChar:
     LOOKDOWN temp2_byte,["0123456789"], temp1_byte
 RETURN
 
-saveChannel:
-    if (conversionSuccessfull != 1) then
-        gosub printError
-        return
-    endif
-    write 0, temp_byte
-    gosub printOK
-return
-
 savePwd:
     for i=2 to 6
-        if (ser_data[i] == 0) or (ser_data[i] == 10) or (ser_data[i] == 13) then 
+        if (ser_data[i] == 0) or (ser_data[i] == 10) or (ser_data[i] == 13) or (ser_data[i] == " ") then 
             GOSUB printError
             return
         endif
