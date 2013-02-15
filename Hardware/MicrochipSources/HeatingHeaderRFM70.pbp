@@ -384,29 +384,47 @@ sendDataOK:
     temp_data[2] = 10
 return
 
-convertInputData:
-    conversionSuccess = 0
-    TEMP_BYTE="a"
-    for ci=0 to 2    
-        TEMP1_BYTE = "a"
-        TEMP2_BYTE = data_in[i]
-        if (TEMP2_BYTE == "|") then return
-        GOSUB lookupChar
-        if (TEMP1_BYTE == "a") then return 
-        if (ci==0) then 
-            TEMP_BYTE = TEMP1_BYTE
-            conversionSuccess = 1 
-        else 
-            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
-            conversionSuccess = 1
-        endif
-        i = i + 1
-    next ci
-return
+'convertInputData:
+'    conversionSuccess = 0
+'    TEMP_BYTE="a"
+'    for ci=0 to 2    
+'        TEMP1_BYTE = "a"
+'        TEMP2_BYTE = data_in[i]
+'        if (TEMP2_BYTE == "|") then return
+'        GOSUB lookupChar
+'        if (TEMP1_BYTE == "a") then return 
+'        if (ci==0) then 
+'            TEMP_BYTE = TEMP1_BYTE
+'            conversionSuccess = 1 
+'        else 
+'            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
+'            conversionSuccess = 1
+'        endif
+'        i = i + 1
+'    next ci
+'return
 
-lookupChar:
-    LOOKDOWN temp2_byte,["0123456789"], temp1_byte
-RETURN
+'lookupChar:
+'    LOOKDOWN temp2_byte,["0123456789"], temp1_byte
+'RETURN
+convertInputData:
+    temp_word = 0
+    conversionSuccess = 0
+    labelContReadDecimals:
+        if data_in[i] > 47 then
+            if data_in[i] < 58 then
+                conversionSuccess = 1
+                TEMP_word = TEMP_word*10 + ((data_in[i]+2)-50)
+                i=i+1
+                if (TEMP_word < 256) then goto labelContReadDecimals
+            endif
+        endif
+    if (TEMP_word > 255) then
+         conversionSuccess = 0
+    else
+        temp_byte = TEMP_word
+    endif
+return
 
 convertNoToStr:
         temp3_byte = (temp_byte DIG 2) + $30
