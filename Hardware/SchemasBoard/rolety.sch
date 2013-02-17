@@ -14749,36 +14749,36 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 Based on the previous library ind-a.lbr&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
 <packages>
-<package name="MMICC7">
+<package name="MICC10">
 <description>&lt;B&gt;INDUCTOR&lt;/B&gt;&lt;p&gt; manufacturer Fastron, distributor Buerklin</description>
-<wire x1="3.81" y1="0" x2="2.921" y2="0" width="0.508" layer="51"/>
-<wire x1="-3.81" y1="0" x2="-2.921" y2="0" width="0.508" layer="51"/>
-<wire x1="-1.778" y1="1.016" x2="-1.524" y2="1.27" width="0.1524" layer="21" curve="-90"/>
-<wire x1="-1.778" y1="-1.016" x2="-1.524" y2="-1.27" width="0.1524" layer="21" curve="90"/>
-<wire x1="1.524" y1="-1.27" x2="1.778" y2="-1.016" width="0.1524" layer="21" curve="90"/>
-<wire x1="1.524" y1="1.27" x2="1.778" y2="1.016" width="0.1524" layer="21" curve="-90"/>
-<wire x1="-1.778" y1="-1.016" x2="-1.778" y2="1.016" width="0.1524" layer="21"/>
-<wire x1="-1.524" y1="1.27" x2="-0.508" y2="1.27" width="0.1524" layer="21"/>
-<wire x1="-0.381" y1="1.143" x2="-0.508" y2="1.27" width="0.1524" layer="21"/>
-<wire x1="-1.524" y1="-1.27" x2="-0.508" y2="-1.27" width="0.1524" layer="21"/>
-<wire x1="-0.381" y1="-1.143" x2="-0.508" y2="-1.27" width="0.1524" layer="21"/>
-<wire x1="0.381" y1="1.143" x2="0.508" y2="1.27" width="0.1524" layer="21"/>
-<wire x1="0.381" y1="1.143" x2="-0.381" y2="1.143" width="0.1524" layer="21"/>
-<wire x1="0.381" y1="-1.143" x2="0.508" y2="-1.27" width="0.1524" layer="21"/>
-<wire x1="0.381" y1="-1.143" x2="-0.381" y2="-1.143" width="0.1524" layer="21"/>
-<wire x1="1.524" y1="1.27" x2="0.508" y2="1.27" width="0.1524" layer="21"/>
-<wire x1="1.524" y1="-1.27" x2="0.508" y2="-1.27" width="0.1524" layer="21"/>
-<wire x1="1.778" y1="-1.016" x2="1.778" y2="1.016" width="0.1524" layer="21"/>
-<wire x1="-0.508" y1="1.016" x2="-0.508" y2="-1.016" width="0.0508" layer="21"/>
-<wire x1="-1.524" y1="1.016" x2="-1.524" y2="-1.016" width="0.0508" layer="21"/>
-<wire x1="1.524" y1="1.016" x2="1.524" y2="-1.016" width="0.0508" layer="21"/>
-<wire x1="0.508" y1="1.016" x2="0.508" y2="-1.016" width="0.0508" layer="21"/>
-<pad name="1" x="-3.81" y="0" drill="0.8128" shape="long"/>
-<pad name="2" x="3.81" y="0" drill="0.8128" shape="long"/>
-<text x="-1.6256" y="1.6764" size="0.9906" layer="25" ratio="10">&gt;NAME</text>
-<text x="-2.1336" y="-2.6924" size="0.9906" layer="27" ratio="10">&gt;VALUE</text>
-<rectangle x1="1.778" y1="-0.254" x2="2.921" y2="0.254" layer="21"/>
-<rectangle x1="-2.921" y1="-0.254" x2="-1.778" y2="0.254" layer="21"/>
+<wire x1="5.08" y1="0" x2="4.191" y2="0" width="0.6096" layer="51"/>
+<wire x1="-5.08" y1="0" x2="-4.191" y2="0" width="0.6096" layer="51"/>
+<wire x1="-3.556" y1="1.27" x2="-3.302" y2="1.524" width="0.1524" layer="21" curve="-90"/>
+<wire x1="-3.556" y1="-1.27" x2="-3.302" y2="-1.524" width="0.1524" layer="21" curve="90"/>
+<wire x1="3.302" y1="-1.524" x2="3.556" y2="-1.27" width="0.1524" layer="21" curve="90"/>
+<wire x1="3.302" y1="1.524" x2="3.556" y2="1.27" width="0.1524" layer="21" curve="-90"/>
+<wire x1="-3.556" y1="-1.27" x2="-3.556" y2="1.27" width="0.1524" layer="21"/>
+<wire x1="-3.302" y1="1.524" x2="-2.032" y2="1.524" width="0.1524" layer="21"/>
+<wire x1="-1.905" y1="1.397" x2="-2.032" y2="1.524" width="0.1524" layer="21"/>
+<wire x1="-3.302" y1="-1.524" x2="-2.032" y2="-1.524" width="0.1524" layer="21"/>
+<wire x1="-1.905" y1="-1.397" x2="-2.032" y2="-1.524" width="0.1524" layer="21"/>
+<wire x1="1.905" y1="1.397" x2="2.032" y2="1.524" width="0.1524" layer="21"/>
+<wire x1="1.905" y1="1.397" x2="-1.905" y2="1.397" width="0.1524" layer="21"/>
+<wire x1="1.905" y1="-1.397" x2="2.032" y2="-1.524" width="0.1524" layer="21"/>
+<wire x1="1.905" y1="-1.397" x2="-1.905" y2="-1.397" width="0.1524" layer="21"/>
+<wire x1="3.302" y1="1.524" x2="2.032" y2="1.524" width="0.1524" layer="21"/>
+<wire x1="3.302" y1="-1.524" x2="2.032" y2="-1.524" width="0.1524" layer="21"/>
+<wire x1="3.556" y1="-1.27" x2="3.556" y2="1.27" width="0.1524" layer="21"/>
+<wire x1="-2.032" y1="1.143" x2="-2.032" y2="-1.143" width="0.0508" layer="21"/>
+<wire x1="-3.302" y1="1.143" x2="-3.302" y2="-1.143" width="0.0508" layer="21"/>
+<wire x1="3.302" y1="1.143" x2="3.302" y2="-1.143" width="0.0508" layer="21"/>
+<wire x1="2.032" y1="1.143" x2="2.032" y2="-1.143" width="0.0508" layer="21"/>
+<pad name="1" x="-5.08" y="0" drill="0.8128" shape="long"/>
+<pad name="2" x="5.08" y="0" drill="0.8128" shape="long"/>
+<text x="-2.159" y="1.905" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="-2.921" y="-3.2258" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
+<rectangle x1="3.556" y1="-0.3048" x2="4.2418" y2="0.3048" layer="21"/>
+<rectangle x1="-4.2418" y1="-0.3048" x2="-3.556" y2="0.3048" layer="21"/>
 </package>
 </packages>
 <symbols>
@@ -14792,13 +14792,13 @@ Based on the previous library ind-a.lbr&lt;p&gt;
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="MMICC7" prefix="L">
+<deviceset name="MICC10" prefix="L">
 <description>&lt;B&gt;INDUCTOR&lt;/B&gt;</description>
 <gates>
 <gate name="1" symbol="DRK" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="MMICC7">
+<device name="" package="MICC10">
 <connects>
 <connect gate="1" pin="1" pad="1"/>
 <connect gate="1" pin="2" pad="2"/>
@@ -15229,7 +15229,7 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <part name="R4" library="resistor" deviceset="R-EU_" device="M2012" value="2,05 k"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
 <part name="C3" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="10uF / 16 V"/>
-<part name="L1" library="inductors" deviceset="MMICC7" device=""/>
+<part name="L1" library="inductors" deviceset="MICC10" device=""/>
 <part name="C4" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="100uF / 6,3 V"/>
 <part name="IC2" library="linear" deviceset="MCP1703" device="DB"/>
 <part name="C5" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
