@@ -7,7 +7,7 @@ import java.io.Serializable;
  * 
  * @author Robert Gregor
  */
-public abstract class AbstractDevice implements Serializable {
+public abstract class AbstractDevice implements Serializable, Comparable<AbstractDevice> {
     
     /**
      * This device type is heating header.
@@ -112,4 +112,18 @@ public abstract class AbstractDevice implements Serializable {
     * @author Robert Gregor
     */
     protected abstract void manageAsynchronousCommand(String[] items);
+    
+    @Override
+    public int hashCode() {
+        return getDeviceId()%10;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof AbstractDevice)) return false;
+        return ((AbstractDevice)o).deviceId == deviceId;
+    }
+    
+    public int compareTo(AbstractDevice device) {
+        return getDeviceName().compareTo(device.getDeviceName());
+    }
 }

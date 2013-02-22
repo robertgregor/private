@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.HashSet;
+import org.remoteHome.gui.WebServer;
 
 /**
  *
@@ -47,8 +49,9 @@ import java.util.HashMap;
 public class RemoteHomeManager {
     
     private HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
-    transient private RemoteHomeCommunicator comm;
-    transient private File persistentFile;
+    private HashMap<String, HashSet<AbstractDevice>> rooms = new HashMap<String, HashSet<AbstractDevice>>();
+    private RemoteHomeCommunicator comm;
+    private File persistentFile;
     
     /**
      * 
@@ -127,11 +130,69 @@ public class RemoteHomeManager {
                targetDevice.manageAsynchronousCommand(tokens[1].split("\\|"));
            }
     }
+    /**
+     * Adds the new room to the system
+     * 
+     * @param name is the name of the room
+     * @return false if the room already exist. Returns true if the room has been added.
+     */
+    public boolean addRoom(String name) {
+        if (rooms.containsKey(name)) return false;
+        rooms.put(name, new HashSet<AbstractDevice>());
+        return true;
+    }
+    /**
+     * Removes empty room from the system
+     * 
+     * @param name is the name of the room
+     * @return false if the room cannot be removed, because it is not empty or doesn't exist. Returns true if the room has been removed.
+     */
+    public boolean removeRoom(String name) {
+        if (!rooms.containsKey(name)) return false;
+        if (rooms.get(name).size() == 0) {
+            rooms.remove(name);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * Add device to room
+     * @param roomName is the name of the room. If it is not exist, it will be added.
+     * @param device is the device to add
+     * @return false if the device already exist in that room or the room name doesn't exist.
+     */
+    public boolean addDeviceToRoom(String roomName, AbstractDevice device) {
+        if (!rooms.containsKey(roomName)) rooms.put(roomName, new HashSet<AbstractDevice>());
+        return rooms.get(roomName).add(device);
+    }    
     
+    /**
+     * Remove device from room
+     * @param roomName is the name of the room.
+     * @param device is the device to remove
+     * @return false if the device or room not exist.
+     */
+    public boolean removeDeviceToRoom(String roomName, AbstractDevice device) {
+        if (!rooms.containsKey(roomName)) return false;
+        return rooms.get(roomName).remove(device);
+    }    
+
+    /**
+     * Sends the command to the device.
+     * @param deviceId is the device Id to which the command should be sent
+     * @param command is the command
+     * @throws RemoteHomeConnectionException if there is an error with the communication.
+     */
     public void sendCommand(int deviceId, String command) throws RemoteHomeConnectionException {
         comm.sendCommand(deviceId, command);
     }
-
+    /**
+     * Sends the command and waits for the answer from the device.
+     * @param deviceId is the device Id to which the command should be sent
+     * @param command is the command
+     * @throws RemoteHomeConnectionException if there is an error with the communication.
+     */
     public String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
         return comm.sendCommandWithAnswer(deviceId, command);
     }
@@ -145,12 +206,10 @@ public class RemoteHomeManager {
             return;
         } finally {
             comm.disconnect();
-            if (persistentFile != null) {
-                try {
-                    savePersistentData();
-                } catch (IOException e) {
-                    throw new RemoteHomeManagerException(e.getMessage(),RemoteHomeManagerException.SERIALIZATION_ERROR);
-                }
+            try {
+                savePersistentData();
+            } catch (IOException e) {
+                throw new RemoteHomeManagerException(e.getMessage(),RemoteHomeManagerException.SERIALIZATION_ERROR);
             }
         }
     }
@@ -161,6 +220,7 @@ public class RemoteHomeManager {
         if (persistentFile.exists()) {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(persistentFile));
             devices = (HashMap<Integer, AbstractDevice>)ois.readObject();
+            rooms = (HashMap<String, HashSet<AbstractDevice>>)ois.readObject();
             ois.close();
         }      
     }
@@ -168,13 +228,16 @@ public class RemoteHomeManager {
      * This method will save the configuration to the file on the disk.
      */
     public void savePersistentData() throws IOException {
-        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(persistentFile));
-        out.writeObject(devices);
-        out.close();
+        if (persistentFile != null) {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(persistentFile));
+            out.writeObject(devices);
+            out.writeObject(rooms);
+            out.close();
+        }
     }
     public static void main(String... args) throws Exception {
-        if ((args.length != 2) || (args.length != 3)) {        
-            System.out.println("Two parametrs host, port or 3 parameters host, port, file should be supplied.");
+        if ((args.length < 2) && (args.length > 4)) {        
+            System.out.println("2 parametrs host, port; 3 parameters host, port, file; 4 parameters host, port, file, webServerPort;");
             return;
         }
         if (args.length == 2) {
@@ -182,6 +245,11 @@ public class RemoteHomeManager {
             manager.joinCommThread();
         } else if (args.length == 3) {
             RemoteHomeManager manager = new RemoteHomeManager(args[0], args[1], args[2]);
+            manager.joinCommThread();            
+        } else if (args.length == 4) {
+            RemoteHomeManager manager = new RemoteHomeManager(args[0], args[1], args[2]);
+            WebServer webServer = new WebServer(args[3], manager);
+            webServer.start();
             manager.joinCommThread();            
         }
     }    
