@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>jQuery UI Tabs - Default functionality</title>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
+<link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css" />
+<script>
+$(function() {
+  var tabs = $( "#tabs" ).tabs();
+  var tabCounter = 2;
+  $( "#accordion" ).accordion();
+  $( document ).tooltip();
+  $("#addDeviceForm").submit(function(event) {
+  event.preventDefault();
+  if ($(this).valid()) {
+   $("#addDeviceResult").html('');
+   var values = $(this).serialize();
+    $.ajax({
+      url: "",
+      type: "get",
+      data: values,
+      success: function(data){
+           $("#addDeviceResult").html(data);
+           $("#addDeviceForm").each(function(){ this.reset();});
+      },
+      error:function(){
+          $("#addDeviceResult").html('Error when tried to add the device.');
+      }   
+    });
+  }
+  });
+  $("#addRoomForm").submit(function(event) {
+  event.preventDefault();
+  if ($(this).valid()) {
+   $("#addRoomResult").html('');
+   var values = $(this).serialize();
+    $.ajax({
+      url: "",
+      type: "get",
+      data: values,
+      success: function(data){
+           $("#addRoomResult").html(data);
+           addTab($("#roomName").val());
+           $("#addRoomForm").each(function(){ this.reset();});
+      },
+      error:function(){
+          $("#addRoomResult").html('Error when tried to add the room.');
+      }   
+    });
+  }
+  });
+  function addTab(label) {
+    id = "tabs-" + tabCounter,
+    li = "<li><a href='?ServiceName=LoadRoomPage&room="+encodeURIComponent(label)+"'>"+label+"</a></li>",
+    tabs.find( ".ui-tabs-nav" ).append( li );
+    tabs.tabs( "refresh" );
+    tabCounter++;
+  }
+  $( "#tabs" ).tabs({      
+      beforeLoad: function( event, ui ) {        
+          ui.jqXHR.error(function() {          
+              ui.panel.html("Couldn't load this tab." );
+          });
+      }
+  });
+});
+$(document).ready(function(){
+  $("#addDeviceForm").validate({
+    rules: {
+     addDeviceId : { required : true, range: [1, 255] }
+    },
+    messages: {
+        addDeviceId : { required : "Please enter some device Id.", range: "Your device ID should be in the range 1..255."}        
+    }
+  });
+  $("#addRoomForm").validate({
+    rules: {
+     roomName : { required : true }
+    },
+    messages: {
+        addDeviceId : { required : "Please enter the room name."}        
+    }
+  });
+  $.ajax({
+      url: "",
+      type: "get",
+      data: "?ServiceName=LoadAllRooms",
+      success: function(data){
+           $("#addRoomResult").html(data);
+           addTab($("#roomName").val());
+           $("#addRoomForm").each(function(){ this.reset();});
+      },
+      error:function(){
+          $("#addRoomResult").html('Error when tried to add the room.');
+      }   
+  });
+});
+</script>
+</head>
+<body>
+<div id="tabs">
+<ul>
+<li><a href="#tabs-1">System management</a></li>
+</ul>
+<div id="tabs-1">
+<div id="accordion">
+<h3>Add new device</h3>
+    <div>    
+        <p>Here you can add new device. Please note that the only <b>one</b> new device (with id = 0) should be powered on.</p>
+        <form id="addDeviceForm">
+           <p><label for="addDeviceId">New device ID:</label><input name="addDeviceId" id="addDeviceId" title="The new device ID should not exist in the system."/></p>
+           <input type="hidden" name="ServiceName" value="ClassName"/>
+           <input type="submit" value="Add new device"/>
+        </form>
+        <div id="addDeviceResult">&nbsp;</div>
+    </div>
+<h3>Rooms management</h3>
+    <div>
+        <p>Here you can manage the rooms of your home.</p>
+        <form id="addRoomForm">
+        <p><label for="roomName">New room name:</label><input name="roomName" id="roomName" title="The room name to be added."/></p>
+           <input type="hidden" name="ServiceName" value="AddRoom"/>
+           <input type="submit" value="Add new room"/>
+        </form>
+        <div id="addRoomResult">&nbsp;</div>
+        
+    </div>
+<h3>Channel/Password configuration</h3>
+    <div>
+        <p>Here you can see and change the settings of the system. Please note, that this should be done only at the beginning of the configuration. If you 
+            change the channel or password here, it is done only locally so the already existing devices stop to work. You have to reset the device one by one and 
+            assign the device id again. (During the assigning procedure, the device will obtain correct channel and password.)
+        </p>
+    </div>
+<h3>Wireless network configuration</h3>
+    <div>
+        <p>Wifi configuration</p>
+    </div>
+</div>
+</div>
+</div>    
+</body>
+</html>
