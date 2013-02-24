@@ -265,6 +265,16 @@ READ 4, ser_data[3]
 READ 5, ser_data[4]
 return
 
+restoreCurrentSettings:
+write 0, ser_data[5]
+write 1, ser_data[0]
+write 2, ser_data[1]
+write 3, ser_data[2]
+write 4, ser_data[3]
+write 5, ser_data[4]
+GOSUB commonRXTX
+return
+
 putDefaultValues:
 write 0, 40
 write 1, "R"
@@ -276,12 +286,7 @@ return
 
 addNewDevice:
 gosub saveCurrentConfig
-write 0, 40
-write 1, "R"
-write 2, "O"
-write 3, "B"
-write 4, "I"
-write 5, "K"
+GOSUB putDefaultValues:                                                                                                         
 'send channel, password, deviceId
 device_id = 0
 temp_data[0] = "c"
@@ -300,13 +305,6 @@ gosub debounce
 gosub sendData
 gosub debounce
 'restore the original value
-write 0, ser_data[5]
-write 1, ser_data[0]
-write 2, ser_data[1]
-write 3, ser_data[2]
-write 4, ser_data[3]
-write 5, ser_data[4]
-GOSUB commonRXTX
 return
 
 printConfig:

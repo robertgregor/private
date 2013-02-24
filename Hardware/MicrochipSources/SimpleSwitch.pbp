@@ -14,7 +14,7 @@
 '7 - 0 switch on when applied power
 '8 timeout
 
-EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","O","B","I","K",0,1,0,0,0,0,0,0,0,0]
 
 INCLUDE "RFM70.pbp"
 
