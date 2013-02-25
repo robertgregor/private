@@ -51,6 +51,7 @@ public class WebServerHandler extends Thread {
                 String parameters = getRequest.split(" ")[1].replaceAll("/", "");
                 parameters = parameters.substring(parameters.indexOf('?')+1);
                 HashMap<String, String> parsedParameters = parseParameters(parameters);
+                System.out.println(parameters);
                 WebService w = (WebService)Class.forName("org.remoteHome.gui."+parsedParameters.get("ServiceName")).newInstance();
                 w.setParameters(remoteHomemanager);
                 out.write(w.processRequest(parsedParameters));

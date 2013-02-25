@@ -173,11 +173,19 @@ public class RemoteHomeManager {
      * @param device is the device to remove
      * @return false if the device or room not exist.
      */
-    public boolean removeDeviceToRoom(String roomName, AbstractDevice device) {
+    public boolean removeDeviceFromRoom(String roomName, AbstractDevice device) {
         if (!rooms.containsKey(roomName)) return false;
         return rooms.get(roomName).remove(device);
     }    
 
+    /**
+     * Get rooms
+     * @return list of the rooms
+     */
+    public HashMap<String, HashSet<AbstractDevice>> getRooms() {
+        return rooms;
+    }
+    
     /**
      * Sends the command to the device.
      * @param deviceId is the device Id to which the command should be sent

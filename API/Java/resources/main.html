@@ -9,11 +9,13 @@
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
 <link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css" />
 <script>
+var addTabJs = null;
 $(function() {
   var tabs = $( "#tabs" ).tabs();
   var tabCounter = 2;
   $( "#accordion" ).accordion();
   $( document ).tooltip();
+  $( "#addDeviceRadio" ).buttonset();
   $("#addDeviceForm").submit(function(event) {
   event.preventDefault();
   if ($(this).valid()) {
@@ -43,9 +45,10 @@ $(function() {
       type: "get",
       data: values,
       success: function(data){
-           $("#addRoomResult").html(data);
-           addTab($("#roomName").val());
-           $("#addRoomForm").each(function(){ this.reset();});
+           //$("#addRoomResult").html(data);
+           //addTab($("#roomName").val());
+           //$("#addRoomForm").each(function(){ this.reset();});
+           window.location.reload(true);
       },
       error:function(){
           $("#addRoomResult").html('Error when tried to add the room.');
@@ -58,8 +61,13 @@ $(function() {
     li = "<li><a href='?ServiceName=LoadRoomPage&room="+encodeURIComponent(label)+"'>"+label+"</a></li>",
     tabs.find( ".ui-tabs-nav" ).append( li );
     tabs.tabs( "refresh" );
+    //update radios
+    var newRadio = $('<input />').attr({type: "radio", id: "addDeviceRadio"+tabCounter, name: label});
+    var newLabel = $('<label />').append(newRadio).append(label);
+    $('#addDeviceRadio').append(newLabel);
     tabCounter++;
   }
+  addTabJs = addTab;
   $( "#tabs" ).tabs({      
       beforeLoad: function( event, ui ) {        
           ui.jqXHR.error(function() {          
@@ -88,14 +96,15 @@ $(document).ready(function(){
   $.ajax({
       url: "",
       type: "get",
-      data: "?ServiceName=LoadAllRooms",
-      success: function(data){
-           $("#addRoomResult").html(data);
-           addTab($("#roomName").val());
-           $("#addRoomForm").each(function(){ this.reset();});
+      data: "ServiceName=LoadAllRooms",
+      success: function(roomsData) {
+           rooms = roomsData.split("\n");
+           for (var i=0; i<rooms.length; i++) {
+               addTabJs(rooms[i]);
+           }
       },
       error:function(){
-          $("#addRoomResult").html('Error when tried to add the room.');
+          alert('Error when tried to get the list of rooms.');
       }   
   });
 });
@@ -113,7 +122,10 @@ $(document).ready(function(){
         <p>Here you can add new device. Please note that the only <b>one</b> new device (with id = 0) should be powered on.</p>
         <form id="addDeviceForm">
            <p><label for="addDeviceId">New device ID:</label><input name="addDeviceId" id="addDeviceId" title="The new device ID should not exist in the system."/></p>
-           <input type="hidden" name="ServiceName" value="ClassName"/>
+           <div id="addDeviceRadio">
+               <strong>Room:</strong>
+           </div>
+           <input type="hidden" name="ServiceName" value="AddNewDevice"/>
            <input type="submit" value="Add new device"/>
         </form>
         <div id="addDeviceResult">&nbsp;</div>
@@ -126,8 +138,7 @@ $(document).ready(function(){
            <input type="hidden" name="ServiceName" value="AddRoom"/>
            <input type="submit" value="Add new room"/>
         </form>
-        <div id="addRoomResult">&nbsp;</div>
-        
+        <div id="addRoomResult">&nbsp;</div>        
     </div>
 <h3>Channel/Password configuration</h3>
     <div>
