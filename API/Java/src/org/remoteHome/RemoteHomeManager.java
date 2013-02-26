@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import org.remoteHome.gui.WebServer;
 
 /**
@@ -199,10 +200,19 @@ public class RemoteHomeManager {
      * Sends the command and waits for the answer from the device.
      * @param deviceId is the device Id to which the command should be sent
      * @param command is the command
+     * @return the answer from the device
      * @throws RemoteHomeConnectionException if there is an error with the communication.
      */
     public String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
         return comm.sendCommandWithAnswer(deviceId, command);
+    }
+    /**
+     * Sends the add command and waits for the answer from the device.
+     * @param deviceId is the device Id to which the command should be sent
+     * @throws RemoteHomeConnectionException if there is an error with the communication.
+     */
+    public void addDevice(int deviceId) throws RemoteHomeConnectionException {
+        comm.addDevice(deviceId);
     }
     /*
      * This method will join the communication thread, so the current thread will block
@@ -242,6 +252,19 @@ public class RemoteHomeManager {
             out.writeObject(rooms);
             out.close();
         }
+    }
+    /*
+     * This method will return unused device id.
+     */
+    public int getUnusedDeviceId() {
+        Set<Integer> deviceIds = devices.keySet();
+        if (deviceIds.isEmpty()) return 1;
+        for (int id : deviceIds) {
+            if (!deviceIds.contains(Integer.valueOf(id+1))) {
+                if ((id+1) < 256) return id+1;
+            }
+        }
+        return 0;
     }
     public static void main(String... args) throws Exception {
         if ((args.length < 2) && (args.length > 4)) {        
