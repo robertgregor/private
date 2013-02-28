@@ -65,6 +65,38 @@ class RemoteHomeCommunicator extends Thread  {
         }
     }
     
+    protected synchronized void addDevice(int deviceId) throws RemoteHomeConnectionException {
+        cmdWithResponse = true;
+        cmdWithResponseId = deviceId;
+        try {
+            dataReceived = "";
+            String cmd = "AT+a="+deviceId+"\n";
+            dataOutputStream.write(cmd.getBytes());
+            dataOutputStream.flush();
+                try {
+                    wait(2000);
+                } catch (InterruptedException e) {
+                    return;
+                }            
+                if (dataReceived.indexOf("OK") > 0) return;
+                if (dataReceived.indexOf("ERROR") > 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.ERROR_FROM_DEVICE);
+                if (dataReceived.length() == 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.NO_RESPONSE_FROM_DEVICE);
+        } catch (IOException e) {
+            //OK, try to reconnect
+            disconnect();
+            try {
+                connect();
+            } catch (Exception ee) {
+                //OK, so now throw the exception
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
+            }
+            addDevice(deviceId);
+        } finally {
+            cmdWithResponse = false;
+            cmdWithResponseId = 0;
+        }
+    }
+
     protected synchronized void sendCommand(int deviceId, String command) throws RemoteHomeConnectionException {
         try {
             dataReceived = "";

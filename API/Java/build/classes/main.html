@@ -2,20 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>jQuery UI Tabs - Default functionality</title>
+<title>Remote-home GUI</title>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
 <link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css" />
 <script>
+var addTabJs = null;
 $(function() {
   var tabs = $( "#tabs" ).tabs();
   var tabCounter = 2;
   $( "#accordion" ).accordion();
   $( document ).tooltip();
+  $( "#addDeviceType").buttonset();
+  $( "input[type=submit], a, button" ).button();  
   $("#addDeviceForm").submit(function(event) {
-  event.preventDefault();
+  event.preventDefault();    
   if ($(this).valid()) {
    $("#addDeviceResult").html('');
    var values = $(this).serialize();
@@ -43,9 +46,10 @@ $(function() {
       type: "get",
       data: values,
       success: function(data){
-           $("#addRoomResult").html(data);
-           addTab($("#roomName").val());
-           $("#addRoomForm").each(function(){ this.reset();});
+           //$("#addRoomResult").html(data);
+           //addTab($("#roomName").val());
+           //$("#addRoomForm").each(function(){ this.reset();});
+           window.location.reload(true);
       },
       error:function(){
           $("#addRoomResult").html('Error when tried to add the room.');
@@ -53,13 +57,29 @@ $(function() {
     });
   }
   });
+  $("#deviceIdLoader").click(function(){  
+    $.ajax({
+      url: "",
+      type: "get",
+      data: "ServiceName=GetFreeDeviceId",
+      success: function(freeId) {
+          document.getElementById("addDeviceId").value = freeId;
+      },
+      error:function(){
+          alert('Error when tried to get the free device id.');
+      }   
+    });
+  });
   function addTab(label) {
     id = "tabs-" + tabCounter,
     li = "<li><a href='?ServiceName=LoadRoomPage&room="+encodeURIComponent(label)+"'>"+label+"</a></li>",
     tabs.find( ".ui-tabs-nav" ).append( li );
     tabs.tabs( "refresh" );
+    //update radios
+    $('#addDeviceLocation').append('<input type="radio" name = "roomName" id = "radio'+tabCounter+'" value="'+label+'"/><label for="radio'+tabCounter+'">'+label+'</label>');
     tabCounter++;
   }
+  addTabJs = addTab;
   $( "#tabs" ).tabs({      
       beforeLoad: function( event, ui ) {        
           ui.jqXHR.error(function() {          
@@ -71,10 +91,16 @@ $(function() {
 $(document).ready(function(){
   $("#addDeviceForm").validate({
     rules: {
-     addDeviceId : { required : true, range: [1, 255] }
+     addDeviceId : { required : true, range: [1, 255] },
+     addDeviceName : { required : true },
+     type : { required : true },
+     roomName : { required : true }
     },
     messages: {
-        addDeviceId : { required : "Please enter some device Id.", range: "Your device ID should be in the range 1..255."}        
+        addDeviceId : { required : "Please enter some device Id.", range: "Your device ID should be in the range 1..255."},
+        addDeviceName : { required : "Please enter some device name." },
+        type : { required : "Please enter the type of the device." },
+        roomName : { required : "Please select the room, where the device is placed." }
     }
   });
   $("#addRoomForm").validate({
@@ -88,14 +114,16 @@ $(document).ready(function(){
   $.ajax({
       url: "",
       type: "get",
-      data: "?ServiceName=LoadAllRooms",
-      success: function(data){
-           $("#addRoomResult").html(data);
-           addTab($("#roomName").val());
-           $("#addRoomForm").each(function(){ this.reset();});
+      data: "ServiceName=LoadAllRooms",
+      success: function(roomsData) {
+           rooms = roomsData.split("\n");
+           for (var i=0; i<rooms.length; i++) {
+               addTabJs(rooms[i]);
+           }
+           $( "#addDeviceLocation" ).buttonset();
       },
       error:function(){
-          $("#addRoomResult").html('Error when tried to add the room.');
+          alert('Error when tried to get the list of rooms.');
       }   
   });
 });
@@ -112,22 +140,39 @@ $(document).ready(function(){
     <div>    
         <p>Here you can add new device. Please note that the only <b>one</b> new device (with id = 0) should be powered on.</p>
         <form id="addDeviceForm">
-           <p><label for="addDeviceId">New device ID:</label><input name="addDeviceId" id="addDeviceId" title="The new device ID should not exist in the system."/></p>
-           <input type="hidden" name="ServiceName" value="ClassName"/>
-           <input type="submit" value="Add new device"/>
+           <input type="hidden" name="ServiceName" value="AddNewDevice"/>
+           <table>
+           <tr>
+           <td><label for="addDeviceId">New device ID:</label></td><td><input name="addDeviceId" id="addDeviceId" title="The new device ID should not exist in the system."/></td><td><button id="deviceIdLoader">Get available ID</button></td>
+           </tr><tr>
+           <td><label for="addDeviceName">New device name:</label></td><td><input name="addDeviceName" id="addDeviceName" title="Identifier, which represents the device."/></td><td>&nbsp;</td>
+           </tr><tr><td><label for="addDeviceLocation">Room name:</label></td><td colspan="2">
+           <div id="addDeviceLocation">
+           </div>
+           </td></tr><td><label for="addDeviceType">Type of the device:</label></td><td colspan="2">
+           <div id="addDeviceType">
+               <input type="radio" name = "type" id = "type1" value="1"/><label for="type1">LightAlarmDevice</label>
+               <input type="radio" name = "type" id = "type2" value="2"/><label for="type2">TemperatureSensor</label>
+               <input type="radio" name = "type" id = "type3" value="3"/><label for="type3">SimpleSwitch</label>
+               <input type="radio" name = "type" id = "type4" value="4"/><label for="type4">HeatingHeader</label>
+               <input type="radio" name = "type" id = "type5" value="5"/><label for="type5">BlindsControllerDevice</label>
+               <input type="radio" name = "type" id = "type6" value="6"/><label for="type6">Thermostat</label>
+               <input type="radio" name = "type" id = "type7" value="7"/><label for="type7">BatteryThermostat</label>
+           </div>
+           </td></tr><tr><td>&nbsp;</td><td colspan="2">
+           <input type="submit" value="Add new device"/><div id="addDeviceResult">&nbsp;</div>
+           </td></tr></table>
         </form>
-        <div id="addDeviceResult">&nbsp;</div>
     </div>
 <h3>Rooms management</h3>
     <div>
         <p>Here you can manage the rooms of your home.</p>
-        <form id="addRoomForm">
+        <form id="addRoomForm">        
         <p><label for="roomName">New room name:</label><input name="roomName" id="roomName" title="The room name to be added."/></p>
            <input type="hidden" name="ServiceName" value="AddRoom"/>
            <input type="submit" value="Add new room"/>
         </form>
-        <div id="addRoomResult">&nbsp;</div>
-        
+        <div id="addRoomResult">&nbsp;</div>        
     </div>
 <h3>Channel/Password configuration</h3>
     <div>
