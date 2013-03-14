@@ -7,16 +7,19 @@
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
+<script type="text/javascript" src="verticalButtonset.js"></script>
+<link href="listbox.css" rel="stylesheet" />
+<script type="text/javascript" src="listbox.js"></script> 
 <link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css" />
 <script>
 var addTabJs = null;
 $(function() {
   var tabs = $( "#tabs" ).tabs();
   var tabCounter = 2;
-  $( "#accordion" ).accordion();
   $( document ).tooltip();
-  $( "#addDeviceType").buttonset();
-  $( "input[type=submit], a, button" ).button();  
+  $( "#addDeviceType").buttonsetv();
+  $( "input[type=submit], a, button" ).button();
+  $("#testselect").listbox({ 'searchbar': false, 'multiselect': false }); 
   $("#addDeviceForm").submit(function(event) {
   event.preventDefault();    
   if ($(this).valid()) {
@@ -87,6 +90,12 @@ $(function() {
           });
       }
   });
+  $("#accordion").accordion({
+            active: false,
+            autoHeight: true,
+            navigation: true,
+            collapsible: true
+  });
 });
 $(document).ready(function(){
   $("#addDeviceForm").validate({
@@ -120,7 +129,7 @@ $(document).ready(function(){
            for (var i=0; i<rooms.length; i++) {
                addTabJs(rooms[i]);
            }
-           $( "#addDeviceLocation" ).buttonset();
+           $( "#addDeviceLocation" ).buttonsetv();
       },
       error:function(){
           alert('Error when tried to get the list of rooms.');
@@ -135,6 +144,12 @@ $(document).ready(function(){
 <li><a href="#tabs-1">System management</a></li>
 </ul>
 <div id="tabs-1">
+            <select id="testselect">
+            <option>Item #1</option>
+            <option>Item #2</option>
+            <option>Item #3</option>
+            <option>Item #4</option>
+        </select> 
 <div id="accordion">
 <h3>Add new device</h3>
     <div>    
@@ -147,18 +162,18 @@ $(document).ready(function(){
            </tr><tr>
            <td><label for="addDeviceName">New device name:</label></td><td><input name="addDeviceName" id="addDeviceName" title="Identifier, which represents the device."/></td><td>&nbsp;</td>
            </tr><tr><td><label for="addDeviceLocation">Room name:</label></td><td colspan="2">
-           <div id="addDeviceLocation">
-           </div>
+                   <div id="addDeviceLocation">
+                   </div>
            </td></tr><td><label for="addDeviceType">Type of the device:</label></td><td colspan="2">
-           <div id="addDeviceType">
-               <input type="radio" name = "type" id = "type1" value="1"/><label for="type1">LightAlarmDevice</label>
-               <input type="radio" name = "type" id = "type2" value="2"/><label for="type2">TemperatureSensor</label>
-               <input type="radio" name = "type" id = "type3" value="3"/><label for="type3">SimpleSwitch</label>
-               <input type="radio" name = "type" id = "type4" value="4"/><label for="type4">HeatingHeader</label>
-               <input type="radio" name = "type" id = "type5" value="5"/><label for="type5">BlindsControllerDevice</label>
-               <input type="radio" name = "type" id = "type6" value="6"/><label for="type6">Thermostat</label>
-               <input type="radio" name = "type" id = "type7" value="7"/><label for="type7">BatteryThermostat</label>
-           </div>
+               <div id="addDeviceType">
+                    <input type="radio" name = "type" id = "type1" value="1"/><label for="type1">LightAlarmDevice</label>
+                    <input type="radio" name = "type" id = "type2" value="2"/><label for="type2">TemperatureSensor</label>
+                    <input type="radio" name = "type" id = "type3" value="3"/><label for="type3">SimpleSwitch</label>
+                    <input type="radio" name = "type" id = "type4" value="4"/><label for="type4">HeatingHeader</label>
+                    <input type="radio" name = "type" id = "type5" value="5"/><label for="type5">BlindsControllerDevice</label>
+                    <input type="radio" name = "type" id = "type6" value="6"/><label for="type6">Thermostat</label>
+                    <input type="radio" name = "type" id = "type7" value="7"/><label for="type7">BatteryThermostat</label>
+               </div>
            </td></tr><tr><td>&nbsp;</td><td colspan="2">
            <input type="submit" value="Add new device"/><div id="addDeviceResult">&nbsp;</div>
            </td></tr></table>

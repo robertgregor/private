@@ -1,5 +1,8 @@
 package org.remoteHome; 
 
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -17,6 +20,7 @@ class RemoteHomeCommunicator extends Thread  {
     String port;
     RemoteHomeManager manager;
     Socket socket;
+    CommPort commPort = null; 
     BufferedReader dataInputStream = null;
     DataOutputStream dataOutputStream = null;
     String dataReceived = "";
@@ -37,6 +41,9 @@ class RemoteHomeCommunicator extends Thread  {
                 socket = new Socket(host, Integer.parseInt(port));
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 dataInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            } catch (NumberFormatException e) {
+                //OK, the port is COM port.
+                connectComPort();
             } catch (UnknownHostException e) {
                 throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);
             } catch (IOException e) {
@@ -45,12 +52,27 @@ class RemoteHomeCommunicator extends Thread  {
             }
     }
     
+    protected void connectComPort() throws RemoteHomeConnectionException {
+            disconnect();
+            try {
+                CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(port); 
+                commPort = portIdentifier.open(this.getClass().getName(),2000);
+                SerialPort serialPort = (SerialPort) commPort;
+                serialPort.setSerialPortParams(9600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+                dataInputStream = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
+                dataOutputStream = new DataOutputStream(serialPort.getOutputStream());                 
+            } catch (IOException e) {
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
+            } catch (Exception e) {
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);                
+            }
+    }
+
     protected void disconnect() {
         try { dataOutputStream.close(); } catch (Throwable e) {}
         try { dataInputStream.close(); } catch (Throwable e) {}
-        try {
-             socket.close();
-        } catch (Throwable e) {}
+        try { if (socket != null) socket.close(); } catch (Throwable e) {}
+        try { if (commPort != null) commPort.close(); } catch (Throwable e) {}
     }
     
     protected synchronized String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
