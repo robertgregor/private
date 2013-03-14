@@ -38,7 +38,7 @@ INCLUDE "RFM70.pbp"
 on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
-TRISA = %00100000 'Set PORTA to all output
+TRISA = %00110000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input,
 WPUA = %11111111
@@ -46,7 +46,9 @@ WPUB = %11111111
  
 
 HEATING_SENSOR var PORTA.5
-HEATING_SENSOR_power var PORTC.5
+HEATING_SENSOR_POWER var PORTC.5
+RESET_BUTTON VAR PORTA.4
+RADIO_MODULE_POWER var PORTC.1
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
@@ -73,20 +75,8 @@ VDD         VAR WORD
 temperature var word
 
 clear
+startProgLabel:
 read 6, device_id
-
-if 0 == 1 then
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    END
-endif
-
 gosub initModule
 READ 7, temp_byte
 sleep_period = temp_byte * 10
@@ -96,8 +86,10 @@ if (sleep_period != 0) then
         gosub sendTemperature
     endif
 endif
-low HEATING_SENSOR_power
+low HEATING_SENSOR_POWER
 commonSettings:
+high RADIO_MODULE_POWER
+pause 50
 gosub commonRXTX
 
 '============Main Rx============================================================
@@ -106,6 +98,18 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
+if RESET_BUTTON == 1 then
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    write 6, 0
+    write 7, 0
+    pause 1000
+    goto startProgLabel
+endif
 'Check for data to send
 if (temp_data[0] != 0) then
     if (configure == 1) then
@@ -119,7 +123,8 @@ endif
 if (sleepMode == 1) then    
       disable    
       INTCON = 0
-      gosub setup_sleep
+      'gosub setup_sleep
+      LOW RADIO_MODULE_POWER
       pause 1
       sleep sleep_period
       pause 1
