@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -93,6 +93,19 @@
 <pad name="PGD" x="2" y="0.25" drill="0.8" shape="long" rot="R90"/>
 <pad name="PGC" x="4" y="0" drill="0.8" shape="long" rot="R90"/>
 </package>
+<package name="CR2032">
+<pad name="1" x="0" y="3.81" drill="2"/>
+<pad name="2" x="20.32" y="3.81" drill="2"/>
+<circle x="10.16" y="3.81" radius="10.77630625" width="0.127" layer="21"/>
+<rectangle x1="6.35" y1="0" x2="13.97" y2="7.62" layer="1"/>
+<pad name="3" x="10.16" y="-1.27" drill="2"/>
+<smd name="P$1" x="8.89" y="1.27" dx="6.4516" dy="3.2512" layer="1"/>
+<smd name="P$2" x="11.43" y="1.27" dx="6.4516" dy="3.2512" layer="1"/>
+<smd name="P$3" x="11.43" y="3.81" dx="6.4516" dy="3.2512" layer="1"/>
+<smd name="P$4" x="8.89" y="3.81" dx="6.4516" dy="3.2512" layer="1"/>
+<smd name="P$5" x="8.89" y="6.35" dx="6.4516" dy="3.2512" layer="1"/>
+<smd name="P$6" x="11.43" y="6.35" dx="6.4516" dy="3.2512" layer="1"/>
+</package>
 </packages>
 <symbols>
 <symbol name="RFM70">
@@ -121,6 +134,12 @@
 <pin name="GND" x="-10.16" y="0" length="middle" direction="pwr"/>
 <pin name="PGD" x="-10.16" y="2.54" length="middle"/>
 <pin name="PGC" x="-10.16" y="5.08" length="middle"/>
+</symbol>
+<symbol name="CR2032">
+<pin name="GND" x="-10.16" y="10.16" length="middle"/>
+<pin name="VDD" x="-10.16" y="0" length="middle"/>
+<wire x1="-2.54" y1="7.62" x2="-17.78" y2="7.62" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="5.08" x2="-12.7" y2="5.08" width="0.254" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -166,6 +185,22 @@ Email: daniel.weber@web4clans.com</description>
 </connects>
 <technologies>
 <technology name="DIP"/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="CR2032">
+<gates>
+<gate name="G$1" symbol="CR2032" x="0" y="2.54"/>
+</gates>
+<devices>
+<device name="" package="CR2032">
+<connects>
+<connect gate="G$1" pin="GND" pad="3"/>
+<connect gate="G$1" pin="VDD" pad="1"/>
+</connects>
+<technologies>
+<technology name=""/>
 </technologies>
 </device>
 </devices>
