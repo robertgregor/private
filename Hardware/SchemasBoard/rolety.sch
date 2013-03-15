@@ -14841,72 +14841,38 @@ Operational amplifiers,  comparators, voltage regulators, ADCs, DACs, etc.&lt;p&
 <rectangle x1="-2.7432" y1="-3.6576" x2="-1.8796" y2="-1.8034" layer="51"/>
 <rectangle x1="1.8796" y1="-3.6576" x2="2.7432" y2="-1.8034" layer="51"/>
 </package>
-<package name="SOT23">
-<description>&lt;b&gt;SMALL OUTLINE TRANSISTOR&lt;/b&gt;&lt;p&gt;
-reflow soldering</description>
-<wire x1="-1.973" y1="1.983" x2="1.973" y2="1.983" width="0.0508" layer="39"/>
-<wire x1="1.973" y1="-1.983" x2="-1.973" y2="-1.983" width="0.0508" layer="39"/>
-<wire x1="-1.973" y1="-1.983" x2="-1.973" y2="1.983" width="0.0508" layer="39"/>
-<wire x1="1.973" y1="1.983" x2="1.973" y2="-1.983" width="0.0508" layer="39"/>
-<wire x1="1.422" y1="0.66" x2="1.422" y2="-0.66" width="0.1524" layer="51"/>
-<wire x1="1.422" y1="-0.66" x2="-1.422" y2="-0.66" width="0.1524" layer="51"/>
-<wire x1="-1.422" y1="-0.66" x2="-1.422" y2="0.66" width="0.1524" layer="51"/>
-<wire x1="-1.422" y1="0.66" x2="1.422" y2="0.66" width="0.1524" layer="51"/>
-<wire x1="-1.422" y1="-0.152" x2="-1.422" y2="0.66" width="0.1524" layer="21"/>
-<wire x1="-1.422" y1="0.66" x2="-0.864" y2="0.66" width="0.1524" layer="21"/>
-<wire x1="0.864" y1="0.66" x2="1.422" y2="0.66" width="0.1524" layer="21"/>
-<wire x1="1.422" y1="0.66" x2="1.422" y2="-0.152" width="0.1524" layer="21"/>
-<smd name="3" x="0" y="1.1" dx="1" dy="1.4" layer="1"/>
-<smd name="2" x="0.95" y="-1.1" dx="1" dy="1.4" layer="1"/>
-<smd name="1" x="-0.95" y="-1.1" dx="1" dy="1.4" layer="1"/>
-<text x="-1.905" y="1.905" size="1.27" layer="25">&gt;NAME</text>
-<text x="-1.905" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
-<rectangle x1="-0.2286" y1="0.7112" x2="0.2286" y2="1.2954" layer="51"/>
-<rectangle x1="0.7112" y1="-1.2954" x2="1.1684" y2="-0.7112" layer="51"/>
-<rectangle x1="-1.1684" y1="-1.2954" x2="-0.7112" y2="-0.7112" layer="51"/>
-<rectangle x1="-0.5001" y1="-0.3" x2="0.5001" y2="0.3" layer="35"/>
-</package>
 </packages>
 <symbols>
-<symbol name="78XX">
-<wire x1="-7.62" y1="-5.08" x2="7.62" y2="-5.08" width="0.4064" layer="94"/>
-<wire x1="7.62" y1="-5.08" x2="7.62" y2="2.54" width="0.4064" layer="94"/>
-<wire x1="7.62" y1="2.54" x2="-7.62" y2="2.54" width="0.4064" layer="94"/>
-<wire x1="-7.62" y1="2.54" x2="-7.62" y2="-5.08" width="0.4064" layer="94"/>
-<text x="-7.62" y="5.715" size="1.778" layer="95">&gt;NAME</text>
-<text x="-7.62" y="3.175" size="1.778" layer="96">&gt;VALUE</text>
-<text x="-2.032" y="-4.318" size="1.524" layer="95">GND</text>
-<pin name="VI" x="-10.16" y="0" length="short" direction="in"/>
-<pin name="GND" x="0" y="-7.62" visible="pad" length="short" direction="pas" rot="R90"/>
-<pin name="VO" x="10.16" y="0" length="short" direction="pas" rot="R180"/>
+<symbol name="VREG-O2">
+<wire x1="-5.08" y1="6.35" x2="7.62" y2="6.35" width="0.254" layer="94"/>
+<wire x1="7.62" y1="6.35" x2="7.62" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-2.54" x2="-5.08" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-5.08" y1="-2.54" x2="-5.08" y2="6.35" width="0.254" layer="94"/>
+<text x="-5.08" y="7.62" size="1.778" layer="95">&gt;NAME</text>
+<text x="3.81" y="-5.08" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="GND/ADJ" x="0" y="-5.08" visible="pad" length="short" direction="in" rot="R90"/>
+<pin name="IN" x="-7.62" y="5.08" length="short" direction="in"/>
+<pin name="OUT" x="10.16" y="5.08" length="short" direction="pas" rot="R180"/>
+<pin name="OUT@1" x="10.16" y="2.54" visible="pad" length="short" direction="pas" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="MCP1703" prefix="IC">
-<description>&lt;b&gt;250 mA, 16V, Low Quiescent Current LDO Regulator&lt;/b&gt;&lt;p&gt;
-Source: http://ww1.microchip.com/downloads/en/DeviceDoc/22049b.pdf</description>
+<deviceset name="MC33269ST*" prefix="IC">
+<description>&lt;b&gt;Adjustable Output Low Dropout Voltage Regulator&lt;/b&gt; 800 mA&lt;p&gt;
+Source: http://www.onsemi.com/pub/Collateral/MC33269-D.PDF</description>
 <gates>
-<gate name="G$1" symbol="78XX" x="0" y="0"/>
+<gate name="G$1" symbol="VREG-O2" x="0" y="0"/>
 </gates>
 <devices>
-<device name="DB" package="SOT223">
+<device name="" package="SOT223">
 <connects>
-<connect gate="G$1" pin="GND" pad="2"/>
-<connect gate="G$1" pin="VI" pad="1"/>
-<connect gate="G$1" pin="VO" pad="3"/>
+<connect gate="G$1" pin="GND/ADJ" pad="1"/>
+<connect gate="G$1" pin="IN" pad="3"/>
+<connect gate="G$1" pin="OUT" pad="4"/>
+<connect gate="G$1" pin="OUT@1" pad="2"/>
 </connects>
 <technologies>
-<technology name=""/>
-</technologies>
-</device>
-<device name="CB" package="SOT23">
-<connects>
-<connect gate="G$1" pin="GND" pad="1"/>
-<connect gate="G$1" pin="VI" pad="3"/>
-<connect gate="G$1" pin="VO" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
+<technology name="-3.3T3"/>
 </technologies>
 </device>
 </devices>
@@ -15231,7 +15197,6 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <part name="C3" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="10uF / 16 V"/>
 <part name="L1" library="inductors" deviceset="MICC10" device=""/>
 <part name="C4" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="100uF / 6,3 V"/>
-<part name="IC2" library="linear" deviceset="MCP1703" device="DB"/>
 <part name="C5" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="T1" library="transistor" deviceset="BC846" device=""/>
 <part name="D3" library="diode" deviceset="DIODE-" device="DO214AA"/>
@@ -15250,6 +15215,8 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <part name="R6" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
 <part name="X1" library="con-ptr500" deviceset="AK500/4" device=""/>
 <part name="U$3" library="rfm70" deviceset="PROGRAMMINGHEADER" device="" technology="DIP"/>
+<part name="IC3" library="linear" deviceset="MC33269ST*" device="" technology="-3.3T3"/>
+<part name="R7" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
 </parts>
 <sheets>
 <sheet>
@@ -15274,9 +15241,8 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <instance part="R5" gate="G$1" x="55.88" y="116.84"/>
 <instance part="C3" gate="G$1" x="55.88" y="76.2"/>
 <instance part="L1" gate="1" x="76.2" y="53.34" rot="R90"/>
-<instance part="C4" gate="G$1" x="86.36" y="38.1"/>
-<instance part="IC2" gate="G$1" x="111.76" y="55.88"/>
-<instance part="C5" gate="G$1" x="127" y="50.8" rot="R180"/>
+<instance part="C4" gate="G$1" x="88.9" y="45.72"/>
+<instance part="C5" gate="G$1" x="127" y="43.18" rot="R180"/>
 <instance part="T1" gate="G$1" x="12.7" y="63.5" rot="R180"/>
 <instance part="D3" gate="G$1" x="71.12" y="38.1" rot="R90"/>
 <instance part="D4" gate="G$1" x="66.04" y="78.74" rot="R180"/>
@@ -15296,6 +15262,8 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <instance part="X1" gate="-3" x="-38.1" y="53.34"/>
 <instance part="X1" gate="-4" x="-38.1" y="48.26"/>
 <instance part="U$3" gate="G$1" x="177.8" y="134.62"/>
+<instance part="IC3" gate="G$1" x="104.14" y="50.8"/>
+<instance part="R7" gate="G$1" x="81.28" y="45.72" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -15344,20 +15312,18 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <wire x1="5.08" y1="30.48" x2="20.32" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="30.48" x2="22.86" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="22.86" y1="30.48" x2="71.12" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="71.12" y1="30.48" x2="86.36" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="86.36" y1="30.48" x2="111.76" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="111.76" y1="30.48" x2="127" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="30.48" x2="81.28" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="30.48" x2="88.9" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="30.48" x2="104.14" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="30.48" x2="127" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="127" y1="30.48" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="30.48" x2="139.7" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="139.7" y1="30.48" x2="144.78" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="144.78" y1="30.48" x2="177.8" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="35.56" x2="71.12" y2="30.48" width="0.1524" layer="91"/>
 <junction x="71.12" y="30.48"/>
-<pinref part="IC2" gate="G$1" pin="GND"/>
-<wire x1="111.76" y1="48.26" x2="111.76" y2="30.48" width="0.1524" layer="91"/>
-<junction x="111.76" y="30.48"/>
 <pinref part="C5" gate="G$1" pin="1"/>
-<wire x1="127" y1="48.26" x2="127" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="127" y1="40.64" x2="127" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="U$2" gate="G$1" pin="VSS"/>
 <wire x1="132.08" y1="66.04" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="GND"/>
@@ -15375,8 +15341,8 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <wire x1="22.86" y1="33.02" x2="22.86" y2="30.48" width="0.1524" layer="91"/>
 <junction x="22.86" y="30.48"/>
 <pinref part="C4" gate="G$1" pin="-"/>
-<wire x1="86.36" y1="33.02" x2="86.36" y2="30.48" width="0.1524" layer="91"/>
-<junction x="86.36" y="30.48"/>
+<wire x1="88.9" y1="40.64" x2="88.9" y2="30.48" width="0.1524" layer="91"/>
+<junction x="88.9" y="30.48"/>
 <pinref part="D3" gate="G$1" pin="A"/>
 <wire x1="20.32" y1="121.92" x2="20.32" y2="68.58" width="0.1524" layer="91"/>
 <junction x="20.32" y="68.58"/>
@@ -15395,6 +15361,12 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <wire x1="167.64" y1="134.62" x2="162.56" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="162.56" y1="134.62" x2="162.56" y2="119.38" width="0.1524" layer="91"/>
 <wire x1="162.56" y1="119.38" x2="177.8" y2="119.38" width="0.1524" layer="91"/>
+<pinref part="IC3" gate="G$1" pin="GND/ADJ"/>
+<wire x1="104.14" y1="45.72" x2="104.14" y2="30.48" width="0.1524" layer="91"/>
+<junction x="104.14" y="30.48"/>
+<pinref part="R7" gate="G$1" pin="1"/>
+<wire x1="81.28" y1="40.64" x2="81.28" y2="30.48" width="0.1524" layer="91"/>
+<junction x="81.28" y="30.48"/>
 </segment>
 </net>
 <net name="N$11" class="0">
@@ -15465,14 +15437,6 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 </net>
 <net name="N$17" class="0">
 <segment>
-<pinref part="C5" gate="G$1" pin="2"/>
-<pinref part="IC2" gate="G$1" pin="VO"/>
-<wire x1="127" y1="55.88" x2="121.92" y2="55.88" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="VDD"/>
-<wire x1="83.82" y1="66.04" x2="127" y2="66.04" width="0.1524" layer="91"/>
-<wire x1="127" y1="66.04" x2="127" y2="55.88" width="0.1524" layer="91"/>
-<junction x="127" y="55.88"/>
-<wire x1="127" y1="55.88" x2="139.7" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="139.7" y1="55.88" x2="147.32" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="55.88" x2="147.32" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="U$1" gate="G$1" pin="VDD"/>
@@ -15484,9 +15448,21 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <junction x="170.18" y="73.66"/>
 <pinref part="C6" gate="G$1" pin="+"/>
 <wire x1="139.7" y1="48.26" x2="139.7" y2="55.88" width="0.1524" layer="91"/>
-<junction x="139.7" y="55.88"/>
 <pinref part="U$3" gate="G$1" pin="VDD"/>
 <wire x1="160.02" y1="132.08" x2="167.64" y2="132.08" width="0.1524" layer="91"/>
+<pinref part="C5" gate="G$1" pin="2"/>
+<wire x1="127" y1="66.04" x2="127" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="VDD"/>
+<wire x1="127" y1="55.88" x2="127" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="127" y1="53.34" x2="127" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="83.82" y1="66.04" x2="127" y2="66.04" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="55.88" x2="127" y2="55.88" width="0.1524" layer="91"/>
+<junction x="127" y="55.88"/>
+<pinref part="IC3" gate="G$1" pin="OUT"/>
+<wire x1="114.3" y1="55.88" x2="127" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="IC3" gate="G$1" pin="OUT@1"/>
+<wire x1="114.3" y1="53.34" x2="127" y2="53.34" width="0.1524" layer="91"/>
+<junction x="127" y="53.34"/>
 </segment>
 </net>
 <net name="N$15" class="0">
@@ -15647,14 +15623,14 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <wire x1="10.16" y1="83.82" x2="33.02" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="83.82" x2="76.2" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="0" y1="81.28" x2="0" y2="83.82" width="0.1524" layer="91"/>
-<pinref part="IC2" gate="G$1" pin="VI"/>
-<wire x1="101.6" y1="55.88" x2="86.36" y2="55.88" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="60.96" x2="86.36" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="86.36" y1="60.96" x2="86.36" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="96.52" y1="55.88" x2="88.9" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="60.96" x2="81.28" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="60.96" x2="88.9" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="60.96" x2="88.9" y2="55.88" width="0.1524" layer="91"/>
 <junction x="76.2" y="60.96"/>
 <pinref part="C4" gate="G$1" pin="+"/>
-<wire x1="86.36" y1="40.64" x2="86.36" y2="55.88" width="0.1524" layer="91"/>
-<junction x="86.36" y="55.88"/>
+<wire x1="88.9" y1="48.26" x2="88.9" y2="55.88" width="0.1524" layer="91"/>
+<junction x="88.9" y="55.88"/>
 <pinref part="D4" gate="G$1" pin="A"/>
 <pinref part="D1" gate="G$1" pin="C"/>
 <wire x1="10.16" y1="78.74" x2="10.16" y2="83.82" width="0.1524" layer="91"/>
@@ -15665,6 +15641,10 @@ Es handelt sich hierbei um AK500 in horizontaler Ausführung.&lt;p&gt;
 <junction x="0" y="81.28"/>
 <junction x="10.16" y="99.06"/>
 <junction x="0" y="99.06"/>
+<pinref part="IC3" gate="G$1" pin="IN"/>
+<pinref part="R7" gate="G$1" pin="2"/>
+<wire x1="81.28" y1="50.8" x2="81.28" y2="60.96" width="0.1524" layer="91"/>
+<junction x="81.28" y="60.96"/>
 </segment>
 </net>
 <net name="N$6" class="0">
