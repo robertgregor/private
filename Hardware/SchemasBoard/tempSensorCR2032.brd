@@ -73,10 +73,17 @@
 </layers>
 <board>
 <plain>
+<<<<<<< HEAD
 <wire x1="0" y1="0" x2="22.1744" y2="-0.0127" width="0" layer="20"/>
 <wire x1="22.1744" y1="-0.0127" x2="22.1742" y2="17.6657" width="0" layer="20"/>
 <wire x1="22.1742" y1="17.6657" x2="22.2123" y2="24.0438" width="0" layer="20"/>
 <wire x1="22.1869" y1="24.1073" x2="-0.0127" y2="24.0438" width="0" layer="20"/>
+=======
+<wire x1="0" y1="0" x2="26.213" y2="-0.0127" width="0" layer="20"/>
+<wire x1="26.213" y1="-0.0127" x2="26.2255" y2="17.6657" width="0" layer="20"/>
+<wire x1="26.2255" y1="17.6657" x2="26.2509" y2="24.1073" width="0" layer="20"/>
+<wire x1="26.2255" y1="24.0184" x2="-0.0127" y2="24.0438" width="0" layer="20"/>
+>>>>>>> origin/master
 <wire x1="-0.0127" y1="24.0438" x2="0" y2="0" width="0" layer="20"/>
 </plain>
 <libraries>
@@ -110,7 +117,11 @@
 <pad name="2" x="20.32" y="3.81" drill="2"/>
 <circle x="10.16" y="3.81" radius="10.77630625" width="0.127" layer="21"/>
 <rectangle x1="6.35" y1="0" x2="13.97" y2="7.62" layer="1"/>
+<<<<<<< HEAD
 <pad name="3" x="10.16" y="-1.27" drill="2"/>
+=======
+<pad name="3" x="10.16" y="3.81" drill="2"/>
+>>>>>>> origin/master
 <smd name="P$1" x="8.89" y="1.27" dx="6.4516" dy="3.2512" layer="1"/>
 <smd name="P$2" x="11.43" y="1.27" dx="6.4516" dy="3.2512" layer="1"/>
 <smd name="P$3" x="11.43" y="3.81" dx="6.4516" dy="3.2512" layer="1"/>
@@ -1368,7 +1379,10 @@ chip, wave soldering</description>
 <smd name="1" x="-2.7" y="0" dx="2" dy="1.6" layer="1"/>
 <smd name="2" x="2.7" y="0" dx="2" dy="1.6" layer="1"/>
 <text x="-2.54" y="-3.81" size="1.27" layer="27">&gt;VALUE</text>
+<<<<<<< HEAD
 <text x="-2.54" y="2.54" size="1.27" layer="25">&gt;NAME</text>
+=======
+>>>>>>> origin/master
 </package>
 </packages>
 </library>
@@ -1558,6 +1572,7 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
+<<<<<<< HEAD
 <element name="U$1" library="rfm70" package="RFM70" value="RFM70" x="-5.1816" y="15.5321" rot="MR270"/>
 <element name="U$2" library="microchip" package="SSOP20" value="PIC16F690" x="16.5227" y="12.5222" rot="MR270"/>
 <element name="IC1" library="ds1820" package="TO-92" value="DS1820" x="19.5072" y="22.6568" rot="R180"/>
@@ -1570,6 +1585,20 @@ design rules under a new name.</description>
 </elements>
 <signals>
 <signal name="VD">
+=======
+<element name="U$1" library="rfm70" package="RFM70" value="RFM70" x="-4.6482" y="17.0942" rot="MR270"/>
+<element name="U$2" library="microchip" package="SSOP20" value="PIC16F690" x="16.764" y="12.0396" rot="MR0"/>
+<element name="IC1" library="ds1820" package="TO-92" value="DS1820" x="2.6289" y="1.4224"/>
+<element name="C1" library="resistor" package="C2012" value="100nF" x="8.8392" y="4.2418" rot="MR0"/>
+<element name="S1" library="switch-tact" package="DTS-3" value="DTS-3" x="24.3459" y="5.7277" rot="MR270"/>
+<element name="C2" library="resistor" package="SMC_A" value="1uF" x="12.7889" y="18.9357" rot="MR0"/>
+<element name="R1" library="resistor" package="R1206W" value="4K7" x="16.764" y="4.2545" rot="MR0"/>
+<element name="U$3" library="rfm70" package="PROGHEADER" value="PROGRAMMINGHEADERDIP" x="24.5491" y="18.8976" rot="R90"/>
+<element name="U$4" library="rfm70" package="CR2032" value="CR2032" x="16.1925" y="1.9304" rot="R90"/>
+</elements>
+<signals>
+<signal name="GND">
+>>>>>>> origin/master
 <polygon width="0.254" layer="1" isolate="0.254">
 <vertex x="0.1905" y="24.0157"/>
 <vertex x="22.0472" y="23.876"/>
@@ -1577,13 +1606,24 @@ design rules under a new name.</description>
 <vertex x="0.1651" y="0.1397"/>
 </polygon>
 <contactref element="C1" pad="2"/>
+<<<<<<< HEAD
 <contactref element="U$4" pad="3"/>
+=======
+<contactref element="C2" pad="-"/>
+<contactref element="U$2" pad="1"/>
+<contactref element="R1" pad="2"/>
+<contactref element="U$3" pad="VDD"/>
+<contactref element="U$3" pad="VDD"/>
+<contactref element="U$4" pad="3"/>
+<contactref element="U$4" pad="1"/>
+>>>>>>> origin/master
 <contactref element="U$2" pad="20"/>
 <contactref element="U$3" pad="GND"/>
 <contactref element="U$3" pad="GND"/>
 <contactref element="U$1" pad="GND"/>
 <contactref element="IC1" pad="1"/>
 <contactref element="S1" pad="1"/>
+<<<<<<< HEAD
 <contactref element="C2" pad="-"/>
 <wire x1="4.8528" y1="19.8755" x2="4.3801" y2="21.6385" width="0.3048" layer="16"/>
 <wire x1="4.3801" y1="21.6385" x2="4.2536" y2="22.2377" width="0.4064" layer="16"/>
@@ -1612,10 +1652,24 @@ design rules under a new name.</description>
 <wire x1="18.1356" y1="8.8722" x2="20.3708" y2="6.637" width="0.3048" layer="16"/>
 <wire x1="6.9723" y1="20.7899" x2="5.4624" y2="20.7899" width="0.3048" layer="16"/>
 <wire x1="5.4624" y1="20.7899" x2="4.8528" y2="19.8755" width="0.3048" layer="16"/>
+=======
+<wire x1="15.265" y1="4.2545" x2="7.9892" y2="4.2418" width="0" layer="19" extent="16-16"/>
+<wire x1="11.2889" y1="18.9357" x2="7.9892" y2="4.2418" width="0" layer="19" extent="16-16"/>
+<wire x1="19.689" y1="8.4146" x2="11.2889" y2="18.9357" width="0" layer="19" extent="16-16"/>
+<wire x1="1.3589" y1="1.4224" x2="11.2889" y2="18.9357" width="0" layer="19" extent="16-16"/>
+<wire x1="19.689" y1="15.6646" x2="19.689" y2="8.4146" width="0" layer="19" extent="16-16"/>
+<wire x1="24.5491" y1="18.8976" x2="19.689" y2="15.6646" width="0" layer="19" extent="16-16"/>
+<wire x1="24.2991" y1="16.8976" x2="24.5491" y2="18.8976" width="0" layer="19" extent="1-1"/>
+<wire x1="24.3459" y1="8.9777" x2="24.5491" y2="18.8976" width="0" layer="19" extent="1-1"/>
+<wire x1="9.6518" y1="17.1942" x2="24.2991" y2="16.8976" width="0" layer="19" extent="1-1"/>
+<wire x1="12.3825" y1="12.0904" x2="9.6518" y2="17.1942" width="0" layer="19" extent="1-1"/>
+<wire x1="12.3825" y1="1.9304" x2="12.3825" y2="12.0904" width="0" layer="19" extent="1-1"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$12">
 <contactref element="U$1" pad="MISO"/>
 <contactref element="U$2" pad="13"/>
+<<<<<<< HEAD
 <wire x1="9.1184" y1="7.8321" x2="8.3782" y2="7.8321" width="0.3048" layer="16"/>
 <wire x1="8.3782" y1="7.8321" x2="7.6708" y2="7.1247" width="0.3048" layer="16"/>
 <wire x1="7.6708" y1="7.1247" x2="7.6708" y2="5.8039" width="0.3048" layer="16"/>
@@ -1626,6 +1680,9 @@ design rules under a new name.</description>
 <wire x1="11.8237" y1="10.8712" x2="11.7983" y2="10.8966" width="0.3048" layer="16"/>
 <wire x1="11.7983" y1="10.8966" x2="12.8971" y2="10.8966" width="0.3048" layer="16"/>
 <wire x1="12.8971" y1="10.8966" x2="12.8977" y2="10.8972" width="0.3048" layer="16"/>
+=======
+<wire x1="15.139" y1="15.6646" x2="9.6518" y2="9.3942" width="0" layer="19" extent="1-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="VDD">
 <polygon width="0.254" layer="16" isolate="0.254">
@@ -1636,36 +1693,54 @@ design rules under a new name.</description>
 <vertex x="0.0381" y="13.2969"/>
 </polygon>
 <contactref element="C1" pad="1"/>
+<<<<<<< HEAD
+=======
+<contactref element="C2" pad="+"/>
+<wire x1="14.2889" y1="18.9357" x2="9.6892" y2="4.2418" width="0" layer="19" extent="16-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$16">
 <contactref element="U$2" pad="17"/>
 <contactref element="U$1" pad="CE"/>
+<<<<<<< HEAD
 <wire x1="9.1184" y1="13.0321" x2="10.581" y2="13.0321" width="0.3048" layer="16"/>
 <wire x1="10.581" y1="13.0321" x2="11.049" y2="13.5001" width="0.3048" layer="16"/>
 <wire x1="11.049" y1="13.5001" x2="12.8948" y2="13.5001" width="0.3048" layer="16"/>
 <wire x1="12.8948" y1="13.5001" x2="12.8977" y2="13.4972" width="0.3048" layer="16"/>
+=======
+<wire x1="9.6518" y1="14.5942" x2="17.739" y2="15.6646" width="0" layer="19" extent="1-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$20">
 <contactref element="U$2" pad="16"/>
 <contactref element="U$1" pad="CSN"/>
+<<<<<<< HEAD
 <wire x1="9.1184" y1="11.7321" x2="10.4748" y2="11.7321" width="0.3048" layer="16"/>
 <wire x1="10.4748" y1="11.7321" x2="11.5951" y2="12.8524" width="0.3048" layer="16"/>
 <wire x1="11.5951" y1="12.8524" x2="12.8925" y2="12.8524" width="0.3048" layer="16"/>
 <wire x1="12.8925" y1="12.8524" x2="12.8977" y2="12.8472" width="0.3048" layer="16"/>
+=======
+<wire x1="17.089" y1="15.6646" x2="9.6518" y2="13.2942" width="0" layer="19" extent="1-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$21">
 <contactref element="U$2" pad="14"/>
 <contactref element="U$1" pad="IRQ"/>
+<<<<<<< HEAD
 <wire x1="9.1184" y1="6.5321" x2="10.1389" y2="6.5321" width="0.3048" layer="16"/>
 <wire x1="10.1389" y1="6.5321" x2="11.2395" y2="7.8994" width="0.3048" layer="16"/>
 <wire x1="11.2395" y1="7.8994" x2="11.2395" y2="11.5697" width="0.3048" layer="16"/>
 <wire x1="11.2395" y1="11.5697" x2="12.1285" y2="11.557" width="0.3048" layer="16"/>
 <wire x1="12.1285" y1="11.557" x2="12.8879" y2="11.557" width="0.3048" layer="16"/>
 <wire x1="12.8879" y1="11.557" x2="12.8977" y2="11.5472" width="0.3048" layer="16"/>
+=======
+<wire x1="15.789" y1="15.6646" x2="9.6518" y2="8.0942" width="0" layer="19" extent="1-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$22">
 <contactref element="U$2" pad="11"/>
 <contactref element="U$1" pad="SCK"/>
+<<<<<<< HEAD
 <wire x1="9.1184" y1="10.4321" x2="7.9937" y2="10.4321" width="0.3048" layer="16"/>
 <wire x1="7.9937" y1="10.4321" x2="5.8928" y2="8.3312" width="0.3048" layer="16"/>
 <wire x1="5.8928" y1="8.3312" x2="5.8928" y2="5.2324" width="0.3048" layer="16"/>
@@ -1680,10 +1755,14 @@ design rules under a new name.</description>
 <via x="12.9921" y="6.2357" extent="1-16" drill="0.6"/>
 <wire x1="12.9921" y1="6.2357" x2="12.9921" y2="9.5028" width="0.3048" layer="16"/>
 <wire x1="12.9921" y1="9.5028" x2="12.8977" y2="9.5972" width="0.3048" layer="16"/>
+=======
+<wire x1="13.839" y1="15.6646" x2="9.6518" y2="11.9942" width="0" layer="19" extent="1-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$23">
 <contactref element="U$2" pad="9"/>
 <contactref element="U$1" pad="MOSI"/>
+<<<<<<< HEAD
 <wire x1="9.1184" y1="9.1321" x2="7.6843" y2="9.1321" width="0.3048" layer="16"/>
 <wire x1="7.6843" y1="9.1321" x2="6.7818" y2="8.2296" width="0.3048" layer="16"/>
 <wire x1="6.7818" y1="8.2296" x2="6.7818" y2="5.6134" width="0.3048" layer="16"/>
@@ -1694,11 +1773,15 @@ design rules under a new name.</description>
 <wire x1="17.6403" y1="10.2235" x2="17.2085" y2="9.779" width="0.3048" layer="16"/>
 <wire x1="17.2085" y1="9.779" x2="17.1704" y2="7.7851" width="0.3048" layer="16"/>
 <wire x1="17.1704" y1="7.7851" x2="14.3129" y2="4.9149" width="0.3048" layer="16"/>
+=======
+<wire x1="14.489" y1="8.4146" x2="9.6518" y2="10.6942" width="0" layer="19" extent="1-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$25">
 <contactref element="U$2" pad="4"/>
 <contactref element="R1" pad="1"/>
 <contactref element="U$3" pad="MCLR"/>
+<<<<<<< HEAD
 <wire x1="17.78" y1="3.81" x2="17.78" y2="2.54" width="0.254" layer="16"/>
 <wire x1="19.7612" y1="6.604" x2="17.78" y2="3.81" width="0.254" layer="1"/>
 <wire x1="19.7612" y1="16.2687" x2="19.7612" y2="6.604" width="0.254" layer="1"/>
@@ -1716,58 +1799,83 @@ design rules under a new name.</description>
 <via x="18.8214" y="17.1196" extent="1-16" drill="0.6"/>
 <wire x1="18.8214" y1="17.1196" x2="18.8214" y2="17.106984375" width="0.3048" layer="1"/>
 <wire x1="18.8214" y1="17.106984375" x2="17.981125" y2="16.279409375" width="0.3048" layer="1"/>
+=======
+<wire x1="17.739" y1="8.4146" x2="18.263" y2="4.2545" width="0" layer="19" extent="16-16"/>
+<wire x1="24.5491" y1="14.8976" x2="17.739" y2="8.4146" width="0" layer="19" extent="16-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$3">
 <contactref element="IC1" pad="3"/>
 <contactref element="U$2" pad="5"/>
+<<<<<<< HEAD
 <wire x1="20.1477" y1="12.8472" x2="18.6996" y2="12.8472" width="0.3048" layer="16"/>
 <wire x1="18.6996" y1="12.8472" x2="17.0815" y2="14.1351" width="0.3048" layer="16"/>
 <wire x1="17.0815" y1="14.1351" x2="17.0434" y2="16.8783" width="0.3048" layer="16"/>
 <wire x1="17.0434" y1="16.8783" x2="18.3388" y2="18.1102" width="0.3048" layer="16"/>
 <wire x1="18.3388" y1="18.1102" x2="18.3388" y2="22.6187" width="0.3048" layer="16"/>
 <wire x1="18.3388" y1="22.6187" x2="18.2372" y2="22.6568" width="0.3048" layer="16"/>
+=======
+<wire x1="17.089" y1="8.4146" x2="3.8989" y2="1.4224" width="0" layer="19" extent="16-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$1">
 <contactref element="IC1" pad="2"/>
 <contactref element="U$2" pad="2"/>
+<<<<<<< HEAD
 <wire x1="19.5072" y1="20.7518" x2="19.5072" y2="20.5867" width="0.3048" layer="16"/>
 <wire x1="19.5072" y1="20.5867" x2="21.59" y2="18.5039" width="0.3048" layer="16"/>
 <wire x1="21.59" y1="18.5039" x2="21.59" y2="15.2527" width="0.3048" layer="16"/>
 <wire x1="21.59" y1="15.2527" x2="21.1455" y2="14.8082" width="0.3048" layer="16"/>
 <wire x1="21.1455" y1="14.8082" x2="20.1587" y2="14.8082" width="0.3048" layer="16"/>
 <wire x1="20.1587" y1="14.8082" x2="20.1477" y2="14.7972" width="0.3048" layer="16"/>
+=======
+<wire x1="2.6289" y1="3.3274" x2="19.039" y2="8.4146" width="0" layer="19" extent="16-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$8">
 <contactref element="U$2" pad="19"/>
 <contactref element="U$3" pad="PGD"/>
+<<<<<<< HEAD
 <wire x1="10.6238" y1="18.4825" x2="10.6238" y2="17.4686" width="0.3048" layer="16"/>
 <wire x1="10.6238" y1="17.4686" x2="10.9982" y2="16.6624" width="0.3048" layer="16"/>
 <wire x1="12.8977" y1="14.7972" x2="10.9982" y2="14.7972" width="0.3048" layer="16"/>
 <wire x1="10.9982" y1="14.7972" x2="10.9982" y2="16.6624" width="0.3048" layer="16"/>
+=======
+<wire x1="19.039" y1="15.6646" x2="24.2991" y2="20.8976" width="0" layer="19" extent="16-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$11">
 <contactref element="U$3" pad="PGC"/>
 <contactref element="U$2" pad="18"/>
+<<<<<<< HEAD
 <wire x1="12.8977" y1="14.1472" x2="10.5029" y2="14.1472" width="0.3048" layer="16"/>
 <wire x1="10.5029" y1="14.1472" x2="10.5029" y2="16.383" width="0.3048" layer="16"/>
 <wire x1="10.5029" y1="16.383" x2="8.7249" y2="18.161" width="0.3048" layer="16"/>
 <wire x1="8.7249" y1="18.161" x2="8.7249" y2="18.9235" width="0.3048" layer="16"/>
 <wire x1="8.7249" y1="18.9235" x2="8.6238" y2="18.7325" width="0.3048" layer="16"/>
+=======
+<wire x1="18.389" y1="15.6646" x2="24.5491" y2="22.8976" width="0" layer="19" extent="16-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$2">
 <contactref element="U$2" pad="3"/>
 <contactref element="S1" pad="2"/>
+<<<<<<< HEAD
 <wire x1="20.3708" y1="1.237" x2="21.0744" y2="1.237" width="0.3048" layer="16"/>
 <wire x1="21.0744" y1="1.237" x2="21.6154" y2="1.778" width="0.3048" layer="16"/>
 <wire x1="21.6154" y1="1.778" x2="21.6154" y2="13.5128" width="0.3048" layer="16"/>
 <wire x1="21.6154" y1="13.5128" x2="20.9804" y2="14.1478" width="0.3048" layer="16"/>
 <wire x1="20.9804" y1="14.1478" x2="20.1483" y2="14.1478" width="0.3048" layer="16"/>
 <wire x1="20.1483" y1="14.1478" x2="20.1477" y2="14.1472" width="0.3048" layer="16"/>
+=======
+<wire x1="24.3459" y1="2.4777" x2="18.389" y2="8.4146" width="0" layer="19" extent="16-16"/>
+>>>>>>> origin/master
 </signal>
 <signal name="N$4">
 <contactref element="U$2" pad="6"/>
 <contactref element="U$2" pad="7"/>
 <contactref element="U$1" pad="VDD"/>
+<<<<<<< HEAD
 <contactref element="C2" pad="+"/>
 <wire x1="20.1477" y1="11.5472" x2="20.1477" y2="12.1972" width="0.4064" layer="16"/>
 <wire x1="5.08" y1="17.78" x2="8.89" y2="13.97" width="0.254" layer="16"/>
@@ -1813,6 +1921,10 @@ design rules under a new name.</description>
 <via x="18.669" y="15.4178" extent="1-16" drill="0.6"/>
 <wire x1="18.669" y1="15.4178" x2="18.8341" y2="15.3162" width="0.3048" layer="1"/>
 <wire x1="18.8341" y1="15.3162" x2="18.26895" y2="14.75105" width="0.3048" layer="1"/>
+=======
+<wire x1="15.789" y1="8.4146" x2="16.439" y2="8.4146" width="0" layer="19" extent="16-16"/>
+<wire x1="9.6518" y1="15.8942" x2="15.789" y2="8.4146" width="0" layer="19" extent="1-16"/>
+>>>>>>> origin/master
 </signal>
 </signals>
 </board>
