@@ -31,9 +31,18 @@ public abstract class AbstractWebService implements WebService {
     protected byte[] sendAjaxAnswer(String data) {
         StringBuffer sb = new StringBuffer();
         sb.append("HTTP/1.0 200 OK\n");
+        sb.append("Cache-Control: no-cache\n");
         sb.append("Content-length:"+data.length()+"\n");
         sb.append("Content-Type: text/html\nConnection: close\n\n");
         sb.append(data);
+        return sb.toString().getBytes();
+    } 
+    protected byte[] sendAjaxError(String data) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("HTTP/1.0 500 "+data+"\n");
+        sb.append("Cache-Control: no-cache\n");
+        sb.append("Content-length: 0\n");
+        sb.append("Content-Type: text/html\nConnection: close\n\n");
         return sb.toString().getBytes();
     } 
 }

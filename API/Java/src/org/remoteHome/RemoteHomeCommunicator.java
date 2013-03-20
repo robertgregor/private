@@ -16,29 +16,32 @@ import java.net.UnknownHostException;
  */
 class RemoteHomeCommunicator extends Thread  { 
 
-    String host;
-    String port;
-    RemoteHomeManager manager;
-    Socket socket;
-    CommPort commPort = null; 
-    BufferedReader dataInputStream = null;
-    DataOutputStream dataOutputStream = null;
-    String dataReceived = "";
-    boolean cmdWithResponse = false;
-    int cmdWithResponseId = 0;
+    private String host;
+    private String port;
+    private String password;
+    private int channel;
+    private RemoteHomeManager manager;
+    private Socket socket;
+    private CommPort commPort = null; 
+    private BufferedReader dataInputStream = null;
+    private DataOutputStream dataOutputStream = null;
+    private String dataReceived = "";
+    private boolean cmdWithResponse = false;
+    private int cmdWithResponseId = 0;
 
     protected RemoteHomeCommunicator(String host, String port, RemoteHomeManager manager) throws RemoteHomeConnectionException {
         this.host = host;
         this.port = port;
         this.manager = manager;
         connect();
+        getUserNamePassword();
         this.start();
     }
         
     protected void connect() throws RemoteHomeConnectionException {
             disconnect();
             try {
-                socket = new Socket(host, Integer.parseInt(port));
+                socket = new Socket( getHost(), Integer.parseInt(getPort()));
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 dataInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (NumberFormatException e) {
@@ -51,11 +54,27 @@ class RemoteHomeCommunicator extends Thread  {
                 
             }
     }
-    
+    private void getUserNamePassword() throws RemoteHomeConnectionException {
+        try {
+            dataOutputStream.write("AT+s\n".getBytes());
+            dataOutputStream.flush();
+            Thread.sleep(50);
+            if (dataInputStream.ready()) {
+                channel = (Integer.parseInt(dataInputStream.readLine().split(":")[1]));
+                password = (dataInputStream.readLine().split(":")[1]);
+            } else {
+                throw new RemoteHomeConnectionException("Cannot read username and password.", RemoteHomeConnectionException.CONNECTION);                
+            }
+        } catch (IOException e) {
+            throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
+        } catch (InterruptedException e) {
+            return;
+        }
+    }
     protected void connectComPort() throws RemoteHomeConnectionException {
             disconnect();
             try {
-                CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(port); 
+                CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(getPort()); 
                 commPort = portIdentifier.open(this.getClass().getName(),2000);
                 SerialPort serialPort = (SerialPort) commPort;
                 serialPort.setSerialPortParams(9600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
@@ -122,7 +141,12 @@ class RemoteHomeCommunicator extends Thread  {
     protected synchronized void sendCommand(int deviceId, String command) throws RemoteHomeConnectionException {
         try {
             dataReceived = "";
-            String cmd = "AT+"+deviceId+"="+command+"\n";
+            String cmd = null;
+            if (deviceId != -1) {
+                cmd = "AT+"+deviceId+"="+command+"\n";
+            } else {
+                cmd = "AT+"+command;
+            }
             dataOutputStream.write(cmd.getBytes());
             dataOutputStream.flush();
                 try {
@@ -152,7 +176,8 @@ class RemoteHomeCommunicator extends Thread  {
                 Thread.sleep(50);
                 while (dataInputStream.ready()) {
                     dataReceived = dataInputStream.readLine();
-                    if ((dataReceived.indexOf("OK") > 0) || (dataReceived.indexOf("ERROR") > 0)) {
+                    System.out.println("R:"+dataReceived);
+                    if ((dataReceived.indexOf("OK") > -1) || (dataReceived.indexOf("ERROR") > -1)) {
                         //response to regular command
                         synchronized(this) {
                             notify();
@@ -189,5 +214,66 @@ class RemoteHomeCommunicator extends Thread  {
     public void interrupt() {
        super.interrupt();
        disconnect();
+    }
+
+    /**
+     * @return the host
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * @param host the host to set
+     */
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    /**
+     * @return the port
+     */
+    public String getPort() {
+        return port;
+    }
+
+    /**
+     * @param port the port to set
+     */
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) throws RemoteHomeConnectionException {
+        if (password.length() != 5) throw new RemoteHomeConnectionException("Invalid password length. Should be exactly 5 characters.", 
+                                RemoteHomeConnectionException.INVALID_PARAMETER);
+        sendCommand(-1, "p="+password+(char)10);
+        this.password = password;
+    }
+
+    /**
+     * @return the channel
+     */
+    public int getChannel() {
+        return channel;
+    }
+
+    /**
+     * @param channel the channel to set
+     */
+    public void setChannel(int channel) throws RemoteHomeConnectionException {
+        sendCommand(-1, "c="+Integer.toString(channel)+(char)10);
+        this.channel = channel;
+        
     }
 }

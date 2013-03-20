@@ -227,6 +227,5 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
             m.sendCommand(getDeviceId(), "l1cf");
         }
         setOnWhenAppliedPower(onWhenPower);
-    }
-    
+    }    
 }

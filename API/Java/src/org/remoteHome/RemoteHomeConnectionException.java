@@ -27,6 +27,11 @@ public class RemoteHomeConnectionException extends Exception {
      */    
     public static final int NO_RESPONSE_FROM_DEVICE = 4;
         
+    /**
+     * The supplied parameter is invalid.
+     */    
+    public static final int INVALID_PARAMETER = 5;
+
     private int type;
     
    /**
@@ -60,6 +65,8 @@ public class RemoteHomeConnectionException extends Exception {
                     return "Error received from device, invalid command.";
             case NO_RESPONSE_FROM_DEVICE:
                     return "No any response received from device.";
+            case INVALID_PARAMETER:
+                    return "Invalid parameter: "+super.getMessage();
             default:
                 return super.getMessage();
         }        

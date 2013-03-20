@@ -20,7 +20,7 @@ public class AddNewDevice extends AbstractWebService {
     public byte[] processRequest() throws IOException {
         try {
             r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));
-            AbstractDevice newDevice = r.getRemoteHomeDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
+            AbstractDevice newDevice = r.createRemoteHomeDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
                 requestParameters.get("addDeviceName"),
                 Integer.parseInt(requestParameters.get("type")));
             r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);

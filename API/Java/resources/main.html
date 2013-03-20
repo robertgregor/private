@@ -4,10 +4,11 @@
 <meta charset="utf-8" />
 <title>Remote-home GUI</title>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="brute-select.css" />
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
 <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
-<script type="text/javascript" src="verticalButtonset.js"></script>
+<script src="brute-select.js"></script>
 <link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css" />
 <script>
 var addTabJs = null;
@@ -15,8 +16,9 @@ $(function() {
   var tabs = $( "#tabs" ).tabs();
   var tabCounter = 2;
   $( document ).tooltip();
-  $( "#addDeviceType").buttonsetv();
+  $( "#type").bruteSelect();
   $( "input[type=submit], a, button" ).button();
+  $('tbody tr').hover(function() { $(this).toggleClass('ui-state-highlight'); });
   $("#addDeviceForm").submit(function(event) {
   event.preventDefault();    
   if ($(this).valid()) {
@@ -24,6 +26,7 @@ $(function() {
    var values = $(this).serialize();
     $.ajax({
       url: "",
+      'cache' : false,
       type: "get",
       data: values,
       success: function(data){
@@ -43,6 +46,7 @@ $(function() {
    var values = $(this).serialize();
     $.ajax({
       url: "",
+      'cache' : false,
       type: "get",
       data: values,
       success: function(data){
@@ -57,11 +61,31 @@ $(function() {
     });
   }
   });
+  $("#changeChannelPassowrd").submit(function(event) {
+  event.preventDefault();
+  if ($(this).valid()) {
+   $("#changeChannelPassowrdResult").html('');
+   var values = $(this).serialize();
+    $.ajax({
+      url: "",
+      'cache' : false,
+      type: "get",
+      data: values,
+      success: function(data){
+           $("#changeChannelPassowrdResult").html(data);
+      },
+      error:function(){
+          $("#changeChannelPassowrdResult").html('Error when tried to change the channel / password.');
+      }   
+    });
+  }
+  });
   $("#deviceIdLoader").click(function(){  
     $.ajax({
       url: "",
+      'cache' : false,
       type: "get",
-      data: "ServiceName=GetFreeDeviceId",
+      data: "ServiceName=GetFreeDeviceId&"+Math.floor((Math.random()*100)+1),
       success: function(freeId) {
           document.getElementById("addDeviceId").value = freeId;
       },
@@ -76,7 +100,7 @@ $(function() {
     tabs.find( ".ui-tabs-nav" ).append( li );
     tabs.tabs( "refresh" );
     //update radios
-    $('#addDeviceLocation').append('<input type="radio" name = "roomName" id = "radio'+tabCounter+'" value="'+label+'"/><label for="radio'+tabCounter+'">'+label+'</label>');
+    $('#addDeviceLocation').append('<option value="'+label+'">'+label+'</option>');
     tabCounter++;
   }
   addTabJs = addTab;
@@ -93,6 +117,8 @@ $(function() {
             navigation: true,
             collapsible: true
   });
+  jQuery.validator.addMethod("exactlength", function(value, element, param) { return this.optional(element) || value.length == param; },
+    jQuery.format("Please enter exactly {0} characters."));
 });
 $(document).ready(function(){
   $("#addDeviceForm").validate({
@@ -117,19 +143,43 @@ $(document).ready(function(){
         addDeviceId : { required : "Please enter the room name."}        
     }
   });
+  $("#changeChannelPassowrd").validate({
+    rules: {
+     channel : { required : true, range: [1, 83] },
+     password : { required : true, exactlength : 5 }
+    },
+    messages: {
+        channel : { required : "Please enter the channel.", range : "The radio has 83 channels, the range is 1 - 83." },
+        password : { required : "Please enter the password.", exactlength : "The password should have exactly 5 characters." }
+    }
+  });
   $.ajax({
       url: "",
       type: "get",
-      data: "ServiceName=LoadAllRooms",
+      'cache' : false,
+      data: "ServiceName=LoadAllRooms&"+Math.floor((Math.random()*100)+1),
       success: function(roomsData) {
            rooms = roomsData.split("\n");
            for (var i=0; i<rooms.length; i++) {
                addTabJs(rooms[i]);
            }
-           $( "#addDeviceLocation" ).buttonsetv();
+           $('#addDeviceLocation').bruteSelect();
       },
       error:function(){
           alert('Error when tried to get the list of rooms.');
+      }   
+  });
+  $.ajax({
+      url: "",
+      'cache' : false,
+      type: "get",
+      data: "ServiceName=LoadChannelPassword&"+Math.floor((Math.random()*100)+1),
+      success: function(data) {
+           document.getElementById("channel").value = data.split("\n")[0];
+           document.getElementById("password").value = data.split("\n")[1];
+      },
+      error:function(){
+          alert('Error when tried to get the channel password.');
       }   
   });
 });
@@ -153,21 +203,21 @@ $(document).ready(function(){
            </tr><tr>
            <td><label for="addDeviceName">New device name:</label></td><td><input name="addDeviceName" id="addDeviceName" title="Identifier, which represents the device."/></td><td>&nbsp;</td>
            </tr><tr><td><label for="addDeviceLocation">Room name:</label></td><td colspan="2">
-                   <div id="addDeviceLocation">
-                   </div>
-           </td></tr><td><label for="addDeviceType">Type of the device:</label></td><td colspan="2">
-               <div id="addDeviceType">
-                    <input type="radio" name = "type" id = "type1" value="1"/><label for="type1">LightAlarmDevice</label>
-                    <input type="radio" name = "type" id = "type2" value="2"/><label for="type2">TemperatureSensor</label>
-                    <input type="radio" name = "type" id = "type3" value="3"/><label for="type3">SimpleSwitch</label>
-                    <input type="radio" name = "type" id = "type4" value="4"/><label for="type4">HeatingHeader</label>
-                    <input type="radio" name = "type" id = "type5" value="5"/><label for="type5">BlindsControllerDevice</label>
-                    <input type="radio" name = "type" id = "type6" value="6"/><label for="type6">Thermostat</label>
-                    <input type="radio" name = "type" id = "type7" value="7"/><label for="type7">BatteryThermostat</label>
-               </div>
-           </td></tr><tr><td>&nbsp;</td><td colspan="2">
-           <input type="submit" value="Add new device"/><div id="addDeviceResult">&nbsp;</div>
-           </td></tr></table>
+                   <select name="roomName" id="addDeviceLocation">
+                   </select>
+           </td></tr><td><label for="type">Type of the device:</label></td><td colspan="2">
+               <select name="type" id="type">
+                    <option value="1">LightAlarmDevice</option>
+                    <option value="2"/>TemperatureSensor</option>
+                    <option value="3"/>SimpleSwitch</option>
+                    <option value="4"/>HeatingHeader</option>
+                    <option value="5"/>BlindsControllerDevice</option>
+                    <option value="6"/>Thermostat</option>
+                    <option value="7"/>BatteryThermostat</option>
+               </select>
+           </td></tr><tr><td>&nbsp;</td><td>
+           <input type="submit" value="Add new device"/></td><td><div id="addDeviceResult">&nbsp;</div></td>
+           </tr></table>
         </form>
     </div>
 <h3>Rooms management</h3>
@@ -186,10 +236,43 @@ $(document).ready(function(){
             change the channel or password here, it is done only locally so the already existing devices stop to work. You have to reset the device one by one and 
             assign the device id again. (During the assigning procedure, the device will obtain correct channel and password.)
         </p>
+        <form id="changeChannelPassowrd">
+            <table><tr>
+            <td><label for="channel">Channel:</label></td><td><input name="channel" id="channel" title="The communication channel."/></td>
+            </tr>
+            <tr>
+            <td><label for="password">Password:</label></td><td><input name="password" id="password" title="The password for communication."/></td>
+            </tr>
+            <tr>
+            <td><input type="hidden" name="ServiceName" value="ChangeChannelPwd"/><input type="submit" value="Configure"/></td><td><div id="changeChannelPassowrdResult">&nbsp;</div></td>
+            </tr>           
+            </table>
+        </form>                
     </div>
 <h3>Wireless network configuration</h3>
     <div>
         <p>Wifi configuration</p>
+            <table class="ui-widget" style="border-collapse: collapse;">
+              <thead class="ui-widget-header">
+                <tr>
+                <th>Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                </tr>
+                </thead>
+                <tbody class="ui-widget-content">
+                <tr>
+                <td><span>[title]</span></td>
+                <td><span>[start date]</span> </td>
+                <td><span>[end date]</span></td>
+                </tr>
+                <tr>
+                <td><span>[title]</span></td>
+                <td><span>[start date]</span> </td>
+                <td><span>[end date]</span></td>
+                </tr>
+                </tbody>
+                </table>
     </div>
 </div>
 </div>

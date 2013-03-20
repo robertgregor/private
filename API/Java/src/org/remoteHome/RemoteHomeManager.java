@@ -88,7 +88,7 @@ public class RemoteHomeManager {
      * @return the device reference
      * @throws RemoteHomeManagerException if the type of the device is unknown.
      */
-    public AbstractDevice getRemoteHomeDevice(int deviceId, String deviceName, int deviceType) throws RemoteHomeManagerException {
+    public AbstractDevice createRemoteHomeDevice(int deviceId, String deviceName, int deviceType) throws RemoteHomeManagerException {
         if (deviceType == AbstractDevice.HeatingHeader) {
             HeatingHeaderDevice device = new HeatingHeaderDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
@@ -117,6 +117,22 @@ public class RemoteHomeManager {
             BatteryThermostatDevice device = new BatteryThermostatDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
             return device;            
+        } else {
+            throw new RemoteHomeManagerException(RemoteHomeManagerException.UNKNOWN_DEVICE);
+        }
+    }
+   
+    /**
+     * 
+     * @param deviceId the device Id, of the device, which was configured during the initial setup.
+     * @return the device reference
+     * @throws RemoteHomeManagerException if the type of the device is unknown.
+     */
+    
+    public AbstractDevice getDevice(int deviceId) throws RemoteHomeManagerException {
+        AbstractDevice dev = devices.get(deviceId);
+        if (dev != null) {
+            return dev;
         } else {
             throw new RemoteHomeManagerException(RemoteHomeManagerException.UNKNOWN_DEVICE);
         }
@@ -266,6 +282,35 @@ public class RemoteHomeManager {
         }
         return 0;
     }
+    
+        /**
+     * @return the password
+     */
+    public String getPassword() {
+        return comm.getPassword();
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) throws RemoteHomeConnectionException {
+        comm.setPassword(password);
+    }
+
+    /**
+     * @return the channel
+     */
+    public int getChannel() {
+        return comm.getChannel();
+    }
+
+    /**
+     * @param channel the channel to set
+     */
+    public void setChannel(int channel) throws RemoteHomeConnectionException {
+        comm.setChannel(channel);
+    }
+    
     public static void main(String... args) throws Exception {
         if ((args.length < 2) && (args.length > 4)) {        
             System.out.println("2 parametrs host, port; 3 parameters host, port, file; 4 parameters host, port, file, webServerPort;");

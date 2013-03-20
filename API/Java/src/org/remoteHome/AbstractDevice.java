@@ -1,6 +1,9 @@
 package org.remoteHome;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This is the implementation class for all hardware devices. All the devices should extend this class.
@@ -125,5 +128,40 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     
     public int compareTo(AbstractDevice device) {
         return getDeviceName().compareTo(device.getDeviceName());
+    }
+    
+    public static String generateJsonData(Object o) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        ArrayList<Field> fields = new <Field>ArrayList();
+        fields.addAll(Arrays.asList(o.getClass().getDeclaredFields()));
+        fields.addAll(Arrays.asList(o.getClass().getSuperclass().getDeclaredFields()));
+        for (Field field : fields) {
+          if (field == null) continue;
+          if (field.getName() == null) continue;          
+          boolean tempAccessible = field.isAccessible();
+          field.setAccessible(true);
+          try {
+            if (sb.length() > 3) sb.append(" , \n");
+            if (field.get(o) == null) {
+                sb.append("\""+field.getName()+"\" : null");
+                continue;
+            }
+            if (field.getType().isAssignableFrom(Integer.TYPE) || 
+                    field.getType().isAssignableFrom(Byte.TYPE) || 
+                    field.getType().isAssignableFrom(Long.TYPE)) {
+                    sb.append("\""+field.getName()+"\" : "+field.get(o).toString());
+            } else if (field.getType().isAssignableFrom(Boolean.TYPE)) {
+               sb.append("\""+field.getName()+"\" : "+field.get(o).toString());
+            } else {
+               sb.append("\""+field.getName()+"\" : \""+field.get(o).toString()+"\"");
+            }
+          } catch (IllegalAccessException e) {
+          } finally {
+              field.setAccessible(tempAccessible);
+          } //No access, no output
+        }
+        sb.append("\n}");
+        return sb.toString();
     }
 }
