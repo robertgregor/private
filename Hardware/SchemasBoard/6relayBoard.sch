@@ -15823,6 +15823,8 @@ nominal inductance, magnetically screened</description>
 <junction x="-7.62" y="124.46"/>
 <junction x="0" y="139.7"/>
 <junction x="0" y="154.94"/>
+<pinref part="K3" gate="1" pin="1"/>
+<junction x="-35.56" y="152.4"/>
 </segment>
 </net>
 <net name="N$6" class="0">
