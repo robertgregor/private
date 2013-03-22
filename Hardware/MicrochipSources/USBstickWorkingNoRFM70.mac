@@ -76,6 +76,22 @@ ADD?BCB macro Bin, Cin, Bout
     endif
     endm
 
+ADD?BCW macro Bin, Cin, Wout
+        movlw   low (Cin)
+        CHK?RP  Bin
+        addwf   Bin, W
+        MOVE?AB Wout
+    if (((Cin) >> 8) == 0)
+        clrf    (Wout) + 1
+        rlf     (Wout) + 1, F
+    else
+        movlw   (Cin) >> 8
+        btfsc   STATUS, C
+        addlw   1
+        movwf   (Wout) + 1
+    endif
+    endm
+
 ADD?CBB macro Cin, Bin, Bout
     if ((Bout) == (Bin))
       if ((Cin) == 1)
@@ -100,14 +116,6 @@ ADD?CBB macro Cin, Bin, Bout
     endif
     endm
 
-ADD?TCB macro Regin, Bitin, Cin, Bout
-        movlw   Cin
-        CHK?RP  Regin
-        btfsc   Regin, Bitin
-        addlw   1
-        MOVE?AB Bout
-    endm
-
 ADD?WBB macro Win, Bin, Bout
         MOVE?BA Win
     if ((Bout) == (Bin))
@@ -118,18 +126,6 @@ ADD?WBB macro Win, Bin, Bout
         addwf   Bin, W
         MOVE?AB Bout
     endif
-    endm
-
-ADD?WCB macro Win, Cin, Bout
-    if ((Cin) == 1)
-        CHK?RP  Win
-        incf    Win, W
-    else
-        movlw   Cin
-        CHK?RP  Win
-        addwf   Win, W
-    endif
-        MOVE?AB Bout
     endm
 
 MUL?BCW macro Bin, Cin, Wout
@@ -192,6 +188,47 @@ AND?BCW macro Bin, Cin, Wout
         CHK?RP  Bin
         andwf   Bin, W
         MOVE?AW Wout
+    endm
+
+LAND?WBW macro Win, Bin, Wout
+        MOVE?BA Win
+        iorwf   Win + 1, W
+        movwf   FSR
+        MOVE?BA Bin
+        L?CALL  LAND
+        MOVE?AB Wout
+        movwf   Wout + 1
+    endm
+LAND_USED = 1
+
+LOR?BBW macro Bin1, Bin2, Wout
+        MOVE?BB Bin1, FSR
+        MOVE?BA Bin2
+        L?CALL  LOR
+        MOVE?AB Wout
+        movwf   Wout + 1
+    endm
+LOR_USED = 1
+
+CMPF?WL macro Win, Label
+        CLRWDT?
+        MOVE?BA Win
+        iorwf   (Win) + 1, W
+        BIT?GOTO 1, STATUS, Z, Label
+    endm
+
+CMPEQ?BCB macro Bin, Cin, Bout
+    if (((Cin) > -100h) & ((Cin) < 100h))
+        MOVE?BA Bin
+        sublw   Cin
+	btfss	STATUS, Z
+        movlw   -1
+	xorlw	0ffh
+        MOVE?AB Bout
+    else
+        CHK?RP  Bout
+        clrf    Bout
+    endif
     endm
 
 CMPEQ?BCL macro Bin, Cin, Label
@@ -301,14 +338,6 @@ CMPNE?TCL macro Regin, Bitin, Cin, Label
     endif
     endm
 
-DIG?BCW macro Bin, Cin, Wout
-        MOVE?BW Bin, R0
-        movlw   Cin
-        L?CALL  DIG
-        MOVE?AW Wout
-    endm
-DIG_USED = 1
-
 ASM? macro
         RST?RP
     endm
@@ -381,17 +410,73 @@ GOTO?L macro Label
         L?GOTO  Label
     endm
 
-HIGH?T macro Regin, Bitin
-        MOVE?CT 1, Regin, Bitin
-        MOVE?CT 0, ((Regin) + 80h), Bitin
+HSERINCHAR?C macro Cin
+        MOVE?CB Cin, R7
     endm
+
+HSERINCOUNT?C macro Cin
+        MOVE?CB Cin, R4 + 1
+    endm
+
+HSERINTIME?C macro Cin
+        MOVE?CW Cin, R6
+    endm
+
+HSERIN?B macro Bout
+        L?CALL  HSERIN
+        MOVE?AB Bout
+    endm
+HSERIN_USED = 1
+
+HSERINWAIT?CLL macro Cin, Label1, Label2
+        L?CALL  HSERINTO
+        BIT?GOTO 0, STATUS, C, Label2
+        sublw   Cin
+        BIT?GOTO 0, STATUS, Z, Label1
+    endm
+HSERINTO_USED = 1
+
+HSERINSTRC?BL macro Bin, Label
+        MOVE?CW HSERINTO, R8
+      if (RAM_BANKS > 2)
+	MOVE?CB	high (Bin), R2 + 1
+      endif
+        MOVE?CA	low (Bin)
+        L?CALL  SERIN2STRC
+        BIT?GOTO 0, STATUS, C, Label
+    endm
+HSERINTO_USED = 1
+SERIN2STRC_USED = 1
+
+HSEROUT?B macro Bin
+        MOVE?BA Bin
+        L?CALL  HSEROUT
+    endm
+HSEROUT_USED = 1
+
+HSEROUT?C macro Cin
+        movlw   Cin
+        L?CALL  HSEROUT
+    endm
+HSEROUT_USED = 1
+
+HSEROUTCOUNT?C macro Cin
+        MOVE?CB Cin, R4 + 1
+    endm
+
+HSEROUTNUM?B macro Bin
+        MOVE?BW Bin, R2
+    endm
+
+HSEROUTDEC? macro
+        MOVE?CW HSEROUTJ, R8
+        L?CALL  SEROUT2DEC
+    endm
+HSEROUTJ_USED = 1
+SEROUT2DEC_USED = 1
 
 ICALL?L macro Label
         L?CALL  Label
-    endm
-
-INPUT?T macro Regin, Bitin
-        MOVE?CT 1, ((Regin) + 80h), Bitin
     endm
 
 LOOKDOWN?BCLB macro Bin, Cin, Label, Bout
@@ -419,11 +504,6 @@ valtbl
 
 LDRET?C macro Cin
         retlw   Cin
-    endm
-
-LOW?T macro Regin, Bitin
-        MOVE?CT 0, Regin, Bitin
-        MOVE?CT 0, ((Regin) + 80h), Bitin
     endm
 
 NEXT?BCL macro Bin, Cin, Label
@@ -457,10 +537,6 @@ label
     endm
 ONINT_USED = 1
 
-OUTPUT?T macro Regin, Bitin
-        MOVE?CT 0, ((Regin) + 80h), Bitin
-    endm
-
 PAUSE?C macro Cin
     if (((Cin) >> 8) == 0)
         MOVE?CA Cin
@@ -484,6 +560,10 @@ PAUSEUS?C macro Cin
     endif
     endm
 PAUSEUS_USED = 1
+
+READADDRESS?B macro Bin
+        MOVE?BB Bin, EEADR
+    endm
 
 READADDRESS?C macro Cin
         MOVE?CB Cin, EEADR
@@ -509,18 +589,12 @@ RETURN? macro
         return
     endm
 
-WRITEADDRESS?C macro Cin
-        MOVE?CB Cin, EEADR
+WRITEADDRESS?B macro Bin
+        MOVE?BB Bin, EEADR
     endm
 
 WRITE?B macro Bin
         MOVE?BA Bin
-        L?CALL  WRITE
-    endm
-WRITE_USED = 1
-
-WRITE?C macro Cin
-        movlw   Cin
         L?CALL  WRITE
     endm
 WRITE_USED = 1

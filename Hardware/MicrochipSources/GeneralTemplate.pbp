@@ -35,7 +35,7 @@ ENABLE
 TRISA = %00000000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input, 
-
+RADIO_MODULE_POWER var PORTC.1
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
@@ -54,6 +54,7 @@ l1counter var byte
 conversionSuccess VAR BYTE
 
 clear
+high RADIO_MODULE_POWER
 read 6, device_id
 
 if 0 == 1 then

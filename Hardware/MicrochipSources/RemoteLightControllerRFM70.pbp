@@ -38,13 +38,15 @@ on interrupt goto intManagement
 ENABLE
 
 '-----------init----------------------------------------------------------------
-TRISA = %00000000 'Set PORTA to all output, RA0 input
-TRISB = %00010000 'Set , SDI input
-TRISC = %00000100 'Set IRQ input, 
+TRISA = %00000000 'Set PORTA to all output
+TRISB = %00110000 'Set , SDI input
+TRISC = %00000110 'Set IRQ input, 
+WPUA = %11111111
+WPUB = %11111111
 
 alarm VAR PORTC.1
-RES var PORTC.3
-RELAY VAR PORTC.6
+RES var PORTB.5
+RELAY VAR PORTA.4
 i VAR BYTE 'loop counter
 j var byte
 
@@ -66,26 +68,12 @@ l1onAlarm var byte
 conversionSuccess var byte
 
 clear
+startLabel:
 read 7, device_id
 read 9, l1onAlarm
 input alarm
 input RES
 output relay
-if RES == 1 then
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    write 8, 0
-    write 9, 0
-    write 10, 0
-    write 11, 0
-    END
-endif
 read 6, temp_byte
 if (temp_byte == 0) then 
     high relay
@@ -103,6 +91,22 @@ pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
 'Check for data to send
+if RES == 0 then
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    write 6, 0
+    write 7, 0
+    write 8, 0
+    write 9, 0
+    write 10, 0
+    write 11, 0
+    pause 2000
+    goto startLabel
+endif
 if (temp_data[0] != 0) then
     if (configure == 1) then
         gosub commonRXTX

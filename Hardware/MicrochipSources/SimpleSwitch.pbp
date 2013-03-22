@@ -36,10 +36,12 @@ ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00000000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
-TRISC = %00000100 'Set IRQ input, 
+TRISC = %00000100 'Set IRQ input
+WPUA = %11111111
+WPUB = %11111111
 
-RES var PORTC.1
-RELAY VAR PORTA.5
+RES var PORTB.5
+RELAY VAR PORTA.4
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
@@ -61,18 +63,6 @@ conversionSuccess VAR BYTE
 clear
 input RES
 output relay
-if 0 == 1 then
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    write 8, 0
-    END
-endif
 READ 6, device_id
 read 7, temp_byte
 if (temp_byte == 0) then 
@@ -91,6 +81,18 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
+if RES == 0 then
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    write 6, 0
+    write 7, 0
+    write 8, 0
+    END
+endif
 'Check for data to send
 if (temp_data[0] != 0) then
     if (configure == 1) then
