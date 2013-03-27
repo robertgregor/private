@@ -7,6 +7,7 @@ package org.remoteHome.gui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Properties;
 import org.remoteHome.RemoteHomeManager;
 
 /**
@@ -16,6 +17,7 @@ import org.remoteHome.RemoteHomeManager;
 public class ResourceLoaderWebService extends AbstractWebService {
     
     private String name = null;
+    private Properties mimeTypes = null;
     
     public void init() {}
 
@@ -34,8 +36,19 @@ public class ResourceLoaderWebService extends AbstractWebService {
         StringBuffer sb = new StringBuffer();
         sb.append("HTTP/1.0 200 OK\n");
         sb.append("Content-length:"+fileBr.length()+"\n");
-        sb.append("Content-Type: text/html\nConnection: close\n\n");
+        String type = getContentType(name);
+        if (type != null) sb.append("Content-Type: "+type+"\n");
+        sb.append("Connection: close\n\n");
         sb.append(fileBr);
         return sb.toString().getBytes();
+    }
+    private String getContentType(String name) throws IOException {
+        if (mimeTypes == null) {
+                mimeTypes = new Properties();
+                mimeTypes.load(this.getClass().getClassLoader().getResourceAsStream("MimeTypes.properties"));
+        }
+        String ext[] = name.split("\\.");
+        String type = mimeTypes.getProperty(ext[ext.length-1]);
+        return type;
     }
 }

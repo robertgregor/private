@@ -50,9 +50,6 @@ $(function() {
       type: "get",
       data: values,
       success: function(data){
-           //$("#addRoomResult").html(data);
-           //addTab($("#roomName").val());
-           //$("#addRoomForm").each(function(){ this.reset();});
            window.location.reload(true);
       },
       error:function(){
@@ -96,7 +93,7 @@ $(function() {
   });
   function addTab(label) {
     id = "tabs-" + tabCounter,
-    li = "<li><a href='?ServiceName=LoadRoomPage&room="+encodeURIComponent(label)+"'>"+label+"</a></li>",
+    li = "<li><a href='?ServiceName=LoadRoomPage&room="+encodeURIComponent(label)+"&"+Math.floor((Math.random()*100)+1)+"'>"+label+"</a></li>",
     tabs.find( ".ui-tabs-nav" ).append( li );
     tabs.tabs( "refresh" );
     //update radios

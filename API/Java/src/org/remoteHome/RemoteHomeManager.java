@@ -75,6 +75,9 @@ public class RemoteHomeManager {
         persistentFile = new File(file);
         try {
             loadPersistentData();
+            HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
+            h.add(createRemoteHomeDevice(1, "TestDevice", 3));
+            rooms.put("aaaaaaa", h);
         } catch (Exception e) {
             throw new RemoteHomeManagerException(e.getMessage(), RemoteHomeManagerException.SERIALIZATION_ERROR);
         }
@@ -173,6 +176,18 @@ public class RemoteHomeManager {
             return false;
         }
     }
+
+    /**
+     * Get devices in the room
+     * 
+     * @param name is the name of the room
+     * @return HashSet of the room objects
+     */
+    public HashSet<AbstractDevice> getDevicesInRoom(String name) {
+        if (!rooms.containsKey(name)) return new HashSet<AbstractDevice>();
+        return rooms.get(name);
+    }
+
     /**
      * Add device to room
      * @param roomName is the name of the room. If it is not exist, it will be added.
@@ -315,7 +330,7 @@ public class RemoteHomeManager {
         if ((args.length < 2) && (args.length > 4)) {        
             System.out.println("2 parametrs host, port; 3 parameters host, port, file; 4 parameters host, port, file, webServerPort;");
             return;
-        }
+        }        
         if (args.length == 2) {
             RemoteHomeManager manager = new RemoteHomeManager(args[0], args[1]);
             manager.joinCommThread();
