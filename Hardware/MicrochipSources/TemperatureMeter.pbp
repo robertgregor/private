@@ -98,7 +98,8 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
-if RESET_BUTTON == 1 then
+'if RESET_BUTTON == 1 then
+if 0 == 1 then
     write 0, 40
     write 1, "R"
     write 2, "O"

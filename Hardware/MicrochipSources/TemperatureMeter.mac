@@ -366,6 +366,12 @@ CMPNE?BCL macro Bin, Cin, Label
     endif
     endm
 
+CMPNE?CCL macro Cin1, Cin2, Label
+    if ((Cin1) != (Cin2))
+        L?GOTO  Label
+    endif
+    endm
+
 CMPNE?TCL macro Regin, Bitin, Cin, Label
     if ((Cin) == 0)
         CLRWDT?

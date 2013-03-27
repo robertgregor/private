@@ -356,6 +356,11 @@ GOTO?L macro Label
         L?GOTO  Label
     endm
 
+HIGH?T macro Regin, Bitin
+        MOVE?CT 1, Regin, Bitin
+        MOVE?CT 0, ((Regin) + 80h), Bitin
+    endm
+
 ICALL?L macro Label
         L?CALL  Label
     endm
