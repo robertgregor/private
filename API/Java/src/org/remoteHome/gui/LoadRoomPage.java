@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import org.remoteHome.AbstractDevice;
 import org.remoteHome.SimpleSwitchDevice;
+import org.remoteHome.TemperatureSensorDevice;
 
 /**
  *
@@ -32,6 +33,8 @@ public class LoadRoomPage extends AbstractWebService {
             accordionBody.append("<H3>"+device.getDeviceName()+"</H3>\n");
             if (device instanceof SimpleSwitchDevice) {
                 accordionBody.append(getDiv("SimpleSwitchDevice.div",Integer.toString(device.getDeviceId())));
+            } else if (device instanceof TemperatureSensorDevice) {
+                accordionBody.append(getDiv("TemperatureSensorDevice.div",Integer.toString(device.getDeviceId())));
             }
         }
         if (accordionBody.toString().length()==0) {

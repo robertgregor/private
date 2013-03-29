@@ -75,9 +75,9 @@ public class RemoteHomeManager {
         persistentFile = new File(file);
         try {
             loadPersistentData();
-            HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
-            h.add(createRemoteHomeDevice(1, "TestDevice", 3));
-            rooms.put("aaaaaaa", h);
+            //HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
+            //h.add(createRemoteHomeDevice(1, "TestDevice", 3));
+            //rooms.put("aaaaaaa", h);
         } catch (Exception e) {
             throw new RemoteHomeManagerException(e.getMessage(), RemoteHomeManagerException.SERIALIZATION_ERROR);
         }
@@ -196,7 +196,8 @@ public class RemoteHomeManager {
      */
     public boolean addDeviceToRoom(String roomName, AbstractDevice device) {
         if (!rooms.containsKey(roomName)) rooms.put(roomName, new HashSet<AbstractDevice>());
-        return rooms.get(roomName).add(device);
+        boolean status = rooms.get(roomName).add(device);        
+        return status;
     }    
     
     /**
@@ -271,6 +272,7 @@ public class RemoteHomeManager {
             devices = (HashMap<Integer, AbstractDevice>)ois.readObject();
             rooms = (HashMap<String, HashSet<AbstractDevice>>)ois.readObject();
             ois.close();
+            for (AbstractDevice dev : devices.values()) dev.m = this;
         }      
     }
     /*

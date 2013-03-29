@@ -147,6 +147,7 @@ class RemoteHomeCommunicator extends Thread  {
             } else {
                 cmd = "AT+"+command;
             }
+            System.out.println("S: "+cmd);
             dataOutputStream.write(cmd.getBytes());
             dataOutputStream.flush();
                 try {

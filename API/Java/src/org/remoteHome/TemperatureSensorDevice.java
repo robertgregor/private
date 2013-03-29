@@ -27,7 +27,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
    /**
      * Current temperature
      */
-    private int temperature; 
+    private float temperature; 
 
     /**
      * Frequency in seconds
@@ -43,12 +43,12 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
     /**
      * Set this to true, if you want to set the expected frequency
      */
-    private boolean manageFrequencyAuto;
+    private boolean manageFrequencyAuto = false;
 
     /**
      * Battery
      */
-    private int battery;
+    private float battery;
 
    /**
      * The constructor is protected. The object should be constructed using
@@ -73,26 +73,34 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
     protected void manageAsynchronousCommand(String[] items) {
         if (items[0].equals("2")) {
             //This is the status
-            this.setTemperature(Integer.parseInt(items[1]));
-            this.setBattery(Integer.parseInt(items[2]));
-            this.setFrequency(Integer.parseInt(items[3])*10); //Frequency in seconds * 10
+            this.setTemperature(Float.parseFloat(items[1].substring(1)));
+            this.setBattery(Float.parseFloat(items[2]));
+            this.setFrequency(Integer.parseInt(items[3]));
         }
         //here manage the temperature
-        try {
             if (isManageFrequencyAuto() && (getExpectedFrequency() != getFrequency())) {
-                m.sendCommand(getDeviceId(),"m="+getExpectedFrequency()/10);
-                setManageFrequencyAuto(false);
+                new Thread(new Runnable() {
+                     public void run() {
+                         try {
+                            Thread.sleep(10);
+                            m.sendCommand(getDeviceId(),"m="+getExpectedFrequency()/10);
+                            setManageFrequencyAuto(false);
+                            setFrequency(getExpectedFrequency());
+                         } catch (InterruptedException e) {
+                             return;
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                }).start();
             }
-        } catch (RemoteHomeConnectionException e) {
-            //there is no way how to report this exception
-        }
     }
     
     /**
      * Current temperature
      * @return the temperature
      */
-    public int getTemperature() {
+    public float getTemperature() {
         return temperature;
     }
 
@@ -100,7 +108,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
      * Current temperature
      * @param temperature the temperature to set
      */
-    protected void setTemperature(int temperature) {
+    protected void setTemperature(float temperature) {
         this.temperature = temperature;
     }
 
@@ -121,6 +129,17 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
     }
 
     /**
+     * After the device Id assignment, the frequency is still 0 second, it means no sleep at all. Set 10 seconds sleep in order not to empty battery.
+     * @param frequency in seconds the frequency to set 
+     */
+    public void setInitialFrequency() throws RemoteHomeConnectionException {
+        this.frequency = 10;
+        this.expectedFrequency = 10;
+        this.manageFrequencyAuto = false;
+        m.sendCommand(getDeviceId(),"m=1");
+    }
+
+    /**
      * Expected frequency in seconds value should be set by external system in order to trigger the value change
      * @return the expectedFrequency in seconds
      */
@@ -134,7 +153,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
      */
     public void setExpectedFrequency(int expectedFrequency) {
         this.expectedFrequency = expectedFrequency;
-        manageFrequencyAuto = true;
+        setManageFrequencyAuto(true);
     }
 
     /**
@@ -157,7 +176,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
      * Battery
      * @return the battery
      */
-    public int getBattery() {
+    public float getBattery() {
         return battery;
     }
 
@@ -165,7 +184,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
      * Battery
      * @param battery the battery to set
      */
-    protected void setBattery(int battery) {
+    protected void setBattery(float battery) {
         this.battery = battery;
     }
     

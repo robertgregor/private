@@ -6,6 +6,7 @@ package org.remoteHome.gui;
 
 import java.io.IOException;
 import org.remoteHome.AbstractDevice;
+import org.remoteHome.TemperatureSensorDevice;
 
 /**
  *
@@ -23,9 +24,14 @@ public class AddNewDevice extends AbstractWebService {
             AbstractDevice newDevice = r.createRemoteHomeDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
                 requestParameters.get("addDeviceName"),
                 Integer.parseInt(requestParameters.get("type")));
-            r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);
+                r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);
+                if (newDevice instanceof TemperatureSensorDevice) {
+                    ((TemperatureSensorDevice)newDevice).setInitialFrequency();
+                }
+                r.savePersistentData();
                 return sendAjaxAnswer("OK, device is added.");
         } catch (Exception e) {
+            e.printStackTrace();
             return sendAjaxAnswer(e.getMessage());
         }
     }
