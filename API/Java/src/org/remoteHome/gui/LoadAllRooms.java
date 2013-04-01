@@ -22,7 +22,7 @@ public class LoadAllRooms extends AbstractWebService {
         TreeSet<String> rooms = new TreeSet<String>(r.getRooms().keySet());
         StringBuilder sb = new StringBuilder();
         for (String room : rooms) sb.append(room + "\n");
-        sb.deleteCharAt(sb.length()-1);
+        if (sb.length() > 1) sb.deleteCharAt(sb.length()-1);
         return sendAjaxAnswer(sb.toString());
     }
 }

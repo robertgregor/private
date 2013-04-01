@@ -35,8 +35,10 @@ public class WebServerHandler extends Thread {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = socket.getOutputStream();
             String getRequest = in.readLine();
-            if (getRequest.indexOf('?') == -1) {
+            System.out.println(getRequest);
+            if ((getRequest.indexOf('?') == -1) || (getRequest.indexOf('?') > 6)) {
                 //it is the request to the resource
+                if (getRequest.indexOf('?') != -1) getRequest = getRequest.substring(0, getRequest.indexOf('?'));
                 String fileName = getRequest.split(" ")[1].replaceAll("/", "");
                 WebService w = (WebService)Class.forName("org.remoteHome.gui.ResourceLoaderWebService").newInstance();
                 if (fileName.trim().length() == 0) {

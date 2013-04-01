@@ -59,7 +59,7 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     /**
      * This is reference to the RemoteHomeManager
      */
-    protected RemoteHomeManager m;
+    protected transient RemoteHomeManager m;
     
     protected AbstractDevice (RemoteHomeManager m, int deviceId, String deviceName) {
         this.m = m;

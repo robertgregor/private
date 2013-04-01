@@ -35,7 +35,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * Indicates, if the swith is configured to switch on, when applied power.
      * True means ON, when applied power, false means to stay OFF.
      */
-    private boolean onWhenAppliedPower;
+    private boolean onWhenAppliedPower = true;
     
     /**
      * Indicates the current state of the device. True means ON, false means OFF.
