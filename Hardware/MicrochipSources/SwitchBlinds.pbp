@@ -27,7 +27,7 @@ INCLUDE "RFM70.pbp"
  'interrupt for timer
     INTCON = %10100000  'T01 enabled PEIE disabled.
     PIE1 = %00000000    'USART disabled
-    OPTION_REG = %00000111
+    OPTION_REG = %00000100
 
 on interrupt goto intManagement
 ENABLE
@@ -275,10 +275,10 @@ intManagement:
                     GOSUB stopBlinds
                endif
            endif
-           If ticks < 31 Then tiexit
+           If ticks < 241 Then tiexit
            ticks = 0
            seconds = seconds + 1
-           if seconds <= 58 then tiexit
+           if seconds <= 59 then tiexit
            seconds = 0
            tiexit: 
            INTCON.2 = 0

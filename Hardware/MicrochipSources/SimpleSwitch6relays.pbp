@@ -29,7 +29,7 @@ INCLUDE "RFM70.pbp"
  'interrupt for timer
     INTCON = %10100000  'T01 enabled PEIE disabled.
     PIE1 = %00000000    'USART disabled
-    OPTION_REG = %00000100
+    OPTION_REG = %00000111
 
 on interrupt goto intManagement
 ENABLE
@@ -56,7 +56,7 @@ temp_word var word
 EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
-ticks   var     word    ' Define pieces of seconds variable
+ticks   var     byte    ' Define pieces of seconds variable
 l1counter var byte
 conversionSuccess VAR BYTE
 
@@ -150,7 +150,6 @@ if (data_in[1] == device_id) then
             elseif (data_in[4] == "o") then
                 if (data_in[5] == "f") then
                     seconds = 0
-                    ticks = 0
                     read 8, l1counter
                     high relay
                     gosub sendDataOK
@@ -218,10 +217,10 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           If ticks < 241 Then tiexit
+           If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
-           if seconds <= 59 then tiexit
+           if seconds <= 58 then tiexit
            seconds = 0
            if (l1counter > 0) then
                l1counter = l1counter - 1
