@@ -4,7 +4,9 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.io.OutputStream;
 import org.remoteHome.AbstractDevice;
 import org.remoteHome.TemperatureSensorDevice;
 
@@ -18,7 +20,7 @@ public class AddNewDevice extends AbstractWebService {
     public void init() {}
     
     @Override
-    public byte[] processRequest() throws IOException {
+    public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         try {
             r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));
             AbstractDevice newDevice = r.createRemoteHomeDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
@@ -29,10 +31,10 @@ public class AddNewDevice extends AbstractWebService {
                     ((TemperatureSensorDevice)newDevice).setInitialFrequency();
                 }
                 r.savePersistentData();
-                return sendAjaxAnswer("OK, device is added.");
+                sendAjaxAnswer("OK, device is added.");
         } catch (Exception e) {
             e.printStackTrace();
-            return sendAjaxAnswer(e.getMessage());
+            sendAjaxAnswer(e.getMessage());
         }
     }
 }

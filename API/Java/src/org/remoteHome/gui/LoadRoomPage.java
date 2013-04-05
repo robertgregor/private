@@ -4,9 +4,11 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.remoteHome.AbstractDevice;
@@ -24,13 +26,14 @@ public class LoadRoomPage extends AbstractWebService {
     public void init() {}
     
     @Override
-    public byte[] processRequest() throws IOException {
+    public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         String roomHtml = readResource("RoomHTML.html");
-        roomHtml = roomHtml.replace("ROOMNAME", requestParameters.get("room"));
+        roomHtml = roomHtml.replaceAll("ROOMNAME", requestParameters.get("room").replaceAll(" ","xxx"));
         HashSet<AbstractDevice> devices = r.getDevicesInRoom(requestParameters.get("room"));
         StringBuilder accordionBody = new StringBuilder();
         for (AbstractDevice device : devices) {
-            accordionBody.append("<H3>"+device.getDeviceName()+"</H3>\n");
+            //accordionBody.append("<H3>"+device.getDeviceName()+"</H3>\n");
+            accordionBody.append("<H3><a href=\"#\">"+device.getDeviceName()+"</a></H3>");
             if (device instanceof SimpleSwitchDevice) {
                 accordionBody.append(getDiv("SimpleSwitchDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof TemperatureSensorDevice) {
@@ -42,7 +45,7 @@ public class LoadRoomPage extends AbstractWebService {
         }
         roomHtml = roomHtml.substring(0, roomHtml.indexOf("BBBODYYY")) + accordionBody.toString() + roomHtml.substring(roomHtml.indexOf("BBBODYYY")+8);
         //System.out.println(roomHtml);
-        return sendAjaxAnswer(roomHtml);
+        sendAjaxAnswer(roomHtml);
     }
     
     String getDiv(String name, String id) throws IOException {

@@ -32,6 +32,11 @@ public class RemoteHomeConnectionException extends Exception {
      */    
     public static final int INVALID_PARAMETER = 5;
 
+    /**
+     * The supplied parameter is invalid.
+     */    
+    public static final int UNKNOWN_PORT = 6;
+
     private int type;
     
    /**
@@ -67,6 +72,8 @@ public class RemoteHomeConnectionException extends Exception {
                     return "No any response received from device.";
             case INVALID_PARAMETER:
                     return "Invalid parameter: "+super.getMessage();
+            case UNKNOWN_PORT:
+                    return "The specified serial port doesn't exist: "+super.getMessage();
             default:
                 return super.getMessage();
         }        

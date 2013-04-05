@@ -4,7 +4,9 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import org.remoteHome.RemoteHomeManager;
 
@@ -15,7 +17,7 @@ import org.remoteHome.RemoteHomeManager;
 public interface WebService {
     
     void init();
-    byte[] processRequest() throws IOException;
-    byte[] processRequest(HashMap<String, String> requestParameters) throws IOException;
+    void processRequest(OutputStream o, HttpExchange t) throws IOException;
+    void processRequest(HashMap<String, String> requestParameters, OutputStream o, HttpExchange t) throws IOException;
     void setParameters(RemoteHomeManager r, String... requestAttributes);
 }

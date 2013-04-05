@@ -4,7 +4,9 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  *
@@ -16,7 +18,7 @@ public class GetFreeDeviceId extends AbstractWebService {
     public void init() {}
     
     @Override
-    public byte[] processRequest() throws IOException {        
-        return sendAjaxAnswer(Integer.toString(r.getUnusedDeviceId()));
+    public void processRequest(OutputStream o, HttpExchange t) throws IOException {        
+        sendAjaxAnswer(Integer.toString(r.getUnusedDeviceId()));
     }
 }

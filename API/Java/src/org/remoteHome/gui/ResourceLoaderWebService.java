@@ -4,9 +4,12 @@
  */
 package org.remoteHome.gui;
 
-import java.io.BufferedReader;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Properties;
 import org.remoteHome.RemoteHomeManager;
 
@@ -26,21 +29,19 @@ public class ResourceLoaderWebService extends AbstractWebService {
         this.name = name[0];
     }
     
-    public byte[] processRequest() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(name)));
-        StringBuffer fileBr = new StringBuffer();
-        String buffer = "";
-        while ((buffer = br.readLine()) != null) {
-             fileBr.append(buffer+"\n");
-        }
-        StringBuffer sb = new StringBuffer();
-        sb.append("HTTP/1.0 200 OK\n");
-        sb.append("Content-length:"+fileBr.length()+"\n");
-        String type = getContentType(name);
-        if (type != null) sb.append("Content-Type: "+type+"\n");
-        sb.append("Connection: close\n\n");
-        sb.append(fileBr);
-        return sb.toString().getBytes();
+    public synchronized void processRequest(OutputStream o, HttpExchange t) throws IOException {
+        DataInputStream br = new DataInputStream(this.getClass().getClassLoader().getResourceAsStream(name));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();        
+        byte[] buffer = new byte[65535];
+        int length;
+        while ((length = br.read(buffer)) != -1) out.write(buffer, 0, length);
+        br.close();
+        byte[] result = out.toByteArray();
+        Headers headers = t.getResponseHeaders();
+        headers.add("Content-Type", getContentType(name));
+        t.sendResponseHeaders(200, result.length);
+        o.write(result);
+        o.flush();
     }
     private String getContentType(String name) throws IOException {
         if (mimeTypes == null) {

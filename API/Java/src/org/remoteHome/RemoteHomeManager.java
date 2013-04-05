@@ -342,7 +342,7 @@ public class RemoteHomeManager {
         } else if (args.length == 4) {
             RemoteHomeManager manager = new RemoteHomeManager(args[0], args[1], args[2]);
             WebServer webServer = new WebServer(args[3], manager);
-            webServer.start();
+            webServer.startServer();
             manager.joinCommThread();            
         }
     }    

@@ -34,8 +34,8 @@ class RemoteHomeCommunicator extends Thread  {
         this.port = port;
         this.manager = manager;
         connect();
-        getUserNamePassword();
-        this.start();
+        //getUserNamePassword();
+        //this.start();
     }
         
     protected void connect() throws RemoteHomeConnectionException {
@@ -83,7 +83,7 @@ class RemoteHomeCommunicator extends Thread  {
             } catch (IOException e) {
                 throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
             } catch (Exception e) {
-                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);                
+                //throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_PORT);                
             }
     }
 

@@ -4,7 +4,10 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -17,63 +20,53 @@ import org.remoteHome.RemoteHomeManager;
  *
  * @author pt596
  */
-public class WebServerHandler extends Thread {
+public class WebServerHandler implements HttpHandler {
     
-    private Socket socket = null;
     RemoteHomeManager remoteHomemanager = null;
     
-    public WebServerHandler(Socket socket, RemoteHomeManager remoteHomemanager) {
-        this.socket = socket;
+    public WebServerHandler(RemoteHomeManager remoteHomemanager) {
         this.remoteHomemanager = remoteHomemanager;
     }
     
-    public void run() {
-        BufferedReader in = null;
+    public void handle(HttpExchange t) throws IOException {
         OutputStream out = null; 
         try {
-            Thread.sleep(100);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = socket.getOutputStream();
-            String getRequest = in.readLine();
-            System.out.println(getRequest);
+            //Thread.sleep(100);
+            out = t.getResponseBody();
+            String getRequest = t.getRequestURI().toString();
             if ((getRequest.indexOf('?') == -1) || (getRequest.indexOf('?') > 6)) {
                 //it is the request to the resource
                 if (getRequest.indexOf('?') != -1) getRequest = getRequest.substring(0, getRequest.indexOf('?'));
-                String fileName = getRequest.split(" ")[1].replaceAll("/", "");
+                String fileNameWithDirs = getRequest.replaceAll("/", " ");
+                fileNameWithDirs = fileNameWithDirs.trim();
+                if (fileNameWithDirs.length() != 0) {
+                    if (fileNameWithDirs.indexOf(" ") != -1) {
+                        String fileNameArray[] = fileNameWithDirs.split(" ");
+                        fileNameWithDirs = fileNameArray[fileNameArray.length - 1];
+                    }
+                }
                 WebService w = (WebService)Class.forName("org.remoteHome.gui.ResourceLoaderWebService").newInstance();
-                if (fileName.trim().length() == 0) {
+                if (fileNameWithDirs.length() == 0) {
                     w.setParameters(remoteHomemanager, "main.html");
                 } else {
-                    w.setParameters(remoteHomemanager, fileName.trim());
+                    w.setParameters(remoteHomemanager, fileNameWithDirs);
                 }
-                out.write(w.processRequest());
-                out.flush();
+                w.processRequest(out, t);
             } else {
                 //it is ajax request to do something
-                String parameters = getRequest.split(" ")[1].replaceAll("/", "");
+                String parameters = getRequest.replaceAll("/", "");
                 parameters = parameters.substring(parameters.indexOf('?')+1);
                 HashMap<String, String> parsedParameters = parseParameters(parameters);
                 System.out.println(parameters);
                 WebService w = (WebService)Class.forName("org.remoteHome.gui."+parsedParameters.get("ServiceName")).newInstance();
                 w.setParameters(remoteHomemanager);
-                out.write(w.processRequest(parsedParameters));
-                out.flush();
+                w.processRequest(parsedParameters, out, t);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                in.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
                 out.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
-                socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -4,7 +4,9 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.io.OutputStream;
 import org.remoteHome.AbstractDevice;
 
 /**
@@ -17,13 +19,13 @@ public class GetJsonObject extends AbstractWebService {
     public void init() {}
     
     @Override
-    public byte[] processRequest() throws IOException {
+    public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append(AbstractDevice.generateJsonData(r.getDevice(Integer.parseInt(requestParameters.get("deviceId")))));
-            return sendAjaxAnswer(sb.toString());
+            sendAjaxAnswer(sb.toString());
         } catch (Exception e) {
-            return sendAjaxError(e.getMessage());
+            sendAjaxError(e.getMessage());
         }
     }   
 }

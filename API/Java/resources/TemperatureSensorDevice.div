@@ -2,10 +2,10 @@
 <script>
 function updateStatusCOMPONENTID() {
   $.ajax({
-      url: "",
+      url: "/",
       type: "get",
       'cache' : false,
-      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID&"+Math.floor((Math.random()*100)+1),
+      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID",
       success: function(indata) {
           var data = JSON.parse(indata);
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
@@ -42,10 +42,10 @@ $(function() {
               return;
           }
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=TemperatureSensorDeviceManager&deviceId=COMPONENTID&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=TemperatureSensorDeviceManager&deviceId=COMPONENTID&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -55,6 +55,8 @@ $(function() {
           });
           updateStatusCOMPONENTID();
     });
+});
+$(document).ready(function() {
     updateStatusCOMPONENTID();
 });
 </script>

@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <title>Remote-home GUI</title>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="jquery-ui-1.10.2.custom.css" />
 <link rel="stylesheet" href="brute-select.css" />
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
-<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
+<script src="jquery-1.9.1.js"></script>
+<script src="jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="jquery.validate.js"></script>
 <script src="brute-select.js"></script>
-<link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css" />
+<link rel="stylesheet" href="style.css" />
 <script>
 var addTabJs = null;
 $(function() {
@@ -25,7 +25,7 @@ $(function() {
    $("#addDeviceResult").html('');
    var values = $(this).serialize();
     $.ajax({
-      url: "",
+      url: "/",
       'cache' : false,
       type: "get",
       data: values,
@@ -45,7 +45,7 @@ $(function() {
    $("#addRoomResult").html('');
    var values = $(this).serialize();
     $.ajax({
-      url: "",
+      url: "/",
       'cache' : false,
       type: "get",
       data: values,
@@ -64,7 +64,7 @@ $(function() {
    $("#changeChannelPassowrdResult").html('');
    var values = $(this).serialize();
     $.ajax({
-      url: "",
+      url: "/",
       'cache' : false,
       type: "get",
       data: values,
@@ -79,7 +79,7 @@ $(function() {
   });
   $("#deviceIdLoader").click(function(){  
     $.ajax({
-      url: "",
+      url: "/",
       'cache' : false,
       type: "get",
       data: "ServiceName=GetFreeDeviceId&"+Math.floor((Math.random()*100)+1),
@@ -151,7 +151,7 @@ $(document).ready(function(){
     }
   });
   $.ajax({
-      url: "",
+      url: "/",
       type: "get",
       'cache' : false,
       data: "ServiceName=LoadAllRooms&"+Math.floor((Math.random()*100)+1),
@@ -167,7 +167,7 @@ $(document).ready(function(){
       }   
   });
   $.ajax({
-      url: "",
+      url: "/",
       'cache' : false,
       type: "get",
       data: "ServiceName=LoadChannelPassword&"+Math.floor((Math.random()*100)+1),

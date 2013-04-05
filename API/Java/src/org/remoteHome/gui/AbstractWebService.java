@@ -4,7 +4,10 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import org.remoteHome.RemoteHomeManager;
 
@@ -16,33 +19,36 @@ public abstract class AbstractWebService implements WebService {
     
     protected RemoteHomeManager r;
     protected HashMap<String, String> requestParameters;
+    OutputStream o;
+    HttpExchange t;
         
     public void setParameters(RemoteHomeManager r, String... requestAttributes) {
         this.r = r;
     }
 
-    public abstract byte[] processRequest() throws IOException;
+    public abstract void processRequest(OutputStream o, HttpExchange t) throws IOException;
     
-    public byte[] processRequest(HashMap<String, String> requestParameters) throws IOException {
+    public void processRequest(HashMap<String, String> requestParameters, OutputStream o, HttpExchange t) throws IOException {
         this.requestParameters = requestParameters;
-        return processRequest();
+        this.o = o;
+        this.t = t;
+        processRequest(o, t);
     }
     
-    protected byte[] sendAjaxAnswer(String data) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("HTTP/1.0 200 OK\n");
-        sb.append("Cache-Control: no-cache\n");
-        sb.append("Content-length:"+data.length()+"\n");
-        sb.append("Content-Type: text/html\nConnection: close\n\n");
-        sb.append(data);
-        return sb.toString().getBytes();
+    protected void sendAjaxAnswer(String data) throws IOException {
+        Headers headers = t.getResponseHeaders();
+        headers.add("Content-Type", "text/html");
+        headers.add("Cache-Control", "no-cache");
+        t.sendResponseHeaders(200, data.length());
+        o.write(data.getBytes());
+        o.flush();
     } 
-    protected byte[] sendAjaxError(String data) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("HTTP/1.0 500 "+data+"\n");
-        sb.append("Cache-Control: no-cache\n");
-        sb.append("Content-length: 0\n");
-        sb.append("Content-Type: text/html\nConnection: close\n\n");
-        return sb.toString().getBytes();
+    protected void sendAjaxError(String data) throws IOException {
+        Headers headers = t.getResponseHeaders();
+        headers.add("Content-Type", "text/html");
+        headers.add("Cache-Control", "no-cache");
+        t.sendResponseHeaders(500, data.length());
+        o.write(data.getBytes());
+        o.flush();
     } 
 }

@@ -4,7 +4,9 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  *
@@ -16,13 +18,14 @@ public class LoadChannelPassword extends AbstractWebService {
     public void init() {}
     
     @Override
-    public byte[] processRequest() throws IOException {
+    public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         
         StringBuilder sb = new StringBuilder();
         sb.append(r.getChannel());
         sb.append("\n");
         sb.append(r.getPassword());
-        return sendAjaxAnswer(sb.toString());
+        //sendAjaxAnswer(sb.toString());
+        sendAjaxAnswer("40\nROBIK");
     }
     
 }

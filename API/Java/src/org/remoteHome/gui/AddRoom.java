@@ -4,10 +4,9 @@
  */
 package org.remoteHome.gui;
 
-import java.io.BufferedReader;
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import org.remoteHome.RemoteHomeManager;
+import java.io.OutputStream;
 
 /**
  *
@@ -19,9 +18,9 @@ public class AddRoom  extends AbstractWebService {
     public void init() {}
     
     @Override
-    public byte[] processRequest() throws IOException {
+    public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         r.addRoom(requestParameters.get("roomName"));
         r.savePersistentData();
-        return sendAjaxAnswer("OK");
+        sendAjaxAnswer("OK");
     }
 }

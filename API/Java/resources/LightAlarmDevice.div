@@ -1,0 +1,262 @@
+<div>
+<script>
+function updateStatusCOMPONENTID() {
+  $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID&"+Math.floor((Math.random()*100)+1),
+      success: function(indata) {
+          var data = JSON.parse(indata);
+          document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
+          document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          if (data.currentState) {
+              document.getElementById("statusCOMPONENTID").innerHTML='ON';
+          } else {
+              document.getElementById("statusCOMPONENTID").innerHTML='OFF';
+          }
+          document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
+          if (data.onWhenAppliedPower) {
+                $( "#checkboxOnWhenPowerCOMPONENTID" ).prop('checked', true);
+                document.getElementById("onWhenPowerCOMPONENTID").innerHTML='YES';
+          } else {
+                $( "#checkboxOnWhenPowerCOMPONENTID" ).prop('checked', false);
+                document.getElementById("onWhenPowerCOMPONENTID").innerHTML='NO';
+          }
+          $("#checkboxOnWhenPowerCOMPONENTID").trigger("change");
+          document.getElementById("configuredPeriodCOMPONENTID").innerHTML=data.configuredPeriod;
+          document.getElementById("offPeriodFormCOMPONENTID").value = data.configuredPeriod;
+          document.getElementById("currentPeriodCOMPONENTID").innerHTML=data.currentCounter;
+      },
+      error:function(){
+          alert('Error when tried to get the status of the device.');
+      }   
+  });
+}
+$(function() {
+    $( "#checkboxOnWhenPowerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxOnWhenPowerCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxOnWhenPowerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+
+    $( "#SwitchOnSimpleSwitchCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&action=ON&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#SwitchOffSimpleSwitchCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&action=OFF&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#periodCOMPONENTID").bruteSelect();
+    $( "#SwitchOffTimeoutSimpleSwitchCOMPONENTID" ).button().click(function() {
+          var period = $( "#periodCOMPONENTID" ).val();
+          $.ajax({
+              url: "",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&action=ONTIMEOUT&period="+period+"&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
+          updateStatusCOMPONENTID();
+    });
+    $( "#RefreshStatusAlCOMPONENTID" ).button().click(function() {
+          updateStatusCOMPONENTID();
+    });
+    $( "#configureCOMPONENTID" ).button().click(function() {
+          var nm = document.getElementById("nameFormCOMPONENTID").value;
+          if (nm == '') {
+                alert('Name of the component cannot be empty!');
+                return;
+          }
+          var tm = parseInt(document.getElementById("offPeriodFormCOMPONENTID").value);
+          if (tm == NaN) {
+              alert('Switch off period should be number!');
+              return;
+          }
+          if (tm > 255) {
+              alert('Switch off period should be number between 0 and 255!');
+              return;
+          }
+          var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").value;
+          $.ajax({
+              url: "",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+          updateStatusCOMPONENTID();
+    });
+    updateStatusCOMPONENTID();
+});
+</script>
+<table width="100%"><tr>
+<td>
+    <table width="100%"><tr><td>
+    <input type="submit" id="SwitchOnSimpleSwitchCOMPONENTID" value="Switch On" />
+    </td><td>
+    <input type="submit" id="SwitchOffSimpleSwitchCOMPONENTID" value="Switch Off" />
+    </td></tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <select id="periodCOMPONENTID">
+                <option value="0">&nbsp;</option>
+                <option value="5">5 min</option>
+                <option value="15">15 min</option>
+                <option value="30">30 min</option>
+                <option value="60">1 hour</option>
+                <option value="120">2 hours</option>
+                <option value="240">4 hours</option>
+            </select>
+            &nbsp;&nbsp;
+            <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID" value="Switch On with period" />
+        </td>
+    </tr>
+    </table>
+</td>
+<td>
+    <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th>Property</th>
+                <th>Value</th>
+                <th>Parameter</th>
+                <th>Value</th>
+                </tr>
+                </thead>
+                <tbody class="ui-widget-content">
+                <tr>
+                <td>Name</td>
+                <td><span id='nameCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Status</td>
+                <td><span id='statusCOMPONENTID'></span></td>
+                <td>Name:</td>
+                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>Component id</td>
+                <td><span id='compIdCOMPONENTID'></span></td>
+                <td>Switch off period:</td>
+                <td><input type="text" id="offPeriodFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>On when applied power</td>
+                <td><span id='onWhenPowerCOMPONENTID'></span></td>
+                <td>On when applied power:</td>
+                <td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td>
+                </tr>
+                <tr>
+                <td>Switch off period</td>
+                <td><span id='configuredPeriodCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Current period</td>
+                <td><span id='currentPeriodCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
+                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
+                </tr>
+                </tbody>
+    </table>
+</td>
+</tr></table>
+<table width="100%"><tr>
+<td>
+    <table width="100%"><tr><td>
+    <input type="submit" id="activateAlarmCOMPONENTID" value="Activate alarm" />
+    </td><td>
+    <input type="submit" id="deactivateAlarmCOMPONENTID" value="Deactivate alarm" />
+    </td></tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+        <td><input type="submit" id="activateAllAlarmCOMPONENTID" value="Activate all alarms" /></td>
+        <td><input type="submit" id="deactivateAllAlarmCOMPONENTID" value="Deactivate all alarms" /></td>
+    <tr>
+    </tr>
+    </table>
+</td>
+<td>
+    <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th>Property</th>
+                <th>Value</th>
+                <th>Parameter</th>
+                <th>Value</th>
+                </tr>
+                </thead>
+                <tbody class="ui-widget-content">
+                <tr>
+                <td>Enter alarm timeout</td>
+                <td><span id='enterTimeoutCOMPONENTID'></span></td>
+                <td>Enter timeout:</td>
+                <td><input type="text" id="enterPeriodFormCOMPONENTID"/></td>
+                </tr>
+                <tr>
+                <td>Leave alarm timeout</td>
+                <td><span id='leaveTimeoutCOMPONENTID'></span></td>
+                <td>Leave timeout:</td>
+                <td><input type="text" id="leavePeriodFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>On when movement detected</td>
+                <td><span id='onWhenMovementCOMPONENTID'></span></td>
+                <td>On when movement detected:</td>
+                <td><input type="checkbox" id="checkboxOnWhenMovementCOMPONENTID" /><label for="checkboxOnWhenMovementCOMPONENTID">&nbsp;</label></td>
+                </tr>
+                <tr>
+                <td colspan ="2"><input type="submit" id="RefreshStatusAlCOMPONENTID" value="Refresh" /></td>
+                <td colspan ="2"><input type="submit" id="configureAlCOMPONENTID" value="Change configuration" /></td>
+                </tr>
+                </tbody>
+    </table>
+</td>
+</tr></table>
+</div>
