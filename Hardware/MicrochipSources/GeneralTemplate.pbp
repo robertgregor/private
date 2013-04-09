@@ -14,7 +14,7 @@
 
 EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
 
-INCLUDE "RFM70.pbp"
+INCLUDE "RFM73.pbp"
 
  DEFINE OSC 8
 
@@ -34,8 +34,7 @@ ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00000000 'Set PORTA to all output
 TRISB = %00010000 'Set , SDI input
-TRISC = %00000100 'Set IRQ input, 
-RADIO_MODULE_POWER var PORTC.1
+TRISC = %00000100 'Set IRQ input
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
@@ -54,7 +53,6 @@ l1counter var byte
 conversionSuccess VAR BYTE
 
 clear
-high RADIO_MODULE_POWER
 read 6, device_id
 
 if 0 == 1 then

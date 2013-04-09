@@ -125,7 +125,7 @@ if (sleepMode == 1) then
       sleep sleep_period
       pause 1
       seconds = 57
-      ticks = 0
+      ticks = 25
       sleepmode = 0
       INTCON = %10100000
       OPTION_REG = %00000111
