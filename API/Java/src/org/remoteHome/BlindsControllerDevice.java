@@ -141,6 +141,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
             throw new RemoteHomeManagerException("The value should be 0 - 255", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
         m.sendCommand(getDeviceId(), "bt="+fullRangeTimeout);
+        setFullRangeTimeout(fullRangeTimeout);
     }
 
     /**
@@ -317,7 +318,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * Calibration value of the blinds. It is time in seconds, from fully opened position to fully closed position.
      * @return the fullRangeTimeout
      */
-    protected int getFullRangeTimeout() {
+    public int getFullRangeTimeout() {
         return fullRangeTimeout;
     }
 

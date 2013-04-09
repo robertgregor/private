@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.remoteHome.AbstractDevice;
+import org.remoteHome.BlindsControllerDevice;
+import org.remoteHome.LightAlarmDevice;
 import org.remoteHome.SimpleSwitchDevice;
 import org.remoteHome.TemperatureSensorDevice;
 
@@ -38,6 +40,10 @@ public class LoadRoomPage extends AbstractWebService {
                 accordionBody.append(getDiv("SimpleSwitchDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof TemperatureSensorDevice) {
                 accordionBody.append(getDiv("TemperatureSensorDevice.div",Integer.toString(device.getDeviceId())));
+            } else if (device instanceof LightAlarmDevice) {
+                accordionBody.append(getDiv("LightAlarmDevice.div",Integer.toString(device.getDeviceId())));
+            } else if (device instanceof BlindsControllerDevice) {
+                accordionBody.append(getDiv("BlindsControllerDevice.div",Integer.toString(device.getDeviceId())));
             }
         }
         if (accordionBody.toString().length()==0) {
