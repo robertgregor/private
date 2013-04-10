@@ -2,7 +2,7 @@
 <script>
 function updateStatusCOMPONENTID() {
   $.ajax({
-      url: "",
+      url: "/",
       type: "get",
       'cache' : false,
       data: "ServiceName=GetJsonObject&deviceId=COMPONENTID&"+Math.floor((Math.random()*100)+1),
@@ -45,7 +45,7 @@ $(function() {
     $( "#checkboxOnWhenPowerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#SwitchOnSimpleSwitchCOMPONENTID" ).button().click(function() {
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
               data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=ON&"+Math.floor((Math.random()*100)+1),
@@ -59,7 +59,7 @@ $(function() {
     });
     $( "#SwitchOffSimpleSwitchCOMPONENTID" ).button().click(function() {
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
               data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=OFF&"+Math.floor((Math.random()*100)+1),
@@ -75,7 +75,7 @@ $(function() {
     $( "#SwitchOffTimeoutSimpleSwitchCOMPONENTID" ).button().click(function() {
           var period = $( "#periodCOMPONENTID" ).val();
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
               data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=ONTIMEOUT&period="+period+"&"+Math.floor((Math.random()*100)+1),
@@ -107,7 +107,7 @@ $(function() {
           }
           var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").value;
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
               data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),

@@ -125,7 +125,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
             this.setTemperature(Integer.parseInt(items[1]));
             this.setBattery(Integer.parseInt(items[2]));
             this.setFrequency(Integer.parseInt(items[3])*10); //Frequency in seconds * 10
-            this.setDeviceExpectedTemperature((Integer.parseInt(items[4])*10)/2); //0.5 is one degree celsius
+            this.setDeviceExpectedTemperature(Integer.parseInt(items[4]));
             this.setOpenAngle(Integer.parseInt(items[5]));
         } else if (items[0].equals("l")) {
             this.setOpenAngle(Integer.parseInt(items[1]));
@@ -134,7 +134,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
         try {
             if (isManageTemperatureAuto() && (getDeviceExpectedTemperature() != getExpectedTemperature())) {
                 // OK, set expected temperature
-                m.sendCommand(getDeviceId(),"t="+(getExpectedTemperature()*2)/10);
+                m.sendCommand(getDeviceId(),"t="+ getExpectedTemperature());
                 setManageTemperatureAuto(false);
             } else if (isManageOpenAngleAuto() && (getExpectedOpenAngle() != getOpenAngle())) {
                 m.sendCommand(getDeviceId(),"l="+getExpectedOpenAngle());
@@ -177,11 +177,11 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * Expected temperature value should be set by external system in order to trigger the temperature change
      * Also the manageTemperatureAuto method should be set to true.
      * @param expectedTemperature the expectedTemperature to set
-     * @throws RemoteHomeManagerException if the range is outside 0 - 400 ( means 0 - 40 degree celsius )
+     * @throws RemoteHomeManagerException if the range is outside 0 - 80 ( means 0 - 40 degree celsius )
      */
     public void setExpectedTemperature(int expectedTemperature) throws RemoteHomeManagerException {
-        if ((expectedTemperature < 0) || (expectedTemperature > 400)) {
-            throw new RemoteHomeManagerException("The value should be 0 - 400", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        if ((expectedTemperature < 0) || (expectedTemperature > 80)) {
+            throw new RemoteHomeManagerException("The value should be 0 - 80", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
         this.expectedTemperature = expectedTemperature;
         setManageTemperatureAuto(true);
