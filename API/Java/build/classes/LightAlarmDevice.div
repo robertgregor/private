@@ -27,6 +27,26 @@ function updateStatusCOMPONENTID() {
           document.getElementById("configuredPeriodCOMPONENTID").innerHTML=data.configuredPeriod;
           document.getElementById("offPeriodFormCOMPONENTID").value = data.configuredPeriod;
           document.getElementById("currentPeriodCOMPONENTID").innerHTML=data.currentCounter;
+          document.getElementById("enterTimeoutCOMPONENTID").innerHTML=data.alarmEnterTimeout;
+          document.getElementById("enterPeriodFormCOMPONENTID").value = data.alarmEnterTimeout;
+          document.getElementById("leaveTimeoutCOMPONENTID").innerHTML=data.alarmLeaveTimeout;
+          document.getElementById("leavePeriodFormCOMPONENTID").value = data.alarmLeaveTimeout;
+          if (data.onWhenMovementDetected) {
+                $( "#checkboxOnWhenMovementCOMPONENTID" ).prop('checked', true);
+                document.getElementById("onWhenMovementCOMPONENTID").innerHTML='YES';
+          } else {
+                $( "#checkboxOnWhenMovementCOMPONENTID" ).prop('checked', false);
+                document.getElementById("onWhenMovementCOMPONENTID").innerHTML='NO';
+          }
+          $("#checkboxOnWhenMovementCOMPONENTID").trigger("change");
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+          document.getElementById("smtpHostFormCOMPONENTID").value = data.smtpHost;
+          document.getElementById("smtpUserFormCOMPONENTID").value = data.smtpUser;
+          document.getElementById("smtpPasswordFormCOMPONENTID").value = data.smtpPassword;
+          document.getElementById("smtpEmailFromFormCOMPONENTID").value = data.smtpEmailFrom;
+          document.getElementById("smtpEmailToFormCOMPONENTID").value = data.smtpEmailTo;
+          document.getElementById("smtpSubjectFormCOMPONENTID").value = data.smtpSubject;
+          document.getElementById("smtpMessageFormCOMPONENTID").value = data.smtpMessage;          
       },
       error:function(){
           alert('Error when tried to get the status of the device.');
@@ -44,12 +64,22 @@ $(function() {
             });
     $( "#checkboxOnWhenPowerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
 
+    $( "#checkboxOnWhenMovementCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxOnWhenMovementCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxOnWhenMovementCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+
     $( "#SwitchOnSimpleSwitchCOMPONENTID" ).button().click(function() {
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&action=ON&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ON&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -60,10 +90,10 @@ $(function() {
     });
     $( "#SwitchOffSimpleSwitchCOMPONENTID" ).button().click(function() {
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&action=OFF&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=OFF&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -76,10 +106,10 @@ $(function() {
     $( "#SwitchOffTimeoutSimpleSwitchCOMPONENTID" ).button().click(function() {
           var period = $( "#periodCOMPONENTID" ).val();
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&action=ONTIMEOUT&period="+period+"&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ONTIMEOUT&period="+period+"&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -111,10 +141,10 @@ $(function() {
           }
           var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").value;
           $.ajax({
-              url: "",
+              url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURESW&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -123,6 +153,103 @@ $(function() {
             }   
           });
           updateStatusCOMPONENTID();
+    });
+    $( "#configureAlCOMPONENTID" ).button().click(function() {
+          var et = parseInt(document.getElementById("enterPeriodFormCOMPONENTID").value);
+          if (et == NaN) {
+              alert('Alarm enter timeout period should be number!');
+              return;
+          }
+          if (et > 255) {
+              alert('Alarm enter timeout should be number between 0 and 255!');
+              return;
+          }
+          var lt = parseInt(document.getElementById("leavePeriodFormCOMPONENTID").value);
+          if (lt == NaN) {
+              alert('Alarm leave timeout period should be number!');
+              return;
+          }
+          if (lt > 255) {
+              alert('Alarm leave timeout period should be number between 0 and 255!');
+              return;
+          }
+          var apw = document.getElementById("checkboxOnWhenMovementCOMPONENTID").value;
+          var smtpHost = encodeURIComponent(document.getElementById("smtpHostFormCOMPONENTID").value);
+          var smtpUser = encodeURIComponent(document.getElementById("smtpUserFormCOMPONENTID").value);
+          var smtpPassword = encodeURIComponent(document.getElementById("smtpPasswordFormCOMPONENTID").value);
+          var smtpFrom = encodeURIComponent(document.getElementById("smtpEmailFromFormCOMPONENTID").value);
+          var smtpTo = encodeURIComponent(document.getElementById("smtpEmailToFormCOMPONENTID").value);
+          var smtpSubject = encodeURIComponent(document.getElementById("smtpSubjectFormCOMPONENTID").value);
+          var smtpMessage = encodeURIComponent(document.getElementById("smtpMessageFormCOMPONENTID").value);
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&et="+et+"&lt="+lt+"&apw="+apw+"&smtpHost="+smtpHost+"&smtpUser="+smtpUser+"&smtpPassword="+smtpPassword+"&smtpFrom="+smtpFrom+"&smtpTo="+smtpTo+"&smtpSubject="+smtpSubject+"&smtpMessage="+smtpMessage+"&action=CONFIGUREAL&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+          updateStatusCOMPONENTID();
+    });
+    $( "#activateAlarmCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALON&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#deactivateAlarmCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALOFF&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#activateAllAlarmCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALALLON&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#deactivateAllAlarmCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALALLOFF&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
     });
     updateStatusCOMPONENTID();
 });
@@ -250,6 +377,46 @@ $(function() {
                 <td><span id='onWhenMovementCOMPONENTID'></span></td>
                 <td>On when movement detected:</td>
                 <td><input type="checkbox" id="checkboxOnWhenMovementCOMPONENTID" /><label for="checkboxOnWhenMovementCOMPONENTID">&nbsp;</label></td>
+                </tr>
+                <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>SMTP server host:</td>
+                <td><input type="text" id="smtpHostFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>SMTP login user:</td>
+                <td><input type="text" id="smtpUserFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>SMTP login password:</td>
+                <td><input type="text" id="smtpPasswordFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>SMTP email address from:</td>
+                <td><input type="text" id="smtpEmailFromFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>SMTP email address to:</td>
+                <td><input type="text" id="smtpEmailToFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>SMTP subject:</td>
+                <td><input type="text" id="smtpSubjectFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td colspan="2">&nbsp;</td>
+                <td>SMTP message:</td>
+                <td><input type="text" id="smtpMessageFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>Last update timestamp</td>
+                <td><span id='timestampCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
                 <td colspan ="2"><input type="submit" id="RefreshStatusAlCOMPONENTID" value="Refresh" /></td>

@@ -134,23 +134,53 @@ public class BatteryThermostatDevice extends AbstractDevice {
                 relayOn = false;                
             }
             this.setThreshold(Integer.parseInt(items[6]));
+            setTimestamp(System.currentTimeMillis());
         }
         //here manage the temperature
-        try {
             if (isManageTemperatureAuto() && (getDeviceExpectedTemperature() != getExpectedTemperature())) {
                 // OK, set expected temperature
-                m.sendCommand(getDeviceId(),"t="+(getExpectedTemperature()*2)/10);
-                setManageTemperatureAuto(false);
+                new Thread(new Runnable() {
+                     public void run() {
+                         try {
+                            Thread.sleep(10);
+                            m.sendCommand(getDeviceId(),"t="+(getExpectedTemperature()*2)/10);
+                            setManageTemperatureAuto(false);
+                         } catch (InterruptedException e) {
+                             return;
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                }).start();                                            
             } else if (isManageThresholdAuto() && (getExpectedThreshold() != getThreshold())) {
-                m.sendCommand(getDeviceId(),"r="+getExpectedThreshold());
-                setManageThresholdAuto(false);
+                new Thread(new Runnable() {
+                     public void run() {
+                         try {
+                            Thread.sleep(30);
+                            m.sendCommand(getDeviceId(),"r="+getExpectedThreshold());
+                            setManageThresholdAuto(false);
+                         } catch (InterruptedException e) {
+                             return;
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                }).start();                                            
             } else if (isManageFrequencyAuto() && (getExpectedFrequency() != getFrequency())) {
-                m.sendCommand(getDeviceId(),"m="+getExpectedFrequency()/10);
-                setManageFrequencyAuto(false);
+                new Thread(new Runnable() {
+                     public void run() {
+                         try {
+                            Thread.sleep(50);
+                            m.sendCommand(getDeviceId(),"m="+getExpectedFrequency()/10);
+                            setManageFrequencyAuto(false);
+                         } catch (InterruptedException e) {
+                             return;
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                }).start();                                            
             }
-        } catch (Exception e) {
-            //there is no way how to report this exception
-        }
     }
 
     /**

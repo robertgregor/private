@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * This is the implementation class for all hardware devices. All the devices should extend this class.
@@ -60,6 +61,12 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
      * This is reference to the RemoteHomeManager
      */
     protected transient RemoteHomeManager m;
+    
+    /**
+     * This is timestamp, when the values has been last updated
+     */
+    private long timestamp = 0;
+    
     
     protected AbstractDevice (RemoteHomeManager m, int deviceId, String deviceName) {
         this.m = m;
@@ -163,5 +170,21 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
         }
         sb.append("\n}");
         return sb.toString();
+    }
+
+    /**
+     * This is timestamp, when the values has been last updated
+     * @return the timestamp
+     */
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * This is timestamp, when the values has been last updated
+     * @param timestamp the timestamp to set
+     */
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

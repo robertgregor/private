@@ -107,6 +107,7 @@ public class ThermostatDevice extends AbstractDevice {
                 relayOn = false;                
         }
         this.setThreshold(Integer.parseInt(statusResponse[5]));
+        setTimestamp(System.currentTimeMillis());
     }
 
     /**
@@ -139,7 +140,7 @@ public class ThermostatDevice extends AbstractDevice {
      * @throws RemoteHomeConnectionException if there is a problem with communication
      * @throws RemoteHomeManagerException if the value is not in range 0 - 400
      */
-    protected void setDeviceExpectedTemperature(int deviceExpectedTemperature) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+    public void setDeviceExpectedTemperature(int deviceExpectedTemperature) throws RemoteHomeConnectionException, RemoteHomeManagerException {
         if ((deviceExpectedTemperature < 0) || (deviceExpectedTemperature > 400)) {
             throw new RemoteHomeManagerException("The value should be 0 - 400", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }        
@@ -160,7 +161,7 @@ public class ThermostatDevice extends AbstractDevice {
      * @param relayOn the relayState to set
      * @throws RemoteHomeConnectionException if there is a problem with communication
      */
-    protected void setRelayOn(boolean relayOn) throws RemoteHomeConnectionException {
+    public void setRelayOn(boolean relayOn) throws RemoteHomeConnectionException {
         if (relayOn) {
             m.sendCommand(getDeviceId(), "o");
         } else {
@@ -197,7 +198,7 @@ public class ThermostatDevice extends AbstractDevice {
      * go on, when currentTemperature - threshold / 10 < expected temperature<br/>
      * @return the threshold
      */
-    protected int getThreshold() {
+    public int getThreshold() {
         return threshold;
     }
 
@@ -208,7 +209,7 @@ public class ThermostatDevice extends AbstractDevice {
      * @throws RemoteHomeConnectionException if there is a problem with communication
      * @throws RemoteHomeManagerException if the value is not in range 0 - 9
      */
-    protected void setThreshold(int threshold) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+    public void setThreshold(int threshold) throws RemoteHomeConnectionException, RemoteHomeManagerException {
         if ((threshold < 0) || (threshold > 9)) {
             throw new RemoteHomeManagerException("The value should be 0 - 9", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }

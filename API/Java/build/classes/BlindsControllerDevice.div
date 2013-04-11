@@ -1,0 +1,250 @@
+<div>
+<script>
+function updateStatusCOMPONENTID() {
+  $.ajax({
+      url: "",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID&"+Math.floor((Math.random()*100)+1),
+      success: function(indata) {
+          var data = JSON.parse(indata);
+          document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
+          document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          document.getElementById("statusCOMPONENTID").innerHTML='Positioned';
+          if (data.movingUp) {
+              document.getElementById("statusCOMPONENTID").innerHTML='Moving UP';
+          }
+          if (data.movingDown) {
+              document.getElementById("statusCOMPONENTID").innerHTML='Moving DOWN';
+          }
+          document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
+          document.getElementById("timeOpeningCurrentCOMPONENTID").innerHTML=data.currentOpening;
+          document.getElementById("timeOpeningFormCOMPONENTID").value = data.fullRangeTimeout;
+          document.getElementById("timeOpeningCOMPONENTID").innerHTML=data.fullRangeTimeout;
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+      },
+      error:function(){
+          alert('Error when tried to get the status of the device.');
+      }   
+  });
+}
+$(function() {
+    $( "#closeBlindCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&action=CLOSE&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#openBlindCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&action=OPEN&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#stopBlindCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&action=STOP&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#closeAllBlindsCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&action=CLOSEALL&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#openAllBlindsCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&action=OPENALL&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#stopAllBlindsCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&action=STOPALL&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#closedPercentage").bruteSelect();
+    $( "#setToPositionCOMPONENTID" ).button().click(function() {
+          var period = $( "#closedPercentage" ).val();
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&action=SETPOS&period="+period+"&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+    });
+    $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
+          updateStatusCOMPONENTID();
+    });
+    $( "#configureCOMPONENTID" ).button().click(function() {
+          var nm = document.getElementById("nameFormCOMPONENTID").value;
+          if (nm == '') {
+                alert('Name of the component cannot be empty!');
+                return;
+          }
+          var tm = parseInt(document.getElementById("timeOpeningFormCOMPONENTID").value);
+          if (tm == NaN) {
+              alert('100% opening timeout should be number!');
+              return;
+          }
+          if (tm > 255) {
+              alert('100% opening timeout should be number between 0 and 255!');
+              return;
+          }
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=BlindsControllerDeviceManager&deviceId=COMPONENTID&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError);
+            }   
+          });
+          updateStatusCOMPONENTID();
+    });
+    updateStatusCOMPONENTID();
+});
+</script>
+<table width="100%"><tr>
+<td>
+    <table width="100%">
+    <tr>
+    <td><input type="submit" id="closeBlindCOMPONENTID" value="Close blind" /></td>
+    <td><input type="submit" id="stopBlindCOMPONENTID" value="Stop blind" /></td>
+    <td><input type="submit" id="openBlindCOMPONENTID" value="Open blind" /></td>
+    </tr>
+    <tr>
+    <td><input type="submit" id="closeAllBlindsCOMPONENTID" value="Close all blinds" /></td>
+    <td><input type="submit" id="stopAllBlindsCOMPONENTID" value="Stop all blinds" /></td>
+    <td><input type="submit" id="openAllBlindsCOMPONENTID" value="Open all blinds" /></td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <select id="closedPercentage">
+                <option value="10">10%</option>
+                <option value="20">20%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
+                <option value="60">60%</option>
+                <option value="70">70%</option>
+                <option value="80">80%</option>
+                <option value="90">90%</option>
+            </select>
+            &nbsp;&nbsp;
+            <input type="submit" id="setToPositionCOMPONENTID" value="Set blinds to position" />
+        </td>
+    </tr>
+    </table>
+</td>
+<td>
+<table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th>Property</th>
+                <th>Value</th>
+                <th>Parameter</th>
+                <th>Value</th>
+                </tr>
+                </thead>
+                <tbody class="ui-widget-content">
+                <tr>
+                <td>Name</td>
+                <td><span id='nameCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Status</td>
+                <td><span id='statusCOMPONENTID'></span></td>
+                <td>Name:</td>
+                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>Component id</td>
+                <td><span id='compIdCOMPONENTID'></span></td>
+                <td>100% time opening period</td>
+                <td><input type="text" id="timeOpeningFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>100% time opening period</td>
+                <td><span id='timeOpeningCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Current position</td>
+                <td><span id='openingCurrentCOMPONENTID'></span>&nbsp;%</td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Last update timestamp</td>
+                <td><span id='timestampCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
+                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
+                </tr>
+                </tbody>
+</table>
+</td>
+</tr></table>
+</div>

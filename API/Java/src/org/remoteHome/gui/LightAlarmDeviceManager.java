@@ -5,12 +5,10 @@
 package org.remoteHome.gui;
 
 import com.sun.net.httpserver.HttpExchange;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import javax.xml.bind.DatatypeConverter;
+import org.remoteHome.AbstractDevice;
+import org.remoteHome.LightAlarmDevice;
 
 /**
  *
@@ -23,56 +21,58 @@ public class LightAlarmDeviceManager extends AbstractWebService {
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
-        
-    }
-    
-    
-    private void sendSMTPcmd(String s, PrintWriter out, BufferedReader in) throws IOException {
-        // Send the SMTP command
-        if (s != null) {
-            out.println(s);
-            out.flush();
-        }
-        // Wait for the response
-        int counter = 0;
-        while(!in.ready()) {
-            try {
-                Thread.sleep(10);
-                if (++counter > 500) throw new IOException("Cannot read from the socket. No answer...");
-            } catch (InterruptedException e) {
-                return;
+        try {
+            LightAlarmDevice device = (LightAlarmDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
+            String action = requestParameters.get("action");
+            if (action.equals("ON")) {
+                device.switchOn();
+            } else if (action.equals("OFF")) {
+                device.switchOff();
+            } else if (action.equals("ONTIMEOUT")) {
+                int time = Integer.parseInt(requestParameters.get("period"));
+                if (time != 0) device.configurePeriod(time);
+                device.switchOnForConfiguredPeriod();                
+            } else if (action.equals("CONFIGURESW")) {
+                String nm = requestParameters.get("nm");
+                int tm = Integer.parseInt(requestParameters.get("tm"));
+                Boolean onWhenPower = new Boolean(requestParameters.get("pw"));
+                if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
+                if (device.getConfiguredPeriod() != tm) device.configurePeriod(tm);
+                if (device.isOnWhenAppliedPower() != onWhenPower) device.switchOnWhenAppliedPower(onWhenPower);
+            } else if (action.equals("CONFIGUREAL")) {
+                int et = Integer.parseInt(requestParameters.get("et"));
+                int lt = Integer.parseInt(requestParameters.get("lt"));
+                Boolean onWhenAlarmDetected = new Boolean(requestParameters.get("apw"));
+                if (device.getAlarmEnterTimeout() != et) device.configureAlarmEnterTimeout(et);
+                if (device.getAlarmLeaveTimeout() != lt) device.configureAlarmLeaveTimeout(lt);
+                if (device.isOnWhenMovementDetected() != onWhenAlarmDetected) device.configureSwitchOnWhenMovement(onWhenAlarmDetected);
+                if (requestParameters.get("smtpHost") != device.getSmtpHost()) device.setSmtpHost(requestParameters.get("smtpHost"));
+                if (requestParameters.get("smtpUser") != device.getSmtpUser()) device.setSmtpUser(requestParameters.get("smtpUser"));
+                if (requestParameters.get("smtpPassword") != device.getSmtpPassword()) device.setSmtpPassword(requestParameters.get("smtpPassword"));
+                if (requestParameters.get("smtpFrom") != device.getSmtpEmailFrom()) device.setSmtpEmailFrom(requestParameters.get("smtpFrom"));
+                if (requestParameters.get("smtpTo") != device.getSmtpEmailTo()) device.setSmtpEmailTo(requestParameters.get("smtpTo"));
+                if (requestParameters.get("smtpSubject") != device.getSmtpSubject()) device.setSmtpSubject(requestParameters.get("smtpSubject"));
+                if (requestParameters.get("smtpMessage") != device.getSmtpMessage()) device.setSmtpMessage(requestParameters.get("smtpMessage"));
+            } else if (action.equals("ALON")) {
+                device.alarmOn();
+            } else if (action.equals("ALOFF")) {
+                device.alarmOff();
+            } else if (action.equals("ALALLON")) {
+                for (AbstractDevice dev : r.getDevices()) {
+                    if (dev instanceof LightAlarmDevice) {
+                        ((LightAlarmDevice)dev).alarmOn();
+                    }
+                }
+            } else if (action.equals("ALALLOFF")) {
+                for (AbstractDevice dev : r.getDevices()) {
+                    if (dev instanceof LightAlarmDevice) {
+                        ((LightAlarmDevice)dev).alarmOff();
+                    }
+                }
             }
-        }
-        in.readLine();
-    }
-    private void sendEmail(String smtpHost, String username, String password, String subject, String message, String from, String to) throws IOException {
-            java.net.Socket s = new java.net.Socket(smtpHost, 25);
-            PrintWriter out = new PrintWriter(s.getOutputStream());
-            BufferedReader in = new BufferedReader(new java.io.InputStreamReader(s.getInputStream()));
-            sendSMTPcmd(null, out, in);
-            sendSMTPcmd("HELO " + java.net.InetAddress.getLocalHost().getHostName(), out, in);
-            if (username != null) {
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                bout.write(username.getBytes());
-                bout.write(new byte[] {(byte)0});
-                bout.write(username.getBytes());
-                bout.write(new byte[] {(byte)0});
-                bout.write(password.getBytes());
-                sendSMTPcmd("AUTH plain", out, in);
-                sendSMTPcmd(DatatypeConverter.printBase64Binary(bout.toByteArray()), out, in);
-                bout.close();
-            }
-            sendSMTPcmd("MAIL FROM: <" + from + ">", out, in);
-            sendSMTPcmd("RCPT TO: <" + to + ">", out, in);
-            sendSMTPcmd("DATA", out, in);
-            out.println("From: \""+from+"\" <"+from+">");
-            out.println("To: \""+to+"\" <"+to+">");
-            out.println("Subject:" + subject+"\n");
-            out.println(message);
-            sendSMTPcmd(".", out, in);
-            sendSMTPcmd("quit", out, in);
-            out.close();
-            in.close();
-            s.close();
-    }
+            sendAjaxAnswer("OK");
+        } catch (Exception e) {
+            sendAjaxError(e.getMessage());
+        }        
+    }    
 }

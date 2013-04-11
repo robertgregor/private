@@ -100,6 +100,8 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
         }
         configuredPeriod = Integer.parseInt(statusResponse[3]);
         currentCounter = Integer.parseInt(statusResponse[4]);
+        setTimestamp(System.currentTimeMillis());
+
     }
     /**
      * This method will switch on the device.

@@ -1,6 +1,11 @@
 package org.remoteHome;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import javax.xml.bind.DatatypeConverter;
 
 /**
   * Light/Alarm controller<BR/><BR/>
@@ -67,6 +72,41 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      */
     private int alarmLeaveTimeout;
 
+   /**
+     * Current smtp server host
+     */
+    private String smtpHost;
+
+   /**
+     * Current smtp server user
+     */
+    private String smtpUser;
+
+   /**
+     * Current smtp server password
+     */
+    private String smtpPassword;
+
+   /**
+     * Current smtp email address to
+     */
+    private String smtpEmailTo;
+
+   /**
+     * Current smtp email address to
+     */
+    private String smtpEmailFrom;
+
+    /**
+     * Current smtp email subject
+     */
+    private String smtpSubject;
+
+   /**
+     * Current smtp email message
+     */
+    private String smtpMessage;
+
     /**
      * The constructor is protected. The object should be constructed using
      * TemperatureSensorDevice device = 
@@ -91,6 +131,18 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
         if (items[0].equals("ALARM")) {
             if (alarmListener != null) {
                 alarmListener.alarmFired();
+            }
+            if (getSmtpHost() != null) {
+                //OK, send e-mail
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            sendEmail();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
             }
         }
     }
@@ -125,7 +177,8 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                 setOnWhenMovementDetected(false);
             }
             setConfiguredPeriod(Integer.parseInt(statusResponse[5]));
-            setCurrentCounter(Integer.parseInt(statusResponse[6]));            
+            setCurrentCounter(Integer.parseInt(statusResponse[6]));
+            setTimestamp(System.currentTimeMillis());
         }
         statusResponse = m.sendCommandWithAnswer(getDeviceId(), "sa").split("\\|");
         if (!statusResponse[0].equals("1")) {
@@ -139,7 +192,9 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                 setAlarmSensorCurrentState(false);
             }            
             setAlarmEnterTimeout(Integer.parseInt(statusResponse[4]));
-            setAlarmLeaveTimeout(Integer.parseInt(statusResponse[5]));            
+            setAlarmLeaveTimeout(Integer.parseInt(statusResponse[5]));
+            setTimestamp(System.currentTimeMillis());
+
         }
     }
     /**
@@ -196,6 +251,22 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
         setAlarmEnterTimeout(period);
     }
     
+   /**
+     * This method will configure the behavior of the switch, when movement is detected.
+     * @param onWhenMovementDetected true to switch on, and then off after configured period, false don't do anything.
+     * 
+     * @throws RemoteHomeConnectionException if there is problem with connection
+     * @throws RemoteHomeManagerException if there is problem with the parameter value
+     */
+    public void configureSwitchOnWhenMovement(boolean onWhenMovementDetected) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        if (onWhenMovementDetected) {
+            m.sendCommand(getDeviceId(), "l1cd");
+        } else {
+            m.sendCommand(getDeviceId(), "l1cc");            
+        }
+        setOnWhenMovementDetected(onWhenMovementDetected);
+    }
+
     /**
      * Indicates, if the swith is configured to switch on, when movement detected.
      * True means switch ON, when movement detected and stay defined configured period ON, then switch off, false means to stay OFF.
@@ -242,7 +313,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      * Enter timeout value
      * @param alarmEnterTimeout the alarmEnterTimeout to set
      */
-    protected void setAlarmEnterTimeout(int alarmEnterTimeout) {
+    public void setAlarmEnterTimeout(int alarmEnterTimeout) {
         this.alarmEnterTimeout = alarmEnterTimeout;
     }
 
@@ -258,7 +329,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      * Leave timeout value
      * @param alarmLeaveTimeout the alarmLeaveTimeout to set
      */
-    protected void setAlarmLeaveTimeout(int alarmLeaveTimeout) {
+    public void setAlarmLeaveTimeout(int alarmLeaveTimeout) {
         this.alarmLeaveTimeout = alarmLeaveTimeout;
     }
 
@@ -293,4 +364,166 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
     protected void setAlarmSensorCurrentState(boolean alarmSensorCurrentState) {
         this.alarmSensorCurrentState = alarmSensorCurrentState;
     }
+
+    /**
+     * Current smtp server host
+     * @return the smtpHost
+     */
+    public String getSmtpHost() {
+        return smtpHost;
+    }
+
+    /**
+     * Current smtp server host
+     * @param smtpHost the smtpHost to set
+     */
+    public void setSmtpHost(String smtpHost) {
+        this.smtpHost = smtpHost;
+    }
+
+    /**
+     * Current smtp server user
+     * @return the smtpUser
+     */
+    public String getSmtpUser() {
+        return smtpUser;
+    }
+
+    /**
+     * Current smtp server user
+     * @param smtpUser the smtpUser to set
+     */
+    public void setSmtpUser(String smtpUser) {
+        this.smtpUser = smtpUser;
+    }
+
+    /**
+     * Current smtp server password
+     * @return the smtpPassword
+     */
+    public String getSmtpPassword() {
+        return smtpPassword;
+    }
+
+    /**
+     * Current smtp server password
+     * @param smtpPassword the smtpPassword to set
+     */
+    public void setSmtpPassword(String smtpPassword) {
+        this.smtpPassword = smtpPassword;
+    }
+
+    /**
+     * Current smtp email address to
+     * @return the smtpEmailTo
+     */
+    public String getSmtpEmailTo() {
+        return smtpEmailTo;
+    }
+
+    /**
+     * Current smtp email address to
+     * @param smtpEmailTo the smtpEmailTo to set
+     */
+    public void setSmtpEmailTo(String smtpEmailTo) {
+        this.smtpEmailTo = smtpEmailTo;
+    }
+
+    /**
+     * Current smtp email address to
+     * @return the smtpEmailFrom
+     */
+    public String getSmtpEmailFrom() {
+        return smtpEmailFrom;
+    }
+
+    /**
+     * Current smtp email address to
+     * @param smtpEmailFrom the smtpEmailFrom to set
+     */
+    public void setSmtpEmailFrom(String smtpEmailFrom) {
+        this.smtpEmailFrom = smtpEmailFrom;
+    }
+
+    /**
+     * Current smtp email subject
+     * @return the smtpSubject
+     */
+    public String getSmtpSubject() {
+        return smtpSubject;
+    }
+
+    /**
+     * Current smtp email subject
+     * @param smtpSubject the smtpSubject to set
+     */
+    public void setSmtpSubject(String smtpSubject) {
+        this.smtpSubject = smtpSubject;
+    }
+
+    /**
+     * Current smtp email message
+     * @return the smtpMessage
+     */
+    public String getSmtpMessage() {
+        return smtpMessage;
+    }
+
+    /**
+     * Current smtp email message
+     * @param smtpMessage the smtpMessage to set
+     */
+    public void setSmtpMessage(String smtpMessage) {
+        this.smtpMessage = smtpMessage;
+    }
+    
+        private void sendSMTPcmd(String s, PrintWriter out, BufferedReader in) throws IOException {
+        // Send the SMTP command
+        if (s != null) {
+            out.println(s);
+            out.flush();
+        }
+        // Wait for the response
+        int counter = 0;
+        while(!in.ready()) {
+            try {
+                Thread.sleep(10);
+                if (++counter > 500) throw new IOException("Cannot read from the socket. No answer...");
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
+        in.readLine();
+    }
+    private void sendEmail() throws IOException {
+            java.net.Socket s = new java.net.Socket(getSmtpHost(), 25);
+            PrintWriter out = new PrintWriter(s.getOutputStream());
+            BufferedReader in = new BufferedReader(new java.io.InputStreamReader(s.getInputStream()));
+            sendSMTPcmd(null, out, in);
+            sendSMTPcmd("HELO " + java.net.InetAddress.getLocalHost().getHostName(), out, in);
+            if (getSmtpUser() != null) {
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                bout.write(getSmtpUser().getBytes());
+                bout.write(new byte[] {(byte)0});
+                bout.write(getSmtpUser().getBytes());
+                bout.write(new byte[] {(byte)0});
+                bout.write(getSmtpPassword().getBytes());
+                sendSMTPcmd("AUTH plain", out, in);
+                sendSMTPcmd(DatatypeConverter.printBase64Binary(bout.toByteArray()), out, in);
+                bout.close();
+            }
+            sendSMTPcmd("MAIL FROM: <" + getSmtpEmailFrom() + ">", out, in);
+            sendSMTPcmd("RCPT TO: <" + getSmtpEmailTo() + ">", out, in);
+            sendSMTPcmd("DATA", out, in);
+            out.println("From: \""+getSmtpEmailFrom()+"\" <"+getSmtpEmailFrom()+">");
+            out.println("To: \""+getSmtpEmailTo()+"\" <"+getSmtpEmailTo()+">");
+            out.println("Subject:" + getSmtpSubject()+"\n");
+            out.println(getSmtpMessage());
+            sendSMTPcmd(".", out, in);
+            sendSMTPcmd("quit", out, in);
+            out.close();
+            in.close();
+            s.close();
+    }
+
 }

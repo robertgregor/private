@@ -76,6 +76,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
             this.setTemperature(Float.parseFloat(items[1].substring(1)));
             this.setBattery(Float.parseFloat(items[2]));
             this.setFrequency(Integer.parseInt(items[3]));
+            setTimestamp(System.currentTimeMillis());
         }
         //here manage the temperature
             if (isManageFrequencyAuto() && (getExpectedFrequency() != getFrequency())) {
@@ -129,8 +130,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
     }
 
     /**
-     * After the device Id assignment, the frequency is still 0 second, it means no sleep at all. Set 10 seconds sleep in order not to empty battery.
-     * @param frequency in seconds the frequency to set 
+     * After the device Id assignment, the frequency is still 0 second, it means no sleep at all. Set 10 seconds sleep in order not to empty battery. 
      */
     public void setInitialFrequency() throws RemoteHomeConnectionException {
         this.frequency = 10;

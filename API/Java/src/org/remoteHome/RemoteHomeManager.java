@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -141,6 +142,15 @@ public class RemoteHomeManager {
         }
     }
     
+    /**
+     * 
+     * @return the devices
+     */
+    
+    public Collection<AbstractDevice> getDevices() {
+        return devices.values();
+    }
+
     protected void manageAsynchronousCommand(String data) {
            String tokens[] = data.split(" ");
            //device Id, skip + sign

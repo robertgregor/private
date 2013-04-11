@@ -34,6 +34,7 @@ public class WebServerHandler implements HttpHandler {
             //Thread.sleep(100);
             out = t.getResponseBody();
             String getRequest = t.getRequestURI().toString();
+            System.out.println(getRequest);
             if ((getRequest.indexOf('?') == -1) || (getRequest.indexOf('?') > 6)) {
                 //it is the request to the resource
                 if (getRequest.indexOf('?') != -1) getRequest = getRequest.substring(0, getRequest.indexOf('?'));
