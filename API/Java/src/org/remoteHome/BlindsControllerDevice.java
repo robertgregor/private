@@ -97,6 +97,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
             if (blindsControllerListener != null) {
                 blindsControllerListener.blindsPositioned();
             }
+            setTimestamp(System.currentTimeMillis());
         }
     }    
    /**
@@ -128,6 +129,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
         }
         fullRangeTimeout = Integer.parseInt(statusResponse[3]);
         currentOpening = Integer.parseInt(statusResponse[4]);
+        setTimestamp(System.currentTimeMillis());
     }
     
     /**

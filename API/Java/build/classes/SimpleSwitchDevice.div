@@ -27,6 +27,7 @@ function updateStatusCOMPONENTID() {
           document.getElementById("configuredPeriodCOMPONENTID").innerHTML=data.configuredPeriod;
           document.getElementById("offPeriodFormCOMPONENTID").value = data.configuredPeriod;
           document.getElementById("currentPeriodCOMPONENTID").innerHTML=data.currentCounter;
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
       },
       error:function(){
           alert('Error when tried to get the status of the device.');
@@ -192,6 +193,11 @@ $(function() {
                 <tr>
                 <td>Current period</td>
                 <td><span id='currentPeriodCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Last update timestamp</td>
+                <td><span id='timestampCOMPONENTID'></span></td>
                 <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>

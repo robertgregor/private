@@ -127,25 +127,56 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
             this.setFrequency(Integer.parseInt(items[3])*10); //Frequency in seconds * 10
             this.setDeviceExpectedTemperature(Integer.parseInt(items[4]));
             this.setOpenAngle(Integer.parseInt(items[5]));
+            setTimestamp(System.currentTimeMillis());            
         } else if (items[0].equals("l")) {
             this.setOpenAngle(Integer.parseInt(items[1]));
+            setTimestamp(System.currentTimeMillis());
         }
-        //here manage the temperature
-        try {
+        //here manage the header values
             if (isManageTemperatureAuto() && (getDeviceExpectedTemperature() != getExpectedTemperature())) {
                 // OK, set expected temperature
-                m.sendCommand(getDeviceId(),"t="+ getExpectedTemperature());
-                setManageTemperatureAuto(false);
+                new Thread(new Runnable() {
+                     public void run() {
+                         try {
+                            Thread.sleep(10);
+                            m.sendCommand(getDeviceId(),"t="+ getExpectedTemperature());
+                            setManageTemperatureAuto(false);
+                         } catch (InterruptedException e) {
+                             return;
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                }).start();                            
             } else if (isManageOpenAngleAuto() && (getExpectedOpenAngle() != getOpenAngle())) {
-                m.sendCommand(getDeviceId(),"l="+getExpectedOpenAngle());
-                setManageOpenAngleAuto(false);
+                new Thread(new Runnable() {
+                     public void run() {
+                         try {
+                            Thread.sleep(30);            
+                            m.sendCommand(getDeviceId(),"l="+getExpectedOpenAngle());
+                            setManageOpenAngleAuto(false);
+                         } catch (InterruptedException e) {
+                             return;
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                }).start();                                                        
             } else if (isManageFrequencyAuto() && (getExpectedFrequency() != getFrequency())) {
-                m.sendCommand(getDeviceId(),"m="+getExpectedFrequency()/10);
-                setManageFrequencyAuto(false);
+                new Thread(new Runnable() {
+                     public void run() {
+                         try {
+                            Thread.sleep(50);                
+                            m.sendCommand(getDeviceId(),"m="+getExpectedFrequency()/10);
+                            setManageFrequencyAuto(false);
+                         } catch (InterruptedException e) {
+                             return;
+                         } catch (Exception e) {
+                             e.printStackTrace();
+                         }
+                     }
+                }).start();                                                        
             }
-        } catch (Exception e) {
-            //there is no way how to report this exception
-        }
     }
 
     /**

@@ -107,6 +107,7 @@ public class ThermostatDevice extends AbstractDevice {
                 relayOn = false;                
         }
         this.setThreshold(Integer.parseInt(statusResponse[5]));
+        setTimestamp(System.currentTimeMillis());
     }
 
     /**

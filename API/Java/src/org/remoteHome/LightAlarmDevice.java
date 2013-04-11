@@ -177,7 +177,8 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                 setOnWhenMovementDetected(false);
             }
             setConfiguredPeriod(Integer.parseInt(statusResponse[5]));
-            setCurrentCounter(Integer.parseInt(statusResponse[6]));            
+            setCurrentCounter(Integer.parseInt(statusResponse[6]));
+            setTimestamp(System.currentTimeMillis());
         }
         statusResponse = m.sendCommandWithAnswer(getDeviceId(), "sa").split("\\|");
         if (!statusResponse[0].equals("1")) {
@@ -191,7 +192,9 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                 setAlarmSensorCurrentState(false);
             }            
             setAlarmEnterTimeout(Integer.parseInt(statusResponse[4]));
-            setAlarmLeaveTimeout(Integer.parseInt(statusResponse[5]));            
+            setAlarmLeaveTimeout(Integer.parseInt(statusResponse[5]));
+            setTimestamp(System.currentTimeMillis());
+
         }
     }
     /**

@@ -39,6 +39,7 @@ function updateStatusCOMPONENTID() {
                 document.getElementById("onWhenMovementCOMPONENTID").innerHTML='NO';
           }
           $("#checkboxOnWhenMovementCOMPONENTID").trigger("change");
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
           document.getElementById("smtpHostFormCOMPONENTID").value = data.smtpHost;
           document.getElementById("smtpUserFormCOMPONENTID").value = data.smtpUser;
           document.getElementById("smtpPasswordFormCOMPONENTID").value = data.smtpPassword;
@@ -411,6 +412,11 @@ $(function() {
                 <td colspan="2">&nbsp;</td>
                 <td>SMTP message:</td>
                 <td><input type="text" id="smtpMessageFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>Last update timestamp</td>
+                <td><span id='timestampCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
                 <td colspan ="2"><input type="submit" id="RefreshStatusAlCOMPONENTID" value="Refresh" /></td>

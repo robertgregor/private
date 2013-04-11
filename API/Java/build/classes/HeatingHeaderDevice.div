@@ -21,6 +21,7 @@ function updateStatusCOMPONENTID() {
           document.getElementById("openAngleCOMPONENTID").innerHTML=(data.expectedOpenAngle);
           document.getElementById("currOpenAngleFormCOMPONENTID").value=(data.expectedOpenAngle);
           document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery;
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
       },
       error:function(){
           alert('Error when tried to get the status of the device.');
@@ -143,6 +144,11 @@ $(document).ready(function() {
                 <tr>
                 <td>Battery voltage</td>
                 <td><span id='battVoltageCOMPONENTID'></span>&nbsp;V</td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Last update timestamp</td>
+                <td><span id='timestampCOMPONENTID'></span></td>
                 <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>

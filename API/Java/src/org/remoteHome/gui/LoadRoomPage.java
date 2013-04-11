@@ -17,6 +17,7 @@ import org.remoteHome.HeatingHeaderDevice;
 import org.remoteHome.LightAlarmDevice;
 import org.remoteHome.SimpleSwitchDevice;
 import org.remoteHome.TemperatureSensorDevice;
+import org.remoteHome.ThermostatDevice;
 
 /**
  *
@@ -47,6 +48,8 @@ public class LoadRoomPage extends AbstractWebService {
                 accordionBody.append(getDiv("BlindsControllerDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof HeatingHeaderDevice) {
                 accordionBody.append(getDiv("HeatingHeaderDevice.div",Integer.toString(device.getDeviceId())));
+            } else if (device instanceof ThermostatDevice) {
+                accordionBody.append(getDiv("ThermostatDevice.div",Integer.toString(device.getDeviceId())));
             }
         }
         if (accordionBody.toString().length()==0) {
