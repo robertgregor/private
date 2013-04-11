@@ -66,7 +66,7 @@ Fifo_status con $17 'FIFO status register register address
 
 goto endRFM70
 initModule:
-pause 50
+pause 500
 '----------SPI settings---------------------------------------------------------
 SSPEN = 1 'enable SPI pins
 SSPCON.0=1 'SPI rate=OSC/16
@@ -176,9 +176,8 @@ gosub spi_write
 return
 
 sendData:
+pause 30
 GOSUB debounce
-pause 2
-gosub debounce
 data_out[0]=Flush_tx 'flush TX_fifo buffer
 num_byte=0
 gosub spi_write
@@ -200,7 +199,7 @@ pauseus 500 'pause 500 us
 Ce=1 'CE=1 (toggle) transmit FIFO buffer
 Pauseus 500 'pause 500 us
 Ce=0
-Pause 10
+Pause 1
 trans_irq:
 If Irq !=0 then trans_irq 'wait until IRQ, active low
 data_out[0]=Stat_us 'read status register
@@ -213,10 +212,7 @@ data_out[0]=Write_reg+Stat_us
 data_out[1]=%00100000 'clear TX_DS IRQ bit
 num_byte=1
 gosub spi_write
-pause 2
 gosub debounce
-pause 2
-GOSUB debounce
 return
 
 '============Subroutines========================================================
@@ -273,17 +269,11 @@ gosub spi_write
 return
 
 setup_rx:
-pause 2
-gosub debounce
-pause 2
 GOSUB debounce
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
 data_out[1]=$0F
 num_byte=1
 gosub spi_write
-pause 2
-gosub debounce
-pause 2
 GOSUB debounce
 return
 
@@ -304,7 +294,7 @@ READ 5, data_out[5]
 num_byte=5
 gosub spi_write
 data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
-data_out[1]= 10 '3x re-transmit (default)
+data_out[1]= %00110101 '3x re-transmit (default)
 num_byte=1
 Gosub spi_write
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled

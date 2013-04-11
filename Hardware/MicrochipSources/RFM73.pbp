@@ -66,7 +66,7 @@ Fifo_status con $17 'FIFO status register register address
 
 goto endRFM70
 initModule:
-pause 50
+pause 500
 '----------SPI settings---------------------------------------------------------
 SSPEN = 1 'enable SPI pins
 SSPCON.0=1 'SPI rate=OSC/16
@@ -123,25 +123,25 @@ temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm
 gosub conf4bytes
 temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 gosub conf4bytes
-temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
+temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
 gosub conf4bytes
-temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 gosub conf4bytes
-temp_byte_rfm = 12 : temp1_byte_rfm = $05 : temp2_byte_rfm = $73 : temp3_byte_rfm = $12 : temp4_byte_rfm = $00
+temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 gosub conf4bytes
-temp_byte_rfm = 13 : temp1_byte_rfm = $00 : temp2_byte_rfm = $80 : temp3_byte_rfm = $B4 : temp4_byte_rfm = $36
+temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
 gosub conf4bytes
 data_out[0]=Write_reg+$0E
 data_out[1]=$41
-data_out[2]=$10
-data_out[3]=$04
-data_out[4]=$82
-data_out[5]=$20
-data_out[6]=$08
-data_out[7]=$08
-data_out[8]=$F2
-data_out[9]=$7D
-data_out[10]=$EF
+data_out[2]=$20
+data_out[3]=$08
+data_out[4]=$04
+data_out[5]=$81
+data_out[6]=$20
+data_out[7]=$CF
+data_out[8]=$F7
+data_out[9]=$FE
+data_out[10]=$FF
 data_out[11]=$FF
 num_byte=11
 gosub spi_write
@@ -173,9 +173,8 @@ gosub spi_write
 return
 
 sendData:
+pause 30
 GOSUB debounce
-pause 2
-gosub debounce
 data_out[0]=Flush_tx 'flush TX_fifo buffer
 num_byte=0
 gosub spi_write
@@ -197,7 +196,7 @@ pauseus 500 'pause 500 us
 Ce=1 'CE=1 (toggle) transmit FIFO buffer
 Pauseus 500 'pause 500 us
 Ce=0
-Pause 10
+Pause 1
 trans_irq:
 If Irq !=0 then trans_irq 'wait until IRQ, active low
 data_out[0]=Stat_us 'read status register
@@ -210,10 +209,7 @@ data_out[0]=Write_reg+Stat_us
 data_out[1]=%00100000 'clear TX_DS IRQ bit
 num_byte=1
 gosub spi_write
-pause 2
 gosub debounce
-pause 2
-GOSUB debounce
 return
 
 '============Subroutines========================================================
@@ -270,18 +266,12 @@ gosub spi_write
 return
 
 setup_rx:
-pause 2
 gosub debounce
-pause 2
-GOSUB debounce
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
 data_out[1]=$0F
 num_byte=1
 gosub spi_write
-pause 2
-gosub debounce
-pause 2
-GOSUB debounce
+'gosub debounce
 return
 
 setup_sleep:
@@ -301,7 +291,7 @@ READ 5, data_out[5]
 num_byte=5
 gosub spi_write
 data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
-data_out[1]= %00001111 '15x re-transmit (default)
+data_out[1]= %00110101 '15x re-transmit (default)
 num_byte=1
 Gosub spi_write
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled

@@ -423,74 +423,74 @@ _Fifo_status     		EQU	00017h
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00125	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
 	MOVE?CB	004h, _temp_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
 	MOVE?CB	0D9h, _temp1_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
-	MOVE?CB	09Eh, _temp2_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+	MOVE?CB	096h, _temp2_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
-	MOVE?CB	086h, _temp3_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+	MOVE?CB	082h, _temp3_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
-	MOVE?CB	00Bh, _temp4_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00126	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+	MOVE?CB	01Bh, _temp4_byte_rfm
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00127	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 	MOVE?CB	005h, _temp_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 	MOVE?CB	024h, _temp1_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
-	MOVE?CB	006h, _temp2_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+	MOVE?CB	002h, _temp2_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 	MOVE?CB	07Fh, _temp3_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00128	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 	MOVE?CB	0A6h, _temp4_byte_rfm
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00129	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $05 : temp2_byte_rfm = $73 : temp3_byte_rfm = $12 : temp4_byte_rfm = $00
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 	MOVE?CB	00Ch, _temp_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $05 : temp2_byte_rfm = $73 : temp3_byte_rfm = $12 : temp4_byte_rfm = $00
-	MOVE?CB	005h, _temp1_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+	MOVE?CB	000h, _temp1_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $05 : temp2_byte_rfm = $73 : temp3_byte_rfm = $12 : temp4_byte_rfm = $00
-	MOVE?CB	073h, _temp2_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+	MOVE?CB	012h, _temp2_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $05 : temp2_byte_rfm = $73 : temp3_byte_rfm = $12 : temp4_byte_rfm = $00
-	MOVE?CB	012h, _temp3_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+	MOVE?CB	073h, _temp3_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $05 : temp2_byte_rfm = $73 : temp3_byte_rfm = $12 : temp4_byte_rfm = $00
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00130	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 	MOVE?CB	000h, _temp4_byte_rfm
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00131	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $00 : temp2_byte_rfm = $80 : temp3_byte_rfm = $B4 : temp4_byte_rfm = $36
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
 	MOVE?CB	00Dh, _temp_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $00 : temp2_byte_rfm = $80 : temp3_byte_rfm = $B4 : temp4_byte_rfm = $36
-	MOVE?CB	000h, _temp1_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+	MOVE?CB	046h, _temp1_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $00 : temp2_byte_rfm = $80 : temp3_byte_rfm = $B4 : temp4_byte_rfm = $36
-	MOVE?CB	080h, _temp2_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+	MOVE?CB	0B4h, _temp2_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $00 : temp2_byte_rfm = $80 : temp3_byte_rfm = $B4 : temp4_byte_rfm = $36
-	MOVE?CB	0B4h, _temp3_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+	MOVE?CB	080h, _temp3_byte_rfm
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $00 : temp2_byte_rfm = $80 : temp3_byte_rfm = $B4 : temp4_byte_rfm = $36
-	MOVE?CB	036h, _temp4_byte_rfm
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00132	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+	MOVE?CB	000h, _temp4_byte_rfm
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00133	gosub conf4bytes
 	GOSUB?L	_conf4bytes
@@ -501,32 +501,32 @@ _Fifo_status     		EQU	00017h
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00135	data_out[1]=$41
 	MOVE?CB	041h, _data_out + 00001h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00136	data_out[2]=$10
-	MOVE?CB	010h, _data_out + 00002h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00136	data_out[2]=$20
+	MOVE?CB	020h, _data_out + 00002h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00137	data_out[3]=$04
-	MOVE?CB	004h, _data_out + 00003h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00137	data_out[3]=$08
+	MOVE?CB	008h, _data_out + 00003h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00138	data_out[4]=$82
-	MOVE?CB	082h, _data_out + 00004h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00138	data_out[4]=$04
+	MOVE?CB	004h, _data_out + 00004h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00139	data_out[5]=$20
-	MOVE?CB	020h, _data_out + 00005h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00139	data_out[5]=$81
+	MOVE?CB	081h, _data_out + 00005h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00140	data_out[6]=$08
-	MOVE?CB	008h, _data_out + 00006h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00140	data_out[6]=$20
+	MOVE?CB	020h, _data_out + 00006h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00141	data_out[7]=$08
-	MOVE?CB	008h, _data_out + 00007h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00141	data_out[7]=$CF
+	MOVE?CB	0CFh, _data_out + 00007h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00142	data_out[8]=$F2
-	MOVE?CB	0F2h, _data_out + 00008h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00142	data_out[8]=$F7
+	MOVE?CB	0F7h, _data_out + 00008h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00143	data_out[9]=$7D
-	MOVE?CB	07Dh, _data_out + 00009h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00143	data_out[9]=$FE
+	MOVE?CB	0FEh, _data_out + 00009h
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00144	data_out[10]=$EF
-	MOVE?CB	0EFh, _data_out + 0000Ah
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00144	data_out[10]=$FF
+	MOVE?CB	0FFh, _data_out + 0000Ah
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00145	data_out[11]=$FF
 	MOVE?CB	0FFh, _data_out + 0000Bh
@@ -742,12 +742,6 @@ _Fifo_status     		EQU	00017h
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00214	gosub debounce
 	GOSUB?L	_debounce
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00215	pause 2
-	PAUSE?C	002h
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00216	GOSUB debounce
-	GOSUB?L	_debounce
-
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00217	return
 	RETURN?	
 
@@ -908,18 +902,6 @@ _Fifo_status     		EQU	00017h
 
 	LABEL?L	_setup_rx	
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00273	pause 2
-	PAUSE?C	002h
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00274	gosub debounce
-	GOSUB?L	_debounce
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00275	pause 2
-	PAUSE?C	002h
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00276	GOSUB debounce
-	GOSUB?L	_debounce
-
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00277	data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
 	MOVE?CB	020h, _data_out
 
@@ -931,18 +913,6 @@ _Fifo_status     		EQU	00017h
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00280	gosub spi_write
 	GOSUB?L	_spi_write
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00281	pause 2
-	PAUSE?C	002h
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00282	gosub debounce
-	GOSUB?L	_debounce
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00283	pause 2
-	PAUSE?C	002h
-
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00284	GOSUB debounce
-	GOSUB?L	_debounce
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00285	return
 	RETURN?	
@@ -1002,8 +972,8 @@ _Fifo_status     		EQU	00017h
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00303	data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
 	MOVE?CB	024h, _data_out
 
-; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00304	data_out[1]= %00001111 '15x re-transmit (default)
-	MOVE?CB	00Fh, _data_out + 00001h
+; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00304	data_out[1]= %00110101 '15x re-transmit (default)
+	MOVE?CB	035h, _data_out + 00001h
 
 ; C:\REMOTE~1\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00305	num_byte=1
 	MOVE?CB	001h, _num_byte
