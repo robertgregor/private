@@ -19,7 +19,7 @@
 
 EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
 
- INCLUDE "RFM73.pbp"
+ INCLUDE "RFM70.pbp"
 
  DEFINE OSC 8
 
