@@ -1,6 +1,7 @@
 package org.remoteHome;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
  /**
   * Simple switch<BR/>
@@ -94,9 +95,9 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
             currentState = false;
         }
         if (statusResponse[2].equals("1")) {
-            onWhenAppliedPower = true;
-        } else {
             onWhenAppliedPower = false;
+        } else {
+            onWhenAppliedPower = true;
         }
         configuredPeriod = Integer.parseInt(statusResponse[3]);
         currentCounter = Integer.parseInt(statusResponse[4]);

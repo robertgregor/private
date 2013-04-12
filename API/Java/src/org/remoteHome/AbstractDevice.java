@@ -123,6 +123,12 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     */
     protected abstract void manageAsynchronousCommand(String[] items);
     
+  /**
+    * 
+    * This method will update the device 
+    */
+    public abstract void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException;
+    
     @Override
     public int hashCode() {
         return getDeviceId()%10;

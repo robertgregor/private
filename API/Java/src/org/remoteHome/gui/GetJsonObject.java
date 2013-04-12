@@ -8,6 +8,9 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.remoteHome.AbstractDevice;
+import org.remoteHome.BatteryThermostatDevice;
+import org.remoteHome.HeatingHeaderDevice;
+import org.remoteHome.TemperatureSensorDevice;
 
 /**
  *
@@ -22,9 +25,14 @@ public class GetJsonObject extends AbstractWebService {
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append(AbstractDevice.generateJsonData(r.getDevice(Integer.parseInt(requestParameters.get("deviceId")))));
+            AbstractDevice device = r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
+            if (!((device instanceof HeatingHeaderDevice) || (device instanceof TemperatureSensorDevice) || (device instanceof BatteryThermostatDevice))) {
+                device.updateDevice();
+            }
+            sb.append(AbstractDevice.generateJsonData(device));
             sendAjaxAnswer(sb.toString());
         } catch (Exception e) {
+            e.printStackTrace();
             sendAjaxError(e.getMessage());
         }
     }   

@@ -28,6 +28,7 @@ class RemoteHomeCommunicator extends Thread  {
     private String dataReceived = "";
     private boolean cmdWithResponse = false;
     private int cmdWithResponseId = 0;
+    private final Object semaphore = new Object();
 
     protected RemoteHomeCommunicator(String host, String port, RemoteHomeManager manager) throws RemoteHomeConnectionException {
         this.host = host;
@@ -99,7 +100,7 @@ class RemoteHomeCommunicator extends Thread  {
         cmdWithResponseId = deviceId;
         try {
             sendCommand(deviceId, command);
-            return dataReceived;
+            return dataReceived.split(" ")[1];
         } finally {
             cmdWithResponse = false;
             cmdWithResponseId = 0;
@@ -115,7 +116,9 @@ class RemoteHomeCommunicator extends Thread  {
             dataOutputStream.write(cmd.getBytes());
             dataOutputStream.flush();
                 try {
-                    wait(2000);
+                    synchronized(semaphore) {
+                        semaphore.wait(2000);
+                    }
                 } catch (InterruptedException e) {
                     return;
                 }            
@@ -151,7 +154,9 @@ class RemoteHomeCommunicator extends Thread  {
             dataOutputStream.write(cmd.getBytes());
             dataOutputStream.flush();
                 try {
-                    wait(3000);
+                    synchronized(semaphore) {
+                        semaphore.wait(3000);
+                    }
                 } catch (InterruptedException e) {
                     return;
                 }            
@@ -180,8 +185,8 @@ class RemoteHomeCommunicator extends Thread  {
                     System.out.println("R:"+dataReceived);
                     if ((dataReceived.indexOf("OK") > -1) || (dataReceived.indexOf("ERROR") > -1)) {
                         //response to regular command
-                        synchronized(this) {
-                            notify();
+                        synchronized(semaphore) {
+                            semaphore.notify();
                         }
                     } else {
                         //asynchronous command? yes or not? get id first
@@ -194,8 +199,8 @@ class RemoteHomeCommunicator extends Thread  {
                         } else {
                             if (devId == cmdWithResponseId) {
                                 //OK, it is response for the "command with response"
-                                synchronized(this) {
-                                    notify();
+                                synchronized(semaphore) {
+                                    semaphore.notify();
                                 }
                             } else {
                                 //Asynchronous command

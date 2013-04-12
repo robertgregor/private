@@ -167,9 +167,9 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                 setCurrentState(false);
             }
             if (statusResponse[3].equals("1")) {
-                setOnWhenAppliedPower(true);
-            } else {
                 setOnWhenAppliedPower(false);
+            } else {
+                setOnWhenAppliedPower(true);
             }
             if (statusResponse[4].equals("1")) {
                 setOnWhenMovementDetected(true);

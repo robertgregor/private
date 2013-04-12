@@ -27,6 +27,11 @@ public class RemoteHomeManagerException extends Exception {
      */
     public static final int SERIALIZATION_ERROR = 4;  
 
+   /**
+     * Not supported error
+     */
+    public static final int NOT_SUPPORTED = 5;  
+
     private int type;
 
    /**
@@ -58,6 +63,10 @@ public class RemoteHomeManagerException extends Exception {
                     return "Invalid parameter value: "+super.getMessage();
             case WRONG_DEVICE_TYPE:
                     return "Invalid device type: "+super.getMessage();
+            case SERIALIZATION_ERROR:
+                    return "Error in serialization procedure: "+super.getMessage();
+            case NOT_SUPPORTED:
+                    return "This feature is not supported for this device type.";
             default:
                 return super.getMessage();
         }        

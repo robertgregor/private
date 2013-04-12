@@ -394,4 +394,12 @@ public class BatteryThermostatDevice extends AbstractDevice {
     protected void setManageThresholdAuto(boolean manageThresholdAuto) {
         this.manageThresholdAuto = manageThresholdAuto;
     }
+    
+    /*
+     * This method is not supported for this device and will throw always RemoteHomeManagerException - NOT_SUPPORTED.
+     * The status of the device is received asynchronously from the device.
+     */
+    public void updateDevice() throws RemoteHomeManagerException {
+        throw new RemoteHomeManagerException(RemoteHomeManagerException.NOT_SUPPORTED);
+    }
 }

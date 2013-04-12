@@ -106,14 +106,13 @@ $(function() {
               alert('Switch off period should be number between 0 and 255!');
               return;
           }
-          var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").value;
+          var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").checked?"TRUE":"FALSE";
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
               data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
-                updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
                 alert(thrownError);

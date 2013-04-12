@@ -32,6 +32,7 @@ public class SimpleSwitchDeviceManager extends AbstractWebService {
                 if (time != 0) device.configurePeriod(time);
                 device.switchOnForConfiguredPeriod();                
             } else if (action.equals("CONFIGURE")) {
+                device.updateDevice();
                 String nm = requestParameters.get("nm");
                 int tm = Integer.parseInt(requestParameters.get("tm"));
                 Boolean onWhenPower = new Boolean(requestParameters.get("pw"));
