@@ -15391,13 +15391,13 @@ nominal inductance, magnetically screened</description>
 <part name="R3" library="resistor" deviceset="R-EU_" device="M2012" value="3.9 k"/>
 <part name="R4" library="resistor" deviceset="R-EU_" device="M2012" value="2,05 k"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
-<part name="C3" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="10uF / 16 V"/>
-<part name="L1" library="inductor-neosid" deviceset="BS" device="11" value="680uH"/>
+<part name="C3" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="22uF / 16 V"/>
+<part name="L1" library="inductor-neosid" deviceset="BS" device="11" value="1mH"/>
 <part name="C4" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="100uF / 6,3 V"/>
 <part name="C5" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="T1" library="transistor" deviceset="BC846" device=""/>
-<part name="D3" library="diode" deviceset="DIODE-" device="DO214AA"/>
-<part name="D4" library="diode" deviceset="DIODE-" device="DO214AA"/>
+<part name="D3" library="diode" deviceset="DIODE-" device="DO214AA" value="UF4007"/>
+<part name="D4" library="diode" deviceset="DIODE-" device="DO214AA" value="1N4007GP"/>
 <part name="D1" library="diode" deviceset="MBRA340T3" device=""/>
 <part name="JP3" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="IC4" library="ds1820" deviceset="DS1820" device=""/>
