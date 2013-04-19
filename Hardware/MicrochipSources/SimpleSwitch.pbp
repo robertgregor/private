@@ -16,7 +16,7 @@
 
 EEPROM  0, [40,"R","O","B","I","K",0,1,0,0,0,0,0,0,0,0]
 
-INCLUDE "RFM70.pbp"
+INCLUDE "RFM73.pbp"
 
  DEFINE OSC 8
 
@@ -89,7 +89,7 @@ if RES == 0 then
     write 4, "I"
     write 5, "K"
     write 6, 0
-    write 7, 0
+    write 7, 1
     write 8, 0
     END
 endif
