@@ -46,7 +46,25 @@ function updateStatusCOMPONENTID() {
           document.getElementById("smtpEmailFromFormCOMPONENTID").value = data.smtpEmailFrom;
           document.getElementById("smtpEmailToFormCOMPONENTID").value = data.smtpEmailTo;
           document.getElementById("smtpSubjectFormCOMPONENTID").value = data.smtpSubject;
-          document.getElementById("smtpMessageFormCOMPONENTID").value = data.smtpMessage;          
+          document.getElementById("smtpMessageFormCOMPONENTID").value = data.smtpMessage;
+          if (data.alarmStatus == 0)
+            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Disabled';
+          else if (data.alarmStatus == 1)
+            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Enabled';
+          else if (data.alarmStatus == 2)
+            document.getElementById("statusAlCOMPONENTID").innerHTML = 'activated';
+          else if (data.alarmStatus == 3)
+            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Leave timeout running';
+          else if (data.alarmStatus == 4)
+            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Enter timeout running';
+          else
+            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Unknown';
+          if (data.alarmSensorCurrentState == 0)
+            document.getElementById("statusSenCOMPONENTID").innerHTML = 'Nothing detected';
+          else if (data.alarmSensorCurrentState == 1)
+            document.getElementById("statusSenCOMPONENTID").innerHTML = 'Movement detected';
+          else
+            document.getElementById("statusSenCOMPONENTID").innerHTML = 'Unknown';
       },
       error:function(){
           alert('Error when tried to get the status of the device.');
@@ -139,22 +157,7 @@ $(function() {
               alert('Switch off period should be number between 0 and 255!');
               return;
           }
-          var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").value;
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURESW&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
-            }   
-          });
-          updateStatusCOMPONENTID();
-    });
-    $( "#configureAlCOMPONENTID" ).button().click(function() {
+          var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").checked?"TRUE":"FALSE";
           var et = parseInt(document.getElementById("enterPeriodFormCOMPONENTID").value);
           if (et == NaN) {
               alert('Alarm enter timeout period should be number!');
@@ -173,7 +176,7 @@ $(function() {
               alert('Alarm leave timeout period should be number between 0 and 255!');
               return;
           }
-          var apw = document.getElementById("checkboxOnWhenMovementCOMPONENTID").value;
+          var apw = document.getElementById("checkboxOnWhenMovementCOMPONENTID").checked?"TRUE":"FALSE";
           var smtpHost = encodeURIComponent(document.getElementById("smtpHostFormCOMPONENTID").value);
           var smtpUser = encodeURIComponent(document.getElementById("smtpUserFormCOMPONENTID").value);
           var smtpPassword = encodeURIComponent(document.getElementById("smtpPasswordFormCOMPONENTID").value);
@@ -185,7 +188,7 @@ $(function() {
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&et="+et+"&lt="+lt+"&apw="+apw+"&smtpHost="+smtpHost+"&smtpUser="+smtpUser+"&smtpPassword="+smtpPassword+"&smtpFrom="+smtpFrom+"&smtpTo="+smtpTo+"&smtpSubject="+smtpSubject+"&smtpMessage="+smtpMessage+"&action=CONFIGUREAL&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&et="+et+"&lt="+lt+"&apw="+apw+"&smtpHost="+smtpHost+"&smtpUser="+smtpUser+"&smtpPassword="+smtpPassword+"&smtpFrom="+smtpFrom+"&smtpTo="+smtpTo+"&smtpSubject="+smtpSubject+"&smtpMessage="+smtpMessage+"&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -279,63 +282,10 @@ $(function() {
             <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID" value="Switch On with period" />
         </td>
     </tr>
-    </table>
-</td>
-<td>
-    <table class="ui-widget" style="border-collapse: collapse;" width="100%">
-              <thead class="ui-widget-header">
-                <tr>
-                <th>Property</th>
-                <th>Value</th>
-                <th>Parameter</th>
-                <th>Value</th>
-                </tr>
-                </thead>
-                <tbody class="ui-widget-content">
-                <tr>
-                <td>Name</td>
-                <td><span id='nameCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Status</td>
-                <td><span id='statusCOMPONENTID'></span></td>
-                <td>Name:</td>
-                <td><input type="text" id="nameFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Component id</td>
-                <td><span id='compIdCOMPONENTID'></span></td>
-                <td>Switch off period:</td>
-                <td><input type="text" id="offPeriodFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>On when applied power</td>
-                <td><span id='onWhenPowerCOMPONENTID'></span></td>
-                <td>On when applied power:</td>
-                <td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Switch off period</td>
-                <td><span id='configuredPeriodCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Current period</td>
-                <td><span id='currentPeriodCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
-                </tr>
-                </tbody>
-    </table>
-</td>
-</tr></table>
-<table width="100%"><tr>
-<td>
-    <table width="100%"><tr><td>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr><td>
     <input type="submit" id="activateAlarmCOMPONENTID" value="Activate alarm" />
     </td><td>
     <input type="submit" id="deactivateAlarmCOMPONENTID" value="Deactivate alarm" />
@@ -361,45 +311,67 @@ $(function() {
                 </thead>
                 <tbody class="ui-widget-content">
                 <tr>
-                <td>Enter alarm timeout</td>
-                <td><span id='enterTimeoutCOMPONENTID'></span></td>
-                <td>Enter timeout:</td>
+                <td>Name</td>
+                <td><span id='nameCOMPONENTID'></span></td>
+                <td>Name:</td>
+                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>Switch status</td>
+                <td><span id='statusCOMPONENTID'></span></td>
+                <td>Switch off period:</td>
+                <td><input type="text" id="offPeriodFormCOMPONENTID" /></td>
+                </tr>
+                <tr>
+                <td>Component id</td>
+                <td><span id='compIdCOMPONENTID'></span></td>
+                <td>On when applied power:</td>
+                <td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td>
+                </tr>
+                <tr>
+                <td>On when applied power</td>
+                <td><span id='onWhenPowerCOMPONENTID'></span></td>
+                <td>Alarm enter timeout:</td>
                 <td><input type="text" id="enterPeriodFormCOMPONENTID"/></td>
                 </tr>
                 <tr>
-                <td>Leave alarm timeout</td>
-                <td><span id='leaveTimeoutCOMPONENTID'></span></td>
-                <td>Leave timeout:</td>
+                <td>Switch off period</td>
+                <td><span id='configuredPeriodCOMPONENTID'></span></td>
+                <td>Alarm leave timeout:</td>
                 <td><input type="text" id="leavePeriodFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td>On when movement detected</td>
-                <td><span id='onWhenMovementCOMPONENTID'></span></td>
-                <td>On when movement detected:</td>
-                <td><input type="checkbox" id="checkboxOnWhenMovementCOMPONENTID" /><label for="checkboxOnWhenMovementCOMPONENTID">&nbsp;</label></td>
+                <td>Current period</td>
+                <td><span id='currentPeriodCOMPONENTID'></span></td>
+                <td>Light on when movement detected:</td>
+                <td><input type="checkbox" id="checkboxOnWhenMovementCOMPONENTID" /><label for="checkboxOnWhenMovementCOMPONENTID">&nbsp;</label></td>                
                 </tr>
                 <tr>
-                <td colspan="2">&nbsp;</td>
+                <td>Enter alarm timeout</td>
+                <td><span id='enterTimeoutCOMPONENTID'></span></td>
                 <td>SMTP server host:</td>
                 <td><input type="text" id="smtpHostFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td colspan="2">&nbsp;</td>
+                <td>Leave alarm timeout</td>
+                <td><span id='leaveTimeoutCOMPONENTID'></span></td>
                 <td>SMTP login user:</td>
                 <td><input type="text" id="smtpUserFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td colspan="2">&nbsp;</td>
+                <td>On when movement detected</td>
+                <td><span id='onWhenMovementCOMPONENTID'></span></td>
                 <td>SMTP login password:</td>
                 <td><input type="text" id="smtpPasswordFormCOMPONENTID" /></td>
                 </tr>
-                <tr>
-                <td colspan="2">&nbsp;</td>
+                <td>Realtime movement sensor state</td>
+                <td><span id='statusSenCOMPONENTID'></span></td>
                 <td>SMTP email address from:</td>
                 <td><input type="text" id="smtpEmailFromFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td colspan="2">&nbsp;</td>
+                <td>Alarm status</td>
+                <td><span id='statusAlCOMPONENTID'></span></td>
                 <td>SMTP email address to:</td>
                 <td><input type="text" id="smtpEmailToFormCOMPONENTID" /></td>
                 </tr>
@@ -419,8 +391,8 @@ $(function() {
                 <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusAlCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureAlCOMPONENTID" value="Change configuration" /></td>
+                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
+                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
                 </tr>
                 </tbody>
     </table>
