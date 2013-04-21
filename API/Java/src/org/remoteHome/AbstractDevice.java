@@ -148,7 +148,11 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
         sb.append("{\n");
         ArrayList<Field> fields = new <Field>ArrayList();
         fields.addAll(Arrays.asList(o.getClass().getDeclaredFields()));
-        fields.addAll(Arrays.asList(o.getClass().getSuperclass().getDeclaredFields()));
+        Class c = o.getClass().getSuperclass();
+        while (!c.getName().equals("java.lang.Object")) {
+            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+            c = c.getSuperclass();
+        }
         for (Field field : fields) {
           if (field == null) continue;
           if (field.getName() == null) continue;          

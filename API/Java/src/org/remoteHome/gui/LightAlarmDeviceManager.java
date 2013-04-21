@@ -32,14 +32,14 @@ public class LightAlarmDeviceManager extends AbstractWebService {
                 int time = Integer.parseInt(requestParameters.get("period"));
                 if (time != 0) device.configurePeriod(time);
                 device.switchOnForConfiguredPeriod();                
-            } else if (action.equals("CONFIGURESW")) {
+            } else if (action.equals("CONFIGURE")) {
                 String nm = requestParameters.get("nm");
                 int tm = Integer.parseInt(requestParameters.get("tm"));
                 Boolean onWhenPower = new Boolean(requestParameters.get("pw"));
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getConfiguredPeriod() != tm) device.configurePeriod(tm);
                 if (device.isOnWhenAppliedPower() != onWhenPower) device.switchOnWhenAppliedPower(onWhenPower);
-            } else if (action.equals("CONFIGUREAL")) {
+                //alarm params
                 int et = Integer.parseInt(requestParameters.get("et"));
                 int lt = Integer.parseInt(requestParameters.get("lt"));
                 Boolean onWhenAlarmDetected = new Boolean(requestParameters.get("apw"));
@@ -53,6 +53,7 @@ public class LightAlarmDeviceManager extends AbstractWebService {
                 if (requestParameters.get("smtpTo") != device.getSmtpEmailTo()) device.setSmtpEmailTo(requestParameters.get("smtpTo"));
                 if (requestParameters.get("smtpSubject") != device.getSmtpSubject()) device.setSmtpSubject(requestParameters.get("smtpSubject"));
                 if (requestParameters.get("smtpMessage") != device.getSmtpMessage()) device.setSmtpMessage(requestParameters.get("smtpMessage"));
+                r.savePersistentData();
             } else if (action.equals("ALON")) {
                 device.alarmOn();
             } else if (action.equals("ALOFF")) {
