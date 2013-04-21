@@ -224,23 +224,6 @@ CMPEQ?BCB macro Bin, Cin, Bout
     endif
     endm
 
-CMPEQ?TCB macro Regin, Bitin, Cin, Bout
-    if (((Cin) == 0) | ((Cin) == 1))
-	clrw
-	CHK?RP	Regin
-      if ((Cin) == 0)
-	btfss Regin, Bitin
-      else
-	btfsc Regin, Bitin
-      endif
-        movlw   -1
-        MOVE?AB Bout
-    else
-        CHK?RP  Bout
-        clrf    Bout
-    endif
-    endm
-
 CMPEQ?BCL macro Bin, Cin, Label
     if (((Cin) > -100h) & ((Cin) < 100h))
         CLRWDT?

@@ -8,20 +8,20 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="1" fill="1" visible="no" active="no"/>
-<layer number="16" name="Bottom" color="12" fill="1" visible="no" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
-<layer number="21" name="tPlace" color="15" fill="1" visible="no" active="no"/>
-<layer number="22" name="bPlace" color="11" fill="1" visible="no" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="1" name="Top" color="1" fill="1" visible="yes" active="no"/>
+<layer number="16" name="Bottom" color="12" fill="1" visible="yes" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
+<layer number="21" name="tPlace" color="15" fill="1" visible="yes" active="no"/>
+<layer number="22" name="bPlace" color="11" fill="1" visible="yes" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -30,8 +30,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -39,13 +39,13 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
@@ -15218,8 +15218,8 @@ nominal inductance, magnetically screened</description>
 <part name="C4" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="100uF / 6,3 V"/>
 <part name="C5" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="T1" library="transistor" deviceset="BC846" device=""/>
-<part name="D3" library="diode" deviceset="DIODE-" device="DO214AA"/>
-<part name="D4" library="diode" deviceset="DIODE-" device="DO214AA"/>
+<part name="D3" library="diode" deviceset="DIODE-" device="DO214AC" value="ES1D"/>
+<part name="D4" library="diode" deviceset="DIODE-" device="DO214AA" value="1N4007GP"/>
 <part name="D1" library="diode" deviceset="MBRA340T3" device=""/>
 <part name="C6" library="resistor" deviceset="CPOL-EU" device="SMCA" value="1uF"/>
 <part name="S1" library="switch-tact" deviceset="DTS-3" device=""/>
@@ -15235,7 +15235,6 @@ nominal inductance, magnetically screened</description>
 <part name="X1" library="con-ptr500" deviceset="AK500/4" device=""/>
 <part name="U$3" library="rfm70" deviceset="PROGRAMMINGHEADER" device="" technology="DIP"/>
 <part name="IC3" library="linear" deviceset="MC33269ST*" device="" technology="-3.3T3"/>
-<part name="R7" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
 <part name="L2" library="inductor-neosid" deviceset="BS" device="11" value="680uH"/>
 </parts>
 <sheets>
@@ -15282,7 +15281,6 @@ nominal inductance, magnetically screened</description>
 <instance part="X1" gate="-4" x="-38.1" y="48.26"/>
 <instance part="U$3" gate="G$1" x="177.8" y="134.62"/>
 <instance part="IC3" gate="G$1" x="104.14" y="50.8"/>
-<instance part="R7" gate="G$1" x="81.28" y="45.72" rot="R90"/>
 <instance part="L2" gate="G$1" x="76.2" y="50.8" rot="R90"/>
 </instances>
 <busses>
@@ -15332,8 +15330,7 @@ nominal inductance, magnetically screened</description>
 <wire x1="5.08" y1="30.48" x2="20.32" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="30.48" x2="22.86" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="22.86" y1="30.48" x2="71.12" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="71.12" y1="30.48" x2="81.28" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="81.28" y1="30.48" x2="88.9" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="30.48" x2="88.9" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="88.9" y1="30.48" x2="104.14" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="104.14" y1="30.48" x2="127" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="127" y1="30.48" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
@@ -15384,9 +15381,6 @@ nominal inductance, magnetically screened</description>
 <pinref part="IC3" gate="G$1" pin="GND/ADJ"/>
 <wire x1="104.14" y1="45.72" x2="104.14" y2="30.48" width="0.1524" layer="91"/>
 <junction x="104.14" y="30.48"/>
-<pinref part="R7" gate="G$1" pin="1"/>
-<wire x1="81.28" y1="40.64" x2="81.28" y2="30.48" width="0.1524" layer="91"/>
-<junction x="81.28" y="30.48"/>
 </segment>
 </net>
 <net name="N$11" class="0">
@@ -15641,8 +15635,7 @@ nominal inductance, magnetically screened</description>
 <wire x1="33.02" y1="83.82" x2="76.2" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="0" y1="81.28" x2="0" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="55.88" x2="88.9" y2="55.88" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="60.96" x2="81.28" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="81.28" y1="60.96" x2="88.9" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="60.96" x2="88.9" y2="60.96" width="0.1524" layer="91"/>
 <wire x1="88.9" y1="60.96" x2="88.9" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="C4" gate="G$1" pin="+"/>
 <wire x1="88.9" y1="48.26" x2="88.9" y2="55.88" width="0.1524" layer="91"/>
@@ -15658,9 +15651,6 @@ nominal inductance, magnetically screened</description>
 <junction x="10.16" y="99.06"/>
 <junction x="0" y="99.06"/>
 <pinref part="IC3" gate="G$1" pin="IN"/>
-<pinref part="R7" gate="G$1" pin="2"/>
-<wire x1="81.28" y1="50.8" x2="81.28" y2="60.96" width="0.1524" layer="91"/>
-<junction x="81.28" y="60.96"/>
 <pinref part="L2" gate="G$1" pin="2"/>
 <wire x1="76.2" y1="55.88" x2="76.2" y2="60.96" width="0.1524" layer="91"/>
 <junction x="76.2" y="60.96"/>

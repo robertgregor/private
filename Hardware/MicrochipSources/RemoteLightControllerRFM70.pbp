@@ -45,11 +45,13 @@ WPUA = %11111111
 WPUB = %11111111
 
 alarm VAR PORTC.1
+alarmCounter VAR byte
 RES var PORTB.5
 RELAY VAR PORTA.4
 i VAR BYTE 'loop counter
 j var byte
 
+relay_alarm_counter var byte
 configure var byte
 temp_byte_int var byte
 temp_byte var byte
@@ -76,9 +78,9 @@ input RES
 output relay
 read 6, temp_byte
 if (temp_byte == 0) then 
-    high relay
+    gosub highRelay
 else
-    low relay
+    gosub lowrelay
 endif
 gosub initModule
 commonSettings:
@@ -116,18 +118,6 @@ if (temp_data[0] != 0) then
     temp_data[0] = 0
     GOTO main_rx
 endif
-'detect alarm
-if (ALSTATUS == 1) then
-    if (alarm == 1) THEN
-        'we have alarm detection
-        READ 10, ALEnterCounter
-        if (ALEnterCounter == 0) then
-            ALSTATUS = 5
-        else
-            ALSTATUS = 4
-        endif
-    endif
-endif
 'send alarm notification
 if (ALSTATUS == 5) then
     ALSTATUS = 2
@@ -138,10 +128,6 @@ if (ALSTATUS == 5) then
     temp_data[4] = "M"
     temp_data[5] = 13
     temp_data[6] = 10
-endif
-if ((alarm == 1) and (l1onAlarm = 1)) then
-    read 8, l1counter
-    high relay
 endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
@@ -206,15 +192,15 @@ if (data_in[1] == temp_byte) then
                 if (data_in[5] == "f") then
                     seconds = 0
                     read 8, l1counter
-                    high relay
+                    gosub highRelay
                 else
-                    high relay
+                    gosub highRelay
                     l1counter = 0
                 endif
                 gosub sendDataOK
             endif
             if (data_in[4] == "f") then
-                LOW relay
+                gosub LOWrelay
                 gosub sendDataOK
             endif
         endif
@@ -349,12 +335,39 @@ intManagement:
                     alstatus = 1
                endif 
            endif
+           if (alarm == 1) THEN
+               if (alarmCounter > 0) then
+                    if (ALSTATUS == 1) then
+                        'we have alarm detection
+                        READ 10, ALEnterCounter
+                        if (ALEnterCounter == 0) then
+                            ALSTATUS = 5
+                        else
+                            ALSTATUS = 4
+                        endif
+                    endif
+                    if (l1onAlarm = 1) then
+                        seconds = 0
+                        read 8, l1counter
+                        gosub highRelay
+                    endif                    
+                    alarmCounter = 0
+               else
+                    alarmCounter = alarmCounter + 1
+               endif
+           endif
+           if (relay_alarm_counter > 0) then
+               relay_alarm_counter = relay_alarm_counter - 1
+               if (relay_alarm_counter == 0) then
+                    input alarm
+               endif 
+           endif
            if seconds <= 58 then tiexit
            seconds = 0
            if (l1counter > 0) then
                l1counter = l1counter - 1
                if (l1counter == 0) then
-                    low relay
+                    gosub lowrelay
                endif
            endif           
            tiexit: 
@@ -411,3 +424,20 @@ convertNoToStr:
         temp1_byte = (temp_byte DIG 0) + $30
 return
 
+highRelay:
+if (relay == 0) then
+    relay_alarm_counter = 4
+    output alarm
+    low alarm
+    high relay
+endif
+return
+
+lowRelay:
+if (relay == 1) then
+    relay_alarm_counter = 4
+    output alarm
+    low alarm
+    low relay
+endif
+return
