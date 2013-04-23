@@ -11,12 +11,22 @@
 '0 - channel number
 '1,2,3,4,5 bank name
 '6 - device_id
-'7 - 0 switch on when applied power
-'8 timeout
+'7 - 0 switch on when applied power 1
+'8 timeout 1
+'9 - 0 switch on when applied power 2
+'10 timeout 2
+'11 - 0 switch on when applied power 3
+'12 timeout 3
+'13 - 0 switch on when applied power 4
+'14 timeout 4
+'15 - 0 switch on when applied power 5
+'16 timeout 5
+'17 - 0 switch on when applied power 6
+'18 timeout 6
 
-EEPROM  0, [40,"R","O","B","I","K",0,1,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","O","B","I","K",0,1,0,1,0,1,0,1,0,1,0,1,0]
 
-INCLUDE "RFM70.pbp"
+INCLUDE "RFM73.pbp"
 
  DEFINE OSC 8
 
@@ -35,16 +45,22 @@ on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00000000 'Set PORTA to all output
-TRISB = %00010000 'Set , SDI input
+TRISB = %00110000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input
 WPUA = %11111111
 WPUB = %11111111
 
 RES var PORTB.5
-RELAY VAR PORTA.4
+RELAY1 VAR PORTA.4
+RELAY2 VAR PORTA.5
+RELAY3 VAR PORTC.3
+RELAY4 VAR PORTC.4
+RELAY5 VAR PORTC.5
+RELAY6 VAR PORTC.6
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
+iint var byte
 configure var byte
 temp_byte_int var byte
 temp_byte var byte
@@ -56,22 +72,29 @@ temp_word var word
 EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
-ticks   var     byte    ' Define pieces of seconds variable
-l1counter var byte
+ticks   var     word    ' Define pieces of seconds variable
+lcounter var byte[7]
 conversionSuccess VAR BYTE
 
 clear
 input RES
-output relay
+output relay1
+output relay2
+output relay3
+output relay4
+output relay5
+output relay6
 READ 6, device_id
-read 7, temp_byte
-if (temp_byte == 0) then 
-    high relay
-else
-    low relay
-endif
+for i = 0 to 10 step 2
+    READ (I+7), temp1_byte
+    temp_byte = (i / 2) + 1
+    if (temp1_byte == 0) then
+        gosub switchOnRelay
+    else
+        gosub switchOffRelay
+    endif
+next i
 gosub initModule
-
 commonSettings:
 gosub commonRXTX
 
@@ -88,10 +111,16 @@ if RES == 0 then
     write 3, "B"
     write 4, "I"
     write 5, "K"
-    write 6, 0
-    write 7, 0
-    write 8, 0
-    END
+    for i = 6 TO 20
+        write i, 0
+    next i
+    write 7, 1
+    write 9, 1
+    write 11, 1
+    write 13, 1
+    write 15, 1
+    write 17, 1
+    pause 1000
 endif
 'Check for data to send
 if (temp_data[0] != 0) then
@@ -127,67 +156,94 @@ if (data_in[1] == device_id) then
             gosub sendDataOK
         endif
     elseif (data_in[2] == "l") then
-        if (data_in[3] == "1") then
-            if (data_in[4] == "c") then
-                if (data_in[5] == "o") then
-                    write 7, 0
-                    gosub sendDataOK
-                endif
-                if (data_in[5] == "f") then
-                    write 7, 1
-                    gosub sendDataOK
-                endif
-                if (data_in[5] == "t") then
-                    if (data_in[6] == "=") then
-                        i = 7
-                        gosub convertInputData
-                        if (conversionSuccess == 1) then
-                            write 8, temp_byte
+        I = 3
+        gosub convertInputData
+        if (conversionSuccess == 1) then
+            temp4_byte = temp_byte 'this is relay number
+            if (TEMP_BYTE > 0) then
+                if (TEMP_BYTE < 7) then
+                    if (data_in[4] == "c") then
+                        if (data_in[5] == "o") then
+                            write 5+(temp4_byte*2), 0
                             gosub sendDataOK
                         endif
+                        if (data_in[5] == "f") then
+                            write 5+(temp4_byte*2), 1
+                            gosub sendDataOK
+                        endif
+                        if (data_in[5] == "t") then
+                            if (data_in[6] == "=") then
+                                i = 7
+                                gosub convertInputData
+                                if (conversionSuccess == 1) then
+                                    write 6+(temp4_byte*2), temp_byte
+                                    gosub sendDataOK
+                                endif
+                            endif
+                        endif                
+                    elseif (data_in[4] == "o") then
+                        if (data_in[5] == "f") then
+                            read 6+(temp4_byte*2), lcounter[temp4_byte]
+                            if (lcounter[temp4_byte] == 1) then
+                                if (seconds < 40) then lcounter[temp4_byte] = 2
+                            endif
+                            temp_byte = temp4_byte
+                            gosub switchOnRelay
+                            gosub sendDataOK
+                        else
+                            temp_byte = temp4_byte
+                            gosub switchOnRelay
+                            lcounter[temp4_byte] = 0
+                            gosub sendDataOK
+                        endif
+                    elseif (data_in[4] == "f") then
+                        temp_byte = temp4_byte
+                        gosub switchOffRelay
+                        gosub sendDataOK
                     endif
-                endif                
-            elseif (data_in[4] == "o") then
-                if (data_in[5] == "f") then
-                    seconds = 0
-                    read 8, l1counter
-                    high relay
-                    gosub sendDataOK
-                else
-                    high relay
-                    l1counter = 0
-                    gosub sendDataOK
                 endif
-            elseif (data_in[4] == "f") then
-                LOW relay
-                gosub sendDataOK
+            endif
+        endif        
+    elseif (data_in[2] == "s") then
+        I = 3
+        gosub convertInputData
+        if (conversionSuccess == 1) then
+            temp4_byte = temp_byte 'this is relay number
+            if (TEMP_BYTE > 0) then
+                if (TEMP_BYTE < 7) then   
+                    temp_data[0] = "3"
+                    temp_data[1] = "|"
+                    if (temp4_byte == 1) then temp_data[2] = RELAY1
+                    if (temp4_byte == 2) then temp_data[2] = RELAY2
+                    if (temp4_byte == 3) then temp_data[2] = RELAY3
+                    if (temp4_byte == 4) then temp_data[2] = RELAY4
+                    if (temp4_byte == 5) then temp_data[2] = RELAY5
+                    if (temp4_byte == 6) then temp_data[2] = RELAY6                    
+                    temp_data[2] = temp_data[2] + $30
+                    temp_data[3] = "|"
+                    read 5+(temp4_byte*2), temp_data[4]
+                    temp_data[4] = temp_data[4] + $30        
+                    temp_data[5] = "|"
+                    read 6+(temp4_byte*2), temp_byte
+                    gosub convertNoToStr
+                    temp_data[6] = temp3_byte
+                    temp_data[7] = temp2_byte
+                    temp_data[8] = temp1_byte
+                    temp_data[9] = "|"
+                    temp_byte = lcounter[temp4_byte]
+                    gosub convertNoToStr
+                    temp_data[10] = temp3_byte
+                    temp_data[11] = temp2_byte
+                    temp_data[12] = temp1_byte
+                    temp_data[13] = 13    
+                    temp_data[14] = 10
+                endif
             endif
         endif
-    elseif (data_in[2] == "s") then
-            temp_data[0] = "3"
-            temp_data[1] = "|"
-            temp_data[2] = RELAY + $30
-            temp_data[3] = "|"
-            read 7, temp_data[4]
-            temp_data[4] = temp_data[4] + $30        
-            temp_data[5] = "|"
-            read 8, temp_byte
-            gosub convertNoToStr
-            temp_data[6] = temp3_byte
-            temp_data[7] = temp2_byte
-            temp_data[8] = temp1_byte
-            temp_data[9] = "|"
-            temp_byte = l1counter
-            gosub convertNoToStr
-            temp_data[10] = temp3_byte
-            temp_data[11] = temp2_byte
-            temp_data[12] = temp1_byte
-            temp_data[13] = 13    
-            temp_data[14] = 10    
     elseif (data_in[2] == "p") then
-            if (data_in[3] == "n") then
-                gosub sendDataOK
-            endif
+        if (data_in[3] == "n") then
+            gosub sendDataOK
+        endif
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"
@@ -217,18 +273,26 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           If ticks < 31 Then tiexit
+           If ticks < 960 Then tiexit
            ticks = 0
            seconds = seconds + 1
-           if seconds <= 58 then tiexit
+           if seconds < 59 then tiexit
            seconds = 0
-           if (l1counter > 0) then
-               l1counter = l1counter - 1
-               if (l1counter == 0) then
-                    low relay
-               endif
-           endif           
-           tiexit: 
+           for iint = 1 to 6
+               if (lcounter[iint] > 0) then
+                   lcounter[iint] = lcounter[iint] - 1
+                   if (lcounter[iint] == 0) then
+                        if (iint = 1) then low relay1
+                        if (iint = 2) then low relay2
+                        if (iint = 3) then low relay3
+                        if (iint = 4) then low relay4
+                        if (iint = 5) then low relay5
+                        if (iint = 6) then low relay6
+                   endif
+               endif           
+           next iint
+           tiexit:
+           INTCON.2 = 0 
         endif
         INTCON.7 = 1
 resume
@@ -269,5 +333,23 @@ convertNoToStr:
         temp3_byte = (temp_byte DIG 2) + $30
         temp2_byte = (temp_byte DIG 1) + $30
         temp1_byte = (temp_byte DIG 0) + $30
+return
+
+switchOnRelay:
+    if (temp_byte == 1) then HIGH RELAY1
+    if (temp_byte == 2) then HIGH RELAY2
+    if (temp_byte == 3) then HIGH RELAY3
+    if (temp_byte == 4) then HIGH RELAY4
+    if (temp_byte == 5) then HIGH RELAY5
+    if (temp_byte == 6) then HIGH RELAY6    
+return
+
+switchOffRelay:
+    if (temp_byte == 1) then LOW RELAY1
+    if (temp_byte == 2) then LOW RELAY2
+    if (temp_byte == 3) then LOW RELAY3
+    if (temp_byte == 4) then LOW RELAY4
+    if (temp_byte == 5) then LOW RELAY5
+    if (temp_byte == 6) then LOW RELAY6    
 return
 

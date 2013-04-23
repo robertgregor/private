@@ -33,11 +33,14 @@ on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00000000 'Set PORTA to all output
-TRISB = %00010000 'Set , SDI input
+TRISB = %00110000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input, 
+WPUA = %11111111
+WPUB = %11111111
 
 RELAY_DOWN VAR PORTA.5
 RELAY_UP VAR PORTA.4
+RES var PORTB.5
 
 i VAR BYTE 'loop counter
 j var byte
@@ -68,21 +71,9 @@ read 6, device_id
 read 7, timeout_value
 timeout_value = timeout_value * 30
 
-
-if 0 == 1 then
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    END
-endif
-
-output PORTA.5
-output PORTA.4
+output RELAY_DOWN
+output RELAY_UP
+input RES
 gosub initModule
 
 commonSettings:
@@ -94,6 +85,17 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
+if RES == 0 then
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    write 6, 0
+    write 7, 0
+    pause 1000
+endif
 'Check for data to send
 if (temp_data[0] != 0) then
     if (configure == 1) then

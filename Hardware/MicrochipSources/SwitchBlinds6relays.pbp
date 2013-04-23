@@ -11,10 +11,13 @@
 '0 - channel number
 '1,2,3,4,5 bank name
 '6 device id
+'7 timeout value 1
+'8 timeout value 2
+'9 timeout value 3
 
-EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","O","B","I","K",0,1,1,1,0,0,0,0,0,0]
 
-INCLUDE "RFM70.pbp"
+INCLUDE "RFM73.pbp"
 
  DEFINE OSC 8
 
@@ -27,23 +30,28 @@ INCLUDE "RFM70.pbp"
  'interrupt for timer
     INTCON = %10100000  'T01 enabled PEIE disabled.
     PIE1 = %00000000    'USART disabled
-    OPTION_REG = %00000111
+    OPTION_REG = %00000100
 
 on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00000000 'Set PORTA to all output
-TRISB = %00010000 'Set , SDI input
+TRISB = %00110000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input, 
 
 RELAY1_DOWN VAR PORTA.5
 RELAY1_UP VAR PORTA.4
-RELAY2_DOWN VAR PORTC.6
-RELAY2_UP VAR PORTC.5
-RELAY3_DOWN VAR PORTC.4
-RELAY3_UP VAR PORTC.3
+RELAY2_DOWN VAR PORTC.4
+RELAY2_UP VAR PORTC.3
+RELAY3_DOWN VAR PORTC.6
+RELAY3_UP VAR PORTC.5
+RES var PORTB.5
 
 i VAR BYTE 'loop counter
+iint var byte
+icurrpos var byte
+icurrposArr var byte
+relaysGroup var byte
 j var byte
 ci var byte
 configure var byte
@@ -52,6 +60,7 @@ temp_byte var byte
 temp1_byte var byte
 temp2_byte var byte
 temp3_byte var byte
+temp4_byte var byte
 temp_word var word
 temp2_word var word
 temp3_word var word
@@ -59,43 +68,22 @@ EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
 ticks   var     byte    ' Define pieces of seconds variable
-counter1 var word
-initial1Counter var word
-initial1Percent var byte
-counter2 var word
-initial2Counter var word
-initial2Percent var byte
-counter3 var word
-initial3Counter var word
-initial3Percent var byte
+counter var word[3]
+initialCounter var word[3]
+initialPercent var byte[3]
 conversionSuccess VAR BYTE
-timeout1_value var word
-current1Counter var byte
-current1Direction var byte
-timeout2_value var word
-current2Counter var byte
-current2Direction var byte
-timeout3_value var word
-current3Counter var byte
-current3Direction var byte
+timeout_value var word[3]
+currentCounter var byte[3]
+currentDirection var byte[3]
 
 clear
 read 6, device_id
-read 7, timeout1_value
-timeout1_value = timeout1_value * 30
-
-
-if 0 == 1 then
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    END
-endif
+read 7, timeout_value[0]
+timeout_value[0] = timeout_value[0] * 30
+read 8, timeout_value[1]
+timeout_value[1] = timeout_value[1] * 30
+read 9, timeout_value[2]
+timeout_value[2] = timeout_value[2] * 30
 
 output RELAY1_DOWN
 output RELAY1_UP
@@ -103,6 +91,8 @@ output RELAY2_DOWN
 output RELAY2_UP
 output RELAY3_DOWN
 output RELAY3_UP
+input res
+
 gosub initModule
 
 commonSettings:
@@ -114,6 +104,19 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
+if RES == 0 then
+    write 0, 40
+    write 1, "R"
+    write 2, "O"
+    write 3, "B"
+    write 4, "I"
+    write 5, "K"
+    write 6, 0
+    write 7, 1
+    write 8, 1
+    write 9, 1
+    pause 1000
+endif
 'Check for data to send
 if (temp_data[0] != 0) then
     if (configure == 1) then
@@ -148,172 +151,178 @@ if (data_in[1] == device_id) then
             gosub sendDataOK
         endif
     elseif (data_in[2] == "b") then
-        if (data_in[3] == "t") then
-            if (data_in[4] == "=") then
-                i = 5
-                gosub convertInputData
-                if (conversionSuccess == 1) then
-                     write 7, temp_byte
-                     timeout1_value = temp_byte * 30
-                     gosub sendDataOK
-                endif                                   
-            endif
-        elseif (timeout1_value == 0) then
-            'timeout not set send error
-        elseif (data_in[3] == "d") then
-            counter1 = timeout1_value
-            initial1counter = counter1
-            gosub blinds1Down
-            initial1Percent = current1Counter
-            current1Counter = 100
-            gosub sendDataOK
-        elseif (data_in[3] == "u") then
-            counter1 = timeout1_value
-            initial1Counter = counter1
-            gosub blinds1up
-            initial1Percent = current1Counter            
-            current1Counter = 0
-            gosub sendDataOK
-        elseif (data_in[3] == "m") then
-            if (data_in[4] == "=") then
-                i = 5
-                gosub convertInputData
-                if (conversionSuccess == 1) then
-                  if (temp_byte < 101) then
-                    if (temp_byte == current1Counter) then
+        I = 3
+        gosub convertInputData
+        if (conversionSuccess == 1) then
+            temp4_byte = temp_byte - 1 'this is relay number
+            if (TEMP_BYTE > 0) then
+                if (TEMP_BYTE < 4) then
+                    if (data_in[4] == "t") then
+                        if (data_in[5] == "=") then
+                            i = 6
+                            gosub convertInputData
+                            if (conversionSuccess == 1) then
+                                if (temp_byte != 0) then
+                                     write (7+temp4_byte), temp_byte
+                                     timeout_value[temp4_byte] = temp_byte * 30
+                                     gosub sendDataOK
+                                endif
+                            endif                                   
+                        endif
+                    elseif (data_in[4] == "d") then
+                        counter[temp4_byte] = timeout_value[temp4_byte]
+                        initialcounter[temp4_byte] = counter[temp4_byte]
+                        relaysGroup = temp4_byte
+                        gosub blindsDown
+                        initialPercent[temp4_byte] = currentCounter[temp4_byte]
+                        currentCounter[temp4_byte] = 100
                         gosub sendDataOK
-                        counter1 = 4
-                    elseif (temp_byte > current1Counter) then
-                        temp2_byte = temp_byte - current1Counter
-                        initial1Percent = current1Counter
-                        gosub compute1Counter
-                        initial1Counter = counter1
-                        gosub blinds1Down
-                        current1Counter = temp_byte
+                    elseif (data_in[4] == "u") then
+                        counter[temp4_byte] = timeout_value[temp4_byte]
+                        initialCounter[temp4_byte] = counter[temp4_byte]
+                        relaysGroup = temp4_byte
+                        gosub blindsup
+                        initialPercent[temp4_byte] = currentCounter[temp4_byte]            
+                        currentCounter[temp4_byte] = 0
                         gosub sendDataOK
-                    else
-                        temp2_byte = current1Counter - temp_byte
-                        initial1Percent = current1Counter
-                        gosub compute1Counter
-                        initial1Counter = counter1
-                        gosub blinds1Up
-                        current1Counter = temp_byte
-                        gosub sendDataOK
-                    endif
-                  endif  
-                endif                                                   
-            endif
-        elseif (data_in[3] == "s") then
-            if (data_in[4] == "1")then
-                if (current1Direction != 0) then
-                    temp_word = initial1Counter - counter1
-                    disable
-                    temp_word = temp_word * 100
-                    temp2_word = DIV32 timeout1_value
-                    enable
-                    if (current1Direction == 1) then
-                        temp3_word = initial1Percent + temp2_word
-                        if (temp3_word > 100 ) then temp3_word = 100
-                        current1Counter = temp3_word
-                    elseif (current1Direction == 2) then
-                        if (initial1Percent > temp2_word) then
-                            current1Counter = initial1Percent - temp2_word
+                    elseif (data_in[4] == "m") then
+                        if (data_in[5] == "=") then
+                            i = 6
+                            gosub convertInputData
+                            if (conversionSuccess == 1) then
+                              if (temp_byte < 101) then
+                                if (temp_byte == currentCounter[temp4_byte]) then
+                                    gosub sendDataOK
+                                    counter = 4
+                                elseif (temp_byte > currentCounter[temp4_byte]) then
+                                    temp2_byte = temp_byte - currentCounter[temp4_byte]
+                                    initialPercent[temp4_byte] = currentCounter[temp4_byte]
+                                    relaysGroup = temp4_byte
+                                    gosub computeCounter
+                                    initialCounter[temp4_byte] = counter[temp4_byte]
+                                    gosub blindsDown
+                                    currentCounter[temp4_byte] = temp_byte[temp4_byte]
+                                    gosub sendDataOK
+                                else
+                                    temp2_byte = currentCounter[temp4_byte] - temp_byte
+                                    initialPercent[temp4_byte] = currentCounter[temp4_byte]
+                                    relaysGroup = temp4_byte
+                                    gosub computeCounter
+                                    initialCounter[temp4_byte] = counter[temp4_byte]
+                                    gosub blindsUp
+                                    currentCounter[temp4_byte] = temp_byte
+                                    gosub sendDataOK
+                                endif
+                              endif  
+                            endif                                                   
+                        endif
+                    elseif (data_in[4] == "s") then               
+                        if (currentDirection[temp4_byte] != 0) then
+                            temp_word = initialCounter[temp4_byte] - counter[temp4_byte]
+                            disable
+                            temp_word = temp_word * 100
+                            temp2_word = DIV32 timeout_value[temp4_byte]
+                            enable
+                            if (currentDirection[temp4_byte] == 1) then
+                                temp3_word = initialPercent[temp4_byte] + temp2_word
+                                if (temp3_word > 100 ) then temp3_word = 100
+                                currentCounter[temp4_byte] = temp3_word
+                            elseif (currentDirection[temp4_byte] == 2) then
+                                if (initialPercent[temp4_byte] > temp2_word) then
+                                    currentCounter[temp4_byte] = initialPercent[temp4_byte] - temp2_word
+                                else
+                                    currentCounter[temp4_byte] = 0
+                                endif
+                            endif
+                            gosub sendDataOK
+                            counter[temp4_byte] = 4
                         else
-                            current1Counter = 0
+                            gosub sendDataOK            
+                            counter[temp4_byte] = 4
                         endif
                     endif
-                    gosub sendDataOK
-                    counter1 = 4
-                else
-                    gosub sendDataOK            
-                    counter1 = 4
-                endif
-            elseif (data_in[4] == "2")then
-                if (current2Direction != 0) then
-                    temp_word = initial2Counter - counter2
-                    disable
-                    temp_word = temp_word * 100
-                    temp2_word = DIV32 timeout2_value
-                    enable
-                    if (current2Direction == 1) then
-                        temp3_word = initial2Percent + temp2_word
-                        if (temp3_word > 100 ) then temp3_word = 100
-                        current2Counter = temp3_word
-                    elseif (current2Direction == 2) then
-                        if (initial2Percent > temp2_word) then
-                            current2Counter = initial2Percent - temp2_word
-                        else
-                            current2Counter = 0
-                        endif
-                    endif
-                    gosub sendDataOK
-                    counter2 = 4
-                else
-                    gosub sendDataOK            
-                    counter2 = 4
-                endif
-            elseif (data_in[4] == "3")then
-                if (current1Direction != 0) then
-                    temp_word = initial3Counter - counter3
-                    disable
-                    temp_word = temp_word * 100
-                    temp2_word = DIV32 timeout3_value
-                    enable
-                    if (current3Direction == 1) then
-                        temp3_word = initial3Percent + temp2_word
-                        if (temp3_word > 100 ) then temp3_word = 100
-                        current3Counter = temp3_word
-                    elseif (current3Direction == 2) then
-                        if (initial3Percent > temp2_word) then
-                            current3Counter = initial3Percent - temp2_word
-                        else
-                            current3Counter = 0
-                        endif
-                    endif
-                    gosub sendDataOK
-                    counter3 = 4
-                else
-                    gosub sendDataOK            
-                    counter3 = 4
                 endif
             endif
         endif
     elseif (data_in[2] == "s") then
-            temp_data[0] = "5"
-            temp_data[1] = "|"
-            temp_data[2] = RELAY1_DOWN + $30
-            temp_data[3] = RELAY1_UP + $30
-            temp_data[4] = RELAY2_DOWN + $30
-            temp_data[5] = RELAY2_UP + $30
-            temp_data[6] = RELAY3_DOWN + $30
-            temp_data[7] = RELAY3_UP + $30
-            temp_data[8] = "|"            
-            temp_byte = timeout1_value / 30
-            gosub convertNoToStr
-            temp_data[9] = temp3_byte
-            temp_data[10] = temp2_byte
-            temp_data[11] = temp1_byte
-            temp_data[12] = "|"            
-            temp_byte = current1Counter
-            gosub convertNoToStr
-            temp_data[13] = temp3_byte
-            temp_data[14] = temp2_byte
-            temp_data[15] = temp1_byte
-            temp_data[16] = 13    
-            temp_data[17] = 10    
+        I = 3
+        gosub convertInputData
+        if (conversionSuccess == 1) then
+            temp4_byte = temp_byte - 1 'this is relay number
+            if (TEMP_BYTE > 0) then
+                if (TEMP_BYTE < 4) then
+                    temp_data[0] = "5"
+                    temp_data[1] = "|"
+                    if (temp4_byte == 0) then
+                        temp_data[2] = RELAY1_DOWN + $30
+                        temp_data[3] = "|"
+                        temp_data[4] = RELAY1_UP + $30
+                    elseif (temp4_byte == 1) then
+                        temp_data[2] = RELAY2_DOWN + $30
+                        temp_data[3] = "|"
+                        temp_data[4] = RELAY2_UP + $30
+                    elseif (temp4_byte == 2) then
+                        temp_data[2] = RELAY3_DOWN + $30
+                        temp_data[3] = "|"
+                        temp_data[4] = RELAY3_UP + $30
+                    endif
+                    temp_data[5] = "|"            
+                    temp_byte = timeout_value[temp4_byte] / 30
+                    gosub convertNoToStr
+                    temp_data[6] = temp3_byte
+                    temp_data[7] = temp2_byte
+                    temp_data[8] = temp1_byte
+                    temp_data[9] = "|"            
+                    temp_byte = currentCounter[temp4_byte]
+                    gosub convertNoToStr
+                    temp_data[10] = temp3_byte
+                    temp_data[11] = temp2_byte
+                    temp_data[12] = temp1_byte
+                    temp_data[13] = 13    
+                    temp_data[14] = 10
+                endif
+            endif
+        endif
     elseif (data_in[2] == "p") then
             if (data_in[3] == "n") then
                 gosub sendDataOK
             endif
     elseif (data_in[2] == "u") then
-        gosub blinds1Up
-        gosub sendDataOK        
+        I = 3
+        gosub convertInputData
+        if (conversionSuccess == 1) then
+            if (temp_byte > 0) then
+                if (temp_byte < 4) then
+                    relaysGroup = temp_byte - 1
+                    gosub blindsUp
+                    gosub sendDataOK
+                endif
+            endif
+        endif
     elseif (data_in[2] == "d") then
-        gosub blinds1Down
-        gosub sendDataOK
+        I = 3
+        gosub convertInputData
+        if (conversionSuccess == 1) then
+            if (temp_byte > 0) then
+                if (temp_byte < 4) then
+                    relaysGroup = temp_byte - 1
+                    gosub blindsDown
+                    gosub sendDataOK
+                endif
+            endif
+        endif
     elseif (data_in[2] == "e") then
-        gosub stopBlinds1Silent
-        gosub sendDataOK
+        I = 3
+        gosub convertInputData
+        if (conversionSuccess == 1) then
+            if (temp_byte > 0) then
+                if (temp_byte < 4) then
+                    relaysGroup = temp_byte - 1
+                    gosub stopBlindsSilent
+                    gosub sendDataOK
+                endif
+            endif
+        endif
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"
@@ -342,28 +351,33 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           if (counter1 > 0) then
-               counter1 = counter1 - 1
-               if (counter1 == 0) then
-                    GOSUB stopBlinds1
+           for iint = 0 to 2
+               if (counter[iint] > 0) then
+                   counter[iint] = counter[iint] - 1
+                   if (counter[iint] == 0) then
+                        if (iint == 0) then
+                            low RELAY1_DOWN
+                            low RELAY1_UP
+                            currentDirection[iint] = 0
+                            gosub sendCurrentPosition
+                        elseif (iint == 1) then
+                            low RELAY2_DOWN
+                            low RELAY2_UP                            
+                            currentDirection[iint] = 0                            
+                            gosub sendCurrentPosition
+                        elseif (iint == 2) then
+                            low RELAY3_DOWN
+                            low RELAY3_UP                            
+                            currentDirection[iint] = 0                            
+                            gosub sendCurrentPosition
+                        endif                        
+                   endif
                endif
-           endif
-           if (counter2 > 0) then
-               counter2 = counter2 - 1
-               if (counter2 == 0) then
-                    GOSUB stopBlinds2
-               endif
-           endif
-           if (counter3 > 0) then
-               counter3 = counter3 - 1
-               if (counter3 == 0) then
-                    GOSUB stopBlinds3
-               endif
-           endif
-           If ticks < 31 Then tiexit
+           next iint
+           If ticks < 241 Then tiexit
            ticks = 0
            seconds = seconds + 1
-           if seconds <= 58 then tiexit
+           if seconds <= 59 then tiexit
            seconds = 0
            tiexit: 
            INTCON.2 = 0
@@ -372,135 +386,76 @@ intManagement:
 resume
 enable
 
-stopBlinds1:
-    low RELAY1_DOWN
-    low RELAY1_UP
+stopBlinds:
+    gosub stopBlindsSilent
     gosub sendCurrentPosition
-    current1Direction = 0
 return
 
-stopBlinds1Silent:
-    low RELAY1_DOWN
-    low RELAY1_UP
-    current1Direction = 0
+stopBlindsSilent:
+    if (relaysGroup == 0) then
+        LOW RELAY1_DOWN
+        low RELAY1_UP
+    elseif (relaysGroup == 1) then
+        LOW RELAY2_DOWN
+        low RELAY2_UP
+    elseif (relaysGroup == 2) then
+        LOW RELAY3_DOWN
+        low RELAY3_UP
+    endif
+    currentDirection[relaysGroup] = 0
 return
 
-blinds1Up:
-    gosub stopBlinds1Silent
+blindsUp:
+    gosub stopBlindsSilent
     pause 100
-    high RELAY1_DOWN
-    low RELAY1_UP
-    current1Direction = 2
+    if (relaysGroup == 0) then
+        high RELAY1_DOWN
+        low RELAY1_UP
+    elseif (relaysGroup == 1) then
+        high RELAY2_DOWN
+        low RELAY2_UP
+    elseif (relaysGroup == 2) then
+        high RELAY3_DOWN
+        low RELAY3_UP
+    endif
+    currentDirection[relaysGroup] = 2
 return
 
-blinds1Down:
-    gosub stopBlinds1Silent
+blindsDown:
+    gosub stopBlindsSilent
     pause 100
-    LOW RELAY1_DOWN
-    HIGH RELAY1_UP
-    current1Direction = 1
-return
-
-stopBlinds2:
-    low RELAY2_DOWN
-    low RELAY2_UP
-    gosub sendCurrentPosition
-    current2Direction = 0
-return
-
-stopBlinds2Silent:
-    low RELAY2_DOWN
-    low RELAY2_UP
-    current2Direction = 0
-return
-
-blinds2Up:
-    gosub stopBlinds2Silent
-    pause 100
-    high RELAY2_DOWN
-    low RELAY2_UP
-    current2Direction = 2
-return
-
-blinds2Down:
-    gosub stopBlinds2Silent
-    pause 100
-    LOW RELAY2_DOWN
-    HIGH RELAY2_UP
-    current2Direction = 1
-return
-
-stopBlinds3:
-    low RELAY3_DOWN
-    low RELAY3_UP
-    gosub sendCurrentPosition
-    current3Direction = 0
-return
-
-stopBlinds3Silent:
-    low RELAY3_DOWN
-    low RELAY3_UP
-    current3Direction = 0
-return
-
-blinds3Up:
-    gosub stopBlinds3Silent
-    pause 100
-    high RELAY3_DOWN
-    low RELAY3_UP
-    current3Direction = 2
-return
-
-blinds3Down:
-    gosub stopBlinds3Silent
-    pause 100
-    LOW RELAY3_DOWN
-    HIGH RELAY3_UP
-    current3Direction = 1
+    if (relaysGroup == 0) then
+        LOW RELAY1_DOWN
+        HIGH RELAY1_UP
+    elseif (relaysGroup == 1) then
+        LOW RELAY2_DOWN
+        HIGH RELAY2_UP
+    elseif (relaysGroup == 2) then
+        LOW RELAY3_DOWN
+        HIGH RELAY3_UP
+    endif
+    currentDirection[relaysGroup] = 1
 return
 
 sendCurrentPosition:
     temp_data[0] = "l"
-    temp_data[1] = "|"
-    temp_byte = current1Counter
-    gosub convertNoToStr
-    temp_data[2] = temp3_byte
-    temp_data[3] = temp2_byte
-    temp_data[4] = temp1_byte
-    temp_data[5] = "|"
-    temp_byte = current2Counter
-    gosub convertNoToStr
-    temp_data[6] = temp3_byte
-    temp_data[7] = temp2_byte
-    temp_data[8] = temp1_byte
-    temp_data[9] = "|"
-    temp_byte = current3Counter
-    gosub convertNoToStr
-    temp_data[10] = temp3_byte
-    temp_data[11] = temp2_byte
-    temp_data[12] = temp1_byte
+    for icurrpos = 0 to 2
+        icurrposArr = (icurrpos*4) + 1
+        temp_data[icurrposArr] = "|"
+        temp_byte = currentCounter[icurrpos]
+        gosub convertNoToStr
+        temp_data[icurrposArr+1] = temp3_byte
+        temp_data[icurrposArr+2] = temp2_byte
+        temp_data[icurrposArr+3] = temp1_byte
+    next icurrpos
     temp_data[13] = 13
     temp_data[14] = 10
 return
 
-compute1Counter:
+computeCounter:
     disable
-    temp_word = timeout1_value * temp2_byte
-    counter1 = div32 100
-    enable
-return
-
-compute2Counter:
-    disable
-    temp_word = timeout2_value * temp2_byte
-    counter2 = div32 100
-    enable
-return
-
-compute3Counter:
-    disable
-    temp_word = timeout3_value * temp2_byte
-    counter3 = div32 100
+    temp_word = timeout_value[relaysGroup] * temp2_byte
+    counter[relaysGroup] = div32 100
     enable
 return
 

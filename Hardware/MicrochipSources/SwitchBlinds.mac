@@ -429,12 +429,6 @@ CMPNE?BCL macro Bin, Cin, Label
     endif
     endm
 
-CMPNE?CCL macro Cin1, Cin2, Label
-    if ((Cin1) != (Cin2))
-        L?GOTO  Label
-    endif
-    endm
-
 CMPNE?TCL macro Regin, Bitin, Cin, Label
     if ((Cin) == 0)
         CLRWDT?
@@ -563,6 +557,10 @@ HIGH?T macro Regin, Bitin
 
 ICALL?L macro Label
         L?CALL  Label
+    endm
+
+INPUT?T macro Regin, Bitin
+        MOVE?CT 1, ((Regin) + 80h), Bitin
     endm
 
 LOOKDOWN?BCLB macro Bin, Cin, Label, Bout

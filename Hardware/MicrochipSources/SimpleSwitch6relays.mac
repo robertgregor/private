@@ -26,6 +26,32 @@ AIN?BBB macro Bin, Bout, Bndx
     endif
     endm
 
+AIN?CBB macro Cin, Bout, Bndx
+	MOVE?BA	Bndx
+        addlw   low (Bout)
+        movwf   FSR
+    if ((Bout) > 255)
+        bsf     STATUS, IRP
+    endif
+        MOVE?CB Cin, INDF
+    if ((Bout) > 255)
+        bcf     STATUS, IRP
+    endif
+    endm
+
+AIN?WBB macro Win, Bout, Bndx
+	MOVE?BA	Bndx
+        addlw   low (Bout)
+        movwf   FSR
+    if ((Bout) > 255)
+        bsf     STATUS, IRP
+    endif
+        MOVE?WB Win, INDF
+    if ((Bout) > 255)
+        bcf     STATUS, IRP
+    endif
+    endm
+
 AOUT?BBB macro Bin, Bndx, Bout
         MOVE?BA Bndx
         addlw   low (Bin)
@@ -76,6 +102,22 @@ ADD?BCB macro Bin, Cin, Bout
     endif
     endm
 
+ADD?BCW macro Bin, Cin, Wout
+        movlw   low (Cin)
+        CHK?RP  Bin
+        addwf   Bin, W
+        MOVE?AB Wout
+    if (((Cin) >> 8) == 0)
+        clrf    (Wout) + 1
+        rlf     (Wout) + 1, F
+    else
+        movlw   (Cin) >> 8
+        btfsc   STATUS, C
+        addlw   1
+        movwf   (Wout) + 1
+    endif
+    endm
+
 ADD?CBB macro Cin, Bin, Bout
     if ((Bout) == (Bin))
       if ((Cin) == 1)
@@ -100,12 +142,45 @@ ADD?CBB macro Cin, Bin, Bout
     endif
     endm
 
-ADD?TCB macro Regin, Bitin, Cin, Bout
-        movlw   Cin
-        CHK?RP  Regin
-        btfsc   Regin, Bitin
+ADD?CWW macro Cin, Win, Wout
+    if ((Wout) == (Win))
+        CHK?RP  Wout
+      if ((Cin) == 1)
+        incf    Wout, F
+        btfsc   STATUS, Z
+        incf    (Wout) + 1, F
+      else  
+        movlw   low (Cin)
+        addwf   Wout, F
+        if (((Cin) >> 8) == 0)
+        btfsc   STATUS, C
+        incf    (Wout) + 1, F
+        else
+        movlw   (Cin) >> 8
+        btfsc   STATUS, C
         addlw   1
-        MOVE?AB Bout
+        addwf   (Wout) + 1, F
+        endif
+      endif
+    else
+        movlw   low (Cin)
+        CHK?RP  Win
+        addwf   Win, W
+        MOVE?AB Wout
+      if (((Cin) >> 8) == 0)
+        MOVE?BA (Win) + 1
+        btfsc   STATUS, C
+        addlw   1
+        MOVE?AB (Wout) + 1
+      else
+        movlw   (Cin) >> 8
+        btfsc   STATUS, C
+        addlw   1
+        CHK?RP  Win
+        addwf   (Win) + 1, W
+        MOVE?AB (Wout) + 1
+      endif
+    endif
     endm
 
 ADD?WBB macro Win, Bin, Bout
@@ -173,6 +248,21 @@ ADD?WCW macro Win, Cin, Wout
     endif
     endm
 
+DIV?BCW macro Bin, Cin, Wout
+    if ((Cin) == 2)
+        bcf     STATUS, C
+        CHK?RP  Bin
+        rrf     Bin, W
+        MOVE?AW Wout
+    else
+        MOVE?BW Bin, R0
+        MOVE?CW Cin, R1
+        L?CALL  DIV
+        MOVE?AWW R0, Wout
+    endif
+    endm
+DIV_USED = 1
+
 MUL?BCW macro Bin, Cin, Wout
         MOVE?BW Bin, R3
         MOVE?CW Cin, R1
@@ -180,29 +270,6 @@ MUL?BCW macro Bin, Cin, Wout
         MOVE?AWW R2, Wout
     endm
 MUL_USED = 1
-
-SUB?BCB macro Bin, Cin, Bout
-    if ((Bout) == (Bin))
-      if ((Cin) == 1)
-        CHK?RP  Bout
-        decf    Bout, F
-      else
-        movlw   Cin
-        CHK?RP  Bout
-        subwf   Bout, F
-      endif
-    else
-      if ((Cin) == 1)
-        CHK?RP  Bin
-        decf    Bin, W
-      else
-        movlw   Cin
-        CHK?RP  Bin
-        subwf   Bin, W
-      endif
-        MOVE?AB Bout
-    endif
-    endm
 
 SUB?BCW macro Bin, Cin, Wout
         movlw   low (-(Cin))
@@ -256,6 +323,20 @@ CMPEQ?TCL macro Regin, Bitin, Cin, Label
     if (((Cin) == 0) | ((Cin) == 1))
         CLRWDT?
         BIT?GOTO Cin, Regin, Bitin, Label
+    endif
+    endm
+
+CMPGE?BCL macro Bin, Cin, Label
+    if ((Cin) <= 0)
+        L?GOTO  Label
+    else
+      if ((Cin) < 100h)
+        CLRWDT?
+        MOVE?CA Cin
+        CHK?RP  Bin
+        subwf   Bin, W
+        BIT?GOTO 1, STATUS, C, Label
+      endif
     endif
     endm
 
@@ -545,9 +626,19 @@ READADDRESS?C macro Cin
         MOVE?CB Cin, EEADR
     endm
 
+READADDRESS?W macro Win
+        MOVE?WB Win, EEADR
+    endm
+
 READ?B macro Bout
         L?CALL  READ
         MOVE?AB Bout
+    endm
+READ_USED = 1
+
+READ?W macro Wout
+        L?CALL  READ
+        MOVE?AW Wout
     endm
 READ_USED = 1
 
@@ -565,8 +656,16 @@ RETURN? macro
         return
     endm
 
+WRITEADDRESS?B macro Bin
+        MOVE?BB Bin, EEADR
+    endm
+
 WRITEADDRESS?C macro Cin
         MOVE?CB Cin, EEADR
+    endm
+
+WRITEADDRESS?W macro Win
+        MOVE?WB Win, EEADR
     endm
 
 WRITE?B macro Bin
