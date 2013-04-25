@@ -55,6 +55,13 @@ conversionSuccess VAR BYTE
 clear
 read 6, device_id
 
+LOW PORTA.5
+LOW PORTA.4
+LOW PORTC.4
+LOW PORTC.3
+LOW PORTC.6
+LOW PORTC.5
+
 if 0 == 1 then
     write 0, 40
     write 1, "R"

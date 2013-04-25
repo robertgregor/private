@@ -30,7 +30,7 @@ INCLUDE "RFM73.pbp"
  'interrupt for timer
     INTCON = %10100000  'T01 enabled PEIE disabled.
     PIE1 = %00000000    'USART disabled
-    OPTION_REG = %00000100
+    OPTION_REG = %00000111
 
 on interrupt goto intManagement
 ENABLE
@@ -38,6 +38,8 @@ ENABLE
 TRISA = %00000000 'Set PORTA to all output
 TRISB = %00110000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input, 
+WPUA = %00000000
+WPUB = %00100000
 
 RELAY1_DOWN VAR PORTA.5
 RELAY1_UP VAR PORTA.4
@@ -76,7 +78,14 @@ timeout_value var word[3]
 currentCounter var byte[3]
 currentDirection var byte[3]
 
+startProgram:
 clear
+relaysGroup = 0
+gosub stopBlindsSilent
+relaysGroup = 1
+gosub stopBlindsSilent
+relaysGroup = 2
+gosub stopBlindsSilent
 read 6, device_id
 read 7, timeout_value[0]
 timeout_value[0] = timeout_value[0] * 30
@@ -91,6 +100,7 @@ output RELAY2_DOWN
 output RELAY2_UP
 output RELAY3_DOWN
 output RELAY3_UP
+
 input res
 
 gosub initModule
@@ -105,6 +115,7 @@ pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
 if RES == 0 then
+'if 1 == 0 then
     write 0, 40
     write 1, "R"
     write 2, "O"
@@ -116,6 +127,7 @@ if RES == 0 then
     write 8, 1
     write 9, 1
     pause 1000
+    goto startProgram
 endif
 'Check for data to send
 if (temp_data[0] != 0) then
@@ -193,7 +205,7 @@ if (data_in[1] == device_id) then
                               if (temp_byte < 101) then
                                 if (temp_byte == currentCounter[temp4_byte]) then
                                     gosub sendDataOK
-                                    counter = 4
+                                    counter[temp4_byte] = 4
                                 elseif (temp_byte > currentCounter[temp4_byte]) then
                                     temp2_byte = temp_byte - currentCounter[temp4_byte]
                                     initialPercent[temp4_byte] = currentCounter[temp4_byte]
@@ -201,7 +213,7 @@ if (data_in[1] == device_id) then
                                     gosub computeCounter
                                     initialCounter[temp4_byte] = counter[temp4_byte]
                                     gosub blindsDown
-                                    currentCounter[temp4_byte] = temp_byte[temp4_byte]
+                                    currentCounter[temp4_byte] = temp_byte
                                     gosub sendDataOK
                                 else
                                     temp2_byte = currentCounter[temp4_byte] - temp_byte
@@ -374,7 +386,7 @@ intManagement:
                    endif
                endif
            next iint
-           If ticks < 241 Then tiexit
+           If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
            if seconds <= 59 then tiexit

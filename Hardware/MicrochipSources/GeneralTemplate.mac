@@ -387,6 +387,11 @@ LDRET?C macro Cin
         retlw   Cin
     endm
 
+LOW?T macro Regin, Bitin
+        MOVE?CT 0, Regin, Bitin
+        MOVE?CT 0, ((Regin) + 80h), Bitin
+    endm
+
 NEXT?BCL macro Bin, Cin, Label
     if ((Cin) == 1)
         CHK?RP  Bin

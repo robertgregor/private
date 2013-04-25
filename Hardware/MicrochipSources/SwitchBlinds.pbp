@@ -11,8 +11,9 @@
 '0 - channel number
 '1,2,3,4,5 bank name
 '6 device id
+'7 timeout value
 
-EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","O","B","I","K",0,1,0,0,0,0,0,0,0,0]
 
 INCLUDE "RFM73.pbp"
 
@@ -27,7 +28,7 @@ INCLUDE "RFM73.pbp"
  'interrupt for timer
     INTCON = %10100000  'T01 enabled PEIE disabled.
     PIE1 = %00000000    'USART disabled
-    OPTION_REG = %00000100
+    OPTION_REG = %00000111
 
 on interrupt goto intManagement
 ENABLE
@@ -35,8 +36,8 @@ ENABLE
 TRISA = %00000000 'Set PORTA to all output
 TRISB = %00110000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input, 
-WPUA = %11111111
-WPUB = %11111111
+WPUA = %00000000
+WPUB = %00100000
 
 RELAY_DOWN VAR PORTA.5
 RELAY_UP VAR PORTA.4
@@ -66,7 +67,9 @@ timeout_value var word
 currentCounter var byte
 currentDirection var byte
 
+startProgram:
 clear
+gosub stopBlindsSilent
 read 6, device_id
 read 7, timeout_value
 timeout_value = timeout_value * 30
@@ -95,6 +98,7 @@ if RES == 0 then
     write 6, 0
     write 7, 0
     pause 1000
+    gosub startProgram
 endif
 'Check for data to send
 if (temp_data[0] != 0) then
@@ -223,7 +227,8 @@ if (data_in[1] == device_id) then
             temp_data[7] = temp2_byte
             temp_data[8] = temp1_byte
             temp_data[9] = "|"            
-            temp_byte = currentCounter
+            'temp_byte = currentCounter
+            temp_byte = seconds
             gosub convertNoToStr
             temp_data[10] = temp3_byte
             temp_data[11] = temp2_byte
@@ -277,7 +282,7 @@ intManagement:
                     GOSUB stopBlinds
                endif
            endif
-           If ticks < 241 Then tiexit
+           If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
            if seconds <= 59 then tiexit

@@ -41,8 +41,9 @@ ENABLE
 TRISA = %00000000 'Set PORTA to all output
 TRISB = %00110000 'Set , SDI input
 TRISC = %00000110 'Set IRQ input, 
-WPUA = %11111111
-WPUB = %11111111
+WPUA = %00000000
+WPUB = %00100000
+
 
 alarm VAR PORTC.1
 alarmCounter VAR byte

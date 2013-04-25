@@ -15,16 +15,9 @@
 '8 timeout 1
 '9 - 0 switch on when applied power 2
 '10 timeout 2
-'11 - 0 switch on when applied power 3
-'12 timeout 3
-'13 - 0 switch on when applied power 4
-'14 timeout 4
-'15 - 0 switch on when applied power 5
-'16 timeout 5
-'17 - 0 switch on when applied power 6
-'18 timeout 6
 
-EEPROM  0, [40,"R","O","B","I","K",0,1,0,1,0,1,0,1,0,1,0,1,0]
+
+EEPROM  0, [40,"R","O","B","I","K",0,1,0,1,0,0,0,0,0,0,0,0,0]
 
 INCLUDE "RFM73.pbp"
 
@@ -53,10 +46,7 @@ WPUB = %00100000
 RES var PORTB.5
 RELAY1 VAR PORTA.4
 RELAY2 VAR PORTA.5
-RELAY3 VAR PORTC.3
-RELAY4 VAR PORTC.4
-RELAY5 VAR PORTC.5
-RELAY6 VAR PORTC.6
+
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
@@ -73,28 +63,30 @@ EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
 ticks   var     word    ' Define pieces of seconds variable
-lcounter var byte[7]
+lcounter var byte[3]
 conversionSuccess VAR BYTE
 
+startProgram:
 clear
 input RES
 output relay1
 output relay2
-output relay3
-output relay4
-output relay5
-output relay6
 
 READ 6, device_id
-for i = 0 to 10 step 2
-    READ (I+7), temp1_byte
-    temp_byte = (i / 2) + 1
+    READ 7, temp1_byte
+    temp_byte = 1
     if (temp1_byte == 0) then
         gosub switchOnRelay
     else
         gosub switchOffRelay
     endif
-next i
+    READ 9, temp1_byte
+    temp_byte = 2
+    if (temp1_byte == 0) then
+        gosub switchOnRelay
+    else
+        gosub switchOffRelay
+    endif
 gosub initModule
 commonSettings:
 gosub commonRXTX
@@ -118,11 +110,8 @@ if RES == 0 then
     next i
     write 7, 1
     write 9, 1
-    write 11, 1
-    write 13, 1
-    write 15, 1
-    write 17, 1
     pause 1000
+    gosub startProgram
 endif
 'Check for data to send
 if (temp_data[0] != 0) then
@@ -163,7 +152,7 @@ if (data_in[1] == device_id) then
         if (conversionSuccess == 1) then
             temp4_byte = temp_byte 'this is relay number
             if (TEMP_BYTE > 0) then
-                if (TEMP_BYTE < 7) then
+                if (TEMP_BYTE < 3) then
                     if (data_in[4] == "c") then
                         if (data_in[5] == "o") then
                             write 5+(temp4_byte*2), 0
@@ -212,15 +201,11 @@ if (data_in[1] == device_id) then
         if (conversionSuccess == 1) then
             temp4_byte = temp_byte 'this is relay number
             if (TEMP_BYTE > 0) then
-                if (TEMP_BYTE < 7) then   
+                if (TEMP_BYTE < 3) then   
                     temp_data[0] = "3"
                     temp_data[1] = "|"
                     if (temp4_byte == 1) then temp_data[2] = RELAY1
                     if (temp4_byte == 2) then temp_data[2] = RELAY2
-                    if (temp4_byte == 3) then temp_data[2] = RELAY3
-                    if (temp4_byte == 4) then temp_data[2] = RELAY4
-                    if (temp4_byte == 5) then temp_data[2] = RELAY5
-                    if (temp4_byte == 6) then temp_data[2] = RELAY6                    
                     temp_data[2] = temp_data[2] + $30
                     temp_data[3] = "|"
                     read 5+(temp4_byte*2), temp_data[4]
@@ -286,10 +271,6 @@ intManagement:
                    if (lcounter[iint] == 0) then
                         if (iint = 1) then low relay1
                         if (iint = 2) then low relay2
-                        if (iint = 3) then low relay3
-                        if (iint = 4) then low relay4
-                        if (iint = 5) then low relay5
-                        if (iint = 6) then low relay6
                    endif
                endif           
            next iint
@@ -340,18 +321,10 @@ return
 switchOnRelay:
     if (temp_byte == 1) then HIGH RELAY1
     if (temp_byte == 2) then HIGH RELAY2
-    if (temp_byte == 3) then HIGH RELAY3
-    if (temp_byte == 4) then HIGH RELAY4
-    if (temp_byte == 5) then HIGH RELAY5
-    if (temp_byte == 6) then HIGH RELAY6    
 return
 
 switchOffRelay:
     if (temp_byte == 1) then LOW RELAY1
     if (temp_byte == 2) then LOW RELAY2
-    if (temp_byte == 3) then LOW RELAY3
-    if (temp_byte == 4) then LOW RELAY4
-    if (temp_byte == 5) then LOW RELAY5
-    if (temp_byte == 6) then LOW RELAY6    
 return
 
