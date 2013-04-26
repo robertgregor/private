@@ -14,7 +14,7 @@
 
 INCLUDE "RFM73.pbp"
 
-EEPROM  0, [40,"R","O","B","I","K","B","O","B","0",0,0,0,0,0,0]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,0,0,0,0]
 
  DEFINE OSC 8
  DEFINE HSER_RCSTA 90h
@@ -57,6 +57,7 @@ ser_data var byte[payloadLength]
 backup_data var byte[payloadLength]
 conversionSuccessfull var byte
 ci var byte
+flagRestoreBackedConfig var byte
 
 ticks var byte
 seconds var byte
@@ -73,19 +74,17 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
-if (1 == 0) then
-'if (resetButton == 0) then
-    disable
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    enable
+'if (1 == 0) then
+if (resetButton == 0) then
+    gosub putDefaultValues
     gosub printConfig
-    pause 2000
+    pause 1000
     goto resetLabel
+endif
+if (flagRestoreBackedConfig == 2) then
+    flagRestoreBackedConfig = 0
+    gosub restoreCurrentSettings
+    goto commonSettings
 endif
 if (manageSerial==1) then
     manageserial = 0
@@ -94,10 +93,12 @@ if (manageSerial==1) then
         GOSUB convertInputData
         if (conversionSuccessfull == 1) then
             if (temp_byte > 0) then                'not needed
-                if (temp_byte < 255) then
+                if (temp_byte < 81) then
+                    disable
                     write 0, temp_byte
+                    enable
                     gosub printOK
-                    GOSUB commonSettings
+                    GOto commonSettings
                 else
                     gosub printError
                 endif
@@ -114,8 +115,12 @@ if (manageSerial==1) then
         i=2
         GOSUB convertInputData
         if (conversionSuccessfull == 1) then
+            gosub saveCurrentConfig
+            gosub putDefaultValues
+            gosub commonRXTX
+            gosub debounce
             gosub addNewDevice
-            GOTO Main_rx
+            flagRestoreBackedConfig = 2
         else
             gosub printError
         endif
@@ -143,11 +148,14 @@ if (manageSerial==1) then
                 endif
             next j
             :endCycleS
-            if (device_id == 0) then
+            if (device_id == 0) then 'default values device -> default values to use...
                 gosub saveCurrentConfig
                 gosub putDefaultValues
+                gosub commonRXTX
+                gosub debounce
                 GOSUB sendData
-                gosub restoreCurrentSettings
+                flagRestoreBackedConfig = 1
+                ticks = 0
             else
                 GOSUB sendData
             endif
@@ -185,6 +193,11 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
+           if (flagRestoreBackedConfig == 1) then
+                if (ticks > 10) then
+                    flagRestoreBackedConfig = 2
+                endif
+           endif
            If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
@@ -261,7 +274,9 @@ savePwd:
     endif
     if (ser_data[11] == 0) then    
         for i=2 to 10
+            disable
             write i-1, ser_data[i]
+            enable
         next i        
         gosub printOK
     else 
@@ -270,94 +285,72 @@ savePwd:
 return
 
 saveCurrentConfig:
-read 0, backup_data[0]
-READ 1, backup_data[1]
-READ 2, backup_data[2]
-READ 3, backup_data[3]
-READ 4, backup_data[4]
-READ 5, backup_data[5]
-READ 6, backup_data[6]
-READ 7, backup_data[7]
-READ 8, backup_data[8]
-READ 9, backup_data[9]
+for i=0 to 9
+    read i, backup_data[i]
+next i
 return
 
 restoreCurrentSettings:
-write 0, backup_data[0]
-write 1, backup_data[1]
-write 2, backup_data[2]
-write 3, backup_data[3]
-write 4, backup_data[4]
-write 5, backup_data[5]
-write 6, backup_data[6]
-write 7, backup_data[7]
-write 8, backup_data[8]
-write 9, backup_data[9]
+for i=0 to 9
+    disable
+    write i, backup_data[i]
+    enable
+next i
 GOSUB commonRXTX
 return
 
 putDefaultValues:
+disable
 write 0, 40
 write 1, "R"
-write 2, "O"
-write 3, "B"
-write 4, "I"
-write 5, "K"
-write 6, "B"
-write 7, "O"
-write 8, "B"
-write 9, "O"
+write 2, "E"
+write 3, "M"
+write 4, "O"
+write 5, "T"
+write 6, "E"
+write 7, "H"
+write 8, "O"
+write 9, "M"
+enable
 return
 
 addNewDevice:
-gosub saveCurrentConfig
-GOSUB putDefaultValues                                                                                                         
 'send channel, password, deviceId
 device_id = 0
 temp_data[0] = "c"
 temp_data[1] = "="
-temp_data[2] = backup_data[0] 'channel
-temp_data[3] = backup_data[1] 'password
-temp_data[4] = backup_data[2]
-temp_data[5] = backup_data[3]
-temp_data[6] = backup_data[4]
-temp_data[7] = backup_data[5]
-temp_data[8] = backup_data[6]
-temp_data[9] = backup_data[7]
-temp_data[10] = backup_data[8]
-temp_data[11] = backup_data[9]
+for i=2 to 11
+    temp_data[i] = backup_data[i-2]
+next i
 temp_data[12] = temp_byte 'deviceId
 temp_data[13] = 13
 temp_data[14] = 10
-GOSUB commonRXTX
-gosub debounce
 gosub sendData
-gosub debounce
-'restore the original value
 return
 
 printConfig:
     read 0, temp_byte
     HSEROUT["+Channel:",DEC temp_byte,13,10]
     HSEROUT["+Password:"]
-    read 1, temp_byte
-    HSEROUT[temp_byte]
-    read 2, temp_byte
-    HSEROUT[temp_byte]
-    read 3, temp_byte
-    HSEROUT[temp_byte]
-    read 4, temp_byte
-    HSEROUT[temp_byte]
-    read 5, temp_byte
-    HSEROUT[temp_byte]
-    read 6, temp_byte
-    HSEROUT[temp_byte]
-    read 7, temp_byte
-    HSEROUT[temp_byte]
-    read 8, temp_byte
-    HSEROUT[temp_byte]
-    read 9, temp_byte
-    HSEROUT[temp_byte]
+    for i = 1 to 9
+        read i, temp_byte
+        HSEROUT[temp_byte]        
+    next i
     HSEROUT[13,10]
 return
 
+setRxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
+return
+
+setTxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return

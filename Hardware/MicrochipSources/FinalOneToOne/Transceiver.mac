@@ -415,12 +415,6 @@ CMPNE?BCL macro Bin, Cin, Label
     endif
     endm
 
-CMPNE?CCL macro Cin1, Cin2, Label
-    if ((Cin1) != (Cin2))
-        L?GOTO  Label
-    endif
-    endm
-
 CMPNE?TCL macro Regin, Bitin, Cin, Label
     if ((Cin) == 0)
         CLRWDT?
@@ -631,6 +625,10 @@ PAUSEUS?C macro Cin
     endm
 PAUSEUS_USED = 1
 
+READADDRESS?B macro Bin
+        MOVE?BB Bin, EEADR
+    endm
+
 READADDRESS?C macro Cin
         MOVE?CB Cin, EEADR
     endm
@@ -638,6 +636,12 @@ READADDRESS?C macro Cin
 READ?B macro Bout
         L?CALL  READ
         MOVE?AB Bout
+    endm
+READ_USED = 1
+
+READ?W macro Wout
+        L?CALL  READ
+        MOVE?AW Wout
     endm
 READ_USED = 1
 
@@ -653,6 +657,10 @@ RETURN? macro
     endif
         RST?RP
         return
+    endm
+
+WRITEADDRESS?B macro Bin
+        MOVE?BB Bin, EEADR
     endm
 
 WRITEADDRESS?C macro Cin

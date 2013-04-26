@@ -52,46 +52,6 @@ AOUT?BWB macro Bin, Wndx, Bout
     endif
     endm
 
-ADD?BCB macro Bin, Cin, Bout
-    if ((Bout) == (Bin))
-      if ((Cin) == 1)
-        CHK?RP  Bout
-        incf    Bout, F
-      else
-        movlw   Cin
-        CHK?RP  Bin
-        addwf   Bin, F
-      endif
-    else
-      if ((Cin) == 1)
-        CHK?RP  Bin
-        incf    Bin, W
-        MOVE?AB Bout
-      else
-        movlw   Cin
-        CHK?RP  Bin
-        addwf   Bin, W
-        MOVE?AB Bout
-      endif
-    endif
-    endm
-
-ADD?BCW macro Bin, Cin, Wout
-        movlw   low (Cin)
-        CHK?RP  Bin
-        addwf   Bin, W
-        MOVE?AB Wout
-    if (((Cin) >> 8) == 0)
-        clrf    (Wout) + 1
-        rlf     (Wout) + 1, F
-    else
-        movlw   (Cin) >> 8
-        btfsc   STATUS, C
-        addlw   1
-        movwf   (Wout) + 1
-    endif
-    endm
-
 ADD?CBB macro Cin, Bin, Bout
     if ((Bout) == (Bin))
       if ((Cin) == 1)
@@ -115,38 +75,6 @@ ADD?CBB macro Cin, Bin, Bout
       endif
     endif
     endm
-
-ADD?WBB macro Win, Bin, Bout
-        MOVE?BA Win
-    if ((Bout) == (Bin))
-        CHK?RP  Bout
-        addwf   Bout, F
-    else
-        CHK?RP  Bin
-        addwf   Bin, W
-        MOVE?AB Bout
-    endif
-    endm
-
-ADD?WCB macro Win, Cin, Bout
-    if ((Cin) == 1)
-        CHK?RP  Win
-        incf    Win, W
-    else
-        movlw   Cin
-        CHK?RP  Win
-        addwf   Win, W
-    endif
-        MOVE?AB Bout
-    endm
-
-MUL?BCW macro Bin, Cin, Wout
-        MOVE?BW Bin, R3
-        MOVE?CW Cin, R1
-        L?CALL  MUL
-        MOVE?AWW R2, Wout
-    endm
-MUL_USED = 1
 
 SUB?BCW macro Bin, Cin, Wout
         movlw   low (-(Cin))
@@ -225,42 +153,6 @@ CMPGT?BCL macro Bin, Cin, Label
     endif
     endm
 
-CMPLE?BCL macro Bin, Cin, Label
-    if ((Cin) >= 0ffh)
-        L?GOTO  Label
-    else
-      if ((Cin) >= 0)
-        CLRWDT?
-        MOVE?CA (Cin) + 1
-        CHK?RP  Bin
-        subwf   Bin, W
-        BIT?GOTO 0, STATUS, C, Label
-      endif
-    endif
-    endm
-
-CMPLT?BCL macro Bin, Cin, Label
-    if ((Cin) >= 100h)
-        L?GOTO  Label
-    else
-      if ((Cin) > 0)
-        CLRWDT?
-        MOVE?CA Cin
-        CHK?RP  Bin
-        subwf   Bin, W
-        BIT?GOTO 0, STATUS, C, Label
-      endif
-    endif
-    endm
-
-CMPNE?BBL macro Bin1, Bin2, Label
-        CLRWDT?
-        MOVE?BA Bin1
-        CHK?RP  Bin2
-        subwf   Bin2, W
-        BIT?GOTO 0, STATUS, Z, Label
-    endm
-
 CMPNE?BCL macro Bin, Cin, Label
     if (((Cin) > -100h) & ((Cin) < 100h))
         CLRWDT?
@@ -284,61 +176,6 @@ CMPNE?TCL macro Regin, Bitin, Cin, Label
         L?GOTO  Label
       endif
     endif
-    endm
-
-DIG?BCW macro Bin, Cin, Wout
-        MOVE?BW Bin, R0
-        movlw   Cin
-        L?CALL  DIG
-        MOVE?AW Wout
-    endm
-DIG_USED = 1
-
-ASM? macro
-        RST?RP
-    endm
-
-CLEAR? macro
-    ifdef BANK0_START
-        movlw   BANK0_START
-        movwf   FSR
-        movlw   BANK0_END - BANK0_START + 1
-        L?CALL  CLEAR
-    endif
-    ifdef BANK1_START
-        movlw   BANK1_START
-        movwf   FSR
-        movlw   BANK1_END - BANK1_START + 1
-        L?CALL  CLEAR
-    endif
-    ifdef BANK2_START
-        movlw   low (BANK2_START)
-        movwf   FSR
-        movlw   BANK2_END - BANK2_START + 1
-        L?CALL  CLEARH
-    endif
-    ifdef BANK3_START
-        movlw   low (BANK3_START)
-        movwf   FSR
-        movlw   BANK3_END - BANK3_START + 1
-        L?CALL  CLEARH
-    endif
-    endm
-CLEAR_USED = 1
-
-DISABLE? macro
-    endm
-
-ENABLE? macro
-    endm
-
-END? macro
-    local loop
-loop    sleep
-        L?GOTO  loop
-    endm
-
-ENDASM? macro
     endm
 
 GOSUB?L macro Label
@@ -366,42 +203,6 @@ GOTO?L macro Label
         L?GOTO  Label
     endm
 
-ICALL?L macro Label
-        L?CALL  Label
-    endm
-
-LOOKDOWN?BCLB macro Bin, Cin, Label, Bout
-    local loop, getval, valtbl
-        MOVE?CB -1, R1
-loop    incf    R1, F
-        movf    R1, W
-        sublw   (Cin) - 1
-        BIT?GOTO 0, STATUS, C, Label
-        L?CALL  getval
-        CHK?RP  Bin
-        subwf   Bin, W
-        BIT?GOTO 0, STATUS, Z, loop
-        MOVE?BB R1, Bout
-        L?GOTO  Label
-getval  movlw   high (valtbl)
-        movwf   PCLATH
-        movf    R1, W
-	addlw	low (valtbl)
-	btfsc	STATUS, C
-	incf	PCLATH, F
-	movwf	PCL
-valtbl
-    endm
-
-LDRET?C macro Cin
-        retlw   Cin
-    endm
-
-LOW?T macro Regin, Bitin
-        MOVE?CT 0, Regin, Bitin
-        MOVE?CT 0, ((Regin) + 80h), Bitin
-    endm
-
 NEXT?BCL macro Bin, Cin, Label
     if ((Cin) == 1)
         CHK?RP  Bin
@@ -421,17 +222,6 @@ NEXT?BCL macro Bin, Cin, Label
       endif
     endif
     endm
-
-ONINT?LL macro Inthand, Intchk
-    local label
-        bsf     INTCON, GIE
-        L?GOTO  label
-Intchk  btfsc   INTCON, GIE
-        return
-        L?GOTO  Inthand
-label
-    endm
-ONINT_USED = 1
 
 PAUSE?C macro Cin
     if (((Cin) >> 8) == 0)
@@ -467,11 +257,6 @@ READ?B macro Bout
     endm
 READ_USED = 1
 
-RESUME? macro
-        RST?RP
-        retfie
-    endm
-
 RETURN? macro
     ifdef DEBUG_STACK
         CHK?RP  DEBUG_STACK
@@ -480,16 +265,6 @@ RETURN? macro
         RST?RP
         return
     endm
-
-WRITEADDRESS?B macro Bin
-        MOVE?BB Bin, EEADR
-    endm
-
-WRITE?B macro Bin
-        MOVE?BA Bin
-        L?CALL  WRITE
-    endm
-WRITE_USED = 1
 
 
 	LIST

@@ -64,7 +64,7 @@ Rx_pw_p4 con $15 'RX payload width pipe4 register address
 Rx_pw_p5 con $16 'RX payload width pipe5 register address
 Fifo_status con $17 'FIFO status register register address
 
-goto endRFM70
+goto endRFM73
 initModule:
 pause 200
 '----------SPI settings---------------------------------------------------------
@@ -84,11 +84,7 @@ return
 
 commonRXTX:
 data_out[0]=Write_reg+Rx_addr_p0 'Rx address for pipe0
-READ 1, data_out[1]
-READ 2, data_out[2]
-READ 3, data_out[3]
-READ 4, data_out[4]
-READ 5, data_out[5]
+gosub setRxAddressPipe
 num_byte=5
 gosub spi_write
 data_out[0]=Write_reg+En_aa 'enable auto ACK pipe0
@@ -283,11 +279,7 @@ return
 
 setup_tx:
 data_out[0]=Write_reg+Tx_addr 'Tx address
-READ 1, data_out[1]
-READ 2, data_out[2]
-READ 3, data_out[3]
-READ 4, data_out[4]
-READ 5, data_out[5]
+gosub setTxAddressPipe
 num_byte=5
 gosub spi_write
 data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
@@ -299,4 +291,4 @@ data_out[1]=$0E
 num_byte=1
 gosub spi_write
 return
-:endRFM70
+:endRFM73

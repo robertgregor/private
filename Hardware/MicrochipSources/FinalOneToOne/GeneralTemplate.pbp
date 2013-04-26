@@ -13,8 +13,7 @@
 '6,7,8,9 bank name device
 '10 device id
 
-EEPROM  0, [40,"R","O","B","I","K","B","O","B","0",0,0,0,0,0,0]
-
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,0,0,0,0]
 
 INCLUDE "RFM73.pbp"
 
@@ -64,17 +63,6 @@ LOW PORTC.3
 LOW PORTC.6
 LOW PORTC.5
 
-if 0 == 1 then
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    END
-endif
-
 gosub initModule
 
 commonSettings:
@@ -107,19 +95,13 @@ if (data_in[1] == device_id) then
     if (data_in[2] == "c") then    
         if (data_in[3] == "=") then
             'OK it is configure
-            write 0, data_in[4] 'channel
-            write 1, data_in[5] 'password transmitter 0 - bank name on the transceiver side
-            write 2, data_in[6] 'password transmitter 1
-            write 3, data_in[7] 'password transmitter 2
-            write 4, data_in[8] 'password transmitter 3
-            write 5, data_in[9] 'password transmitter 4
-            write 6, data_in[10] 'password device 0
-            write 7, data_in[11] 'password device 1
-            write 8, data_in[12] 'password device 2
-            write 9, data_in[13] 'password device 3
-            write 10, data_in[14]'device id - it is also password 4 bank name on the device side
-            device_id = data_in[14]
-            pause 10
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id
+            pause 250
             configure = 1
             gosub sendDataOK
         endif
@@ -207,3 +189,18 @@ convertNoToStr:
         temp1_byte = (temp_byte DIG 0) + $30
 return
 
+setRxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return
+
+setTxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
+return
