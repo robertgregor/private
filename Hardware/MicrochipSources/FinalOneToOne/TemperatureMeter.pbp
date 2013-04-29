@@ -1,0 +1,349 @@
+'@  __config _INTRC_OSC_NOCLKOUT & _WDT_ON & _MCLRE_OFF & _CP_OFF & _CPD_OFF & _FCMEN_OFF & _IESO_OFF & _BOR_ON & _PWRTE_ON
+                 
+@ DEVICE PIC16F690,INTRC_OSC_NOCLKOUT
+@ DEVICE PIC16F690,WDT_ON
+@ DEVICE PIC16F690,MCLR_ON
+@ DEVICE PIC16F690,CPD_OFF
+@ DEVICE PIC16F690,BOD_OFF
+@ DEVICE PIC16F690,PWRT_OFF
+
+'0 - channel number
+'1,2,3,4,5 bank name transmitter
+'6,7,8,9 bank name device
+'10 device id
+'11 interval
+
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,0,0]
+
+INCLUDE "RFM70.pbp"
+
+ DEFINE OSC 8
+ DEFINE ADC_BITS 10
+ DEFINE ADC_CLOCK 3 ' ADC clock source (Fosc/32)
+ DEFINE ADC_SAMPLEUS 50 ' ADC sampling time (uSec)
+ ADCON0.7 = 1
+ ADCON0.0 = 0
+
+ OSCCON = %01110000 ' Internal 8MHz osc
+ ANSEL = 0
+ ANSELH = 0
+ CM1CON0 = 0
+ CM2CON0 = 0
+ 
+ 'interrupt for timer
+    INTCON = %10101000 'TMR0 enabled , PORTAB int enabled PEIE disabled.
+    PIE1 = %00000000    'USART disabled
+    OPTION_REG = %00000111
+
+on interrupt goto intManagement
+ENABLE
+'-----------init----------------------------------------------------------------
+TRISA = %00110000 'Set PORTA to all output
+TRISB = %00010000 'Set , SDI input
+TRISC = %00000100 'Set IRQ input,
+WPUA = %11111111
+WPUB = %11111111
+IOCA.4 = 1 'PORTA.4 is reset button, enable interrupt 
+
+HEATING_SENSOR var PORTA.5
+HEATING_SENSOR_POWER var PORTC.5
+'RESET_BUTTON VAR PORTA.4
+RESET_BUTTON_FLAG var byte
+i VAR BYTE 'loop counter
+j var byte
+ci var byte
+configure var byte
+temp_byte_int var byte
+temp_byte var byte
+temp1_byte var byte
+temp2_byte var byte
+temp3_byte var byte
+temp_word var word
+EEPROMBYTE      VAR BYTE
+EEPROMPOSITION  VAR BYTE
+seconds  var     byte    ' Define second variable
+ticks   var     byte    ' Define pieces of seconds variable
+l1counter var byte
+conversionSuccess VAR BYTE
+sleepMode var byte
+sleep_period var word
+Dummy       VAR BYTE
+TempC       VAR WORD
+Float       VAR WORD        
+busy        var BIT
+VDD         VAR WORD
+temperature var word
+
+startProgLabel:
+clear
+read 10, device_id
+gosub initModule
+READ 11, temp_byte
+sleep_period = temp_byte * 10
+if (sleep_period != 0) then
+    if (device_id != 0) then
+        sleepMode = 1
+        gosub sendTemperature
+    endif
+endif
+low HEATING_SENSOR_POWER
+commonSettings:
+gosub commonRXTX
+
+'============Main Rx============================================================
+Main_rx:
+gosub setup_rx 'setup Rx
+pause 2 'delay for Rx starting
+Ce=1 'set nRF24L01 in Rx mode
+irqLoop:
+if RESET_BUTTON_FLAG == 1 then
+    RESET_BUTTON_FLAG = 0
+    DISABLE
+    write 0, 40
+    write 1, "R"
+    write 2, "E"
+    write 3, "M"
+    write 4, "O"
+    write 5, "T"
+    write 6, "E"
+    write 7, "H"
+    write 8, "O"
+    write 9, "M"
+    write 10, 0
+    write 11, 1
+    ENABLE
+    pause 1000
+    goto startProgLabel
+endif
+'Check for data to send
+if (temp_data[0] != 0) then
+    if (configure == 1) then
+        gosub commonRXTX
+        configure = 0
+    endif
+    gosub sendData
+    temp_data[0] = 0
+    GOTO main_rx
+endif
+if (sleepMode == 1) then    
+      gosub setup_sleep
+      sleep sleep_period
+      pause 1
+      seconds = 57
+      ticks = 25
+      sleepmode = 0
+      INTCON = %10101000      
+      OPTION_REG = %00000111
+      gosub sendTemperature
+      goto commonSettings    
+endif
+If Irq !=0 then irqLoop 'wait until IRQ, active low
+Ce=0
+lop:
+data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
+num_byte=payloadLength
+gosub spi_read
+temp_data[0] = 0
+if (data_in[1] == device_id) then
+    if (data_in[2] == "c") then    
+        if (data_in[3] == "=") then
+            'OK it is configure
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id
+            pause 250
+            configure = 1
+            if (sleep_period == 0) then 
+                sleepMode = 0                
+            else
+                sleepMode = 1
+            endif
+            gosub sendDataOK
+        endif
+    ELSEif (data_in[2] == "m") then    
+        if (data_in[3] == "=") then
+            I=4
+            GOSUB convertInputData
+            if (conversionSuccess = 1) then
+                write 11, temp_byte
+                sleep_period = temp_byte * 10
+                if (sleep_period == 0) then 
+                    sleepMode = 0                
+                else
+                    if (device_id != 0) then
+                        sleepMode = 1
+                    else
+                        sleepMode = 0
+                    endif
+                endif
+                gosub sendDataOK
+            endif
+        ENDIF
+    ELSEif (data_in[2] == "s") then    
+            gosub sendTemperature
+    elseif (data_in[2] == "p") then
+            if (data_in[3] == "n") then
+                gosub sendDataOK
+            endif
+    endif
+    if (temp_data[0] == 0) then
+        temp_data[0] = "E"
+        temp_data[1] = "R"
+        temp_data[2] = "R"
+        temp_data[3] = "O"
+        temp_data[4] = "R"
+        temp_data[5] = 13
+        temp_data[6] = 10
+    endif
+endif
+
+data_out[0]=Fifo_status 'Read FIFO status
+num_byte=1
+gosub spi_read
+val= data_in[1] 'FIFO status register
+if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
+data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
+data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
+num_byte=1
+gosub spi_write
+pause 2 'wait 2ms Rx<->Tx
+GOTO Main_rx
+end
+
+disable
+intManagement:
+        if (INTCON.2 == 1) then
+           ticks = ticks + 1      ' Count pieces of seconds
+           If ticks < 31 Then tiexit
+           ticks = 0
+           seconds = seconds + 1
+           if seconds <= 58 then tiexit
+           seconds = 0
+           if (sleep_period != 0) then
+               if (device_id != 0) then
+                   sleepMode = 1
+               endif
+           endif
+           tiexit: 
+           INTCON.2 = 0
+        endif
+        if (INTCON.0 == 1) then
+           INTCON.0 = 0
+           RESET_BUTTON_FLAG = 1
+        endif
+        INTCON.7 = 1
+resume
+enable
+
+sendDataOK:
+    temp_data[0] = "O"
+    temp_data[1] = "K"
+    temp_data[2] = 13
+    temp_data[3] = 10
+return
+
+convertInputData:
+    conversionSuccess = 0
+    TEMP_BYTE="a"
+    for ci=0 to 2    
+        TEMP1_BYTE = "a"
+        TEMP2_BYTE = data_in[i]
+        if (TEMP2_BYTE == "|") then return
+        GOSUB lookupChar
+        if (TEMP1_BYTE == "a") then return 
+        if (ci==0) then 
+            TEMP_BYTE = TEMP1_BYTE
+            conversionSuccess = 1 
+        else 
+            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
+            conversionSuccess = 1
+        endif
+        i = i + 1
+    next ci
+return
+
+lookupChar:
+    LOOKDOWN temp2_byte,["0123456789"], temp1_byte
+RETURN
+
+convertNoToStr:
+        temp3_byte = (temp_byte DIG 2) + $30
+        temp2_byte = (temp_byte DIG 1) + $30
+        temp1_byte = (temp_byte DIG 0) + $30
+return
+
+sendTemperature:
+    high HEATING_SENSOR_power
+    pause 50
+   'read current temperature    
+   OWOUT HEATING_SENSOR, 1, [$CC, $44] 'Skip ROM search & do temp conversion
+Wait_Up:
+   OWIN HEATING_SENSOR, 4, [Busy]      'Read busy-bit
+   IF Busy = 0 THEN goto Wait_Up            'Still busy..?, Wait_Up..!
+   OWOUT HEATING_SENSOR, 1, [$CC, $BE] 'Skip ROM search & read scratchpad memory
+   OWIN HEATING_SENSOR, 2, [temperature.Lowbyte, temperature.Highbyte] 'Read two bytes / end comms
+   low HEATING_SENSOR_power
+   temp_data[0] = "2"
+   temp_data[1] = "|"
+   if (temperature.11 = 1) then
+        temp_data[2] = "-"
+        disable
+        Dummy = 625 * (~temperature+1)
+        TempC = DIV32 10
+        enable
+        temp_data[3] = (TempC DIG 4) + $30
+        temp_data[4] = (TempC DIG 3) + $30
+        temp_data[5] = "."
+        temp_data[6] = (TempC DIG 2) + $30
+        temp_data[7] = (TempC DIG 1) + $30
+   else
+        temp_data[2] = "+"
+        disable
+        Dummy = 625 * temperature
+        TempC = DIV32 10
+        enable
+        TempC  = (temperature & $0FF0) >> 4 ' Mask middle 8-bits, shift into lower byte
+        Float = ((temperature.Lowbyte & $0F) * 625) ' Lower 4-bits of result * 625
+        temp_data[3] = (TempC DIG 1) + $30
+        temp_data[4] = (TempC DIG 0) + $30
+        temp_data[5] = "."
+        temp_data[6] = (Float DIG 3) + $30
+        temp_data[7] = (Float DIG 2) + $30
+   endif
+        'read baterry        
+        VRCON.4 = 1 ; Turn 0.6V reference ON
+        PAUSEUS 200 ; Allow VP6 to settle
+        ADCIN 13, temp_word ; get VP6 analog reading (10-bit)
+        VRCON.4 = 0 ; Turn 0.6V reference OFF
+        VDD = 6138 / temp_word ; convert to voltage ve vdd je 25 = 2,5 V        
+        temp_data[8] = "|"
+        temp_data[9] = (VDD DIG 1) + $30
+        temp_data[10] = "."
+        temp_data[11] = (VDD DIG 0) + $30
+        temp_data[12] = "|"
+        temp_data[13] = (sleep_period DIG 3) + $30
+        temp_data[14] = (sleep_period DIG 2) + $30
+        temp_data[15] = (sleep_period DIG 1) + $30
+        temp_data[16] = (sleep_period DIG 0) + $30
+        temp_data[17] = 13
+        temp_data[18] = 10
+return
+
+setRxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return
+
+setTxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
+return
