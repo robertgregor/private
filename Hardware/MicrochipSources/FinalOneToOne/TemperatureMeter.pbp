@@ -47,7 +47,6 @@ IOCA.4 = 1 'PORTA.4 is reset button, enable interrupt
 
 HEATING_SENSOR var PORTA.5
 HEATING_SENSOR_POWER var PORTC.5
-'RESET_BUTTON VAR PORTA.4
 RESET_BUTTON_FLAG var byte
 i VAR BYTE 'loop counter
 j var byte
@@ -168,7 +167,9 @@ if (data_in[1] == device_id) then
             I=4
             GOSUB convertInputData
             if (conversionSuccess = 1) then
+                disable
                 write 11, temp_byte
+                enable
                 sleep_period = temp_byte * 10
                 if (sleep_period == 0) then 
                     sleepMode = 0                

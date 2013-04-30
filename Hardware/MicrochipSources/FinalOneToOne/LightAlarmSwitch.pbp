@@ -96,6 +96,7 @@ Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
 'Check for data to send
 if RES == 0 then
+    disable
     write 0, 40
     write 1, "R"
     write 2, "E"
@@ -112,6 +113,7 @@ if RES == 0 then
     write 13, 0
     write 14, 0
     write 15, 0
+    enable
     pause 1000
     goto startLabel
 endif
@@ -162,20 +164,28 @@ if (data_in[1] == temp_byte) then
         if (data_in[3] == "1") then
             if (data_in[4] == "c") then
                 if (data_in[5] == "o") then
+                    disable
                     write 11, 0
+                    enable
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "f") then
+                    disable
                     write 11, 1
+                    enable
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "d") then
+                    disable
                     write 13, 1
+                    enable
                     l1onAlarm = 1
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "c") then
+                    disable
                     write 13, 0
+                    enable
                     l1onAlarm = 0
                     gosub sendDataOK
                 endif                
@@ -184,7 +194,9 @@ if (data_in[1] == temp_byte) then
                         i = 7
                         gosub convertInputData
                         if (conversionSuccess == 1) then
+                            disable
                             write 12, temp_byte
+                            enable
                             gosub sendDataOK
                         else
                             gosub sendDataError
@@ -233,11 +245,15 @@ if (data_in[1] == temp_byte) then
                     gosub convertInputData
                     if (conversionSuccess == 1) then
                         if (data_in[5] == "e") then
+                            disable
                             write 14, temp_byte
+                            enable
                             gosub sendDataOK
                         endif
                         if (data_in[5] == "l") then
+                            disable
                             write 15, temp_byte
+                            enable
                             gosub sendDataOK
                         endif
                     endif

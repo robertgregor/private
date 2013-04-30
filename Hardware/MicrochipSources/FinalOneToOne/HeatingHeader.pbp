@@ -7,24 +7,21 @@
 @ DEVICE PIC16F690,BOD_OFF
 @ DEVICE PIC16F690,PWRT_OFF
 
-'EEPROM_MAP
 '0 - channel number
-'1,2,3,4,5 bank name
-'6 device id
-'7 full range highByte
-'8 full range lowbyte
-'9 interval
-'10 temperature - it is temperature / 2
-'11 analog percentage
+'1,2,3,4,5 bank name transmitter
+'6,7,8,9 bank name device
+'10 device id
+'11 interval
+'12 full range highByte
+'13 full range lowbyte
+'14 temperature - it is temperature / 2
+'15 analog percentage
+
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,44,95]
 
 INCLUDE "RFM73.pbp"
 
-EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,44,95,0,0,0,0]
-
  DEFINE OSC 8
- 'DEFINE HSER_TXSTA 24h
- 'DEFINE HSER_SPBRG 51
- 'DEFINE HSER_CLROERR 1
 
  DEFINE ADC_BITS 10 ' ADCIN resolution (Bits)
  DEFINE ADC_CLOCK 3 ' ADC clock source (Fosc/32)
@@ -38,7 +35,7 @@ EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,44,95,0,0,0,0]
  CM2CON0 = 0
  
  'interrupt for timer
- INTCON = %10100000
+ INTCON = %10101000
  PIE1 = %00000000
  OPTION_REG = %00000100
 
@@ -47,14 +44,16 @@ ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00110000 'Set PORTA to all output
 TRISB = %00110000 'Set , SDI input
-TRISC = %00000100 'Set IRQ input, 
+TRISC = %00000100 'Set IRQ input,
+WPUA = %11111111
+WPUB = %11111111
+IOCB.5 = 1 'PORTB.5 is reset button, enable interrupt 
 
 HEATING_SENSOR var PORTA.4
 HEATING_SENSOR_power var PORTC.1
 MOTOR_1 var PORTC.4
 MOTOR_2 var PORTC.5
 MOVE_SENSOR_POWER VAR PORTC.3
-'MOTOR_BRIDGE_POWER VAR PORTC.6
 MOVE_SENSOR VAR PORTA.5
 ANALOG_INPUT_MOTOR VAR PORTB.5
 moveSensorPrevious var byte
@@ -69,6 +68,8 @@ motorAnalogValueSeconds var WORD
 motorAnalogValueTmpTicks var WORD
 ANALOG_PERCENTAGE var byte
 mode var byte
+RESET_BUTTON_FLAG var byte
+
 
 i VAR BYTE 'loop counter
 j var byte
@@ -94,14 +95,15 @@ VDD VAR WORD
 sleep_period var word
 temperatureExp var byte
 
+startProgLabel:
 clear
 input MOVE_SENSOR
-read 6, device_id
-READ 7, motorFullRangeTicks.highbyte
-read 8, motorFullRangeTicks.lowbyte
-read 9, sleep_period
-read 10, temperatureExp
-read 11, ANALOG_PERCENTAGE
+read 10, device_id
+READ 12, motorFullRangeTicks.highbyte
+read 13, motorFullRangeTicks.lowbyte
+read 11, sleep_period
+read 14, temperatureExp
+read 15, ANALOG_PERCENTAGE
 gosub motorStopInt
 gosub initModule
 if (device_id != 0) then mode = 4
@@ -114,6 +116,29 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
+if RESET_BUTTON_FLAG == 1 then
+    RESET_BUTTON_FLAG = 0
+    DISABLE
+    write 0, 40
+    write 1, "R"
+    write 2, "E"
+    write 3, "M"
+    write 4, "O"
+    write 5, "T"
+    write 6, "E"
+    write 7, "H"
+    write 8, "O"
+    write 9, "M"
+    write 10, 0
+    write 11, 1
+    write 12, 0
+    write 13, 0
+    write 14, 44
+    write 15, 90
+    ENABLE
+    pause 1000
+    goto startProgLabel
+endif
 if (mode == 1) then
     if (sleep_period != 0) then
        mode = 2
@@ -180,7 +205,6 @@ if (mode == 2) then
              temp_data[0] = 0
          endif
       endif      
-      disable
       INTCON = 0
       OSCCON = %00010000
       pause 1
@@ -192,9 +216,8 @@ if (mode == 2) then
       ticks = 0
       OSCCON = %01110000
       pause 1
-      INTCON = %10100000
+      INTCON = %10101000
       OPTION_REG = %00000100
-      enable
       mode = 1
       goto commonSettings
    endif
@@ -225,8 +248,8 @@ endif
 if (mode == 6) then
     if (motorRunning == 0) then
         motorFullRangeTicks = motorCurrentTicks
-        write 7, motorFullRangeTicks.highbyte
-        write 8, motorFullRangeTicks.lowbyte
+        write 12, motorFullRangeTicks.highbyte
+        write 13, motorFullRangeTicks.lowbyte
         TEMP_data[0] = "A"
         TEMP_data[1] = "e"
         gosub setModeBasedOnSleepPeriod    
@@ -244,15 +267,13 @@ if (data_in[1] == device_id) then
     if (data_in[2] == "c") then    
         if (data_in[3] == "=") then
             'OK it is configure
-            write 0, data_in[9] 'channel
-            write 1, data_in[4] 'password 0
-            write 2, data_in[5] 'password 1
-            write 3, data_in[6] 'password 2
-            write 4, data_in[7] 'password 3
-            write 5, data_in[8] 'password 4
-            write 6, data_in[10]'device id
-            device_id = data_in[10]
-            pause 10
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id            
+            pause 250
             configure = 1
             gosub sendDataOK
         endif
@@ -260,7 +281,9 @@ if (data_in[1] == device_id) then
             mode = 4
             gosub sendDataOK
     elseif (data_in[2] == "p") then
+        if (data_in[3] == "n") then
             gosub sendDataOK
+        endif
     ELSEif (data_in[2] == "s") then    
             gosub sendTemperature
     else
@@ -273,17 +296,23 @@ if (data_in[1] == device_id) then
                   gosub setValveToPosition
                   gosub sendDataOK
             endif
-        elseif (data_in[2] == "m") then   
-             write 9, temp_byte
+        elseif (data_in[2] == "m") then
+             disable   
+             write 11, temp_byte
+             enable
              sleep_period = temp_byte
              gosub setModeBasedOnSleepPeriod
              gosub sendDataOK
         elseif (data_in[2] == "t") then 
-             write 10, temp_byte
+             disable
+             write 14, temp_byte
+             enable
              temperatureExp = temp_byte
              gosub sendDataOK
         elseif (data_in[2] == "n") then 
-             write 11, temp_byte
+             disable
+             write 15, temp_byte
+             enable
              ANALOG_PERCENTAGE = temp_byte
              gosub sendDataOK
         endif
@@ -365,6 +394,10 @@ intManagement:
            tiexit: 
            INTCON.2 = 0
         endif
+        if (INTCON.0 == 1) then
+           INTCON.0 = 0
+           RESET_BUTTON_FLAG = 1
+        endif
         INTCON.7 = 1
 resume
 
@@ -373,7 +406,6 @@ motorStopInt:
         low MOTOR_2
         motorRunning = 0
         LOW MOVE_SENSOR_power
-        'LOW MOTOR_BRIDGE_POWER
 return
 
 enable
@@ -384,29 +416,6 @@ sendDataOK:
     temp_data[2] = 10
 return
 
-'convertInputData:
-'    conversionSuccess = 0
-'    TEMP_BYTE="a"
-'    for ci=0 to 2    
-'        TEMP1_BYTE = "a"
-'        TEMP2_BYTE = data_in[i]
-'        if (TEMP2_BYTE == "|") then return
-'        GOSUB lookupChar
-'        if (TEMP1_BYTE == "a") then return 
-'        if (ci==0) then 
-'            TEMP_BYTE = TEMP1_BYTE
-'            conversionSuccess = 1 
-'        else 
-'            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
-'            conversionSuccess = 1
-'        endif
-'        i = i + 1
-'    next ci
-'return
-
-'lookupChar:
-'    LOOKDOWN temp2_byte,["0123456789"], temp1_byte
-'RETURN
 convertInputData:
     temp_word = 0
     conversionSuccess = 0
@@ -433,7 +442,6 @@ convertNoToStr:
 return
 
 MotorOpenHead:
-    'HIGH MOTOR_BRIDGE_POWER
     motorRunning = 2
     HIGH MOTOR_1
     LOW MOTOR_2
@@ -444,7 +452,6 @@ MotorOpenHead:
 return
 
 motorCloseHead:
-    'HIGH MOTOR_BRIDGE_POWER
     motorRunning = 1
     HIGH MOTOR_2
     LOW MOTOR_1
@@ -556,21 +563,6 @@ setModeBasedOnSleepPeriod:
             mode = 1
         endif
     endif
-return
-
-resetValues:
-    write 0, 40
-    write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    write 8, 0
-    write 9, 0
-    write 10, 44
-    write 11, 90
 return
 
 setRxAddressPipe:
