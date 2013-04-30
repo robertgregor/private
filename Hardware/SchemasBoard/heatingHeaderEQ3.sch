@@ -1487,21 +1487,6 @@ rotated 45 deg.</description>
 <rectangle x1="0.7112" y1="-1.2954" x2="1.1684" y2="-0.7112" layer="51"/>
 <rectangle x1="-1.1684" y1="-1.2954" x2="-0.7112" y2="-0.7112" layer="51"/>
 </package>
-<package name="SOT23">
-<description>&lt;b&gt;SOT-23&lt;/b&gt;</description>
-<wire x1="1.4224" y1="0.6604" x2="1.4224" y2="-0.6604" width="0.1524" layer="51"/>
-<wire x1="1.4224" y1="-0.6604" x2="-1.4224" y2="-0.6604" width="0.1524" layer="51"/>
-<wire x1="-1.4224" y1="-0.6604" x2="-1.4224" y2="0.6604" width="0.1524" layer="51"/>
-<wire x1="-1.4224" y1="0.6604" x2="1.4224" y2="0.6604" width="0.1524" layer="51"/>
-<smd name="3" x="0" y="1.1" dx="1" dy="1.4" layer="1"/>
-<smd name="2" x="0.95" y="-1.1" dx="1" dy="1.4" layer="1"/>
-<smd name="1" x="-0.95" y="-1.1" dx="1" dy="1.4" layer="1"/>
-<text x="-1.905" y="1.905" size="1.27" layer="25">&gt;NAME</text>
-<text x="-1.905" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
-<rectangle x1="-0.2286" y1="0.7112" x2="0.2286" y2="1.2954" layer="51"/>
-<rectangle x1="0.7112" y1="-1.2954" x2="1.1684" y2="-0.7112" layer="51"/>
-<rectangle x1="-1.1684" y1="-1.2954" x2="-0.7112" y2="-0.7112" layer="51"/>
-</package>
 </packages>
 <symbols>
 <symbol name="NPN">
@@ -2530,24 +2515,6 @@ BF959 corrected 2008.03.06&lt;br&gt;</description>
 <technology name="MMUN2112LT1"/>
 <technology name="MMUN2113LT1"/>
 <technology name="MMUN2114LT1"/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-<deviceset name="BC846" prefix="T">
-<description>&lt;b&gt;NPN TRANSISTOR&lt;/b&gt;</description>
-<gates>
-<gate name="G$1" symbol="NPN" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="SOT23">
-<connects>
-<connect gate="G$1" pin="B" pad="1"/>
-<connect gate="G$1" pin="C" pad="3"/>
-<connect gate="G$1" pin="E" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
 </technologies>
 </device>
 </devices>
@@ -14014,8 +13981,6 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <part name="C2" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="R6" library="resistor" deviceset="R-EU_" device="R1206W" value="4K7"/>
 <part name="U$3" library="rfm70" deviceset="PROGRAMMINGHEADER" device="" technology="DIP"/>
-<part name="T5" library="transistor" deviceset="BC846" device=""/>
-<part name="R9" library="resistor" deviceset="R-EU_" device="R1206" value="1K"/>
 <part name="C3" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 </parts>
 <sheets>
@@ -14054,8 +14019,6 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <instance part="C2" gate="G$1" x="25.4" y="50.8"/>
 <instance part="R6" gate="G$1" x="160.02" y="109.22" rot="R270"/>
 <instance part="U$3" gate="G$1" x="185.42" y="121.92"/>
-<instance part="T5" gate="G$1" x="185.42" y="43.18"/>
-<instance part="R9" gate="G$1" x="182.88" y="55.88" rot="R90"/>
 <instance part="C3" gate="G$1" x="30.48" y="99.06" rot="R90"/>
 </instances>
 <busses>
@@ -14068,7 +14031,8 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <wire x1="137.16" y1="30.48" x2="187.96" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="66.04" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="IC1" gate="G$1" pin="GND"/>
-<wire x1="187.96" y1="38.1" x2="187.96" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="187.96" y1="38.1" x2="187.96" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="187.96" y1="35.56" x2="187.96" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="58.42" y1="91.44" x2="58.42" y2="86.36" width="0.1524" layer="91"/>
 <wire x1="58.42" y1="86.36" x2="58.42" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="58.42" y1="30.48" x2="101.6" y2="30.48" width="0.1524" layer="91"/>
@@ -14115,8 +14079,10 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <wire x1="203.2" y1="109.22" x2="203.2" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="203.2" y1="30.48" x2="187.96" y2="30.48" width="0.1524" layer="91"/>
 <junction x="187.96" y="30.48"/>
-<pinref part="T5" gate="G$1" pin="E"/>
-<junction x="187.96" y="38.1"/>
+<pinref part="U$1" gate="G$1" pin="GND"/>
+<wire x1="172.72" y1="71.12" x2="172.72" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="187.96" y1="38.1" x2="187.96" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="187.96" y1="71.12" x2="172.72" y2="71.12" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$18" class="0">
@@ -14452,34 +14418,6 @@ Source: http://www.onsemi.com/pub_link/Collateral/MBRA340T3-D.PDF</description>
 <pinref part="JP1" gate="A" pin="2"/>
 <pinref part="R8" gate="G$1" pin="1"/>
 <wire x1="7.62" y1="134.62" x2="12.7" y2="134.62" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$5" class="0">
-<segment>
-<pinref part="R9" gate="G$1" pin="1"/>
-<pinref part="T5" gate="G$1" pin="B"/>
-<wire x1="182.88" y1="50.8" x2="182.88" y2="43.18" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$11" class="0">
-<segment>
-<pinref part="R9" gate="G$1" pin="2"/>
-<wire x1="182.88" y1="60.96" x2="193.04" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="193.04" y1="60.96" x2="193.04" y2="142.24" width="0.1524" layer="91"/>
-<wire x1="193.04" y1="142.24" x2="104.14" y2="142.24" width="0.1524" layer="91"/>
-<wire x1="104.14" y1="142.24" x2="104.14" y2="121.92" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="RC6/AN8/SS"/>
-<wire x1="104.14" y1="121.92" x2="86.36" y2="121.92" width="0.1524" layer="91"/>
-<wire x1="86.36" y1="121.92" x2="86.36" y2="119.38" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$28" class="0">
-<segment>
-<pinref part="U$1" gate="G$1" pin="GND"/>
-<wire x1="172.72" y1="71.12" x2="172.72" y2="68.58" width="0.1524" layer="91"/>
-<pinref part="T5" gate="G$1" pin="C"/>
-<wire x1="187.96" y1="48.26" x2="187.96" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="187.96" y1="71.12" x2="172.72" y2="71.12" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
