@@ -74,7 +74,6 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
-'if (1 == 0) then
 if (resetButton == 0) then
     gosub putDefaultValues
     gosub printConfig

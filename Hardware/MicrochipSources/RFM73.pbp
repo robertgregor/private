@@ -104,8 +104,8 @@ data_out[1]=payloadLength 'number of bytes used in data sent
 num_byte=1
 gosub spi_write
 data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm, 1Mbps
-'data_out[1]=%00100111 '250kbit
- data_out[1]=%00000111 '1mbit
+data_out[1]=%00100111 '250kbit
+'data_out[1]=%00000111 '1mbit
 num_byte=1
 gosub spi_write
 ' configure bank 1
@@ -119,9 +119,9 @@ temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm
 gosub conf4bytes
 temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 gosub conf4bytes
-temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $B6 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
 gosub conf4bytes
-temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+temp_byte_rfm = 5 : temp1_byte_rfm = $28 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 gosub conf4bytes
 temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 gosub conf4bytes
@@ -283,7 +283,7 @@ gosub setTxAddressPipe
 num_byte=5
 gosub spi_write
 data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
-data_out[1]= %00110101 '15x re-transmit (default)
+data_out[1]= %00011111 '15x re-transmit (default)
 num_byte=1
 Gosub spi_write
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled
