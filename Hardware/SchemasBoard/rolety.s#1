@@ -15202,7 +15202,7 @@ nominal inductance, magnetically screened</description>
 </class>
 </classes>
 <parts>
-<part name="IC1" library="powerint" deviceset="SO-8C" device="" value="LNK302"/>
+<part name="IC1" library="powerint" deviceset="SO-8C" device="" value="LNK304"/>
 <part name="B1" library="rectifier" deviceset="RECTIFIER-" device="S40" value="RECTIFIER"/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="R2512W" value="100"/>
 <part name="R2" library="resistor" deviceset="R-EU_" device="R2512W" value="8,2"/>
@@ -15214,7 +15214,7 @@ nominal inductance, magnetically screened</description>
 <part name="R3" library="resistor" deviceset="R-EU_" device="M2012" value="3.9 k"/>
 <part name="R4" library="resistor" deviceset="R-EU_" device="M2012" value="2,05 k"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
-<part name="C3" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="22uF / 16 V"/>
+<part name="C3" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="10uF / 16 V"/>
 <part name="C4" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="100uF / 6,3 V"/>
 <part name="C5" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="T1" library="transistor" deviceset="BC846" device=""/>

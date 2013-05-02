@@ -143,9 +143,8 @@ lop:
 data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
 num_byte=payloadLength
 gosub spi_read
-read 7, temp_byte
 temp_data[0] = 0
-if (data_in[1] == temp_byte) then
+if (data_in[1] == device_id) then
     if (data_in[2] == "c") then    
         if (data_in[3] == "=") then
            'OK it is configure
