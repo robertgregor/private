@@ -9,12 +9,13 @@
 
 'EEPROM_MAP
 '0 - channel number
-'1,2,3,4,5 bank name
-'6 - device_id
-'7 - 0 switch on when applied power
-'8 timeout
+'1,2,3,4,5 bank name transmitter
+'6,7,8,9 bank name device
+'10 device id
+'11 - 0 switch on when applied power
+'12 timeout
 
-EEPROM  0, [40,"R","O","B","I","K",0,1,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,0,0]
 
 INCLUDE "RFM73.pbp"
 
@@ -60,11 +61,12 @@ ticks   var word    ' Define pieces of seconds variable
 l1counter var byte
 conversionSuccess VAR BYTE
 
+startProg:
 clear
 input RES
 output relay
-READ 6, device_id
-read 7, temp_byte
+READ 10, device_id
+read 11, temp_byte
 if (temp_byte == 0) then 
     high relay
 else
@@ -84,14 +86,19 @@ irqLoop:
 if RES == 0 then
     write 0, 40
     write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 1
-    write 8, 0
-    END
+    write 2, "E"
+    write 3, "M"
+    write 4, "O"
+    write 5, "T"
+    write 6, "E"
+    write 7, "H"
+    write 8, "O"
+    write 9, "M"
+    write 10, 0
+    write 11, 1
+    write 12, 0
+    pause 1000
+    goto startProg
 endif
 'Check for data to send
 if (temp_data[0] != 0) then
@@ -113,16 +120,14 @@ temp_data[0] = 0
 if (data_in[1] == device_id) then
     if (data_in[2] == "c") then    
         if (data_in[3] == "=") then
-            'OK it is configure
-            write 0, data_in[9] 'channel
-            write 1, data_in[4] 'password 0
-            write 2, data_in[5] 'password 1
-            write 3, data_in[6] 'password 2
-            write 4, data_in[7] 'password 3
-            write 5, data_in[8] 'password 4
-            write 6, data_in[10]'device id
-            pause 10
-            device_id = data_in[10]
+           'OK it is configure
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id
+            pause 250
             configure = 1
             gosub sendDataOK
         endif
@@ -130,11 +135,11 @@ if (data_in[1] == device_id) then
         if (data_in[3] == "1") then
             if (data_in[4] == "c") then
                 if (data_in[5] == "o") then
-                    write 7, 0
+                    write 11, 0
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "f") then
-                    write 7, 1
+                    write 11, 1
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "t") then
@@ -142,7 +147,7 @@ if (data_in[1] == device_id) then
                         i = 7
                         gosub convertInputData
                         if (conversionSuccess == 1) then
-                            write 8, temp_byte
+                            write 12, temp_byte
                             gosub sendDataOK
                         endif
                     endif
@@ -151,7 +156,7 @@ if (data_in[1] == device_id) then
                 if (data_in[5] == "f") then
                     seconds = 0
                     ticks = 0
-                    read 8, l1counter
+                    read 12, l1counter
                     high relay
                     gosub sendDataOK
                 else
@@ -169,10 +174,10 @@ if (data_in[1] == device_id) then
             temp_data[1] = "|"
             temp_data[2] = RELAY + $30
             temp_data[3] = "|"
-            read 7, temp_data[4]
+            read 11, temp_data[4]
             temp_data[4] = temp_data[4] + $30        
             temp_data[5] = "|"
-            read 8, temp_byte
+            read 12, temp_byte
             gosub convertNoToStr
             temp_data[6] = temp3_byte
             temp_data[7] = temp2_byte
@@ -271,5 +276,21 @@ convertNoToStr:
         temp3_byte = (temp_byte DIG 2) + $30
         temp2_byte = (temp_byte DIG 1) + $30
         temp1_byte = (temp_byte DIG 0) + $30
+return
+
+setRxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return
+
+setTxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
 return
 

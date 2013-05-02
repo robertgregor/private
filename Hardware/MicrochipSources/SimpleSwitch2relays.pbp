@@ -9,15 +9,16 @@
 
 'EEPROM_MAP
 '0 - channel number
-'1,2,3,4,5 bank name
-'6 - device_id
-'7 - 0 switch on when applied power 1
-'8 timeout 1
-'9 - 0 switch on when applied power 2
-'10 timeout 2
+'1,2,3,4,5 bank name transmitter
+'6,7,8,9 bank name device
+'10 device id
+'11 - 0 switch on when applied power 1
+'12 timeout 1
+'13 - 0 switch on when applied power 2
+'14 timeout 2
 
 
-EEPROM  0, [40,"R","O","B","I","K",0,1,0,1,0,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,1,0]
 
 INCLUDE "RFM73.pbp"
 
@@ -72,15 +73,15 @@ input RES
 output relay1
 output relay2
 
-READ 6, device_id
-    READ 7, temp1_byte
+READ 10, device_id
+    READ 11, temp1_byte
     temp_byte = 1
     if (temp1_byte == 0) then
         gosub switchOnRelay
     else
         gosub switchOffRelay
     endif
-    READ 9, temp1_byte
+    READ 13, temp1_byte
     temp_byte = 2
     if (temp1_byte == 0) then
         gosub switchOnRelay
@@ -98,18 +99,23 @@ pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
 if RES == 0 then
-'if 1 == 0 then
+    DISABLE
     write 0, 40
     write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    for i = 6 TO 20
-        write i, 0
-    next i
-    write 7, 1
-    write 9, 1
+    write 2, "E"
+    write 3, "M"
+    write 4, "O"
+    write 5, "T"
+    write 6, "E"
+    write 7, "H"
+    write 8, "O"
+    write 9, "M"
+    write 10, 0    
+    write 11, 1    
+    write 12, 0    
+    write 13, 1    
+    write 14, 0    
+    ENABLE
     pause 1000
     gosub startProgram
 endif
@@ -133,16 +139,14 @@ temp_data[0] = 0
 if (data_in[1] == device_id) then
     if (data_in[2] == "c") then    
         if (data_in[3] == "=") then
-            'OK it is configure
-            write 0, data_in[9] 'channel
-            write 1, data_in[4] 'password 0
-            write 2, data_in[5] 'password 1
-            write 3, data_in[6] 'password 2
-            write 4, data_in[7] 'password 3
-            write 5, data_in[8] 'password 4
-            write 6, data_in[10]'device id
-            pause 10
-            device_id = data_in[10]
+           'OK it is configure
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id
+            pause 250
             configure = 1
             gosub sendDataOK
         endif
@@ -155,11 +159,15 @@ if (data_in[1] == device_id) then
                 if (TEMP_BYTE < 3) then
                     if (data_in[4] == "c") then
                         if (data_in[5] == "o") then
-                            write 5+(temp4_byte*2), 0
+                            disable
+                            write 9+(temp4_byte*2), 0
+                            enable
                             gosub sendDataOK
                         endif
                         if (data_in[5] == "f") then
-                            write 5+(temp4_byte*2), 1
+                            disable
+                            write 9+(temp4_byte*2), 1
+                            enable
                             gosub sendDataOK
                         endif
                         if (data_in[5] == "t") then
@@ -167,14 +175,16 @@ if (data_in[1] == device_id) then
                                 i = 7
                                 gosub convertInputData
                                 if (conversionSuccess == 1) then
-                                    write 6+(temp4_byte*2), temp_byte
+                                    disable
+                                    write 10+(temp4_byte*2), temp_byte
+                                    enable
                                     gosub sendDataOK
                                 endif
                             endif
                         endif                
                     elseif (data_in[4] == "o") then
                         if (data_in[5] == "f") then
-                            read 6+(temp4_byte*2), lcounter[temp4_byte]
+                            read 10+(temp4_byte*2), lcounter[temp4_byte]
                             if (lcounter[temp4_byte] == 1) then
                                 if (seconds < 40) then lcounter[temp4_byte] = 2
                             endif
@@ -208,10 +218,10 @@ if (data_in[1] == device_id) then
                     if (temp4_byte == 2) then temp_data[2] = RELAY2
                     temp_data[2] = temp_data[2] + $30
                     temp_data[3] = "|"
-                    read 5+(temp4_byte*2), temp_data[4]
+                    read 9+(temp4_byte*2), temp_data[4]
                     temp_data[4] = temp_data[4] + $30        
                     temp_data[5] = "|"
-                    read 6+(temp4_byte*2), temp_byte
+                    read 10+(temp4_byte*2), temp_byte
                     gosub convertNoToStr
                     temp_data[6] = temp3_byte
                     temp_data[7] = temp2_byte
@@ -326,5 +336,21 @@ return
 switchOffRelay:
     if (temp_byte == 1) then LOW RELAY1
     if (temp_byte == 2) then LOW RELAY2
+return
+
+setRxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return
+
+setTxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
 return
 

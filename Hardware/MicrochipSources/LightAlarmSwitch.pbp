@@ -9,17 +9,18 @@
 
 'EEPROM_MAP
 '0 - channel number
-'1,2,3,4,5 bank name
-'6 - 0 switch on when applied power
-'7 device id
-'8 timeout
-'9 1 - on when movement detected 0 no action
-'10 - alarm enter timeout
-'11 - alarm leave timeout
+'1,2,3,4,5 bank name transmitter
+'6,7,8,9 bank name device
+'10 device id
+'11 - 0 switch on when applied power
+'12 timeout
+'13 1 - on when movement detected 0 no action
+'14 - alarm enter timeout
+'15 - alarm leave timeout
 
-EEPROM  0, [40,"R","O","B","I","K",1,0,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,0,0]
 
- INCLUDE "RFM70.pbp"
+ INCLUDE "RFM73.pbp"
 
  DEFINE OSC 8
 
@@ -70,14 +71,14 @@ l1counter var byte
 l1onAlarm var byte
 conversionSuccess var byte
 
-clear
 startLabel:
-read 7, device_id
-read 9, l1onAlarm
+clear
+read 10, device_id
+read 13, l1onAlarm
 input alarm
 input RES
 output relay
-read 6, temp_byte
+read 11, temp_byte
 if (temp_byte == 0) then 
     gosub highRelay
 else
@@ -95,19 +96,25 @@ Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
 'Check for data to send
 if RES == 0 then
+    disable
     write 0, 40
     write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 1
-    write 7, 0
-    write 8, 0
-    write 9, 0
+    write 2, "E"
+    write 3, "M"
+    write 4, "O"
+    write 5, "T"
+    write 6, "E"
+    write 7, "H"
+    write 8, "O"
+    write 9, "M"
     write 10, 0
-    write 11, 0
-    pause 2000
+    write 11, 1
+    write 12, 0
+    write 13, 0
+    write 14, 0
+    write 15, 0
+    enable
+    pause 1000
     goto startLabel
 endif
 if (temp_data[0] != 0) then
@@ -136,21 +143,18 @@ lop:
 data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
 num_byte=payloadLength
 gosub spi_read
-read 7, temp_byte
 temp_data[0] = 0
-if (data_in[1] == temp_byte) then
+if (data_in[1] == device_id) then
     if (data_in[2] == "c") then    
         if (data_in[3] == "=") then
-            'OK it is configure
-            write 0, data_in[9] 'channel
-            write 1, data_in[4] 'password 0
-            write 2, data_in[5] 'password 1
-            write 3, data_in[6] 'password 2
-            write 4, data_in[7] 'password 3
-            write 5, data_in[8] 'password 4
-            write 7, data_in[10]'device id
-            pause 10
-            device_id = data_in[10]
+           'OK it is configure
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id
+            pause 250
             configure = 1
             gosub sendDataOK
         endif
@@ -159,20 +163,28 @@ if (data_in[1] == temp_byte) then
         if (data_in[3] == "1") then
             if (data_in[4] == "c") then
                 if (data_in[5] == "o") then
-                    write 6, 0
+                    disable
+                    write 11, 0
+                    enable
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "f") then
-                    write 6, 1
+                    disable
+                    write 11, 1
+                    enable
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "d") then
-                    write 9, 1
+                    disable
+                    write 13, 1
+                    enable
                     l1onAlarm = 1
                     gosub sendDataOK
                 endif
                 if (data_in[5] == "c") then
-                    write 9, 0
+                    disable
+                    write 13, 0
+                    enable
                     l1onAlarm = 0
                     gosub sendDataOK
                 endif                
@@ -181,7 +193,9 @@ if (data_in[1] == temp_byte) then
                         i = 7
                         gosub convertInputData
                         if (conversionSuccess == 1) then
-                            write 8, temp_byte
+                            disable
+                            write 12, temp_byte
+                            enable
                             gosub sendDataOK
                         else
                             gosub sendDataError
@@ -192,7 +206,7 @@ if (data_in[1] == temp_byte) then
             if (data_in[4] == "o") then
                 if (data_in[5] == "f") then
                     seconds = 0
-                    read 8, l1counter
+                    read 12, l1counter
                     gosub highRelay
                 else
                     gosub highRelay
@@ -209,7 +223,7 @@ if (data_in[1] == temp_byte) then
     if (data_in[2] == "a") then
         if (data_in[3] == "l") then 
             if (data_in[4] == "a") then
-                read 11, ALLeaveCounter
+                read 15, ALLeaveCounter
                 ALEnterCounter = 0
                 if (ALLeaveCounter == 0) then
                     alstatus = 1
@@ -230,11 +244,15 @@ if (data_in[1] == temp_byte) then
                     gosub convertInputData
                     if (conversionSuccess == 1) then
                         if (data_in[5] == "e") then
-                            write 10, temp_byte
+                            disable
+                            write 14, temp_byte
+                            enable
                             gosub sendDataOK
                         endif
                         if (data_in[5] == "l") then
-                            write 11, temp_byte
+                            disable
+                            write 15, temp_byte
+                            enable
                             gosub sendDataOK
                         endif
                     endif
@@ -252,13 +270,13 @@ if (data_in[1] == temp_byte) then
             temp_data[5] = "|"
             temp_data[6] = alarm + $30
             temp_data[7] = "|"
-            read 10, temp_byte 
+            read 14, temp_byte 
             gosub convertNoToStr
             temp_data[8] = temp3_byte
             temp_data[9] = temp2_byte
             temp_data[10] = temp1_byte
             temp_data[11] = "|"
-            read 11, temp_byte 
+            read 15, temp_byte 
             gosub convertNoToStr
             temp_data[12] = temp3_byte
             temp_data[13] = temp2_byte
@@ -273,13 +291,13 @@ if (data_in[1] == temp_byte) then
             temp_data[3] = "|"
             temp_data[4] = RELAY + $30
             temp_data[5] = "|"
-            read 6, temp_data[6]
+            read 11, temp_data[6]
             temp_data[6] = temp_data[6] + $30        
             temp_data[7] = "|"
-            read 9, temp_data[8]
+            read 13, temp_data[8]
             temp_data[8] = temp_data[8] + $30        
             temp_data[9] = "|"
-            read 8, temp_byte
+            read 12, temp_byte
             gosub convertNoToStr
             temp_data[10] = temp3_byte
             temp_data[11] = temp2_byte
@@ -340,7 +358,7 @@ intManagement:
                if (alarmCounter > 0) then
                     if (ALSTATUS == 1) then
                         'we have alarm detection
-                        READ 10, ALEnterCounter
+                        READ 14, ALEnterCounter
                         if (ALEnterCounter == 0) then
                             ALSTATUS = 5
                         else
@@ -349,7 +367,7 @@ intManagement:
                     endif
                     if (l1onAlarm = 1) then
                         seconds = 0
-                        read 8, l1counter
+                        read 12, l1counter
                         gosub highRelay
                     endif                    
                     alarmCounter = 0
@@ -441,4 +459,20 @@ if (relay == 1) then
     low alarm
     low relay
 endif
+return
+
+setRxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return
+
+setTxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
 return

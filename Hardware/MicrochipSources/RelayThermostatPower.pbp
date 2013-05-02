@@ -9,24 +9,21 @@
 
 'EEPROM_MAP
 '0 - channel number
-'1,2,3,4,5 bank name
-'6 device id
-'7 treshold
-'9 interval
-'10 temperature - it is temperature / 2
+'1,2,3,4,5 bank name transmitter
+'6,7,8,9 bank name device
+'10 device id
+'11 treshold
+'12 interval
+'13 temperature - it is temperature / 2
 
 INCLUDE "RFM70.pbp"
 
-EEPROM  0, [40,"R","O","B","I","K",0,0,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,1,44]
 
  DEFINE OSC 8
- DEFINE ADC_BITS 10 ' ADCIN resolution (Bits)
- DEFINE ADC_CLOCK 3 ' ADC clock source (Fosc/32)
- DEFINE ADC_SAMPLEUS 50 ' ADC sampling time (uSec)
- ADCON0.7 = 1
- 
+  
  OSCCON = %01110000 ' Internal 8MHz osc
- ANSEL = %10000000
+ ANSEL = 0
  ANSELH = 0
  CM1CON0 = 0
  CM2CON0 = 0
@@ -40,15 +37,17 @@ on interrupt goto intManagement
 ENABLE
 '-----------init----------------------------------------------------------------
 TRISA = %00100000 'Set PORTA to all output
-TRISB = %00010000 'Set , SDI input
-TRISC = %00001100 'Set IRQ input, 
+TRISB = %00110000 'Set , SDI input
+TRISC = %00000100 'Set IRQ input, 
+WPUA = %00000000
+WPUB = %00100000
 
 HEATING_SENSOR var PORTA.5
 RELAY var PORTA.4
+RES var PORTB.5
 i VAR BYTE 'loop counter
 j var byte
 ic var byte
-VDD VAR WORD
 confSuccess var byte
 configure var byte
 temp_byte_int var byte
@@ -72,36 +71,42 @@ busy        var BIT
 sleep_period var word
 currentState var byte
 temperatureExp var byte
-treshold var byte
+threshold var byte
 
+startProg:
 clear
 output relay
 input heating_sensor
-read 9, sleep_period
+read 12, sleep_period
 sleep_period = sleep_period * 10
-read 6, device_id
+read 10, device_id
+read 11, threshold
+read 13, temperatureExp
 'here the reset should be triggered
-if 1 == 0 then
+if RES == 0 then
     write 0, 40
     write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 0
-    write 8, 0
-    END
+    write 2, "E"
+    write 3, "M"
+    write 4, "O"
+    write 5, "T"
+    write 6, "E"
+    write 7, "H"
+    write 8, "O"
+    write 9, "M"
+    write 10, 0
+    write 11, 0
+    write 12, 1
+    write 13, 44
+    pause 1000
+    goto startProg
 endif
 normalmode = 0
 gosub relayOff
 gosub initModule
-'--------------Common RX-TX settings--------------------------------------------
 commonSettings:
 gosub commonRXTX
-'============Main Rx============================================================
-READ 6, temp_byte
-if (temp_byte != 0) then
+if (device_id != 0) then
     normalMode = 1
 endif
 Main_rx:
@@ -139,32 +144,36 @@ if (data_in[1] == device_id) then
         i = 4
         gosub convertInputData
         if (data_in[2] == "c") then    
-            'OK it is configure
-            write 0, data_in[9]
-            write 1, data_in[4]            
-            write 2, data_in[5]            
-            write 3, data_in[6]            
-            write 4, data_in[7]            
-            write 5, data_in[8]            
-            write 6, data_in[10]            
-            pause 10
+           'OK it is configure
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id
+            pause 250
             configure = 1
-            device_id = data_in[10]
             gosub sendDataOK
         elseif (confSuccess == 1) then                
-            if (data_in[2] == "m") then   
-                write 9, temp_byte
+            if (data_in[2] == "m") then
+                disable   
+                write 12, temp_byte
+                enable
                 sleep_period = temp_byte
                 gosub setModeBasedOnSleepPeriod
                 gosub sendDataOK
-            elseif (data_in[2] == "t") then 
-                write 10, temp_byte
+            elseif (data_in[2] == "t") then
+                disable
+                write 13, temp_byte
+                enable
                 temperatureExp = temp_byte
                 gosub sendDataOK
             elseif (data_in[2] == "r") then
-                if (temp_byte < 10) then 
-                    write 7, temp_byte
-                    treshold = temp_byte
+                if (temp_byte < 10) then
+                    disable 
+                    write 11, temp_byte
+                    enable
+                    threshold = temp_byte
                     gosub sendDataOK
                 endif
             endif
@@ -295,12 +304,12 @@ Wait_Up:
             if (currentState != 1) then gosub relayOn
         else
             if (temperatureExp != 0) then
-                temp_word = temp3_word + treshold
+                temp_word = temp3_word + threshold
                 temp2_word = ((temperatureExp / 2) * 10) + ((temperatureExp // 2) * 5)
                 if (temp_word > temp2_word) then
                     if (currentState != 0) then gosub relayOff
                 else
-                    temp_word = temp3_word - treshold
+                    temp_word = temp3_word - threshold
                     if (temp_word < temp2_word) then 
                         if (currentState != 1) then gosub relayOn
                     endif
@@ -319,7 +328,7 @@ Wait_Up:
         temp_data[12] = "|"
         temp_data[13] = currentState + $30
         temp_data[14] = "|"
-        temp_data[15] = treshold + $30
+        temp_data[15] = threshold + $30
         temp_data[16] = 13
         temp_data[17] = 10
 return
@@ -347,4 +356,20 @@ setModeBasedOnSleepPeriod:
     else     
         normalmode = 1
     endif
+return
+
+setRxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return
+
+setTxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
 return

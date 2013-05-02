@@ -66,7 +66,7 @@ Fifo_status con $17 'FIFO status register register address
 
 goto endRFM70
 initModule:
-pause 500
+pause 200
 '----------SPI settings---------------------------------------------------------
 SSPEN = 1 'enable SPI pins
 SSPCON.0=1 'SPI rate=OSC/16
@@ -84,11 +84,7 @@ return
 
 commonRXTX:
 data_out[0]=Write_reg+Rx_addr_p0 'Rx address for pipe0
-READ 1, data_out[1]
-READ 2, data_out[2]
-READ 3, data_out[3]
-READ 4, data_out[4]
-READ 5, data_out[5]
+gosub setRxAddressPipe
 num_byte=5
 gosub spi_write
 data_out[0]=Write_reg+En_aa 'enable auto ACK pipe0
@@ -286,11 +282,7 @@ return
 
 setup_tx:
 data_out[0]=Write_reg+Tx_addr 'Tx address
-READ 1, data_out[1]
-READ 2, data_out[2]
-READ 3, data_out[3]
-READ 4, data_out[4]
-READ 5, data_out[5]
+gosub setTxAddressPipe
 num_byte=5
 gosub spi_write
 data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK

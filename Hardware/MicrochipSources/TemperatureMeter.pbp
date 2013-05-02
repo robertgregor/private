@@ -7,13 +7,13 @@
 @ DEVICE PIC16F690,BOD_OFF
 @ DEVICE PIC16F690,PWRT_OFF
 
-'EEPROM_MAP
 '0 - channel number
-'1,2,3,4,5 bank name
-'6 device id
-'7 interval
+'1,2,3,4,5 bank name transmitter
+'6,7,8,9 bank name device
+'10 device id
+'11 interval
 
-EEPROM  0, [40,"R","O","B","I","K",0,1,0,0,0,0,0,0,0,0]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,0,0]
 
 INCLUDE "RFM70.pbp"
 
@@ -31,7 +31,7 @@ INCLUDE "RFM70.pbp"
  CM2CON0 = 0
  
  'interrupt for timer
-    INTCON = %10100000  'T01 enabled PEIE disabled.
+    INTCON = %10101000 'TMR0 enabled , PORTAB int enabled PEIE disabled.
     PIE1 = %00000000    'USART disabled
     OPTION_REG = %00000111
 
@@ -43,11 +43,11 @@ TRISB = %00010000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input,
 WPUA = %11111111
 WPUB = %11111111
- 
+IOCA.4 = 1 'PORTA.4 is reset button, enable interrupt 
 
 HEATING_SENSOR var PORTA.5
 HEATING_SENSOR_POWER var PORTC.5
-RESET_BUTTON VAR PORTA.4
+RESET_BUTTON_FLAG var byte
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
@@ -73,11 +73,11 @@ busy        var BIT
 VDD         VAR WORD
 temperature var word
 
-clear
 startProgLabel:
-read 6, device_id
+clear
+read 10, device_id
 gosub initModule
-READ 7, temp_byte
+READ 11, temp_byte
 sleep_period = temp_byte * 10
 if (sleep_period != 0) then
     if (device_id != 0) then
@@ -95,16 +95,22 @@ gosub setup_rx 'setup Rx
 pause 2 'delay for Rx starting
 Ce=1 'set nRF24L01 in Rx mode
 irqLoop:
-if RESET_BUTTON == 0 then
-'if 0 == 1 then
+if RESET_BUTTON_FLAG == 1 then
+    RESET_BUTTON_FLAG = 0
+    DISABLE
     write 0, 40
     write 1, "R"
-    write 2, "O"
-    write 3, "B"
-    write 4, "I"
-    write 5, "K"
-    write 6, 0
-    write 7, 1
+    write 2, "E"
+    write 3, "M"
+    write 4, "O"
+    write 5, "T"
+    write 6, "E"
+    write 7, "H"
+    write 8, "O"
+    write 9, "M"
+    write 10, 0
+    write 11, 1
+    ENABLE
     pause 1000
     goto startProgLabel
 endif
@@ -119,17 +125,14 @@ if (temp_data[0] != 0) then
     GOTO main_rx
 endif
 if (sleepMode == 1) then    
-      disable    
-      INTCON = 0
       gosub setup_sleep
       sleep sleep_period
       pause 1
       seconds = 57
       ticks = 25
       sleepmode = 0
-      INTCON = %10100000
+      INTCON = %10101000      
       OPTION_REG = %00000111
-      enable
       gosub sendTemperature
       goto commonSettings    
 endif
@@ -144,16 +147,19 @@ if (data_in[1] == device_id) then
     if (data_in[2] == "c") then    
         if (data_in[3] == "=") then
             'OK it is configure
-            write 0, data_in[9] 'channel
-            write 1, data_in[4] 'password 0
-            write 2, data_in[5] 'password 1
-            write 3, data_in[6] 'password 2
-            write 4, data_in[7] 'password 3
-            write 5, data_in[8] 'password 4
-            write 6, data_in[10]'device id
-            device_id = data_in[10]
-            pause 10
+            for i = 0 to 10
+                disable
+                write i, data_in[i+4]
+                enable
+            next i
+            read 10, device_id
+            pause 250
             configure = 1
+            if (sleep_period == 0) then 
+                sleepMode = 0                
+            else
+                sleepMode = 1
+            endif
             gosub sendDataOK
         endif
     ELSEif (data_in[2] == "m") then    
@@ -161,12 +167,18 @@ if (data_in[1] == device_id) then
             I=4
             GOSUB convertInputData
             if (conversionSuccess = 1) then
-                write 7, temp_byte
+                disable
+                write 11, temp_byte
+                enable
                 sleep_period = temp_byte * 10
                 if (sleep_period == 0) then 
                     sleepMode = 0                
                 else
-                    sleepMode = 1
+                    if (device_id != 0) then
+                        sleepMode = 1
+                    else
+                        sleepMode = 0
+                    endif
                 endif
                 gosub sendDataOK
             endif
@@ -218,6 +230,10 @@ intManagement:
            endif
            tiexit: 
            INTCON.2 = 0
+        endif
+        if (INTCON.0 == 1) then
+           INTCON.0 = 0
+           RESET_BUTTON_FLAG = 1
         endif
         INTCON.7 = 1
 resume
@@ -315,4 +331,20 @@ Wait_Up:
         temp_data[16] = (sleep_period DIG 0) + $30
         temp_data[17] = 13
         temp_data[18] = 10
+return
+
+setRxAddressPipe:
+READ 6, data_out[1]
+READ 7, data_out[2]
+READ 8, data_out[3]
+READ 9, data_out[4]
+data_out[5] = device_id
+return
+
+setTxAddressPipe:
+READ 1, data_out[1]
+READ 2, data_out[2]
+READ 3, data_out[3]
+READ 4, data_out[4]
+READ 5, data_out[5]
 return
