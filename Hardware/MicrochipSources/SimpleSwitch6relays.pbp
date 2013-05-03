@@ -100,6 +100,7 @@ next i
 gosub initModule
 commonSettings:
 gosub commonRXTX
+gosub commonRXTX
 
 '============Main Rx============================================================
 Main_rx:
@@ -134,7 +135,7 @@ if RES == 0 then
     write 22, 0    
     ENABLE
     pause 1000
-    gosub startProgram
+    goto startProgram
 endif
 'Check for data to send
 if (temp_data[0] != 0) then
