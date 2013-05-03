@@ -15382,7 +15382,7 @@ nominal inductance, magnetically screened</description>
 <part name="IC1" library="powerint" deviceset="SO-8C" device="" value="LNK304"/>
 <part name="B1" library="rectifier" deviceset="RECTIFIER-" device="S40" value="RECTIFIER"/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="R2512W" value="100"/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R2512W" value="8,2"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="0411/12" value="8,2"/>
 <part name="U$1" library="rfm70" deviceset="RFM70" device=""/>
 <part name="U$2" library="microchip" deviceset="PIC16F690*" device=""/>
 <part name="K1" library="relay" deviceset="FRS1B" device=""/>
@@ -15391,7 +15391,7 @@ nominal inductance, magnetically screened</description>
 <part name="R3" library="resistor" deviceset="R-EU_" device="M2012" value="3.9 k"/>
 <part name="R4" library="resistor" deviceset="R-EU_" device="M2012" value="2,05 k"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
-<part name="C3" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="22uF / 16 V"/>
+<part name="C3" library="resistor" deviceset="CPOL-EU" device="SMCC" value="22uF / 16 V"/>
 <part name="L1" library="inductor-neosid" deviceset="BS" device="11" value="1mH"/>
 <part name="C4" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="100uF / 6,3 V"/>
 <part name="C5" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
@@ -15407,6 +15407,7 @@ nominal inductance, magnetically screened</description>
 <part name="X1" library="con-ptr500" deviceset="AK500/5" device=""/>
 <part name="IC3" library="linear" deviceset="MC33269ST*" device="" technology="-3.3T3"/>
 <part name="R7" library="resistor" deviceset="R-EU_" device="M2012" value="10 k"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
 </parts>
 <sheets>
 <sheet>
@@ -15446,6 +15447,7 @@ nominal inductance, magnetically screened</description>
 <instance part="X1" gate="-5" x="-35.56" y="50.8"/>
 <instance part="IC3" gate="G$1" x="111.76" y="50.8"/>
 <instance part="R7" gate="G$1" x="33.02" y="109.22"/>
+<instance part="R6" gate="G$1" x="104.14" y="43.18" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -15497,7 +15499,8 @@ nominal inductance, magnetically screened</description>
 <wire x1="20.32" y1="30.48" x2="22.86" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="22.86" y1="30.48" x2="71.12" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="30.48" x2="86.36" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="86.36" y1="30.48" x2="111.76" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="30.48" x2="104.14" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="30.48" x2="111.76" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="30.48" x2="127" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="127" y1="30.48" x2="132.08" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="30.48" x2="139.7" y2="30.48" width="0.1524" layer="91"/>
@@ -15552,6 +15555,9 @@ nominal inductance, magnetically screened</description>
 <wire x1="20.32" y1="109.22" x2="20.32" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="109.22" x2="27.94" y2="109.22" width="0.1524" layer="91"/>
 <junction x="20.32" y="109.22"/>
+<pinref part="R6" gate="G$1" pin="1"/>
+<wire x1="104.14" y1="38.1" x2="104.14" y2="30.48" width="0.1524" layer="91"/>
+<junction x="104.14" y="30.48"/>
 </segment>
 </net>
 <net name="N$11" class="0">
@@ -15728,6 +15734,9 @@ nominal inductance, magnetically screened</description>
 <wire x1="43.18" y1="101.6" x2="43.18" y2="83.82" width="0.1524" layer="91"/>
 <junction x="43.18" y="83.82"/>
 <pinref part="IC3" gate="G$1" pin="IN"/>
+<pinref part="R6" gate="G$1" pin="2"/>
+<wire x1="104.14" y1="48.26" x2="104.14" y2="55.88" width="0.1524" layer="91"/>
+<junction x="104.14" y="55.88"/>
 </segment>
 </net>
 <net name="N$25" class="0">
@@ -15865,6 +15874,7 @@ nominal inductance, magnetically screened</description>
 <wire x1="121.92" y1="53.34" x2="127" y2="53.34" width="0.1524" layer="91"/>
 <junction x="127" y="53.34"/>
 <wire x1="139.7" y1="55.88" x2="127" y2="55.88" width="0.1524" layer="91"/>
+<junction x="139.7" y="55.88"/>
 </segment>
 </net>
 </nets>
