@@ -11412,7 +11412,7 @@ type RDH, grid 15 mm</description>
 <busses>
 </busses>
 <nets>
-<net name="VD" class="0">
+<net name="GND" class="0">
 <segment>
 <wire x1="132.08" y1="30.48" x2="147.32" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="U$2" gate="G$1" pin="VSS"/>
@@ -11574,7 +11574,7 @@ type RDH, grid 15 mm</description>
 <wire x1="73.66" y1="142.24" x2="73.66" y2="76.2" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$7" class="0">
+<net name="VDD" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="VDD"/>
 <wire x1="195.58" y1="76.2" x2="170.18" y2="76.2" width="0.1524" layer="91"/>
