@@ -47,6 +47,7 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
      * This device type is battery thermostat, connected to power line
      */
     public static int BatteryThermostat = 7;
+   
     /**
      * This is device id of the hardware device assigned with AT+a=id command
      */

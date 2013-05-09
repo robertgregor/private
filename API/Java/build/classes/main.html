@@ -207,21 +207,23 @@ $(document).ready(function(){
            <table>
            <tr>
            <td><label for="addDeviceId">New device ID:</label></td><td><input name="addDeviceId" id="addDeviceId" title="The new device ID should not exist in the system."/></td><td><button id="deviceIdLoader">Get available ID</button></td>
-           </tr><tr>
+           </tr>
+           <td><label for="addSubDeviceId">New sub device ID:</label></td><td><input name="addSubDeviceId" id="addSubDeviceId" title="The sub device id is used only if you have multiple device board."/></td><td>&nbsp;</td>
+           </tr>           
+           <tr>
            <td><label for="addDeviceName">New device name:</label></td><td><input name="addDeviceName" id="addDeviceName" title="Identifier, which represents the device."/></td><td>&nbsp;</td>
            </tr><tr><td><label for="addDeviceLocation">Room name:</label></td><td colspan="2">
                    <select name="roomName" id="addDeviceLocation">
                    </select>
            </td></tr><td><label for="type">Type of the device:</label></td><td colspan="2">
-               <select name="type" id="type">
+               <select name="type" id="type" >
                     <option value="1">LightAlarmDevice</option>
                     <option value="2"/>TemperatureSensor</option>
                     <option value="3"/>SimpleSwitch</option>
                     <option value="4"/>HeatingHeader</option>
                     <option value="5"/>BlindsControllerDevice</option>
-                    <option value="6"/>Thermostat</option>
-                    <option value="7"/>BatteryThermostat</option>
-               </select>
+                    <option value="6"/>Thermostat</option>                    
+               </select>               
            </td></tr><tr><td>&nbsp;</td><td>
            <input type="submit" value="Add new device"/></td><td><div id="addDeviceResult">&nbsp;</div></td>
            </tr></table>

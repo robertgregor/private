@@ -84,6 +84,8 @@ public class RemoteHomeManager {
         }
     }
     /**
+     * This method creates the device inside the API. API is using it to e.g. update the device, when the status arrives.
+     * For multiple devices, use the method createRemoteHomeMultipleDevice.<br/><br/>
      * 
      * @param deviceId the device Id, of the device, which was configured during the initial setup.
      * @param deviceName Device name is free text to describe the device and e.g. the location of the device
@@ -126,6 +128,24 @@ public class RemoteHomeManager {
         }
     }
    
+    /**
+     * This method creates the sub device inside the API. E.g. the 6 relay board has 6 sub devices SimpleSwitch. So you have to create 6 SimpleSwitch
+     * sub devices with this method with the deviceId always the same (It is real deviceId used with the AT+a command) and subDeviceId in range 1..6.
+     <br/><br/>
+     * 
+     * @param deviceId the device Id, of the device, which was configured during the initial setup.
+     * @param subDeviceId is the subdeviceId, e.g. for 2 switch board it is 1..2, for 6 switch board 1..6, for 3 blinds board 1..3
+     * @param deviceName Device name is free text to describe the device and e.g. the location of the device
+     * @param deviceType could be:<br/>AbstractDevice.HeatingHeader<br/>AbstractDevice.SimpleSwitch<br/>AbstractDevice.TemperatureSensor<br/>
+     * AbstractDevice.LightAlarmDevice<br/>AbstractDevice.BlindsControllerDevice<br/>AbstractDevice.Thermostat<br/>AbstractDevice.BatteryThermostat
+     * @return the device reference
+     * @throws RemoteHomeManagerException if the type of the device is unknown.
+     */
+    public AbstractDevice createRemoteHomeMultipleDevice(int deviceId, int subDeviceId, String deviceName, int deviceType) throws RemoteHomeManagerException {
+        int realDeviceId = (deviceId*1000) + subDeviceId;
+        return createRemoteHomeDevice(realDeviceId, deviceName, deviceType);
+    }
+    
     /**
      * 
      * @param deviceId the device Id, of the device, which was configured during the initial setup.

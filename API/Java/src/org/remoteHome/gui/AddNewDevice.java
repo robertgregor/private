@@ -22,16 +22,28 @@ public class AddNewDevice extends AbstractWebService {
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         try {
-            r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));
-            AbstractDevice newDevice = r.createRemoteHomeDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
-                requestParameters.get("addDeviceName"),
-                Integer.parseInt(requestParameters.get("type")));
-                r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);
-                if (newDevice instanceof TemperatureSensorDevice) {
-                    ((TemperatureSensorDevice)newDevice).setInitialFrequency();
+            if ((requestParameters.get("addSubDeviceId") != null) && requestParameters.get("addSubDeviceId").length() > 0) {
+                if (Integer.parseInt(requestParameters.get("addSubDeviceId")) == 1) {
+                    r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));                    
                 }
-                r.savePersistentData();
-                sendAjaxAnswer("OK, device is added.");
+                AbstractDevice newDevice = r.createRemoteHomeMultipleDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
+                    Integer.parseInt(requestParameters.get("addSubDeviceId")),
+                    requestParameters.get("addDeviceName"),
+                    Integer.parseInt(requestParameters.get("type")));
+                    r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);
+                
+            } else {
+                r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));
+                AbstractDevice newDevice = r.createRemoteHomeDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
+                    requestParameters.get("addDeviceName"),
+                    Integer.parseInt(requestParameters.get("type")));
+                    r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);
+                    if (newDevice instanceof TemperatureSensorDevice) {
+                        ((TemperatureSensorDevice)newDevice).setInitialFrequency();
+                    }
+            }
+            r.savePersistentData();
+            sendAjaxAnswer("OK, device is added.");
         } catch (Exception e) {
             e.printStackTrace();
             sendAjaxAnswer(e.getMessage());
