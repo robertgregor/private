@@ -152,7 +152,7 @@ bxd - blinds down moving to fully closed position
 bxs - blinds stop stop movements
 bxm=nnn - Move to the nnn position. nnn is the percentage between open and close. 0 - fully open, 100 - fully closed
 
-Asynchronous messages: l|nnn1|lnnn2|lnnn3 percentage of opening: nnn1 - 1st blind, lnnn2 - 2nd blind, lnnn3 - 3rd blind
+Asynchronous messages: l|nnn|X percentage of opening: nnn
 
 Manual mode:
 
