@@ -170,7 +170,13 @@ public class RemoteHomeManager {
     public Collection<AbstractDevice> getDevices() {
         return devices.values();
     }
-
+    
+    /**
+     * This method is called by the communicator, when the asynchronous command is received.
+     * It will parse the device Id and call the device object manageAsynchronousCommand method.
+     * If unknown data are received, just ignore it.
+     */
+    
     protected void manageAsynchronousCommand(String data) {
            String tokens[] = data.split(" ");
            //device Id, skip + sign
@@ -178,6 +184,16 @@ public class RemoteHomeManager {
            AbstractDevice targetDevice = devices.get(deviceId);
            if (targetDevice != null) {
                targetDevice.manageAsynchronousCommand(tokens[1].split("\\|"));
+           } else {
+               //OK, the device could be multiple device asynchronous command. It is received only for 6 relay board
+               //with the software SwitchBlinds6relays (three blinds controller)
+               try {
+                    int subDeviceId = Integer.parseInt(tokens[1].split("\\|")[2]);
+                    targetDevice = devices.get((deviceId*1000)+subDeviceId);
+                    targetDevice.manageAsynchronousCommand(tokens[1].split("\\|"));
+               } catch (Exception e) {
+                   //crap received, forget it and don't do anything.
+               }
            }
     }
     /**

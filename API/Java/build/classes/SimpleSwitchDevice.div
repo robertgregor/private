@@ -72,7 +72,6 @@ $(function() {
             }   
           });
     });
-    $( "#periodCOMPONENTID").bruteSelect();
     $( "#SwitchOffTimeoutSimpleSwitchCOMPONENTID" ).button().click(function() {
           var period = $( "#periodCOMPONENTID" ).val();
           $.ajax({

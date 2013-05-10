@@ -46,7 +46,7 @@ public class AddNewDevice extends AbstractWebService {
             sendAjaxAnswer("OK, device is added.");
         } catch (Exception e) {
             e.printStackTrace();
-            sendAjaxAnswer(e.getMessage());
+            sendAjaxError(e.getMessage());
         }
     }
 }

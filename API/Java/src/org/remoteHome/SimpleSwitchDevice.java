@@ -32,7 +32,6 @@ import java.util.Arrays;
   */
 public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
     
-    private String switchNumber = "1";
     /**
      * Indicates, if the swith is configured to switch on, when applied power.
      * True means ON, when applied power, false means to stay OFF.
@@ -65,7 +64,8 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      */
     
     protected SimpleSwitchDevice(RemoteHomeManager m, int deviceId, String deviceName) {
-        super (m, deviceId, deviceName);        
+        super (m, deviceId, deviceName);
+        setSubDeviceNumber("1");
     }
     /**
      * For Simple switch, this method is not used.
@@ -86,7 +86,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * 
      */
     public void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        String statusResponse[] = m.sendCommandWithAnswer(parseDeviceIdForMultipleSwitch(getDeviceId()), "s"+switchNumber).split("\\|");
+        String statusResponse[] = m.sendCommandWithAnswer(parseDeviceIdForMultipleDevice(getDeviceId()), "s"+getSubDeviceNumber()).split("\\|");
         if (!statusResponse[0].equals("3")) {
             throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
         }
@@ -111,7 +111,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @throws RemoteHomeConnectionException if there is problem with connection
      */
     public void switchOn() throws RemoteHomeConnectionException {
-        m.sendCommand(parseDeviceIdForMultipleSwitch(getDeviceId()), "l"+switchNumber+"o");
+        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"o");
         setCurrentState(true);
     }
     
@@ -121,7 +121,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @throws RemoteHomeConnectionException if there is problem with connection
      */
     public void switchOff() throws RemoteHomeConnectionException {
-        m.sendCommand(parseDeviceIdForMultipleSwitch(getDeviceId()), "l"+switchNumber+"f");
+        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"f");
         setCurrentState(false);
     }
     
@@ -133,7 +133,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @throws RemoteHomeConnectionException if there is problem with connection
      */
     public void switchOnForConfiguredPeriod() throws RemoteHomeConnectionException {
-        m.sendCommand(parseDeviceIdForMultipleSwitch(getDeviceId()), "l"+switchNumber+"of");
+        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"of");
     }
 
     /**
@@ -215,7 +215,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
         if ((period < 0) || (period > 255)) {
             throw new RemoteHomeManagerException("The value should be 0 - 255", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
-        m.sendCommand(parseDeviceIdForMultipleSwitch(getDeviceId()), "l"+switchNumber+"ct="+period);
+        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"ct="+period);
         setConfiguredPeriod(period);
     }
     
@@ -226,34 +226,10 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      */
     public void switchOnWhenAppliedPower(boolean onWhenPower) throws RemoteHomeConnectionException {
         if (onWhenPower) {
-            m.sendCommand(parseDeviceIdForMultipleSwitch(getDeviceId()), "l"+switchNumber+"co");
+            m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"co");
         } else {
-            m.sendCommand(parseDeviceIdForMultipleSwitch(getDeviceId()), "l"+switchNumber+"cf");
+            m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"cf");
         }
         setOnWhenAppliedPower(onWhenPower);
     }
-
-    /**
-     * @return the switchNumber
-     */
-    public String getSwitchNumber() {
-        return switchNumber;
-    }
-
-    /**
-     * @param switchNumber the switchNumber to set
-     */
-    public void setSwitchNumber(String switchNumber) {
-        this.switchNumber = switchNumber;
-    }
-    
-    private int parseDeviceIdForMultipleSwitch(int deviceId) {
-        if (deviceId < 256) {
-            switchNumber = "1";
-            return deviceId;
-        } else {
-            switchNumber = Integer.toString(deviceId % 1000);
-            return deviceId / 1000;
-        }
-    }    
 }

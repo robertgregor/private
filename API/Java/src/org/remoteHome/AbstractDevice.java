@@ -49,6 +49,11 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     public static int BatteryThermostat = 7;
    
     /**
+     * This is subdevice number e.g. for 6 relay board switch it is 1..6
+     */
+    private String subDeviceNumber = "1";
+
+    /**
      * This is device id of the hardware device assigned with AT+a=id command
      */
     private int deviceId = 0;    
@@ -198,4 +203,26 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
+        /**
+     * @return the subDeviceNumber
+     */
+    public String getSubDeviceNumber() {
+        return subDeviceNumber;
+    }
+
+    /**
+     * @param subDeviceNumber the subDeviceNumber to set
+     */
+    public void setSubDeviceNumber(String switchNumber) {
+        this.subDeviceNumber = switchNumber;
+    }
+    
+    protected int parseDeviceIdForMultipleDevice(int deviceId) {
+        if (deviceId < 256) {            
+            return deviceId;
+        } else {
+            subDeviceNumber = Integer.toString(deviceId % 1000);
+            return deviceId / 1000;
+        }
+    }    
 }

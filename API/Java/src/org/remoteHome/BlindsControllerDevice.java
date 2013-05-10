@@ -80,7 +80,8 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @param deviceName device name
      */    
     protected BlindsControllerDevice(RemoteHomeManager m, int deviceId, String deviceName) {
-        super (m, deviceId, deviceName);        
+        super (m, deviceId, deviceName);
+        setSubDeviceNumber("");
     }
     /**
      * Receive asynchronous command - blinds positioned
@@ -108,7 +109,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * 
      */
     public void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        String statusResponse[] = m.sendCommandWithAnswer(getDeviceId(), "s").split("\\|");
+        String statusResponse[] = m.sendCommandWithAnswer(getDeviceId(), "s"+getSubDeviceNumber()).split("\\|");
         if (!statusResponse[0].equals("5")) {
             throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
         }        
@@ -142,7 +143,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
         if ((fullRangeTimeout < 0) || (fullRangeTimeout > 255)) {
             throw new RemoteHomeManagerException("The value should be 0 - 255", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
-        m.sendCommand(getDeviceId(), "bt="+fullRangeTimeout);
+        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"t="+fullRangeTimeout);
         setFullRangeTimeout(fullRangeTimeout);
     }
 
@@ -151,7 +152,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @throws RemoteHomeConnectionException if there is a problem with the connection 
      */
     public void blindsUp() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "bu"); 
+        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"u"); 
         moving = true;
         movingUp = true;
         movingDown = false;        
@@ -162,7 +163,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @throws RemoteHomeConnectionException if there is a problem with the connection 
      */
     public void blindsDown() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "bd");        
+        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"d");        
         moving = true;
         movingUp = false;
         movingDown = true;
@@ -178,7 +179,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
         if ((fullRangeTimeout < 0) || (fullRangeTimeout > 100)) {
             throw new RemoteHomeManagerException("The value should be 0 - 100", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
-        m.sendCommand(getDeviceId(), "bm="+position);        
+        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"m="+position);        
         moving = true;
         movingUp = false;
         movingDown = false;
@@ -189,7 +190,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      */
     public void stopBlindsMovement() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "bs");
+        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"s");
         moving = false;
         movingUp = false;
         movingDown = false;
@@ -202,7 +203,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      */
     public void manualMoveUp() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "u");        
+        m.sendCommand(getDeviceId(), "u"+getSubDeviceNumber());        
         moving = true;
         movingUp = true;
         movingDown = false;
@@ -215,7 +216,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      */
     public void manualMoveDown() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "d");        
+        m.sendCommand(getDeviceId(), "d"+getSubDeviceNumber());        
         moving = true;
         movingUp = false;
         movingDown = true;
@@ -228,14 +229,14 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      */
     public void manualStop() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "e");
+        m.sendCommand(getDeviceId(), "e"+getSubDeviceNumber());
         moving = false;
         movingUp = false;
         movingDown = false;
     }
 
     /**
-     * This listenner listen for the event, when the blind is moved to required position. The user of this API should implement this interface
+     * This listenner listen for the event, when the blind is moved to required position. The user of this API could implement this interface
      * and register it for that event.
      * @return the blindsControllerListener
      */

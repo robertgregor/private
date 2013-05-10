@@ -62,6 +62,7 @@ public class WebServerHandler implements HttpHandler {
                 WebService w = (WebService)Class.forName("org.remoteHome.gui."+parsedParameters.get("ServiceName")).newInstance();
                 w.setParameters(remoteHomemanager);
                 w.processRequest(parsedParameters, out, t);
+                Thread.sleep(100);
             }
         } catch (Exception e) {
             e.printStackTrace();
