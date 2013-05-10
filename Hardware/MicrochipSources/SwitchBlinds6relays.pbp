@@ -80,6 +80,7 @@ conversionSuccess VAR BYTE
 timeout_value var word[3]
 currentCounter var byte[3]
 currentDirection var byte[3]
+currentPositionRelayNotifNumber var byte
 
 startProgram:
 clear
@@ -380,16 +381,19 @@ intManagement:
                             low RELAY1_DOWN
                             low RELAY1_UP
                             currentDirection[iint] = 0
+                            currentPositionRelayNotifNumber = 31
                             gosub sendCurrentPosition
                         elseif (iint == 1) then
                             low RELAY2_DOWN
                             low RELAY2_UP                            
-                            currentDirection[iint] = 0                            
+                            currentDirection[iint] = 0
+                            currentPositionRelayNotifNumber = 32                            
                             gosub sendCurrentPosition
                         elseif (iint == 2) then
                             low RELAY3_DOWN
                             low RELAY3_UP                            
-                            currentDirection[iint] = 0                            
+                            currentDirection[iint] = 0
+                            currentPositionRelayNotifNumber = 33
                             gosub sendCurrentPosition
                         endif                        
                    endif
@@ -416,12 +420,15 @@ stopBlindsSilent:
     if (relaysGroup == 0) then
         LOW RELAY1_DOWN
         low RELAY1_UP
+        currentPositionRelayNotifNumber = 31
     elseif (relaysGroup == 1) then
         LOW RELAY2_DOWN
         low RELAY2_UP
+        currentPositionRelayNotifNumber = 32
     elseif (relaysGroup == 2) then
         LOW RELAY3_DOWN
         low RELAY3_UP
+        currentPositionRelayNotifNumber = 33
     endif
     currentDirection[relaysGroup] = 0
 return
@@ -460,17 +467,22 @@ return
 
 sendCurrentPosition:
     temp_data[0] = "l"
-    for icurrpos = 0 to 2
-        icurrposArr = (icurrpos*4) + 1
-        temp_data[icurrposArr] = "|"
-        temp_byte = currentCounter[icurrpos]
-        gosub convertNoToStr
-        temp_data[icurrposArr+1] = temp3_byte
-        temp_data[icurrposArr+2] = temp2_byte
-        temp_data[icurrposArr+3] = temp1_byte
-    next icurrpos
-    temp_data[13] = 13
-    temp_data[14] = 10
+    temp_data[1] = "|"
+    if (currentPositionRelayNotifNumber == 31) then
+        temp_byte = currentCounter[0]
+    elseif (currentPositionRelayNotifNumber == 32) then
+        temp_byte = currentCounter[1]
+    elseif (currentPositionRelayNotifNumber == 33) then
+        temp_byte = currentCounter[2]
+    endif        
+    gosub convertNoToStr
+    temp_data[2] = temp3_byte
+    temp_data[3] = temp2_byte
+    temp_data[4] = temp1_byte
+    temp_data[5] = "|"    
+    temp_data[6] = currentPositionRelayNotifNumber
+    temp_data[7] = 13
+    temp_data[8] = 10
 return
 
 computeCounter:

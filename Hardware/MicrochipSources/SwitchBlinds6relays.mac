@@ -26,19 +26,6 @@ AIN?BBB macro Bin, Bout, Bndx
     endif
     endm
 
-AIN?BBW macro Bin, Bout, Wndx
-	MOVE?WA	Wndx
-        addlw   low (Bout)
-        movwf   FSR
-    if ((Bout) > 255)
-        bsf     STATUS, IRP
-    endif
-        MOVE?BB Bin, INDF
-    if ((Bout) > 255)
-        bcf     STATUS, IRP
-    endif
-    endm
-
 AIN?CBB macro Cin, Bout, Bndx
 	MOVE?BA	Bndx
         addlw   low (Bout)
