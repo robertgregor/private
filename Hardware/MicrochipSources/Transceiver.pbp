@@ -12,7 +12,7 @@
 '1,2,3,4,5 bank name transmitter
 '6,7,8,9 bank name device
 
-INCLUDE "RFM73.pbp"
+INCLUDE "RFM70.pbp"
 
 EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,0,0,0,0]
 
