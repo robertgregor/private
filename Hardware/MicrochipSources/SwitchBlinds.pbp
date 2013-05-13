@@ -82,6 +82,7 @@ gosub initModule
 
 commonSettings:
 gosub commonRXTX
+gosub commonRXTX
 
 '============Main Rx============================================================
 Main_rx:
@@ -262,7 +263,8 @@ if (data_in[1] == device_id) then
         temp_data[2] = "R"
         temp_data[3] = "O"
         temp_data[4] = "R"
-        temp_data[5] = 10
+        temp_data[5] = 13
+        temp_data[6] = 10
     endif
 endif
 
@@ -352,7 +354,8 @@ return
 sendDataOK:
     temp_data[0] = "O"
     temp_data[1] = "K"
-    temp_data[2] = 10
+    temp_data[2] = 13
+    temp_data[3] = 10
 return
 
 convertInputData:

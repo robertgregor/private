@@ -17,7 +17,7 @@
 '13 timeout value
 
 
-EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,0,0]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,1,1,0,0]
 
 
 INCLUDE "RFM73.pbp"
@@ -110,6 +110,7 @@ input res
 gosub initModule
 
 commonSettings:
+gosub commonRXTX
 gosub commonRXTX
 
 '============Main Rx============================================================
