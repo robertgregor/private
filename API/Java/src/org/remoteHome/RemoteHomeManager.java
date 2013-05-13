@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import org.remoteHome.gui.WebServer;
 
 /**
  *
@@ -387,7 +386,7 @@ public class RemoteHomeManager {
             manager.joinCommThread();            
         } else if (args.length == 4) {
             RemoteHomeManager manager = new RemoteHomeManager(args[0], args[1], args[2]);
-            WebServer webServer = new WebServer(args[3], manager);
+            org.remoteHome.gui.WebServer webServer = new org.remoteHome.gui.WebServer(args[3], manager);
             webServer.startServer();
             manager.joinCommThread();            
         }

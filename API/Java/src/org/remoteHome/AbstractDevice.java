@@ -125,7 +125,6 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     * Please note, that this method is called in the same thread as the receiving thread, so the implementation should be fast enough to return as soon as possible.
     * @param items the items after the space. The detailed list is described in the communication protocol.
     * 
-    * @author Robert Gregor
     */
     protected abstract void manageAsynchronousCommand(String[] items);
     
@@ -213,8 +212,8 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     /**
      * @param subDeviceNumber the subDeviceNumber to set
      */
-    public void setSubDeviceNumber(String switchNumber) {
-        this.subDeviceNumber = switchNumber;
+    public void setSubDeviceNumber(String subDeviceNumber) {
+        this.subDeviceNumber = subDeviceNumber;
     }
     
     protected int parseDeviceIdForMultipleDevice(int deviceId) {
