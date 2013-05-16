@@ -216,4 +216,10 @@ public class ThermostatDevice extends AbstractDevice {
         m.sendCommand(getDeviceId(), "r="+threshold);
         this.threshold = threshold;
     }
+    /**
+     * This method will start the scheduler thread to process the schedule.
+     */
+    public void startScheduling() {
+        
+    }    
 }

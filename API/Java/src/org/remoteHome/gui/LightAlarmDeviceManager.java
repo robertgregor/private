@@ -70,6 +70,20 @@ public class LightAlarmDeviceManager extends AbstractWebService {
                         ((LightAlarmDevice)dev).alarmOff();
                     }
                 }
+            } else if (action.equals("SAVESCH")) {
+                for (int i=0; i<14;i++) {
+                    device.getLightSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
+                }
+            } else if (action.equals("LOADSCH")) {
+                sendAjaxAnswer(device.getLightSchedule().loadSchedule());
+                return;
+            } else if (action.equals("SAVESCHMOVEMENT")) {
+                for (int i=0; i<14;i++) {
+                    device.getLightOnWhenMovementDetectedSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
+                }                
+            } else if (action.equals("LOADSCHMOVEMENT")) {
+                sendAjaxAnswer(device.getLightOnWhenMovementDetectedSchedule().loadSchedule());
+                return;
             }
             sendAjaxAnswer("OK");
         } catch (Exception e) {

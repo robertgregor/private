@@ -119,22 +119,88 @@ $(function() {
           });
           updateStatusCOMPONENTID();
     });
+    $( "#schDialogCOMPONENTID" ).dialog({      
+            autoOpen: false,
+            height: 385,
+            width: 830,
+            modal: true,
+            buttons: {
+                "Save schedule": function() {
+                  var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+                  });
+                  $( this ).dialog( "close" );
+                },
+                Cancel: function() {
+                      $( this ).dialog( "close" );        
+                }
+          }
+    });
+    $( "#scheduleButtCOMPONENTID" ).button().click(function() {
+          $( "#schDialog2COMPONENTID" ).replaceWith(createSchTable('schTableCOMPONENTID'));
+          mouseDown=0;
+          $( 'table.schtable' ).delegate('td', 'mousedown', function () {
+                mouseDown=1;
+                if ($(this).attr('class') == "schtdns") {
+                    $(this).removeClass().addClass('schtds');
+                } else {
+                    $(this).removeClass().addClass('schtdns');
+                }
+          });
+          $( 'table.schtable' ).delegate('td', 'mouseup', function () {
+                mouseDown=0;
+          });
+          $( 'table.schtable' ).delegate('td', 'mouseover', function () {
+            if (mouseDown == 1) {
+                if ($(this).attr('class') == "schtdns") {
+                    $(this).removeClass().addClass('schtds');
+                } else {
+                    $(this).removeClass().addClass('schtdns');
+                }
+            }
+          });
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=LOADSCH&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadSchedule(data, 'schTableCOMPONENTID');
+                        $( "#schDialogCOMPONENTID" ).dialog( "open" );          
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+          });          
+    });
     updateStatusCOMPONENTID();
 });
 </script>
 <table width="100%"><tr>
 <td>
-    <table width="100%"><tr><td>
-    <input type="submit" id="SwitchOnSimpleSwitchCOMPONENTID" value="Switch On" />
-    </td><td>
-    <input type="submit" id="SwitchOffSimpleSwitchCOMPONENTID" value="Switch Off" />
+    <table width="100%"><tr><td width="50%">
+    <input width="100%" type="submit" id="SwitchOnSimpleSwitchCOMPONENTID" value="Switch On" />
+    </td><td width="50%">
+    <input width="100%" type="submit" id="SwitchOffSimpleSwitchCOMPONENTID" value="Switch Off" />
     </td></tr>
     <tr>
         <td colspan="2">&nbsp;</td>
     </tr>
     <tr>
-        <td colspan="2">
-            <select id="periodCOMPONENTID">
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td  width="50%">
+            <select  width="100%" id="periodCOMPONENTID">
                 <option value="0">&nbsp;</option>
                 <option value="5">5 min</option>
                 <option value="15">15 min</option>
@@ -142,11 +208,18 @@ $(function() {
                 <option value="60">1 hour</option>
                 <option value="120">2 hours</option>
                 <option value="240">4 hours</option>
-            </select>
+            </select></td><td  width="50%">
             &nbsp;&nbsp;
-            <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID" value="Switch On with period" />
+            <input width="100%" type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID" value="Switch On with period" />
         </td>
     </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr><td  width="100%" colspan="2"><button id="scheduleButtCOMPONENTID">Scheduler</button></td></tr>
     </table>
 </td>
 <td>
@@ -206,4 +279,8 @@ $(function() {
 </table>
 </td>
 </tr></table>
+<div id="schDialogCOMPONENTID" title="Switch Scheduler">
+    <div id="schDialog2COMPONENTID">
+    </div>
+</div>
 </div>

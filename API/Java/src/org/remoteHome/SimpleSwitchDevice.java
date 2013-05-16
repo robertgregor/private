@@ -1,7 +1,7 @@
 package org.remoteHome;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.Calendar;
 
  /**
   * Simple switch<BR/>
@@ -53,6 +53,8 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      */    
     private int currentCounter;
     
+    private OnOffSchedule lightSchedule;
+    
    /**
      * The constructor is protected. The object should be constructed using
      * SimpleSwitchDevice device = 
@@ -66,6 +68,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
     protected SimpleSwitchDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);
         setSubDeviceNumber("1");
+        lightSchedule = new OnOffSchedule();
     }
     /**
      * For Simple switch, this method is not used.
@@ -195,6 +198,20 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
     }
 
     /**
+     * @return the lightSchedule
+     */
+    public OnOffSchedule getLightSchedule() {
+        return lightSchedule;
+    }
+
+    /**
+     * @param lightSchedule the lightSchedule to set
+     */
+    public void setLightSchedule(OnOffSchedule lightSchedule) {
+        this.lightSchedule = lightSchedule;
+    }
+
+    /**
      * Current counter in minutes. When the counter reach 0, the switch will turn off.
      * @param currentCounter the currentCounter to set
      */
@@ -217,8 +234,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
         }
         m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"ct="+period);
         setConfiguredPeriod(period);
-    }
-    
+    }    
     /**
      * This method will configure the behavior of the switch, when the power is applied.
      * @param onWhenPower true, if the switch should go ON, when the power is applied. false, when it should stay off.
@@ -231,5 +247,39 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
             m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"cf");
         }
         setOnWhenAppliedPower(onWhenPower);
+    }
+    
+    /**
+     * This method will start the scheduler thread to process the schedule.
+     */
+    public void startScheduling() {
+        getLightSchedule().setCurrentState("0");
+        new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(30000);
+                        Calendar c = Calendar.getInstance();
+                        int min = c.get(Calendar.MINUTE);
+                        if ((min % 10) == 0) {
+                            Boolean action = getLightSchedule().processSchedule();
+                            if (action != null) {
+                                //something has to be done.
+                                if (action) {
+                                    switchOn();
+                                } else {
+                                    switchOff();
+                                }
+                            }
+                        }
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                        return;
+                    } catch (RemoteHomeConnectionException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();        
     }
 }

@@ -25,12 +25,15 @@ public class SimpleSwitchDeviceManager extends AbstractWebService {
             String action = requestParameters.get("action");
             if (action.equals("ON")) {
                 device.switchOn();
+                sendAjaxAnswer("OK");
             } else if (action.equals("OFF")) {
                 device.switchOff();
+                sendAjaxAnswer("OK");
             } else if (action.equals("ONTIMEOUT")) {
                 int time = Integer.parseInt(requestParameters.get("period"));
                 if (time != 0) device.configurePeriod(time);
-                device.switchOnForConfiguredPeriod();                
+                device.switchOnForConfiguredPeriod();
+                sendAjaxAnswer("OK");
             } else if (action.equals("CONFIGURE")) {
                 device.updateDevice();
                 String nm = requestParameters.get("nm");
@@ -39,9 +42,18 @@ public class SimpleSwitchDeviceManager extends AbstractWebService {
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getConfiguredPeriod() != tm) device.configurePeriod(tm);
                 if (device.isOnWhenAppliedPower() != onWhenPower) device.switchOnWhenAppliedPower(onWhenPower);
-            }
-            sendAjaxAnswer("OK");
+                sendAjaxAnswer("OK");
+            } else if (action.equals("SAVESCH")) {
+                for (int i=0; i<14;i++) {
+                    device.getLightSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
+                }
+                r.savePersistentData();
+                sendAjaxAnswer("OK");
+            } else if (action.equals("LOADSCH")) {
+                sendAjaxAnswer(device.getLightSchedule().loadSchedule());
+            }            
         } catch (Exception e) {
+            e.printStackTrace();
             sendAjaxError(e.getMessage());
         }
     }

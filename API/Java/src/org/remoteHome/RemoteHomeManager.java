@@ -97,30 +97,37 @@ public class RemoteHomeManager {
         if (deviceType == AbstractDevice.HeatingHeader) {
             HeatingHeaderDevice device = new HeatingHeaderDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.SimpleSwitch) {
             SimpleSwitchDevice device = new SimpleSwitchDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.TemperatureSensor) {
             TemperatureSensorDevice device = new TemperatureSensorDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.LightAlarmDevice) {
             LightAlarmDevice device = new LightAlarmDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.BlindsControllerDevice) {
             BlindsControllerDevice device = new BlindsControllerDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.startScheduling();
             return device;            
         } else if (deviceType == AbstractDevice.Thermostat) {
             ThermostatDevice device = new ThermostatDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.startScheduling();
             return device;            
         } else if (deviceType == AbstractDevice.BatteryThermostat) {
             BatteryThermostatDevice device = new BatteryThermostatDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.startScheduling();
             return device;            
         } else {
             throw new RemoteHomeManagerException(RemoteHomeManagerException.UNKNOWN_DEVICE);
@@ -317,7 +324,10 @@ public class RemoteHomeManager {
             devices = (HashMap<Integer, AbstractDevice>)ois.readObject();
             rooms = (HashMap<String, HashSet<AbstractDevice>>)ois.readObject();
             ois.close();
-            for (AbstractDevice dev : devices.values()) dev.m = this;
+            for (AbstractDevice dev : devices.values()) {
+                dev.m = this;
+                dev.startScheduling();
+            }
         }      
     }
     /*

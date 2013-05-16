@@ -195,6 +195,10 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
     public void updateDevice() throws RemoteHomeManagerException {
         throw new RemoteHomeManagerException(RemoteHomeManagerException.NOT_SUPPORTED);
     }
-
-    
+    /**
+     * This method will start the scheduler thread to process the schedule.
+     */
+    public void startScheduling() {
+        
+    }    
 }

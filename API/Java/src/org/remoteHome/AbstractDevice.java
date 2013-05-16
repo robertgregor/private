@@ -223,5 +223,9 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
             subDeviceNumber = Integer.toString(deviceId % 1000);
             return deviceId / 1000;
         }
-    }    
+    }
+    /*
+     * This method is called once, when the class is instantiated or deserialized.
+     */
+    protected abstract void startScheduling();
 }

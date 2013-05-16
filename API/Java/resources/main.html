@@ -4,12 +4,16 @@
 <meta charset="utf-8" />
 <title>Remote-home GUI</title>
 <link rel="stylesheet" href="jquery-ui-1.10.2.custom.css" />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="schedulers.css" />
 <script src="jquery-1.9.1.js"></script>
 <script src="jquery-ui-1.10.2.custom.js"></script>
 <script type="text/javascript" src="jquery.validate.js"></script>
-<link rel="stylesheet" href="style.css" />
+<script src="schedulers.js"></script>
+
 <script>
 var addTabJs = null;
+var mouseDown = 0;
 $(function() {
   var tabs = $( "#tabs" ).tabs();
   $( document ).tooltip();

@@ -253,6 +253,104 @@ $(function() {
             }   
           });
     });
+    $( "#schDialogLaCOMPONENTID" ).dialog({      
+            autoOpen: false,
+            height: 385,
+            width: 830,
+            modal: true,
+            buttons: {
+                "Save schedule": function() {
+                  var schData="&0="+saveSchedule("schTableLaCOMPONENTID", 0)+"&1="+saveSchedule("schTableLaCOMPONENTID", 1)+"&2="+saveSchedule("schTableLaCOMPONENTID", 2)+"&3="+saveSchedule("schTableLaCOMPONENTID", 3)+"&4="+saveSchedule("schTableLaCOMPONENTID", 4)+"&5="+saveSchedule("schTableLaCOMPONENTID", 5)+"&6="+saveSchedule("schTableLaCOMPONENTID", 6)+"&7="+saveSchedule("schTableLaCOMPONENTID", 7)+"&8="+saveSchedule("schTableLaCOMPONENTID", 8)+"&9="+saveSchedule("schTableLaCOMPONENTID", 9)+"&10="+saveSchedule("schTableLaCOMPONENTID", 10)+"&11="+saveSchedule("schTableLaCOMPONENTID", 11)+"&12="+saveSchedule("schTableLaCOMPONENTID", 12)+"&13="+saveSchedule("schTableLaCOMPONENTID", 13);
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+                  });
+                  $( this ).dialog( "close" );
+                },
+                Cancel: function() {
+                      $( this ).dialog( "close" );        
+                }
+          }
+    });
+    $( "#scheduleButtLightAlmCOMPONENTID" ).button().click(function() {
+          $( "#schDialogLa2COMPONENTID" ).replaceWith(createSchTable('schTableLaCOMPONENTID'));
+          mouseDown==0;
+          $( 'table.schtable' ).delegate('td', 'mouseover', function () {
+            if (mouseDown == 1) $(this).toggleClass('schtds');
+          });
+          $( 'table.schtable' ).delegate('td', 'mousedown', function () {
+            $(this).toggleClass('schtds');
+          });
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=LOADSCH&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadSchedule(data, 'schTableLaCOMPONENTID');
+                        $( "#schDialogLaCOMPONENTID" ).dialog( "open" );          
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+          });          
+    });
+    $( "#schDialogMovementCOMPONENTID" ).dialog({      
+            autoOpen: false,
+            height: 385,
+            width: 830,
+            modal: true,
+            buttons: {
+                "Save schedule": function() {
+                  var schData="&0="+saveSchedule("schTableMovementCOMPONENTID", 0)+"&1="+saveSchedule("schTableMovementCOMPONENTID", 1)+"&2="+saveSchedule("schTableMovementCOMPONENTID", 2)+"&3="+saveSchedule("schTableMovementCOMPONENTID", 3)+"&4="+saveSchedule("schTableMovementCOMPONENTID", 4)+"&5="+saveSchedule("schTableMovementCOMPONENTID", 5)+"&6="+saveSchedule("schTableMovementCOMPONENTID", 6)+"&7="+saveSchedule("schTableMovementCOMPONENTID", 7)+"&8="+saveSchedule("schTableMovementCOMPONENTID", 8)+"&9="+saveSchedule("schTableMovementCOMPONENTID", 9)+"&10="+saveSchedule("schTableMovementCOMPONENTID", 10)+"&11="+saveSchedule("schTableMovementCOMPONENTID", 11)+"&12="+saveSchedule("schTableMovementCOMPONENTID", 12)+"&13="+saveSchedule("schTableMovementCOMPONENTID", 13);
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCHMOVEMENT&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+                  });
+                  $( this ).dialog( "close" );
+                },
+                Cancel: function() {
+                      $( this ).dialog( "close" );        
+                }
+          }
+    });
+    $( "#scheduleLightOnMovementCOMPONENTID" ).button().click(function() {
+          $( "#schDialogMovement2COMPONENTID" ).replaceWith(createSchTable('schTableMovementCOMPONENTID'));
+          mouseDown==0;
+          $( 'table.schtable' ).delegate('td', 'mouseover', function () {
+            if (mouseDown == 1) $(this).toggleClass('schtds');
+          });
+          $( 'table.schtable' ).delegate('td', 'mousedown', function () {
+            $(this).toggleClass('schtds');
+          });
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=LOADSCHMOVEMENT&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadSchedule(data, 'schTableMovementCOMPONENTID');
+                        $( "#schDialogMovementCOMPONENTID" ).dialog( "open" );          
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+          });          
+    });
     updateStatusCOMPONENTID();
 });
 </script>
@@ -280,6 +378,17 @@ $(function() {
             &nbsp;&nbsp;
             <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID" value="Switch On with period" />
         </td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+    <td>
+    <button id="scheduleButtLightAlmCOMPONENTID">Light scheduler</button>
+    </td>
+    <td>
+    <button id="scheduleLightOnMovementCOMPONENTID">Movement sensor scheduler</button>
+    </td>
     </tr>
     <tr>
         <td colspan="2">&nbsp;</td>
@@ -397,4 +506,12 @@ $(function() {
     </table>
 </td>
 </tr></table>
+<div id="schDialogLaCOMPONENTID" title="Light Scheduler">
+    <div id="schDialogLa2COMPONENTID">
+    </div>
+</div>
+<div id="schDialogMovementCOMPONENTID" title="Switch Scheduler">
+    <div id="schDialogMovement2COMPONENTID">
+    </div>
+</div>
 </div>

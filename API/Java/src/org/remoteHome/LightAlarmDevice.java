@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Calendar;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -107,6 +108,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      */
     private String smtpMessage;
 
+    private OnOffSchedule lightOnWhenMovementDetectedSchedule;
     /**
      * The constructor is protected. The object should be constructed using
      * TemperatureSensorDevice device = 
@@ -476,6 +478,20 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
     public void setSmtpMessage(String smtpMessage) {
         this.smtpMessage = smtpMessage;
     }
+
+    /**
+     * @return the lightOnWhenMovementDetectedSchedule
+     */
+    public OnOffSchedule getLightOnWhenMovementDetectedSchedule() {
+        return lightOnWhenMovementDetectedSchedule;
+    }
+
+    /**
+     * @param lightOnWhenMovementDetectedSchedule the lightOnWhenMovementDetectedSchedule to set
+     */
+    public void setLightOnWhenMovementDetectedSchedule(OnOffSchedule lightOnWhenMovementDetectedSchedule) {
+        this.lightOnWhenMovementDetectedSchedule = lightOnWhenMovementDetectedSchedule;
+    }
     
         private void sendSMTPcmd(String s, PrintWriter out, BufferedReader in) throws IOException {
         // Send the SMTP command
@@ -525,5 +541,40 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
             in.close();
             s.close();
     }
-
+    /**
+     * This method will start the scheduler thread to process the schedule.
+     */
+    public void startScheduling() {
+        super.startScheduling();
+        getLightOnWhenMovementDetectedSchedule().setCurrentState("0");
+        new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(30000);
+                        Calendar c = Calendar.getInstance();
+                        int min = c.get(Calendar.MINUTE);
+                        if ((min % 10) == 0) {
+                            Boolean action = getLightOnWhenMovementDetectedSchedule().processSchedule();
+                            if (action != null) {
+                                //something has to be done.
+                                if (action) {
+                                    configureSwitchOnWhenMovement(true);
+                                } else {
+                                    configureSwitchOnWhenMovement(false);
+                                }
+                            }
+                        }
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                        return;
+                    } catch (RemoteHomeConnectionException e) {
+                        e.printStackTrace();
+                    } catch (RemoteHomeManagerException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();        
+    }
 }
