@@ -1,0 +1,23 @@
+.schtable { border-collapse: collapse; }
+.schtd { border: 1px solid #000000; background-color: silver; font: x-small; color: white; font-weight: bolder;}
+.schtdns { border: 1px solid #000000; background-color: white;}
+.schtds { border: 1px solid #000000; background-color: orange;}
+.schtdsblack { border: 1px solid #000000; background-color: black; color:white;}
+.schtdswhite { border: 1px solid #000000; background-color: white; color:black;}
+.schtdslightblue { border: 1px solid #000000; background-color: lightblueblue; color:black;}
+.schtdsblue { border: 1px solid #000000; background-color: blue; color:white;}
+.schtdsdarkblue { border: 1px solid #000000; background-color: darkblue; color:white;}
+.schtdslightgreen { border: 1px solid #000000; background-color: lightgreen; color:black;}
+.schtdsgreen { border: 1px solid #000000; background-color: green; color:white;}
+.schtdsdarkgreen { border: 1px solid #000000; background-color: darkgreen; color:white;}
+.schtdslightpink { border: 1px solid #000000; background-color: lightpink; color:black;}
+.schtdspink { border: 1px solid #000000; background-color: pink; color:black;}
+.schtdsdarkpink { border: 1px solid #000000; background-color: darksalmon; color:black;}
+.schtdslightyellow { border: 1px solid #000000; background-color: lightgoldenrodyellow; color:black;}
+.schtdsyellow { border: 1px solid #000000; background-color: yellow; color:black;}
+.schtdsdarkyellow { border: 1px solid #000000; background-color: gold; color:black;}
+.schtdsorange { border: 1px solid #000000; background-color: orange; color:black;}
+.schtdslightred { border: 1px solid #000000; background-color: lightcoral; color:black;}
+.schtdsred { border: 1px solid #000000; background-color: red; color:black;}
+.schtdsdarkred { border: 1px solid #000000; background-color: darkred; color:black;}
+.schtdsorangered { border: 1px solid #000000; background-color: orangered; color:black;}
