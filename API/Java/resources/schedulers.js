@@ -1,4 +1,4 @@
-	function saveSchedule(id, day) {
+        function saveSchedule(id, day) {
             var s="";
             var p="";
             for (var i=0;i<12;i++){
