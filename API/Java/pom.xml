@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
+    <groupId>org.remotehome</groupId>
+    <artifactId>remotehome</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <name>RemoteHome</name>
+
+    <organization>
+        <name>Remote-Home s.r.o.</name>
+        <url>http://www.remote-home.org</url>
+    </organization>
+
+    <properties>
+        <!-- Project -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.7</java.version>
+        <nrjavaserial.version>3.8.8</nrjavaserial.version>
+        <!-- Maven plugins -->
+        <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
+        <maven-dependency-plugin.version>2.7</maven-dependency-plugin.version>
+        <maven-war-plugin.version>2.3</maven-war-plugin.version>
+    </properties>
+
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- nrjavaserial -->
+        <dependency>
+            <groupId>com.neuronrobotics</groupId>
+            <artifactId>nrjavaserial</artifactId>
+            <version>${nrjavaserial.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>remotehome-${project.version}</finalName>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>org.remoteHome.RemoteHomeManager</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>win</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <server.host>localhost</server.host>
+                <server.port>8080</server.port>
+                <socket.host>192.168.1.5</socket.host>
+                <socket.port>2000</socket.port>
+                <commPort>COM10</commPort>
+                <serialize.filepath>serialize/remotehome.ser</serialize.filepath>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <server.host>localhost</server.host>
+                <server.port>8080</server.port>
+                <socket.host>192.168.1.5</socket.host>
+                <socket.port>2000</socket.port>
+                <commPort>/dev/ttyUSB0</commPort>
+                <serialize.filepath>serialize/remotehome.ser</serialize.filepath>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <server.host>localhost</server.host>
+                <server.port>8080</server.port>
+                <socket.host>192.168.1.5</socket.host>
+                <socket.port>2000</socket.port>
+                <commPort>/dev/tty.usbserial-A700dYoR</commPort>
+                <serialize.filepath>serialize/remotehome.ser</serialize.filepath>
+            </properties>
+        </profile>
+    </profiles>
+
+    <repositories>
+        <repository>
+            <id>eclipse-juno</id>
+            <url>http://download.eclipse.org/releases/juno</url>
+        </repository>
+        <repository>
+            <id>eclipse-kepler</id>
+            <url>http://download.eclipse.org/releases/kepler</url>
+        </repository>
+        <repository>
+            <id>repo2_maven_org</id>
+            <url>http://repo2.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>Sonatype snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+        <repository>
+            <id>Sonatype releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+        <!-- nrjavaserial -->
+        <repository>
+            <id>Remote-Home thirdparty</id>
+            <url>http://nexus.remote-home.org/content/repositories/thirdparty/</url>
+        </repository>
+    </repositories>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>http://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+</project>

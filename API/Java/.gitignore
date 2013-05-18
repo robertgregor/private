@@ -1,0 +1,32 @@
+## java specific
+*.class
+
+## intellij specific
+.idea
+*.iml
+*.ipr
+*.iws
+
+## eclipse specific
+.settings
+.classpath
+.project
+.checkstyle
+
+## netbeans specific 
+/nbproject/
+/config/
+
+## maven specific
+target
+/target/
+
+## python specific
+*.pyc
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
