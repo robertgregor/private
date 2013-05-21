@@ -57,9 +57,12 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <addClasspath>true</addClasspath>
+                            <!--<addClasspath>true</addClasspath>-->
                             <mainClass>org.remoteHome.RemoteHomeManager</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Class-Path>../lib/nrjavaserial-3.8.8.jar</Class-Path>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
