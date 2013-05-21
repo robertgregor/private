@@ -5,8 +5,8 @@
                 var hour = i.toString(10);
                 if (hour.length == 1) hour = "0" + hour;
                 for (var j=1; j<7; j++) {
-                    var idElem = id+day.toString(10)+hour+j.toString(10);                    
-                    if ($("#"+idElem).attr('class') == "schtdns") p+="0"; else p+="1";
+                    var idElem = id+day.toString(10)+hour+j.toString(10);
+                    if (document.getElementById(idElem).style.backgroundColor == 'orange') p+="1"; else p+="0";
                 }
                 p=parseInt(p,2);
                 p=p+"";
@@ -22,9 +22,22 @@
 		var h=i.toString(10);
 		if (h.length==1) h="0"+h;
 		for (var j=1;j<7;j++)
-                    r+="<td title=\""+i+":"+(j-1)+"0 "+n+"\" class=\"schtdns\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\"></td>";
+                    r+="<td title=\""+i+":"+(j-1)+"0 "+n+"\" class=\"schtd\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\" onMouseOver=\"manageSchTableMouseOver(this);\" onMouseDown=\"manageSchTableMouseDown(this);\"></td>";
             }
             return r+"</tr>";
+        }
+        function manageSchTableMouseDown(tdid) {
+                isMouseDown=true;
+                manageSchTableMouseOver(tdid);
+        }
+        function manageSchTableMouseOver(tdid) {
+            if (isMouseDown) {
+                if (tdid.style.backgroundColor == 'white') {
+                    tdid.style.backgroundColor = 'orange';
+                } else {
+                    tdid.style.backgroundColor = 'white';
+                }
+            }
         }
         function createSchTable(id) {
             var html = "";
@@ -63,9 +76,9 @@
                   for (var j=1; j<7; j++) {
                     var idElem = id+day.toString(10)+hour+j.toString(10);
                     if (sch.substring(binaryCounter,binaryCounter+1)=="1") {
-                        $("#"+idElem).removeClass().addClass('schtds');
+                        document.getElementById(idElem).style.backgroundColor = 'orange';
                     } else {
-                        $("#"+idElem).removeClass().addClass('schtdns');
+                        document.getElementById(idElem).style.backgroundColor = 'white';                        
                     }
                     binaryCounter = binaryCounter + 1;
                 }

@@ -1,7 +1,5 @@
 .schtable { border-collapse: collapse; }
 .schtd { border: 1px solid #000000; background-color: silver; font: x-small; color: white; font-weight: bolder;}
-.schtdns { border: 1px solid #000000; background-color: white;}
-.schtds { border: 1px solid #000000; background-color: orange;}
 .schtdsblack { border: 1px solid #000000; background-color: black; color:white;}
 .schtdswhite { border: 1px solid #000000; background-color: white; color:black;}
 .schtdslightblue { border: 1px solid #000000; background-color: lightblueblue; color:black;}

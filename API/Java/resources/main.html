@@ -13,10 +13,10 @@
 
 <script>
 var addTabJs = null;
-var mouseDown = 0;
+var isMouseDown = false;
 $(function() {
   var tabs = $( "#tabs" ).tabs();
-  $( document ).tooltip();
+  //$( document ).tooltip();
   $( "input[type=submit], a, button" ).button();
   $('tbody tr').hover(function() { $(this).toggleClass('ui-state-highlight'); });
   function addTab(label) {
@@ -40,6 +40,10 @@ $(function() {
   }).ajaxStop(function () {
     $('#ajaxBusy').hide();
   });
+});
+$(document)
+    .mouseup(function () {
+      isMouseDown = false;
 });
 $(document).ready(function(){
   $.ajax({

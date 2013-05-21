@@ -122,7 +122,7 @@ $(function() {
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
             height: 385,
-            width: 830,
+            width: 850,
             modal: true,
             buttons: {
                 "Save schedule": function() {
@@ -147,27 +147,6 @@ $(function() {
     });
     $( "#scheduleButtCOMPONENTID" ).button().click(function() {
           $( "#schDialog2COMPONENTID" ).replaceWith(createSchTable('schTableCOMPONENTID'));
-          mouseDown=0;
-          $( 'table.schtable' ).delegate('td', 'mousedown', function () {
-                mouseDown=1;
-                if ($(this).attr('class') == "schtdns") {
-                    $(this).removeClass().addClass('schtds');
-                } else {
-                    $(this).removeClass().addClass('schtdns');
-                }
-          });
-          $( 'table.schtable' ).delegate('td', 'mouseup', function () {
-                mouseDown=0;
-          });
-          $( 'table.schtable' ).delegate('td', 'mouseover', function () {
-            if (mouseDown == 1) {
-                if ($(this).attr('class') == "schtdns") {
-                    $(this).removeClass().addClass('schtds');
-                } else {
-                    $(this).removeClass().addClass('schtdns');
-                }
-            }
-          });
           $.ajax({
                         url: "/",
                         type: "get",
