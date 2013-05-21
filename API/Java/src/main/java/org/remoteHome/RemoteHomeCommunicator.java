@@ -1,10 +1,8 @@
 package org.remoteHome; 
 
 //import gnu.io.SerialPort;
-import gnu.io.NativeResource;
-import gnu.io.NRSerialPort;
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
+import gnu.io.*;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -59,6 +57,7 @@ class RemoteHomeCommunicator extends Thread  {
     }
     private void getUserNamePassword() throws RemoteHomeConnectionException {
         try {
+            if(dataOutputStream == null) System.out.println("outputstream is null");
             dataOutputStream.write("AT+s\n".getBytes());
             dataOutputStream.flush();
             Thread.sleep(50);
@@ -81,13 +80,12 @@ class RemoteHomeCommunicator extends Thread  {
 				nr.load("libNRJavaSerial");
                 CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(getPort());
                 commPort = portIdentifier.open(this.getClass().getName(),2000);
-                NRSerialPort serialPort = new NRSerialPort(getPort(), 9600);
-				serialPort.connect();
-                //serialPort.setSerialPortParams(9600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+                SerialPort serialPort = (SerialPort) commPort;
+                serialPort.setSerialPortParams(9600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
                 dataInputStream = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
-                dataOutputStream = new DataOutputStream(serialPort.getOutputStream());                 
+                dataOutputStream = new DataOutputStream(serialPort.getOutputStream());
             } catch (Exception e) {
-                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_PORT);                
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_PORT);
             }
     }
 
