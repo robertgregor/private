@@ -66,6 +66,23 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <executable>java</executable>
+                    <mainClass>org.remoteHome.RemoteHomeManager</mainClass>
+                    <classpathScope>runtime</classpathScope>
+                    <includeProjectDependencies>true</includeProjectDependencies>
+                    <arguments>
+                        <argument>${socket.host}</argument>
+                        <argument>${socket.port}</argument>
+                        <argument>${serialize.filepath}</argument>
+                        <argument>${server.port}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -101,7 +118,7 @@
                 <socket.host>192.168.1.5</socket.host>
                 <socket.port>2000</socket.port>
                 <commPort>/dev/ttyUSB0</commPort>
-                <serialize.filepath>serialize/remotehome.ser</serialize.filepath>
+                <serialize.filepath>remotehome.ser</serialize.filepath>
             </properties>
         </profile>
         <profile>
