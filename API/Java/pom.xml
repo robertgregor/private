@@ -77,15 +77,14 @@
                     <includeProjectDependencies>true</includeProjectDependencies>
                     <arguments>
                         <argument>${socket.host}</argument>
-                        <argument>${socket.port}</argument>
+                        <argument>${port}</argument>
                         <argument>${serialize.filepath}</argument>
-                        <argument>${server.port}</argument>
+                        <argument>${listenPort}</argument>
                     </arguments>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>win</id>
@@ -97,27 +96,25 @@
             </activation>
             <properties>
                 <server.host>localhost</server.host>
-                <server.port>8080</server.port>
+                <listenPort>8080</listenPort>
                 <socket.host>192.168.1.5</socket.host>
-                <socket.port>2000</socket.port>
-                <commPort>COM10</commPort>
+                <port>COM18</port>
                 <serialize.filepath>serialize/remotehome.ser</serialize.filepath>
             </properties>
         </profile>
         <profile>
             <id>unix</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
                 </os>
             </activation>
             <properties>
                 <server.host>localhost</server.host>
-                <server.port>8080</server.port>
+                <listenPort>8080</listenPort>
                 <socket.host>192.168.1.5</socket.host>
-                <socket.port>2000</socket.port>
-                <commPort>/dev/ttyUSB0</commPort>
+                <port>/dev/ttyUSB0</port>
                 <serialize.filepath>remotehome.ser</serialize.filepath>
             </properties>
         </profile>
@@ -131,15 +128,29 @@
             </activation>
             <properties>
                 <server.host>localhost</server.host>
-                <server.port>8080</server.port>
+                <listenPort>8080</listenPort>
                 <socket.host>192.168.1.5</socket.host>
-                <socket.port>2000</socket.port>
-                <commPort>/dev/tty.usbserial-A700dYoR</commPort>
+                <port>/dev/tty.usbserial-A700dYoR</port>
                 <serialize.filepath>serialize/remotehome.ser</serialize.filepath>
             </properties>
         </profile>
+        <profile>
+            <id>Robko</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <server.host>localhost</server.host>
+                <listenPort>8080</listenPort>
+                <socket.host>localhost</socket.host>
+                <port>COM18</port>
+                <serialize.filepath>c:/RemoteHome/test.ser</serialize.filepath>
+            </properties>
+        </profile>
     </profiles>
-
     <repositories>
         <repository>
             <id>eclipse-juno</id>
