@@ -3,8 +3,6 @@ package org.remoteHome;
 //import gnu.io.SerialPort;
 import gnu.io.NativeResource;
 import gnu.io.NRSerialPort;
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -79,11 +77,8 @@ class RemoteHomeCommunicator extends Thread  {
             try {
 		NativeResource nr = new NativeResource();
 		nr.load("libNRJavaSerial");
-                //CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(getPort());
-                //commPort = portIdentifier.open(this.getClass().getName(),2000);
                 serialPort = new NRSerialPort(getPort(), 9600);
                 serialPort.connect();
-                //serialPort.setSerialPortParams(9600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
                 dataInputStream = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
                 dataOutputStream = new DataOutputStream(serialPort.getOutputStream());                 
             } catch (Exception e) {
