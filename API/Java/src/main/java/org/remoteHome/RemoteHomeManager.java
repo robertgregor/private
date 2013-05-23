@@ -51,6 +51,7 @@ public class RemoteHomeManager {
     
     private HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
     private HashMap<String, HashSet<AbstractDevice>> rooms = new HashMap<String, HashSet<AbstractDevice>>();
+    private HashMap<String, AbstractSchedule> schedulers = new HashMap<String, AbstractSchedule>();
     private RemoteHomeCommunicator comm;
     private File persistentFile;
     
@@ -270,6 +271,20 @@ public class RemoteHomeManager {
     public HashMap<String, HashSet<AbstractDevice>> getRooms() {
         return rooms;
     }
+
+    /**
+     * @return the schedulers
+     */
+    public HashMap<String, AbstractSchedule> getSchedulers() {
+        return schedulers;
+    }
+
+    /**
+     * @param schedulers the schedulers to set
+     */
+    public void setSchedulers(HashMap<String, AbstractSchedule> schedulers) {
+        this.schedulers = schedulers;
+    }
     
     /**
      * Sends the command to the device.
@@ -322,7 +337,11 @@ public class RemoteHomeManager {
         if (persistentFile.exists()) {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(persistentFile));
             devices = (HashMap<Integer, AbstractDevice>)ois.readObject();
+            if (devices == null) devices = new HashMap<Integer, AbstractDevice>();
             rooms = (HashMap<String, HashSet<AbstractDevice>>)ois.readObject();
+            if (rooms == null) rooms = new HashMap<String, HashSet<AbstractDevice>>();
+            schedulers = ((HashMap<String, AbstractSchedule>)ois.readObject());
+            if (schedulers == null) schedulers = new HashMap<String, AbstractSchedule>();
             ois.close();
             for (AbstractDevice dev : devices.values()) {
                 dev.m = this;
@@ -338,6 +357,7 @@ public class RemoteHomeManager {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(persistentFile));
             out.writeObject(devices);
             out.writeObject(rooms);
+            out.writeObject(getSchedulers());
             out.close();
         }
     }

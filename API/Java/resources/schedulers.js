@@ -17,7 +17,7 @@
           return s;
         }
         function pL(n,ii,id) {
-            var r="<tr><td class=\"schtd\">"+n+"</TD>";
+            var r="<tr><td class=\"schtd\"><span>"+n+"</span></TD>";
             for (var i=0;i<12;i++) {
 		var h=i.toString(10);
 		if (h.length==1) h="0"+h;
@@ -39,9 +39,9 @@
                 }
             }
         }
-        function createSchTable(id) {
+        function createOnOffSchTable(id) {
             var html = "";
-            html += "<TABLE id=\""+id+"table\" class=\"schtable\">";
+            html += "<TABLE><TR><TD width=\"90%\"><TABLE id=\""+id+"table\" class=\"schtable\">";
 	    html += "<thead><TR><th class=\"schtd\">&nbsp</th>";
             for (var i=0; i<12; i++) {
 		var hour = i;
@@ -64,8 +64,25 @@
             html += pL("Saturday PM","11",id);
             html += pL("Sunday AM","12",id);
             html += pL("Sunday PM","13",id);
-            html += "</TR></tbody></table>";
+            html += "</TR></tbody></table></td><td>"+scheduleOnOffProgramsManager(id)+"</td></table>";
             return html;
+        }
+        function scheduleOnOffProgramsManager(id) {
+            var html = "";
+            html += "Saved programs:<BR><SELECT id=\"onoffProgs"+id+"\"></select><BR>";
+            html += "<BUTTON id=\"onoffProgsLoad"+id+"\">Load</BUTTON><BUTTON id=\"onoffProgsDelete"+id+"\">Delete</BUTTON><BR><BR><BR>";
+            html += "<BR>New program:<BR><INPUT id=\"onoffProgsName"+id+"\" type=\"text\" /><BR>";
+            html += "<BUTTON id=\"onoffProgsSave"+id+"\">Save</BUTTON>";
+            return html;
+        }
+        
+        function loadOnOffPrograms(data, id) {
+           var progs = data.split("\n");
+           $('#'+id).children().remove();
+           for (var i=0; i<progs.length; i++) {
+                $('#'+id).append('<option value="'+progs[i]+'">'+progs[i]+'</option>');
+           }
+
         }
         function loadSchedule(sch, id) {
             var binaryCounter = 2;

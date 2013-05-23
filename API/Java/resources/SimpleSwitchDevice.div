@@ -1,6 +1,9 @@
 <div>
 <script>
 function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
   $.ajax({
       url: "/",
       type: "get",
@@ -30,7 +33,9 @@ function updateStatusCOMPONENTID() {
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
       },
       error:function(){
+        if (showError) {
           alert('Error when tried to get the status of the device.');
+        }
       }   
   });
 }
@@ -122,10 +127,10 @@ $(function() {
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
             height: 385,
-            width: 850,
+            width: 1024,
             modal: true,
             buttons: {
-                "Save schedule": function() {
+                "Assign schedule": function() {
                   var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);
                   $.ajax({
                         url: "/",
@@ -146,7 +151,7 @@ $(function() {
           }
     });
     $( "#scheduleButtCOMPONENTID" ).button().click(function() {
-          $( "#schDialog2COMPONENTID" ).replaceWith(createSchTable('schTableCOMPONENTID'));
+          $( "#schDialog2COMPONENTID" ).replaceWith(createOnOffSchTable('schTableCOMPONENTID'));
           $.ajax({
                         url: "/",
                         type: "get",
@@ -160,8 +165,74 @@ $(function() {
                         alert(thrownError);
                     }   
           });          
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&type=OnOff&action=LOAD&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadOnOffPrograms(data, 'onoffProgsschTableCOMPONENTID');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+          });
+          $( "#onoffProgsSaveschTableCOMPONENTID" ).button().click(function() {
+                  var name = document.getElementById("onoffProgsNameschTableCOMPONENTID").value;
+                  if (name == '') {
+                        alert('The name of the program cannot be empty');
+                        return;
+                  }
+                  var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);
+                  schData += "&name=" + name;
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager"+schData+"&action=SAVE&type=OnOff&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $('#onoffProgsschTableCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+                  });
+          });
+          $( "#onoffProgsDeleteschTableCOMPONENTID" ).button().click(function() {
+                var name = $("#onoffProgsschTableCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=DELETE&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $("#onoffProgsschTableCOMPONENTID option:selected").remove();
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+                  });
+          });
+          $( "#onoffProgsLoadschTableCOMPONENTID" ).button().click(function() {
+                var name = $("#onoffProgsschTableCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=GET&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadSchedule(data, 'schTableCOMPONENTID');                        
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError);
+                    }   
+                  });
+          });
     });
     updateStatusCOMPONENTID();
+    window.setInterval(function() {
+        updateStatusCOMPONENTID(false);
+    }, 30000);
 });
 </script>
 <table width="100%"><tr>

@@ -21,10 +21,14 @@ public class LoadAllRooms extends AbstractWebService {
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
-        TreeSet<String> rooms = new TreeSet<String>(r.getRooms().keySet());
-        StringBuilder sb = new StringBuilder();
-        for (String room : rooms) sb.append(room + "\n");
-        if (sb.length() > 1) sb.deleteCharAt(sb.length()-1);
-        sendAjaxAnswer(sb.toString());
+        if (r.getRooms().keySet() == null) {
+            sendAjaxAnswer("");
+        } else {
+            TreeSet<String> rooms = new TreeSet<String>(r.getRooms().keySet());
+            StringBuilder sb = new StringBuilder();
+            for (String room : rooms) sb.append(room + "\n");
+            if (sb.length() > 1) sb.deleteCharAt(sb.length()-1);
+            sendAjaxAnswer(sb.toString());
+        }
     }
 }

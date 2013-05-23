@@ -8,117 +8,27 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 /**
- * @author pt596
+ * This class represents the week on off schedule
+ * The day strings represents the schedule stream. Each 10 minute interval is represented by one bit, one hour is represented by one byte.
+ * So e.g. 00111000 means, that from 0 - 30 minutes it is on, from 30 - 60 minute it is off.
+ * By default whole day is off:
+ * 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+ * So in total, there is 24 * 8 = 192 characters. In each hour, first two characters are ignored. 
  */
-public class OnOffSchedule implements Serializable {
+
+public class OnOffSchedule extends AbstractSchedule {
     
-    private String scheduleStreamMonday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    private String scheduleStreamTuesday =   "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    private String scheduleStreamWednesday = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    private String scheduleStreamThursday =  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    private String scheduleStreamFriday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    private String scheduleStreamSaturday =  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    private String scheduleStreamSunday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     private transient String currentState = "0";
 
-    /**
-     * @return the scheduleStreamMonday
-     */
-    public String getScheduleStreamMonday() {
-        return scheduleStreamMonday;
+    public OnOffSchedule() {
+        scheduleStreamMonday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        scheduleStreamTuesday =   "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        scheduleStreamWednesday = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        scheduleStreamThursday =  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        scheduleStreamFriday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        scheduleStreamSaturday =  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        scheduleStreamSunday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     }
-
-    /**
-     * @param scheduleStreamMonday the scheduleStreamMonday to set
-     */
-    public void setScheduleStreamMonday(String scheduleStreamMonday) {
-        this.scheduleStreamMonday = scheduleStreamMonday;
-    }
-
-    /**
-     * @return the scheduleStreamTuesday
-     */
-    public String getScheduleStreamTuesday() {
-        return scheduleStreamTuesday;
-    }
-
-    /**
-     * @param scheduleStreamTuesday the scheduleStreamTuesday to set
-     */
-    public void setScheduleStreamTuesday(String scheduleStreamTuesday) {
-        this.scheduleStreamTuesday = scheduleStreamTuesday;
-    }
-
-    /**
-     * @return the scheduleStreamWednesday
-     */
-    public String getScheduleStreamWednesday() {
-        return scheduleStreamWednesday;
-    }
-
-    /**
-     * @param scheduleStreamWednesday the scheduleStreamWednesday to set
-     */
-    public void setScheduleStreamWednesday(String scheduleStreamWednesday) {
-        this.scheduleStreamWednesday = scheduleStreamWednesday;
-    }
-
-    /**
-     * @return the scheduleStreamThursday
-     */
-    public String getScheduleStreamThursday() {
-        return scheduleStreamThursday;
-    }
-
-    /**
-     * @param scheduleStreamThursday the scheduleStreamThursday to set
-     */
-    public void setScheduleStreamThursday(String scheduleStreamThursday) {
-        this.scheduleStreamThursday = scheduleStreamThursday;
-    }
-
-    /**
-     * @return the scheduleStreamFriday
-     */
-    public String getScheduleStreamFriday() {
-        return scheduleStreamFriday;
-    }
-
-    /**
-     * @param scheduleStreamFriday the scheduleStreamFriday to set
-     */
-    public void setScheduleStreamFriday(String scheduleStreamFriday) {
-        this.scheduleStreamFriday = scheduleStreamFriday;
-    }
-
-    /**
-     * @return the scheduleStreamSaturday
-     */
-    public String getScheduleStreamSaturday() {
-        return scheduleStreamSaturday;
-    }
-
-    /**
-     * @param scheduleStreamSaturday the scheduleStreamSaturday to set
-     */
-    public void setScheduleStreamSaturday(String scheduleStreamSaturday) {
-        this.scheduleStreamSaturday = scheduleStreamSaturday;
-    }
-
-    /**
-     * @return the scheduleStreamSunday
-     */
-    public String getScheduleStreamSunday() {
-        return scheduleStreamSunday;
-    }
-
-    /**
-     * @param scheduleStreamSunday the scheduleStreamSunday to set
-     */
-    public void setScheduleStreamSunday(String scheduleStreamSunday) {
-        this.scheduleStreamSunday = scheduleStreamSunday;
-    }
-
     /**
      * @return the currentState
      */
@@ -132,6 +42,12 @@ public class OnOffSchedule implements Serializable {
     public void setCurrentState(String currentState) {
         this.currentState = currentState;
     }
+    /*
+     * This method is used to receive the schedule for external source in decimal mode, so each byte
+     * is represented by the 3 digit number.
+     * @param value is the schedule string, represents 12 3 digits number
+     * @param schNb is the schedule number. 0 means Monday AM, 1 means Monday PM, 2 means Tuesday AM and so on.
+     */
     public void saveSchedule(String value, String schNb) {
             if (schNb.equals("0") || schNb.equals("1")) {
                 String oldSch = getScheduleStreamMonday();
@@ -183,7 +99,7 @@ public class OnOffSchedule implements Serializable {
                 setScheduleStreamSunday(oldSch);
             }
     } 
-        private String parseSchedule(String in) {
+    private String parseSchedule(String in) {
         StringBuffer sb = new StringBuffer();
         for (int i=0; i<12; i++) {
             int piece = Integer.parseInt(in.substring(i*3, (i*3)+3));
@@ -193,6 +109,10 @@ public class OnOffSchedule implements Serializable {
         }
         return sb.toString();
     }
+    
+    /**
+     * @return stream with all schedules started from Monday 
+     */
     public String loadSchedule() {
             StringBuffer sb = new StringBuffer();
             sb.append(getScheduleStreamMonday());
@@ -204,6 +124,12 @@ public class OnOffSchedule implements Serializable {
             sb.append(getScheduleStreamSunday());
             return sb.toString();
     }
+    
+    /**
+     * This method will process the realtime schedule
+     * @return True, if it changed from 0 to 1, false if it changed from 1 to 0 and null, if there was no change.
+     * It returns also null, if minute % 10 != 0, so it makes sense to call it only when minute % 10 == 0.
+     */
     public Boolean processSchedule() {
         Calendar c = Calendar.getInstance();
         int min = c.get(Calendar.MINUTE);
