@@ -70,9 +70,9 @@
         function scheduleOnOffProgramsManager(id) {
             var html = "";
             html += "Saved programs:<BR><SELECT id=\"onoffProgs"+id+"\"></select><BR>";
-            html += "<BUTTON id=\"onoffProgsLoad"+id+"\">Load</BUTTON><BUTTON id=\"onoffProgsDelete"+id+"\">Delete</BUTTON><BR><BR><BR>";
-            html += "<BR>New program:<BR><INPUT id=\"onoffProgsName"+id+"\" type=\"text\" /><BR>";
-            html += "<BUTTON id=\"onoffProgsSave"+id+"\">Save</BUTTON>";
+            html += "<BUTTON title=\"Load\" id=\"onoffProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Update\" id=\"onoffProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Delete\" id=\"onoffProgsDelete"+id+"\">&nbsp;</BUTTON><BR><BR><BR>";
+            html += "<BR>New program:<BR><INPUT id=\"onoffProgsName"+id+"\" type=\"text\"/>";
+            html += "<BUTTON title=\"Save new program\" id=\"onoffProgsSave"+id+"\">&nbsp;</BUTTON>";
             return html;
         }
         

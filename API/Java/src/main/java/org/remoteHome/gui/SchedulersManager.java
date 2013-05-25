@@ -58,6 +58,22 @@ public class SchedulersManager extends AbstractWebService {
                     sendAjaxAnswer("OK");
                 }
             }
+            if (action.equals("UPDATE")) {
+                if (requestParameters.get("type").equalsIgnoreCase("OnOff")) {
+                    String name = requestParameters.get("name");
+                    if (r.getSchedulers().containsKey(name)) {
+                        OnOffSchedule schd = (OnOffSchedule)r.getSchedulers().get(name);
+                    for (int i=0; i<14;i++) {
+                       schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
+                    }
+                    r.savePersistentData();
+                    sendAjaxAnswer("OK");
+                    } else {
+                        sendAjaxError("This program name does not exist. Cannot update this program. Please reopen the schedule frame.");
+                        return;                        
+                    }
+                }
+            }
             if (action.equals("DELETE")) {
                 r.getSchedulers().remove(requestParameters.get("name"));
                     r.savePersistentData();
