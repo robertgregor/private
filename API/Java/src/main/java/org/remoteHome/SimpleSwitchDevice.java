@@ -3,7 +3,7 @@ package org.remoteHome;
 import java.io.Serializable;
 import java.util.Calendar;
 
- /**
+/**
   * Simple switch<BR/>
   * 
   * pn - check weather the device is up and running (ping command).<BR/>
@@ -53,9 +53,17 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      */    
     private int currentCounter;
     
+    /*
+     * This is automatic scheduler
+     */
     private OnOffSchedule lightSchedule;
-    
-   /**
+
+    /*
+     * This is true if scheduler is enabled.
+     */
+    private boolean enabledScheduler;
+
+    /**
      * The constructor is protected. The object should be constructed using
      * SimpleSwitchDevice device = 
      *          (SimpleSwitchDevice)remoteHomeManager.getRemoteHomeDevice(deviceId,deviceName, AbstractDevice.SimpleSwitch)
@@ -69,6 +77,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
         super (m, deviceId, deviceName);
         setSubDeviceNumber("1");
         lightSchedule = new OnOffSchedule();
+        enabledScheduler = lightSchedule.isEnabled();
     }
     /**
      * For Simple switch, this method is not used.
@@ -248,6 +257,21 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
         }
         setOnWhenAppliedPower(onWhenPower);
     }
+
+    /**
+     * @return the enabledScheduler
+     */
+    public boolean isEnabledScheduler() {
+        return getLightSchedule().isEnabled();
+    }
+
+    /**
+     * @param enabledScheduler the enabledScheduler to set
+     */
+    public void setEnabledScheduler(boolean enabledScheduler) {
+        getLightSchedule().setEnabled(enabledScheduler);
+        this.enabledScheduler = enabledScheduler;
+    }
     
     /**
      * This method will start the scheduler thread to process the schedule.
@@ -258,7 +282,8 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(30000);
+                        Thread.sleep(30000);                        
+                        if (!isEnabledScheduler()) continue;
                         Calendar c = Calendar.getInstance();
                         int min = c.get(Calendar.MINUTE);
                         if ((min % 10) == 0) {

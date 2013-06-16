@@ -39,9 +39,11 @@ public class SimpleSwitchDeviceManager extends AbstractWebService {
                 String nm = requestParameters.get("nm");
                 int tm = Integer.parseInt(requestParameters.get("tm"));
                 Boolean onWhenPower = new Boolean(requestParameters.get("pw"));
+                Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getConfiguredPeriod() != tm) device.configurePeriod(tm);
                 if (device.isOnWhenAppliedPower() != onWhenPower) device.switchOnWhenAppliedPower(onWhenPower);
+                if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
                 sendAjaxAnswer("OK");
             } else if (action.equals("SAVESCH")) {
                 for (int i=0; i<14;i++) {

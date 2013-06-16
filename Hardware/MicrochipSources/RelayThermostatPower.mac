@@ -275,6 +275,21 @@ DIV?BCW macro Bin, Cin, Wout
     endm
 DIV_USED = 1
 
+DIV?WCB macro Win, Cin, Bout
+    if ((Cin) == 2)
+        CHK?RP  Win
+        rrf     (Win) + 1, W
+        rrf     Win, W
+        MOVE?AB Bout
+    else
+        MOVE?WW Win, R0
+        MOVE?CW Cin, R1
+        L?CALL  DIV
+        MOVE?AB Bout
+    endif
+    endm
+DIV_USED = 1
+
 MOD?BCW macro Bin, Cin, Wout
         MOVE?BW Bin, R0
         MOVE?CW Cin, R1

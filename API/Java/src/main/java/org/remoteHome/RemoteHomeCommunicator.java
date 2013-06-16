@@ -209,8 +209,8 @@ class RemoteHomeCommunicator extends Thread  {
                 }
             } catch (InterruptedException e) {
                 return;
-            } catch (IOException e) {
-                //ignore the error, thus it is communication problem. The exception is thrown, when 
+            } catch (Exception e) {
+                //ignore the error, thus it is communication problem. 
             }
         }
     }

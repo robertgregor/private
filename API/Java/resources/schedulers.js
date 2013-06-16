@@ -14,8 +14,30 @@
                 s+=p;
                 p="";
             }
-          return s;
+            return s;
         }
+        function saveTempSchedule(id, day) {
+            var s="";
+            var p="";
+            for (var i=0;i<12;i++){
+                var hour = i.toString(10);
+                if (hour.length == 1) hour = "0" + hour;
+                for (var j=1; j<5; j++) {
+                    var idElem = id+day.toString(10)+hour+j.toString(10);
+                    var element = document.getElementById(idElem);
+                    s+=getTemperatureFromTitle(element.title.split(String.fromCharCode(176))[0]);
+                }
+            }
+            return s;
+        }
+        function getTemperatureFromTitle(title) {
+            var ts = title.split(",");
+                var td = ts[0]*2;
+                try { 
+                    if (ts[1].toString(10) == "5") ++td; 
+                } catch(e) {}
+            return td.toString(16).toUpperCase();
+        }        
         function pL(n,ii,id) {
             var r="<tr><td class=\"schtd\"><span>"+n+"</span></TD>";
             for (var i=0;i<12;i++) {
@@ -23,6 +45,19 @@
 		if (h.length==1) h="0"+h;
 		for (var j=1;j<7;j++)
                     r+="<td title=\""+i+":"+(j-1)+"0 "+n+"\" class=\"schtd\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\" onMouseOver=\"manageSchTableMouseOver(this);\" onMouseDown=\"manageSchTableMouseDown(this);\"></td>";
+            }
+            return r+"</tr>";
+        }
+        function pLTemp(n,ii,id) {
+            var r="<tr><td class=\"schtd\"><span>"+n+"</span></TD>";
+            for (var i=0;i<12;i++) {
+		var h=i.toString(10);
+		if (h.length==1) h="0"+h;
+		for (var j=1;j<5;j++) {
+                    var mn = ((j-1)*15).toString(10);
+                    while (mn.length == 1) mn = "0"+mn;
+                    r+="<td title=\"20,5"+String.fromCharCode(176)+"C "+i+":"+mn+" "+n+"\" class=\"schtd\" style=\"background-color: green;\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\" onMouseOver=\"manageSchTempTableMouseOver(this,'"+id+"');\" onMouseDown=\"manageSchTempTableMouseDown(this,'"+id+"');\"></td>";
+                }
             }
             return r+"</tr>";
         }
@@ -39,12 +74,26 @@
                 }
             }
         }
+        function manageSchTempTableMouseDown(tdid,id) {
+                isMouseDown=true;
+                manageSchTempTableMouseOver(tdid,id);
+        }
+        function manageSchTempTableMouseOver(tdid,id) {
+            if (isMouseDown) {
+                var sel = document.getElementById("temperatureSelect"+id);
+                tdid.style.backgroundColor = sel.options[sel.selectedIndex].style.backgroundColor;
+                var tempValue = sel.options[sel.selectedIndex].value;
+                var temp = tempValue.split(" ");
+                tdid.title = temp[0]+String.fromCharCode(176)+"C "+tdid.title;
+
+            }
+        }
         function createOnOffSchTable(id) {
             var html = "";
             html += "<TABLE><TR><TD width=\"90%\"><TABLE id=\""+id+"table\" class=\"schtable\">";
 	    html += "<thead><TR><th class=\"schtd\">&nbsp</th>";
             for (var i=0; i<12; i++) {
-		var hour = i;
+		var hour = i.toString(10);
 		if (hour.length == 1) hour = "0" + hour;
                 html += "<th class=\"schtd\" colspan=\"3\">"+hour+":00&nbsp;</th>";
                 html += "<th class=\"schtd\" colspan=\"3\">"+hour+":30&nbsp;</th>";
@@ -67,6 +116,34 @@
             html += "</TR></tbody></table></td><td>"+scheduleOnOffProgramsManager(id)+"</td></table>";
             return html;
         }
+        function createTempSchTable(id) {
+            var html = "";
+            html += "<TABLE id=\""+id+"table\" class=\"schtable\">";
+	    html += "<thead><TR><th class=\"schtd\">&nbsp</th>";
+            for (var i=0; i<12; i++) {
+		var hour = i.toString(10);
+		if (hour.length == 1) hour = "0" + hour;
+                html += "<th class=\"schtd\" colspan=\"2\">"+hour+":00&nbsp;</th>";
+                html += "<th class=\"schtd\" colspan=\"2\">"+hour+":30&nbsp;</th>";
+            }
+            html += "</TR></thead><tbody>";
+            html += pLTemp("Monday AM","0",id);
+            html += pLTemp("Monday PM","1",id);
+            html += pLTemp("Tuesday AM","2",id);
+            html += pLTemp("Tuesday PM","3",id);
+            html += pLTemp("Wednesday AM","4",id);
+            html += pLTemp("Wednesday PM","5",id);
+            html += pLTemp("Thursday AM","6",id);
+            html += pLTemp("Thursday PM","7",id);
+            html += pLTemp("Friday AM","8",id);
+            html += pLTemp("Friday PM","9",id);
+            html += pLTemp("Saturday AM","10",id);
+            html += pLTemp("Saturday PM","11",id);
+            html += pLTemp("Sunday AM","12",id);
+            html += pLTemp("Sunday PM","13",id);
+            html += "</TR><tr><td colspan=\"49\">"+scheduleTempProgramsManager(id)+"</td></tr></tbody></table>";
+            return html;
+        }
         function scheduleOnOffProgramsManager(id) {
             var html = "";
             html += "Saved programs:<BR><SELECT id=\"onoffProgs"+id+"\"></select><BR>";
@@ -75,8 +152,47 @@
             html += "<BUTTON title=\"Save new program\" id=\"onoffProgsSave"+id+"\">&nbsp;</BUTTON>";
             return html;
         }
-        
-        function loadOnOffPrograms(data, id) {
+        function scheduleTempProgramsManager(id) {
+            var html = "";
+            html += "Temperature selection:<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"temperatureSelect"+id+"\">"+populateTempOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += "Saved programs:<SELECT id=\"temperatureProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            html += "<BUTTON title=\"Load\" id=\"temperatureProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Update\" id=\"temperatureProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Delete\" id=\"temperatureProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += "New program:<INPUT id=\"temperatureProgsName"+id+"\" type=\"text\"/>";
+            html += "<BUTTON title=\"Save new program\" id=\"temperatureProgsSave"+id+"\">&nbsp;</BUTTON>";
+            return html;
+        }
+        function populateTempOptions() {
+            var statusData = "";
+            statusData += "<option style=\"background-color:black; color:white;\">10 deg. celsius</option>";
+            statusData += "<option style=\"background-color: white; color:black;\">15 deg. celsius</option>";
+            statusData += "<option style=\"background-color: lightblue; color:black;\">17 deg. celsius</option>";
+            statusData += "<option style=\"background-color: blue; color:white;\">18 deg. celsius</option>";
+            statusData += "<option style=\"background-color: darkblue; color:white;\">19 deg. celsius</option>";
+            statusData += "<option style=\"background-color: lightgreen; color:black;\">20 deg. celsius</option>";
+            statusData += "<option style=\"background-color: green; color:white;\" selected=\"selected\">20,5 deg. celsius</option>";
+            statusData += "<option style=\"background-color: darkgreen; color:white;\">21 deg. celsius</option>";
+            statusData += "<option style=\"background-color: lightgoldenrodyellow; color:black;\">21,5 deg. celsius</option>";
+            statusData += "<option style=\"background-color: yellow; color:black;\">22 deg. celsius</option>";
+            statusData += "<option style=\"background-color: gold; color:black;\">22,5 deg. celsius</option>";
+            statusData += "<option style=\"background-color: lightpink; color:black;\">23 deg. celsius</option>";
+            statusData += "<option style=\"background-color: pink; color:black;\">23,5 deg. celsius</option>";
+            statusData += "<option style=\"background-color: darksalmon; color:black;\">24 deg. celsius</option>";
+            statusData += "<option style=\"background-color: orange; color:black;\">24,5 deg. celsius</option>";
+            statusData += "<option style=\"background-color: lightcoral; color:black;\">25 deg. celsius</option>";
+            statusData += "<option style=\"background-color: red; color:black;\">26 deg. celsius</option>";
+            statusData += "<option style=\"background-color: darkred; color:white;\">28 deg. celsius</option>";
+            statusData += "<option style=\"background-color: orangered; color:black;\">30 deg. celsius</option>";
+            return statusData;
+        }
+        function getTemperatureFromTitle(title) {
+            var ts = title.split(",");
+                var td = ts[0]*2;
+                try { 
+                    if (ts[1].toString(10) == "5") ++td; 
+                } catch(e) {}
+            return td.toString(16).toUpperCase();
+        }
+        function loadPrograms(data, id) {
            var progs = data.split("\n");
            $('#'+id).children().remove();
            for (var i=0; i<progs.length; i++) {
@@ -103,3 +219,99 @@
                 }
             }
         }
+        function loadTempSchedule(sch, id) {
+            var counter = 0;
+            for (var day=0;day<14;day++) {                
+                for (var i=0;i<12;i++){
+                  var hour = i.toString(10);
+                  if (hour.length == 1) hour = "0" + hour;
+                  for (var j=1; j<5; j++) {
+                    var idElem = id+day.toString(10)+hour+j.toString(10);
+                    var temperature = sch.substring(counter,counter+2);
+                    populateStyleFromTemperature(document.getElementById(idElem), temperature);
+                    counter = counter + 2;
+                  }
+                }
+            }
+        }
+        function populateStyleFromTemperature(element, temperature) {
+            var title = String.fromCharCode(176)+"C"+((element.title.split("C"))[1]); 
+            if (temperature == "14") {
+                element.style.backgroundColor = "black";
+                element.style.color = "white";
+                element.title = "10"+title;
+            } else if (temperature == "1E") {
+                element.style.backgroundColor = "white";
+                element.style.color = "black";
+                element.title = "15"+title;                
+            } else if (temperature == "22") {
+                element.style.backgroundColor = "lightblue";
+                element.style.color = "black";
+                element.title = "17"+title;                
+            } else if (temperature == "24") {
+                element.style.backgroundColor = "blue";
+                element.style.color = "white";
+                element.title = "18"+title;                
+            } else if (temperature == "26") {
+                element.style.backgroundColor = "darkblue";
+                element.style.color = "white";
+                element.title = "19"+title;                
+            } else if (temperature == "28") {
+                element.style.backgroundColor = "lightgreen";
+                element.style.color = "black";
+                element.title = "20"+title;                
+            } else if (temperature == "29") {
+                element.style.backgroundColor = "green";
+                element.style.color = "white";
+                element.title = "20,5"+title;                
+            } else if (temperature == "2A") {
+                element.style.backgroundColor = "darkgreen";
+                element.style.color = "white";
+                element.title = "21"+title;                
+            } else if (temperature == "2B") {
+                element.style.backgroundColor = "lightgoldenrodyellow";
+                element.style.color = "black";
+                element.title = "21,5"+title;                
+            } else if (temperature == "2C") {
+                element.style.backgroundColor = "yellow";
+                element.style.color = "black";
+                element.title = "22"+title;                
+            } else if (temperature == "2D") {
+                element.style.backgroundColor = "gold";
+                element.style.color = "black";
+                element.title = "22,5"+title;                
+            } else if (temperature == "2E") {
+                element.style.backgroundColor = "lightpink";
+                element.style.color = "black";
+                element.title = "23"+title;                
+            } else if (temperature == "2F") {
+                element.style.backgroundColor = "pink";
+                element.style.color = "black";
+                element.title = "23,5"+title;                
+            } else if (temperature == "30") {
+                element.style.backgroundColor = "darksalmon";
+                element.style.color = "black";
+                element.title = "24"+title;                
+            } else if (temperature == "31") {
+                element.style.backgroundColor = "orange";
+                element.style.color = "black";
+                element.title = "24,5"+title;                
+            } else if (temperature == "32") {
+                element.style.backgroundColor = "lightcoral";
+                element.style.color = "black";
+                element.title = "25"+title;                
+            } else if (temperature == "34") {
+                element.style.backgroundColor = "red";
+                element.style.color = "black";
+                element.title = "26"+title;                
+            } else if (temperature == "38") {
+                element.style.backgroundColor = "darkred";
+                element.style.color = "white";
+                element.title = "28"+title;                
+            } else if (temperature == "3C") {
+                element.style.backgroundColor = "orangered";
+                element.style.color = "black";
+                element.title = "30"+title;                
+            }
+        }
+        

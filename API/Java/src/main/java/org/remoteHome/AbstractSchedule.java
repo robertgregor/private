@@ -21,9 +21,13 @@ public abstract class AbstractSchedule implements Serializable {
     protected String scheduleStreamSunday =    "";
 
     /**
-     * @return the full schedule string
+     * If true, schedule is enabled, false disabled
      */
-    
+    private boolean enabled = false;
+
+    /**
+     * @return the full schedule string
+     */    
     public abstract String loadSchedule();
 
     /**
@@ -122,5 +126,19 @@ public abstract class AbstractSchedule implements Serializable {
      */
     public void setScheduleStreamSunday(String scheduleStreamSunday) {
         this.scheduleStreamSunday = scheduleStreamSunday;
+    }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

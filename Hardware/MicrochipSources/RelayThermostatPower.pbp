@@ -15,10 +15,11 @@
 '11 treshold
 '12 interval
 '13 temperature - it is temperature / 2
+'14 manual control
 
 INCLUDE "RFM70.pbp"
 
-EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,1,44]
+EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,12,44,0]
 
  DEFINE OSC 8
   
@@ -39,8 +40,8 @@ ENABLE
 TRISA = %00100000 'Set PORTA to all output
 TRISB = %00110000 'Set , SDI input
 TRISC = %00000100 'Set IRQ input, 
-WPUA = %00000000
-WPUB = %00100000
+WPUA = %11111111
+WPUB = %11111111
 
 HEATING_SENSOR var PORTA.5
 RELAY var PORTA.4
@@ -72,6 +73,7 @@ sleep_period var word
 currentState var byte
 temperatureExp var byte
 threshold var byte
+manualcontrol var byte
 
 startProg:
 clear
@@ -82,6 +84,7 @@ sleep_period = sleep_period * 10
 read 10, device_id
 read 11, threshold
 read 13, temperatureExp
+read 14, manualcontrol
 'here the reset should be triggered
 if RES == 0 then
     write 0, 40
@@ -96,8 +99,9 @@ if RES == 0 then
     write 9, "M"
     write 10, 0
     write 11, 0
-    write 12, 1
+    write 12, 12
     write 13, 44
+    write 14, 0
     pause 1000
     goto startProg
 endif
@@ -107,7 +111,7 @@ gosub initModule
 commonSettings:
 gosub commonRXTX
 if (device_id != 0) then
-    normalMode = 1
+    gosub setModebasedonsleepperiod
 endif
 Main_rx:
 gosub setup_rx 'setup Rx
@@ -159,7 +163,8 @@ if (data_in[1] == device_id) then
                 disable   
                 write 12, temp_byte
                 enable
-                sleep_period = temp_byte
+                sleep_period = temp_byte * 10
+                seconds = sleep_period
                 gosub setModeBasedOnSleepPeriod
                 gosub sendDataOK
             elseif (data_in[2] == "t") then
@@ -182,9 +187,23 @@ if (data_in[1] == device_id) then
             gosub sendTemperature
     ELSEif (data_in[2] == "o") then
         GOSUB relayOn
+        manualcontrol = 1
         GOSUB sendDataOK    
     ELSEif (data_in[2] == "f") then    
         GOSUB relayOff
+        manualcontrol = 1
+        GOSUB sendDataOK    
+    ELSEif (data_in[2] == "x") then
+        manualcontrol = 1
+        disable
+        write 14, 1
+        enable
+        GOSUB sendDataOK    
+    ELSEif (data_in[2] == "y") then
+        manualcontrol = 0
+        disable
+        write 14, 0
+        enable
         GOSUB sendDataOK    
     elseif (data_in[2] == "p") then
             if (data_in[3] == "n") then
@@ -217,7 +236,7 @@ intManagement:
            if (seconds > 0) then
                 seconds = seconds - 1
                 if (seconds == 0) then
-                    normalMode = 1
+                    gosub setmodebasedonsleepperiod
                 endif
            endif
            tiexit: 
@@ -277,7 +296,7 @@ Wait_Up:
    IF Busy = 0 THEN goto Wait_Up            'Still busy..?, Wait_Up..!
    OWOUT HEATING_SENSOR, 1, [$CC, $BE] 'Skip ROM search & read scratchpad memory
    OWIN HEATING_SENSOR, 2, [temperature.Lowbyte, temperature.Highbyte] 'Read two bytes / end comms
-   temp_data[0] = "t"
+   temp_data[0] = "6"
    temp_data[1] = "|"
    if (temperature.11 == 1) then
         temp_data[2] = "-"
@@ -303,22 +322,24 @@ Wait_Up:
         if (temp3_word < 30) then
             if (currentState != 1) then gosub relayOn
         else
-            if (temperatureExp != 0) then
-                temp_word = temp3_word + threshold
-                temp2_word = ((temperatureExp / 2) * 10) + ((temperatureExp // 2) * 5)
-                if (temp_word > temp2_word) then
-                    if (currentState != 0) then gosub relayOff
-                else
-                    temp_word = temp3_word - threshold
-                    if (temp_word < temp2_word) then 
-                        if (currentState != 1) then gosub relayOn
+            if (manualcontrol == 0) then
+                if (temperatureExp != 0) then
+                    temp_word = temp3_word + threshold
+                    temp2_word = ((temperatureExp / 2) * 10) + ((temperatureExp // 2) * 5)
+                    if (temp_word > temp2_word) then
+                        if (currentState != 0) then gosub relayOff
+                    else
+                        temp_word = temp3_word - threshold
+                        if (temp_word < temp2_word) then 
+                            if (currentState != 1) then gosub relayOn
+                        endif
                     endif
                 endif
             endif
         endif
    endif
         temp_data[5] = "|"
-        temp_byte = sleep_period
+        temp_byte = sleep_period / 10
         i=6
         gosub printByteToTempByte
         temp_data[9] = "|"
@@ -329,8 +350,10 @@ Wait_Up:
         temp_data[13] = currentState + $30
         temp_data[14] = "|"
         temp_data[15] = threshold + $30
-        temp_data[16] = 13
-        temp_data[17] = 10
+        temp_data[16] = "|"
+        temp_data[17] = manualcontrol + $30
+        temp_data[18] = 13
+        temp_data[19] = 10
 return
 
 printByteToTempByte:        

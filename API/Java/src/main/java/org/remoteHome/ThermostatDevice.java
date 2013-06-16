@@ -1,5 +1,7 @@
 package org.remoteHome;
 
+import java.util.Calendar;
+
 /**
   *Thermostat<br/>
   *<br/><br/>
@@ -39,7 +41,12 @@ public class ThermostatDevice extends AbstractDevice {
      */
     private boolean relayOn;
     
-   /**
+    /**
+     * State of the manual control mode, true if the manual control is ON (Relay is not controlled using the expected temperature.)
+     */
+    private boolean manualControl;
+
+    /**
      * Frequency in seconds
      */
     private int frequency; 
@@ -50,6 +57,15 @@ public class ThermostatDevice extends AbstractDevice {
      */
     private int threshold;
         
+    /*
+     * This is true if scheduler is enabled.
+     */
+    private boolean enabledScheduler;
+
+    /*
+     * This is automatic scheduler
+     */
+    private TemperatureSchedule temperatureSchedule;   
     
    /**
      * The constructor is protected. The object should be constructed using
@@ -62,7 +78,9 @@ public class ThermostatDevice extends AbstractDevice {
      **/
 
     protected ThermostatDevice(RemoteHomeManager m, int deviceId, String deviceName) {
-        super (m, deviceId, deviceName);        
+        super (m, deviceId, deviceName);
+        temperatureSchedule = new TemperatureSchedule();
+        enabledScheduler = temperatureSchedule.isEnabled();
     }
     
     /**
@@ -83,6 +101,12 @@ public class ThermostatDevice extends AbstractDevice {
                 relayOn = false;                
             }
             this.threshold = (Integer.parseInt(items[5]));
+            if (items[6].equals("1")) {
+                manualControl = true;
+            } else {
+                manualControl = false;                
+            }
+            setTimestamp(System.currentTimeMillis());
         }
     }
     
@@ -97,17 +121,8 @@ public class ThermostatDevice extends AbstractDevice {
         String statusResponse[] = m.sendCommandWithAnswer(getDeviceId(), "s").split("\\|");
         if (!statusResponse[0].equals("6")) {
             throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
-        }        
-        this.setTemperature(Integer.parseInt(statusResponse[1]));
-        this.setFrequency(Integer.parseInt(statusResponse[2])*10); //Frequency in seconds * 10
-        this.setDeviceExpectedTemperature((Integer.parseInt(statusResponse[3])*10)/2); //0.5 is one degree celsius
-        if (statusResponse[4].equals("1")) {
-                relayOn = true;
-        } else {
-                relayOn = false;                
         }
-        this.setThreshold(Integer.parseInt(statusResponse[5]));
-        setTimestamp(System.currentTimeMillis());
+        manageAsynchronousCommand(statusResponse);
     }
 
     /**
@@ -216,10 +231,88 @@ public class ThermostatDevice extends AbstractDevice {
         m.sendCommand(getDeviceId(), "r="+threshold);
         this.threshold = threshold;
     }
+
+    /**
+     * @return the manualControl
+     */
+    public boolean isManualControl() {
+        return manualControl;
+    }
+
+    /**
+     * @param manualControl the manualControl to set
+     */
+    public void setManualControl(boolean manualControl) throws RemoteHomeConnectionException {
+        if (manualControl) {
+            m.sendCommand(getDeviceId(), "x");
+        } else {
+            m.sendCommand(getDeviceId(), "y");
+        }
+        this.manualControl = manualControl;
+    }
+
+    /**
+     * @return the enabledScheduler
+     */
+    public boolean isEnabledScheduler() {
+        return getTemperatureSchedule().isEnabled();
+    }
+
+    /**
+     * @param enabledScheduler the enabledScheduler to set
+     */
+    public void setEnabledScheduler(boolean enabledScheduler) {
+        this.enabledScheduler = enabledScheduler;
+        getTemperatureSchedule().setEnabled(enabledScheduler);
+    }
+
+    /**
+     * @return the temperatureSchedule
+     */
+    public TemperatureSchedule getTemperatureSchedule() {
+        return temperatureSchedule;
+    }
+
+    /**
+     * @param temperatureSchedule the temperatureSchedule to set
+     */
+    public void setTemperatureSchedule(TemperatureSchedule temperatureSchedule) {
+        this.temperatureSchedule = temperatureSchedule;
+    }
+
     /**
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
-        
+        String deviceTemp = Integer.toString((getDeviceExpectedTemperature()*2)/10,16).toUpperCase();
+        while (deviceTemp.length() < 2) deviceTemp = "0" + deviceTemp;
+        getTemperatureSchedule().setCurrentState(deviceTemp);
+        new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(30000);                        
+                        if (!isEnabledScheduler()) continue;
+                        if (isManualControl()) continue;
+                        Calendar c = Calendar.getInstance();
+                        int min = c.get(Calendar.MINUTE);
+                        if ((min % 15) == 0) {
+                            Integer temperature = getTemperatureSchedule().processSchedule();
+                            if (temperature != null) {
+                                //something has to be done.
+                                setDeviceExpectedTemperature((temperature*10)/2);
+                            }
+                        }
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                        return;
+                    } catch (RemoteHomeConnectionException e) {
+                        e.printStackTrace();
+                    } catch (RemoteHomeManagerException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();                
     }    
 }

@@ -31,10 +31,18 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("offPeriodFormCOMPONENTID").value = data.configuredPeriod;
           document.getElementById("currentPeriodCOMPONENTID").innerHTML=data.currentCounter;
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+          if (data.enabledScheduler) {
+                $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML='YES';
+          } else {
+                $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', false);
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML='NO';
+          }
+          $("#checkboxEnabledSchedulerCOMPONENTID").trigger("change");
       },
       error:function(){
         if (showError) {
-          alert('Error when tried to get the status of the device.');
+             alert('Error when tried to get the status of the device.');
         }
       }   
   });
@@ -49,6 +57,15 @@ $(function() {
                 }
             });
     $( "#checkboxOnWhenPowerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#SwitchOnSimpleSwitchCOMPONENTID" ).button().click(function() {
           $.ajax({
               url: "/",
@@ -111,11 +128,12 @@ $(function() {
               return;
           }
           var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").checked?"TRUE":"FALSE";
+          var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&schenabled="+schenabled+"&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
             },
             error:function(xhr, ajaxOptions, thrownError){
@@ -126,7 +144,7 @@ $(function() {
     });
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
-            height: 385,
+            height: 390,
             width: 1024,
             modal: true,
             buttons: {
@@ -171,7 +189,7 @@ $(function() {
                         'cache' : false,
                         data: "ServiceName=SchedulersManager&type=OnOff&action=LOAD&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
-                        loadOnOffPrograms(data, 'onoffProgsschTableCOMPONENTID');
+                        loadPrograms(data, 'onoffProgsschTableCOMPONENTID');
                     },
                     error:function(xhr, ajaxOptions, thrownError){
                         alert(thrownError);
@@ -248,7 +266,7 @@ $(function() {
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
-    }, 30000);
+    }, 60000);
 });
 </script>
 <table width="100%"><tr>
@@ -325,11 +343,17 @@ $(function() {
                 <tr>
                 <td>Switch off period</td>
                 <td><span id='configuredPeriodCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
+                <td>Enabled scheduler:</td>
+                <td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td>
                 </tr>
                 <tr>
                 <td>Current period</td>
                 <td><span id='currentPeriodCOMPONENTID'></span></td>
+                <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                <td>Scheduler enabled</td>
+                <td><span id='enabledSchedulerCOMPONENTID'></span></td>
                 <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
