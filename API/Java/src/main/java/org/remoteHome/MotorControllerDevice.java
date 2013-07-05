@@ -1,9 +1,10 @@
 package org.remoteHome;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 /**
-  * Blinds controller<br/>
+  * Motor controller<br/>
   * <br/>
   * pn - check weather the device is up and runing (ping command)<br/>
   * s - return status 5|down|up|timeout value|current opening<br/>
@@ -69,6 +70,16 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      */
     private int currentOpening;
 
+    /*
+     * This is automatic scheduler
+     */
+    private PercentageSchedule positionSchedule;
+
+    /*
+     * This is true if scheduler is enabled.
+     */
+    private boolean enabledScheduler;
+    
     
    /**
      * The constructor is protected. The object should be constructed using
@@ -336,6 +347,60 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
-        
+        getPositionSchedule().setCurrentState("00");
+        new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(30000);                        
+                        if (!isEnabledScheduler()) continue;
+                        Calendar c = Calendar.getInstance();
+                        int min = c.get(Calendar.MINUTE);
+                        if (((min % 10) == 0) || (min == 0)) {
+                            Integer action = getPositionSchedule().processSchedule();
+                            if (action != null) {
+                                //something has to be done.
+                                moveBlindsToPosition(action);
+                            }
+                        }
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                        return;
+                    } catch (RemoteHomeConnectionException e) {
+                        e.printStackTrace();
+                    } catch (RemoteHomeManagerException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * @return the positionSchedule
+     */
+    public PercentageSchedule getPositionSchedule() {
+        return positionSchedule;
+    }
+
+    /**
+     * @param positionSchedule the positionSchedule to set
+     */
+    public void setPositionSchedule(PercentageSchedule positionSchedule) {
+        this.positionSchedule = positionSchedule;
+    }
+
+    /**
+     * @return the enabledScheduler
+     */
+    public boolean isEnabledScheduler() {
+        return enabledScheduler;
+    }
+
+    /**
+     * @param enabledScheduler the enabledScheduler to set
+     */
+    public void setEnabledScheduler(boolean enabledScheduler) {
+        this.enabledScheduler = enabledScheduler;
     }
 }

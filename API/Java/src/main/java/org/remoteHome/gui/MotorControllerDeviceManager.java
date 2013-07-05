@@ -15,7 +15,7 @@ import org.remoteHome.LightAlarmDevice;
  *
  * @author pt596
  */
-public class BlindsControllerDeviceManager extends AbstractWebService {
+public class MotorControllerDeviceManager extends AbstractWebService {
     
     @Override
     public void init() {}
@@ -37,8 +37,10 @@ public class BlindsControllerDeviceManager extends AbstractWebService {
             } else if (action.equals("CONFIGURE")) {
                 String nm = requestParameters.get("nm");
                 int tm = Integer.parseInt(requestParameters.get("tm"));
+                Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getFullRangeTimeout() != tm) device.configureFullRangeTimeout(tm);
+                if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);                
             } else if (action.equals("CLOSEALL")) {
                 for (AbstractDevice dev : r.getDevices()) {
                     if (dev instanceof MotorControllerDevice) {
@@ -57,6 +59,14 @@ public class BlindsControllerDeviceManager extends AbstractWebService {
                         ((MotorControllerDevice)dev).stopBlindsMovement();
                     }
                 }
+            } else if (action.equals("SAVESCH")) {
+                for (int i=0; i<14;i++) {
+                    device.getPositionSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
+                }
+                r.savePersistentData();        
+            } else if (action.equals("LOADSCH")) {
+                sendAjaxAnswer(device.getPositionSchedule().loadSchedule());
+                return;
             }
             sendAjaxAnswer("OK");
         } catch (Exception e) {

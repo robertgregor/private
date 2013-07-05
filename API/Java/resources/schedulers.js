@@ -30,6 +30,24 @@
             }
             return s;
         }
+        function savePercentSchedule(id, day) {
+            var s="";
+            var p="";
+            for (var i=0;i<12;i++){
+                var hour = i.toString(10);
+                if (hour.length == 1) hour = "0" + hour;
+                for (var j=1; j<7; j++) {
+                    var idElem = id+day.toString(10)+hour+j.toString(10);
+                    var element = document.getElementById(idElem);
+                    s+=getPercentFromTitle(element.title.split(' ')[0]);
+                }
+            }
+            return s;
+        }
+        function getPercentFromTitle(title) {
+            var ts = title.split("%");
+            return ts[0].toString(16).toUpperCase();
+        }        
         function getTemperatureFromTitle(title) {
             var ts = title.split(",");
                 var td = ts[0]*2;
@@ -61,6 +79,19 @@
             }
             return r+"</tr>";
         }
+        function pLpercent(n,ii,id) {
+            var r="<tr><td class=\"schtd\"><span>"+n+"</span></TD>";
+            for (var i=0;i<12;i++) {
+		var h=i.toString(10);
+		if (h.length==1) h="0"+h;
+		for (var j=1;j<5;j++) {
+                    var mn = ((j-1)*15).toString(10);
+                    while (mn.length == 1) mn = "0"+mn;
+                    r+="<td title=\"0% "+i+":"+mn+" "+n+"\" class=\"schtd\" style=\"background-color: green;\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\" onMouseOver=\"manageSchPercentTableMouseOver(this,'"+id+"');\" onMouseDown=\"manageSchPercentTableMouseDown(this,'"+id+"');\"></td>";
+                }
+            }
+            return r+"</tr>";
+        }
         function manageSchTableMouseDown(tdid) {
                 isMouseDown=true;
                 manageSchTableMouseOver(tdid);
@@ -85,6 +116,20 @@
                 var tempValue = sel.options[sel.selectedIndex].value;
                 var temp = tempValue.split(" ");
                 tdid.title = temp[0]+String.fromCharCode(176)+"C "+tdid.title;
+
+            }
+        }
+        function manageSchPercentTableMouseDown(tdid,id) {
+                isMouseDown=true;
+                manageSchPercentTableMouseOver(tdid,id);
+        }
+        function manageSchPercentTableMouseOver(tdid,id) {
+            if (isMouseDown) {
+                var sel = document.getElementById("percentSelect"+id);
+                tdid.style.backgroundColor = sel.options[sel.selectedIndex].style.backgroundColor;
+                var percentValue = sel.options[sel.selectedIndex].value;
+                var temp = percentValue.split(" ");
+                tdid.title = temp[0]+"% "+tdid.title;
 
             }
         }
@@ -114,6 +159,34 @@
             html += pL("Sunday AM","12",id);
             html += pL("Sunday PM","13",id);
             html += "</TR></tbody></table></td><td>"+scheduleOnOffProgramsManager(id)+"</td></table>";
+            return html;
+        }
+        function createPercentSchTable(id) {
+            var html = "";
+            html += "<TABLE><TR><TD width=\"90%\"><TABLE id=\""+id+"table\" class=\"schtable\">";
+	    html += "<thead><TR><th class=\"schtd\">&nbsp</th>";
+            for (var i=0; i<12; i++) {
+		var hour = i.toString(10);
+		if (hour.length == 1) hour = "0" + hour;
+                html += "<th class=\"schtd\" colspan=\"3\">"+hour+":00&nbsp;</th>";
+                html += "<th class=\"schtd\" colspan=\"3\">"+hour+":30&nbsp;</th>";
+            }
+            html += "</TR></thead><tbody>";
+            html += pLpercent("Monday AM","0",id);
+            html += pLpercent("Monday PM","1",id);
+            html += pLpercent("Tuesday AM","2",id);
+            html += pLpercent("Tuesday PM","3",id);
+            html += pLpercent("Wednesday AM","4",id);
+            html += pLpercent("Wednesday PM","5",id);
+            html += pLpercent("Thursday AM","6",id);
+            html += pLpercent("Thursday PM","7",id);
+            html += pLpercent("Friday AM","8",id);
+            html += pLpercent("Friday PM","9",id);
+            html += pLpercent("Saturday AM","10",id);
+            html += pLpercent("Saturday PM","11",id);
+            html += pLpercent("Sunday AM","12",id);
+            html += pLpercent("Sunday PM","13",id);
+            html += "</TR></tbody></table></td><td>"+schedulePercentProgramsManager(id)+"</td></table>";
             return html;
         }
         function createTempSchTable(id) {
@@ -184,13 +257,29 @@
             statusData += "<option style=\"background-color: orangered; color:black;\">30 deg. celsius</option>";
             return statusData;
         }
-        function getTemperatureFromTitle(title) {
-            var ts = title.split(",");
-                var td = ts[0]*2;
-                try { 
-                    if (ts[1].toString(10) == "5") ++td; 
-                } catch(e) {}
-            return td.toString(16).toUpperCase();
+        function schedulePercentProgramsManager(id) {
+            var html = "";
+            html += "Percentage selection:<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"percentSelect"+id+"\">"+populatePercentOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += "Saved programs:<SELECT id=\"percentProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            html += "<BUTTON title=\"Load\" id=\"percentProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Update\" id=\"percentProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Delete\" id=\"percentProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += "New program:<INPUT id=\"percentProgsName"+id+"\" type=\"text\"/>";
+            html += "<BUTTON title=\"Save new program\" id=\"percentProgsSave"+id+"\">&nbsp;</BUTTON>";
+            return html;
+        }
+        function populatePercentOptions() {
+            var statusData = "";
+            statusData += "<option style=\"background-color: green; color:white;\" selected=\"selected\">0 percent</option>";
+            statusData += "<option style=\"background-color: white; color:black;\">10 percent</option>";
+            statusData += "<option style=\"background-color: lightblue; color:black;\">20 percent</option>";
+            statusData += "<option style=\"background-color: yellow; color:black;\">30 percent</option>";
+            statusData += "<option style=\"background-color: darkblue; color:white;\">40 percent</option>";
+            statusData += "<option style=\"background-color: pink; color:black;\">50 percent</option>";
+            statusData += "<option style=\"background-color: black; color:white;\">60 percent</option>";
+            statusData += "<option style=\"background-color: orange; color:black;\">70 percent</option>";
+            statusData += "<option style=\"background-color: red; color:white;\">80 percent</option>";
+            statusData += "<option style=\"background-color: darkred; color:white;\">90 percent</option>";
+            statusData += "<option style=\"background-color: lightcoral; color:black;\">100 percent</option>";
+            return statusData;
         }
         function loadPrograms(data, id) {
            var progs = data.split("\n");
@@ -229,6 +318,21 @@
                     var idElem = id+day.toString(10)+hour+j.toString(10);
                     var temperature = sch.substring(counter,counter+2);
                     populateStyleFromTemperature(document.getElementById(idElem), temperature);
+                    counter = counter + 2;
+                  }
+                }
+            }
+        }
+        function loadPercentSchedule(sch, id) {
+            var counter = 0;
+            for (var day=0;day<14;day++) {                
+                for (var i=0;i<12;i++){
+                  var hour = i.toString(10);
+                  if (hour.length == 1) hour = "0" + hour;
+                  for (var j=1; j<7; j++) {
+                    var idElem = id+day.toString(10)+hour+j.toString(10);
+                    var percent = sch.substring(counter,counter+2);
+                    populateStyleFromPercent(document.getElementById(idElem), percent);
                     counter = counter + 2;
                   }
                 }
@@ -314,4 +418,51 @@
                 element.title = "30"+title;                
             }
         }
-        
+        function populateStyleFromPercent(element, temperature) {
+            var title = "%"+((element.title.split("%"))[1]); 
+            if (temperature == "0") {
+                element.style.backgroundColor = "green";
+                element.style.color = "white";
+                element.title = "0"+title;
+            } else if (temperature == "0A") {
+                element.style.backgroundColor = "white";
+                element.style.color = "black";
+                element.title = "10"+title;                
+            } else if (temperature == "14") {
+                element.style.backgroundColor = "lightblue";
+                element.style.color = "black";
+                element.title = "20"+title;                
+            } else if (temperature == "1E") {
+                element.style.backgroundColor = "yellow";
+                element.style.color = "black";
+                element.title = "30"+title;                
+            } else if (temperature == "28") {
+                element.style.backgroundColor = "darkblue";
+                element.style.color = "white";
+                element.title = "40"+title;                
+            } else if (temperature == "32") {
+                element.style.backgroundColor = "pink";
+                element.style.color = "black";
+                element.title = "50"+title;                
+            } else if (temperature == "3C") {
+                element.style.backgroundColor = "black";
+                element.style.color = "white";
+                element.title = "60"+title;                
+            } else if (temperature == "46") {
+                element.style.backgroundColor = "orange";
+                element.style.color = "black";
+                element.title = "70"+title;                
+            } else if (temperature == "50") {
+                element.style.backgroundColor = "red";
+                element.style.color = "white";
+                element.title = "80"+title;                
+            } else if (temperature == "5A") {
+                element.style.backgroundColor = "darkred";
+                element.style.color = "white";
+                element.title = "90"+title;                
+            } else if (temperature == "64") {
+                element.style.backgroundColor = "lightcoral";
+                element.style.color = "black";
+                element.title = "100"+title;                
+            }
+        }        

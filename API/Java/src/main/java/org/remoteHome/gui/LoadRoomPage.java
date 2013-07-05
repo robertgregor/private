@@ -49,7 +49,7 @@ public class LoadRoomPage extends AbstractWebService {
             } else if (device instanceof LightAlarmDevice) {
                 accordionBody.append(getDiv("LightAlarmDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof MotorControllerDevice) {
-                accordionBody.append(getDiv("BlindsControllerDevice.div",Integer.toString(device.getDeviceId())));
+                accordionBody.append(getDiv("MotorControllerDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof HeatingHeaderDevice) {
                 accordionBody.append(getDiv("HeatingHeaderDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof ThermostatDevice) {

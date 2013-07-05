@@ -334,7 +334,7 @@ $(function() {
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
-    }, 60000);
+    }, 120000);
 });
 </script>
 <table width="100%"><tr>

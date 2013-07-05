@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.TreeSet;
 import org.remoteHome.OnOffSchedule;
+import org.remoteHome.PercentageSchedule;
 import org.remoteHome.TemperatureSchedule;
 
 /**
@@ -54,6 +55,20 @@ public class SchedulersManager extends AbstractWebService {
                         if (sb.length() > 1) sb.deleteCharAt(sb.length()-1);                        
                         sendAjaxAnswer(sb.toString());
                     }
+                } else if (requestParameters.get("type").equalsIgnoreCase("Percentage")) {
+                    if (r.getSchedulers().keySet() == null) {
+                        sendAjaxAnswer("");                        
+                    } else {
+                        TreeSet<String> names = new TreeSet<String>(r.getSchedulers().keySet());
+                        StringBuilder sb = new StringBuilder();
+                        for (String name : names) {
+                            if (r.getSchedulers().get(name) instanceof PercentageSchedule) {
+                                sb.append(name + "\n");
+                            }
+                        }
+                        if (sb.length() > 1) sb.deleteCharAt(sb.length()-1);                        
+                        sendAjaxAnswer(sb.toString());
+                    }
                 }
             }
             if (action.equals("SAVE")) {
@@ -83,6 +98,19 @@ public class SchedulersManager extends AbstractWebService {
                     r.getSchedulers().put(name, schd);
                     r.savePersistentData();
                     sendAjaxAnswer("OK");
+                } else if (requestParameters.get("type").equalsIgnoreCase("Percentage")) {
+                    String name = requestParameters.get("name");
+                    if (r.getSchedulers().containsKey(name)) {
+                        sendAjaxError("This program name already exist. Cannot save this program. Please use the name, which does not exist.");
+                        return;
+                    }
+                    PercentageSchedule schd = new PercentageSchedule();
+                    for (int i=0; i<14;i++) {
+                       schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
+                    }
+                    r.getSchedulers().put(name, schd);
+                    r.savePersistentData();
+                    sendAjaxAnswer("OK");
                 }
             }
             if (action.equals("UPDATE")) {
@@ -104,6 +132,20 @@ public class SchedulersManager extends AbstractWebService {
                     String name = requestParameters.get("name");
                     if (r.getSchedulers().containsKey(name)) {
                         TemperatureSchedule schd = (TemperatureSchedule)r.getSchedulers().get(name);
+                    for (int i=0; i<14;i++) {
+                       schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
+                    }
+                    r.savePersistentData();
+                    sendAjaxAnswer("OK");
+                    } else {
+                        sendAjaxError("This program name does not exist. Cannot update this program. Please reopen the schedule frame.");
+                        return;                        
+                    }
+                }
+                if (requestParameters.get("type").equalsIgnoreCase("Percentage")) {
+                    String name = requestParameters.get("name");
+                    if (r.getSchedulers().containsKey(name)) {
+                        PercentageSchedule schd = (PercentageSchedule)r.getSchedulers().get(name);
                     for (int i=0; i<14;i++) {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
