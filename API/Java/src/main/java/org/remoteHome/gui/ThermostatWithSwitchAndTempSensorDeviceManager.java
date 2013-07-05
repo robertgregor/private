@@ -7,47 +7,39 @@ package org.remoteHome.gui;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
-import org.remoteHome.ThermostatDevice;
+import org.remoteHome.ThermostatWithSwitchAndTempSensorDevice;
 
 /**
  *
- * @author pt596
+ * @author gregorro
  */
-public class ThermostatDeviceManager  extends AbstractWebService {
+public class ThermostatWithSwitchAndTempSensorDeviceManager extends AbstractWebService {
     
     @Override
     public void init() {}
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
-        try {
-            ThermostatDevice device = (ThermostatDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
+                try {
+            ThermostatWithSwitchAndTempSensorDevice device = 
+                    (ThermostatWithSwitchAndTempSensorDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
             String action = requestParameters.get("action");
             if (action.equals("CONFIGURE")) {
                 String nm = requestParameters.get("nm");
-                int tm = Integer.parseInt(requestParameters.get("tm"));
                 int thr = Integer.parseInt(requestParameters.get("thr"));
                 int temp = Integer.parseInt(requestParameters.get("temp"));
                 int heatingId = Integer.parseInt(requestParameters.get("heatingId"));
                 int remoteTempId = Integer.parseInt(requestParameters.get("remoteTempId"));                
                 Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
-                Boolean manualMode = new Boolean(requestParameters.get("manual"));
                 Boolean heatingEnabled = new Boolean(requestParameters.get("heatingEnabled"));
-                Boolean tempEnabled = new Boolean(requestParameters.get("tempEnabled"));                
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
-                if (device.getFrequency() != tm) device.setFrequency(tm);
                 if (device.getThreshold() != thr) device.setThreshold(thr);
                 if (device.getHeatingController()!= heatingId) device.setHeatingController(heatingId);
-                if (device.getRemoteTemperatureMeter() != remoteTempId) device.setRemoteTemperatureMeter(remoteTempId);                
+                if (device.getRemoteTemperatureMeterId() != remoteTempId) device.setRemoteTemperatureMeterId(remoteTempId);                
                 if (device.getDeviceExpectedTemperature() != temp) device.setDeviceExpectedTemperature(temp);
                 if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
-                if (device.isManualControl()!= manualMode) device.setManualControl(manualMode);                
                 if (device.isHeatingControllerEnabled()!= heatingEnabled) device.setHeatingControllerEnabled(heatingEnabled);                
-                if (device.isRemoteTemperatureMeterEnabled()!= tempEnabled) device.setRemoteTemperatureMeterEnabled(tempEnabled);                
-            } else if (action.equals("ON")) {
-                device.setRelayOn(true);
-            } else if (action.equals("OFF")) {
-                device.setRelayOn(false);
+                r.savePersistentData();        
             } else if (action.equals("SAVESCH")) {
                 for (int i=0; i<14;i++) {
                     device.getTemperatureSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
@@ -61,5 +53,5 @@ public class ThermostatDeviceManager  extends AbstractWebService {
         } catch (Exception e) {
             sendAjaxError(e.getMessage());
         }
-    }
+    }  
 }

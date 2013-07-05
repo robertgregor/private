@@ -61,7 +61,11 @@ temp_word var word
 temp2_word var word
 temp3_word var word
 temperature var word
+firstTemperature VAR WORD
+differenceManaged var byte
+difference VAR WORD
 seconds  var    word    ' Define second variable
+realseconds var byte
 ticks   var     byte    ' Define pieces of seconds variable
 dat var word 'unscaled ADC data
 normalMode VAR byte
@@ -85,6 +89,21 @@ read 10, device_id
 read 11, threshold
 read 13, temperatureExp
 read 14, manualcontrol
+gosub readTempSensor
+firstTemperature = temperature
+normalmode = 0
+gosub relayOff
+gosub initModule
+commonSettings:
+gosub commonRXTX
+if (device_id != 0) then
+    gosub setModebasedonsleepperiod
+endif
+Main_rx:
+gosub setup_rx 'setup Rx
+pause 2 'delay for Rx starting
+Ce=1 'set nRF24L01 in Rx mode
+irqLoop:
 'here the reset should be triggered
 if RES == 0 then
     write 0, 40
@@ -105,19 +124,6 @@ if RES == 0 then
     pause 1000
     goto startProg
 endif
-normalmode = 0
-gosub relayOff
-gosub initModule
-commonSettings:
-gosub commonRXTX
-if (device_id != 0) then
-    gosub setModebasedonsleepperiod
-endif
-Main_rx:
-gosub setup_rx 'setup Rx
-pause 2 'delay for Rx starting
-Ce=1 'set nRF24L01 in Rx mode
-irqLoop:
 if (normalMode == 1) then
     if (sleep_period != 0) then
           normalMode = 2
@@ -233,6 +239,15 @@ intManagement:
            ticks = ticks + 1      ' Count pieces of seconds
            If ticks < 31 Then tiexit
            ticks = 0
+           realseconds = realseconds + 1
+           if (realseconds == 50) then
+                realseconds = 0
+                if (differenceManaged == 0) then
+                    differenceManaged = 1
+                    gosub readTempSensor
+                    difference = temperature - firstTemperature
+                endif
+           endif
            if (seconds > 0) then
                 seconds = seconds - 1
                 if (seconds == 0) then
@@ -287,15 +302,21 @@ lookupChar:
     LOOKDOWN temp2_byte,["0123456789"], temp1_byte
 RETURN
 
-sendTemperature:
-    pause 50
-   'read current temperature    
+readTempSensor:
    OWOUT HEATING_SENSOR, 1, [$CC, $44] 'Skip ROM search & do temp conversion
-Wait_Up:
+  Wait_Up:
    OWIN HEATING_SENSOR, 4, [Busy]      'Read busy-bit
    IF Busy = 0 THEN goto Wait_Up            'Still busy..?, Wait_Up..!
    OWOUT HEATING_SENSOR, 1, [$CC, $BE] 'Skip ROM search & read scratchpad memory
    OWIN HEATING_SENSOR, 2, [temperature.Lowbyte, temperature.Highbyte] 'Read two bytes / end comms
+   if (differenceManaged == 1) then
+        temperature = temperature - difference
+   endif
+return
+
+sendTemperature:
+   'read current temperature
+   gosub readTempSensor
    temp_data[0] = "6"
    temp_data[1] = "|"
    if (temperature.11 == 1) then

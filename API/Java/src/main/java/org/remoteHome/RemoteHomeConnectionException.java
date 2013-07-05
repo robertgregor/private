@@ -37,6 +37,11 @@ public class RemoteHomeConnectionException extends Exception {
      */    
     public static final int UNKNOWN_PORT = 6;
 
+    /**
+     * The function or operation is not allowed.
+     */    
+    public static final int NOT_ALLOWED = 7;
+
     private int type;
     
    /**
@@ -74,6 +79,8 @@ public class RemoteHomeConnectionException extends Exception {
                     return "Invalid parameter: "+super.getMessage();
             case UNKNOWN_PORT:
                     return "The specified serial port doesn't exist: "+super.getMessage();
+            case NOT_ALLOWED:
+                    return "This operation is forbidden: "+super.getMessage();
             default:
                 return super.getMessage();
         }        

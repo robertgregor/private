@@ -8,7 +8,7 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.remoteHome.AbstractDevice;
-import org.remoteHome.BlindsControllerDevice;
+import org.remoteHome.MotorControllerDevice;
 import org.remoteHome.LightAlarmDevice;
 
 /**
@@ -23,7 +23,7 @@ public class BlindsControllerDeviceManager extends AbstractWebService {
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         try {
-            BlindsControllerDevice device = (BlindsControllerDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
+            MotorControllerDevice device = (MotorControllerDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
             String action = requestParameters.get("action");
             if (action.equals("CLOSE")) {
                 device.blindsDown();
@@ -41,20 +41,20 @@ public class BlindsControllerDeviceManager extends AbstractWebService {
                 if (device.getFullRangeTimeout() != tm) device.configureFullRangeTimeout(tm);
             } else if (action.equals("CLOSEALL")) {
                 for (AbstractDevice dev : r.getDevices()) {
-                    if (dev instanceof BlindsControllerDevice) {
-                        ((BlindsControllerDevice)dev).blindsDown();
+                    if (dev instanceof MotorControllerDevice) {
+                        ((MotorControllerDevice)dev).blindsDown();
                     }
                 }
             } else if (action.equals("OPENALL")) {
                 for (AbstractDevice dev : r.getDevices()) {
-                    if (dev instanceof BlindsControllerDevice) {
-                        ((BlindsControllerDevice)dev).blindsUp();
+                    if (dev instanceof MotorControllerDevice) {
+                        ((MotorControllerDevice)dev).blindsUp();
                     }
                 }
             } else if (action.equals("STOPALL")) {
                 for (AbstractDevice dev : r.getDevices()) {
-                    if (dev instanceof BlindsControllerDevice) {
-                        ((BlindsControllerDevice)dev).stopBlindsMovement();
+                    if (dev instanceof MotorControllerDevice) {
+                        ((MotorControllerDevice)dev).stopBlindsMovement();
                     }
                 }
             }

@@ -14,30 +14,14 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
-          document.getElementById("periodCOMPONENTID").innerHTML=data.frequency;          
-          document.getElementById("currPeriodFormCOMPONENTID").value=data.frequency;
-          if (data.relayOn) {
-               document.getElementById("stateCOMPONENTID").innerHTML='Relay is ON';
-          } else {
-               document.getElementById("stateCOMPONENTID").innerHTML='Relay is OFF';
-          }
-          if (data.manualControl) {
-               $( "#checkboxManualModeCOMPONENTID" ).prop('checked', true);
-               document.getElementById("manualModeCOMPONENTID").innerHTML='Manual mode';
-          } else {
-               $( "#checkboxManualModeCOMPONENTID" ).prop('checked', false);
-               document.getElementById("manualModeCOMPONENTID").innerHTML='Automatic mode';
-          }
-          $("#checkboxManualModeCOMPONENTID").trigger("change");
           document.getElementById("expTemperatureCOMPONENTID").innerHTML=data.deviceExpectedTemperature / 10;
           document.getElementById("expTemperatureFormCOMPONENTID").value=(data.deviceExpectedTemperature / 10);
-          document.getElementById("temperatureCOMPONENTID").innerHTML=((data.temperature < 0) ? data.temperature : data.temperature / 10);
           document.getElementById("thresholdCOMPONENTID").innerHTML=data.threshold;
           document.getElementById("thresholdFormCOMPONENTID").value=(data.threshold);
           document.getElementById("heatingControllerCOMPONENTID").innerHTML=data.heatingController;
           document.getElementById("heatingControllerFormCOMPONENTID").value=(data.heatingController);
-          document.getElementById("remoteTemperatureMeterCOMPONENTID").innerHTML=data.remoteTemperatureMeter;
-          document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value=(data.remoteTemperatureMeter);
+          document.getElementById("remoteTemperatureMeterCOMPONENTID").innerHTML=data.remoteTemperatureMeterId;
+          document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value=(data.remoteTemperatureMeterId);
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
           if (data.enabledScheduler) {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
@@ -55,14 +39,6 @@ function updateStatusCOMPONENTID(showError) {
                 document.getElementById("heatingControllerEnabledCOMPONENTID").innerHTML='NO';
           }
           $("#checkboxHeatingControllerEnabledCOMPONENTID").trigger("change");
-          if (data.remoteTemperatureMeterEnabled) {
-                $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).prop('checked', true);
-                document.getElementById("remoteTemperatureMeterEnabledCOMPONENTID").innerHTML='YES';
-          } else {
-                $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).prop('checked', false);
-                document.getElementById("remoteTemperatureMeterEnabledCOMPONENTID").innerHTML='NO';
-          }
-          $("#checkboxRemoteTemperatureMeterEnabledCOMPONENTID").trigger("change");
       },
       error:function() {
           if (showError) {
@@ -72,34 +48,6 @@ function updateStatusCOMPONENTID(showError) {
   });
 }
 $(function() {
-    $( "#onThermostatCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&action=ON&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
-            }   
-          });
-    });
-    $( "#offThermostatCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&action=OFF&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
-            }   
-          });
-    });
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
@@ -112,15 +60,6 @@ $(function() {
                 }
             });
     $( "#checkboxEnabledSchedulerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
-    $( "#checkboxManualModeCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
-    $( "#checkboxManualModeCOMPONENTID" ).change(function () {
-                if (this.checked) {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
-                } else {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
-                }
-            });
-    $( "#checkboxManualModeCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
     $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).change(function () {
                 if (this.checked) {
@@ -130,29 +69,11 @@ $(function() {
                 }
             });
     $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
-    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
-    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).change(function () {
-                if (this.checked) {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
-                } else {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
-                }
-            });
-    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
                 alert('Name of the component cannot be empty!');
                 return;
-          }
-          var tm = parseInt(document.getElementById("currPeriodFormCOMPONENTID").value);
-          if (tm == NaN) {
-              alert('Sending period should be number!');
-              return;
-          }
-          if ((tm > 2550) || (tm < 10)) {
-              alert('Sending period should be number between 10 and 2550!');
-              return;
           }
           var thr = parseInt(document.getElementById("thresholdFormCOMPONENTID").value);
           if (thr == NaN) {
@@ -192,15 +113,13 @@ $(function() {
               return;
           }
           var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
-          var manual = document.getElementById("checkboxManualModeCOMPONENTID").checked?"TRUE":"FALSE";
           var heatingEnabled = document.getElementById("checkboxHeatingControllerEnabledCOMPONENTID").checked?"TRUE":"FALSE";
-          var tempEnabled = document.getElementById("checkboxRemoteTemperatureMeterEnabledCOMPONENTID").checked?"TRUE":"FALSE";
 
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&tm="+tm+"&thr="+thr+"&heatingId="+heatingId+"&remoteTempId="+remoteTempId+"&schenabled="+schenabled+"&manual="+manual+"&heatingEnabled="+heatingEnabled+"&tempEnabled="+tempEnabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+              data: "ServiceName=ThermostatWithSwitchAndTempSensorDeviceManager&deviceId=COMPONENTID&thr="+thr+"&heatingId="+heatingId+"&remoteTempId="+remoteTempId+"&schenabled="+schenabled+"&heatingEnabled="+heatingEnabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -222,7 +141,7 @@ $(function() {
                         url: "/",
                         type: "get",
                         'cache' : false,
-                        data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+Math.floor((Math.random()*100)+1),
+                        data: "ServiceName=ThermostatWithSwitchAndTempSensorDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
@@ -242,7 +161,7 @@ $(function() {
                         url: "/",
                         type: "get",
                         'cache' : false,
-                        data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&action=LOADSCH&"+Math.floor((Math.random()*100)+1),
+                        data: "ServiceName=ThermostatWithSwitchAndTempSensorDeviceManager&deviceId=COMPONENTID&action=LOADSCH&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
                         loadTempSchedule(data, 'schTempTableCOMPONENTID');
                         $( "#schDialogCOMPONENTID" ).dialog( "open" );          
@@ -340,10 +259,6 @@ $(function() {
 <table width="100%"><tr>
 <td>
     <table width="100%">
-      <tr>
-        <td><input type="submit" id="onThermostatCOMPONENTID" value="Switch on" /></td>
-        <td><input type="submit" id="offThermostatCOMPONENTID" value="Switch off" /></td>
-      </tr>
       <tr><td  width="100%" colspan="2">&nbsp;</td></tr>
       <tr><td  width="100%" colspan="2">&nbsp;</td></tr>
       <tr><td  width="100%" colspan="2"><button id="scheduleButtCOMPONENTID">Scheduler</button></td></tr>
@@ -367,68 +282,40 @@ $(function() {
                 <td><input type="text" id="nameFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td>State</td>
-                <td><span id='stateCOMPONENTID'></span></td>
-                <td>Sending configure period:</td>
-                <td><input type="text" id="currPeriodFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
                 <td>Component id</td>
                 <td><span id='compIdCOMPONENTID'></span></td>
                 <td>Configure expected temperature:</td>
                 <td><input type="text" id="expTemperatureFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td>Period</td>
-                <td><span id='periodCOMPONENTID'></span>&nbsp;seconds</td>
+                <td>Expected temperature</td>
+                <td><span id='expTemperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
                 <td>Configure threshold:</td>
                 <td><input type="text" id="thresholdFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td>Expected temperature</td>
-                <td><span id='expTemperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
+                <td>Threshold</td>
+                <td>0.<span id='thresholdCOMPONENTID'></span>&nbsp;Deg. celsius</td>
                 <td>Configure heating unit Id:</td>
                 <td><input type="text" id="heatingControllerFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td>Threshold</td>
-                <td>0.<span id='thresholdCOMPONENTID'></span>&nbsp;Deg. celsius</td>
+                <td>Heating unit Id</td>
+                <td><span id='heatingControllerCOMPONENTID'></span></td>
                 <td>Configure remote temperature meter Id:</td>
                 <td><input type="text" id="remoteTemperatureMeterFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
-                <td>Current temperature</td>
-                <td><span id='temperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
+                <td>Enabled scheduler</td>
+                <td><span id='enabledSchedulerCOMPONENTID'></span></td>
                 <td>Enabled scheduler:</td>
                 <td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td>
                 </tr>
                 <tr>
-                <td>Enabled scheduler</td>
-                <td><span id='enabledSchedulerCOMPONENTID'></span></td>
-                <td>Manual mode:</td>
-                <td><input type="checkbox" id="checkboxManualModeCOMPONENTID" /><label for="checkboxManualModeCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Mode</td>
-                <td><span id='manualModeCOMPONENTID'></span></td>
-                <td>Enabled heating unit:</td>
-                <td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
                 <td>Enabled heating unit</td>
                 <td><span id='heatingControllerEnabledCOMPONENTID'></span></td>
-                <td>Enabled remote temperature meter:</td>
-                <td><input type="checkbox" id="checkboxRemoteTemperatureMeterEnabledCOMPONENTID" /><label for="checkboxRemoteTemperatureMeterEnabledCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Heating unit Id</td>
-                <td><span id='heatingControllerCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Enabled remote temperature meter</td>
-                <td><span id='remoteTemperatureMeterEnabledCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
+                <td>Enabled heating unit:</td>
+                <td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td>
                 </tr>
                 <tr>
                 <td>Remote temperature meter Id</td>

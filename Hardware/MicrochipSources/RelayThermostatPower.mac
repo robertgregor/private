@@ -375,6 +375,29 @@ SUB?WCW macro Win, Cin, Wout
     endif
     endm
 
+SUB?WWW macro Win1, Win2, Wout
+        MOVE?BA Win2
+    if ((Wout) == (Win1))
+        CHK?RP  Wout
+        subwf   Wout, F
+        MOVE?BA (Win2) + 1
+        btfss   STATUS, C
+        addlw   1
+        CHK?RP  Wout
+        subwf   (Wout) + 1, F
+    else
+        CHK?RP  Win1
+        subwf   Win1, W
+        MOVE?AB Wout
+        MOVE?BA (Win2) + 1
+        btfss   STATUS, C
+        addlw   1
+        CHK?RP  Win1
+        subwf   (Win1) + 1, W
+        MOVE?AB (Wout) + 1
+    endif
+    endm
+
 AND?BCB macro Bin, Cin, Bout
     if (Bout == Bin)
         movlw   Cin

@@ -286,7 +286,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
                         if (!isEnabledScheduler()) continue;
                         Calendar c = Calendar.getInstance();
                         int min = c.get(Calendar.MINUTE);
-                        if ((min % 10) == 0) {
+                        if (((min % 10) == 0) || (min == 0)) {
                             Boolean action = getLightSchedule().processSchedule();
                             if (action != null) {
                                 //something has to be done.

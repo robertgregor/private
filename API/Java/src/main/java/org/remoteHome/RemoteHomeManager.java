@@ -76,9 +76,13 @@ public class RemoteHomeManager {
         persistentFile = new File(file);
         try {
             loadPersistentData();
-            //HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
-            //h.add(createRemoteHomeDevice(1, "TestDevice", 3));
-            //rooms.put("aaaaaaa", h);
+            /*
+            HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
+            h.add(createRemoteHomeDevice(1, "TestDevice", 6));
+            h.add(createRemoteHomeDevice(2, "Kotel", 3));
+            h.add(createRemoteHomeDevice(3, "TempSensor", 2));
+            rooms.put("aaaaaaa", h);
+            */
         } catch (Exception e) {
             throw new RemoteHomeManagerException(e.getMessage(), RemoteHomeManagerException.SERIALIZATION_ERROR);
         }
@@ -116,7 +120,7 @@ public class RemoteHomeManager {
             device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.BlindsControllerDevice) {
-            BlindsControllerDevice device = new BlindsControllerDevice(this, deviceId, deviceName);
+            MotorControllerDevice device = new MotorControllerDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
             device.startScheduling();
             return device;            
@@ -127,6 +131,11 @@ public class RemoteHomeManager {
             return device;            
         } else if (deviceType == AbstractDevice.BatteryThermostat) {
             BatteryThermostatDevice device = new BatteryThermostatDevice(this, deviceId, deviceName);
+            devices.put(deviceId, device);
+            device.startScheduling();
+            return device;            
+        } else if (deviceType == AbstractDevice.ThermostatWithSwitchAndTempSensor) {
+            ThermostatWithSwitchAndTempSensorDevice device = new ThermostatWithSwitchAndTempSensorDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
             device.startScheduling();
             return device;            

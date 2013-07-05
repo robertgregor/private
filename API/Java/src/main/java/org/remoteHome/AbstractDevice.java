@@ -44,6 +44,11 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     public static int Thermostat = 6;
     
     /**
+     * This device type is thermostat with Simple switch and TemperatureSensor
+     */
+    public static int ThermostatWithSwitchAndTempSensor = 8;
+
+    /**
      * This device type is battery thermostat, connected to power line
      */
     public static int BatteryThermostat = 7;
@@ -228,4 +233,15 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
      * This method is called once, when the class is instantiated or deserialized.
      */
     protected abstract void startScheduling();
+    
+    /*
+     * This method will return true, if the device data are older then defined
+     * @param minute is the defined period, after which the device has been updated
+     * @return true, if the timestamp + minute < current system date, otherwise return false
+     */
+    public boolean updatedBefore (int minute) {
+        long currentTimestamp = System.currentTimeMillis();
+        if ((timestamp + minute*60000) < currentTimestamp) return true;
+        return false;
+    }
 }

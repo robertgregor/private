@@ -12,12 +12,13 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.remoteHome.AbstractDevice;
-import org.remoteHome.BlindsControllerDevice;
+import org.remoteHome.MotorControllerDevice;
 import org.remoteHome.HeatingHeaderDevice;
 import org.remoteHome.LightAlarmDevice;
 import org.remoteHome.SimpleSwitchDevice;
 import org.remoteHome.TemperatureSensorDevice;
 import org.remoteHome.ThermostatDevice;
+import org.remoteHome.ThermostatWithSwitchAndTempSensorDevice;
 
 /**
  *
@@ -47,12 +48,14 @@ public class LoadRoomPage extends AbstractWebService {
                 accordionBody.append(getDiv("TemperatureSensorDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof LightAlarmDevice) {
                 accordionBody.append(getDiv("LightAlarmDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof BlindsControllerDevice) {
+            } else if (device instanceof MotorControllerDevice) {
                 accordionBody.append(getDiv("BlindsControllerDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof HeatingHeaderDevice) {
                 accordionBody.append(getDiv("HeatingHeaderDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof ThermostatDevice) {
                 accordionBody.append(getDiv("ThermostatDevice.div",Integer.toString(device.getDeviceId())));
+            } else if (device instanceof ThermostatWithSwitchAndTempSensorDevice) {
+                accordionBody.append(getDiv("ThermostatWithSwitchAndTempSensorDevice.div",Integer.toString(device.getDeviceId())));
             }
         }
         if (accordionBody.toString().length()==0) {

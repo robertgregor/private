@@ -108,7 +108,26 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      */
     private String smtpMessage;
 
+    /*
+     * This is the schedule allows to set the light on when movement is detected.
+     */
     private OnOffSchedule lightOnWhenMovementDetectedSchedule;
+    
+    /*
+     * This is the schedule allows to set the light on hardly
+     */
+    private OnOffSchedule lightSchedule;
+    
+    /*
+     * This is true if scheduler is enabled.
+     */
+    private boolean enabledScheduler;
+    
+    /*
+     * This is true if movement scheduler is enabled.
+     */
+    private boolean enabledLightOnWhenMovementScheduler;
+    
     /**
      * The constructor is protected. The object should be constructed using
      * TemperatureSensorDevice device = 
@@ -492,6 +511,48 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
     public void setLightOnWhenMovementDetectedSchedule(OnOffSchedule lightOnWhenMovementDetectedSchedule) {
         this.lightOnWhenMovementDetectedSchedule = lightOnWhenMovementDetectedSchedule;
     }
+
+    /**
+     * @return the lightSchedule
+     */
+    public OnOffSchedule getLightSchedule() {
+        return lightSchedule;
+    }
+
+    /**
+     * @param lightSchedule the lightSchedule to set
+     */
+    public void setLightSchedule(OnOffSchedule lightSchedule) {
+        this.lightSchedule = lightSchedule;
+    }
+
+    /**
+     * @return the enabledScheduler
+     */
+    public boolean isEnabledScheduler() {
+        return enabledScheduler;
+    }
+
+    /**
+     * @param enabledScheduler the enabledScheduler to set
+     */
+    public void setEnabledScheduler(boolean enabledScheduler) {
+        this.enabledScheduler = enabledScheduler;
+    }
+
+    /**
+     * @return the enabledLightOnWhenMovementScheduler
+     */
+    public boolean isEnabledLightOnWhenMovementScheduler() {
+        return enabledLightOnWhenMovementScheduler;
+    }
+
+    /**
+     * @param enabledLightOnWhenMovementScheduler the enabledLightOnWhenMovementScheduler to set
+     */
+    public void setEnabledLightOnWhenMovementScheduler(boolean enabledLightOnWhenMovementScheduler) {
+        this.enabledLightOnWhenMovementScheduler = enabledLightOnWhenMovementScheduler;
+    }
     
         private void sendSMTPcmd(String s, PrintWriter out, BufferedReader in) throws IOException {
         // Send the SMTP command
@@ -545,7 +606,6 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
-        super.startScheduling();
         getLightOnWhenMovementDetectedSchedule().setCurrentState("0");
         new Thread(new Runnable() {
             public void run() {
@@ -554,7 +614,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                         Thread.sleep(30000);
                         Calendar c = Calendar.getInstance();
                         int min = c.get(Calendar.MINUTE);
-                        if ((min % 10) == 0) {
+                        if (((min % 10) == 0) || (min == 0)) {
                             Boolean action = getLightOnWhenMovementDetectedSchedule().processSchedule();
                             if (action != null) {
                                 //something has to be done.
@@ -562,6 +622,15 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                                     configureSwitchOnWhenMovement(true);
                                 } else {
                                     configureSwitchOnWhenMovement(false);
+                                }
+                            }
+                            action = getLightSchedule().processSchedule();
+                            if (action != null) {
+                                //something has to be done.
+                                if (action) {
+                                    switchOn();
+                                } else {
+                                    switchOff();
                                 }
                             }
                         }

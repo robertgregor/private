@@ -37,7 +37,7 @@ import java.io.Serializable;
   * 
   * @author Robert Gregor
   */
-public class BlindsControllerDevice extends AbstractDevice implements Serializable {
+public class MotorControllerDevice extends AbstractDevice implements Serializable {
    /**
      * This listenner listen for the event, when the blind is moved to required position. The user of this API should implement this interface
      * and register it for that event.
@@ -79,7 +79,7 @@ public class BlindsControllerDevice extends AbstractDevice implements Serializab
      * @param deviceId deviceId assigned to this device
      * @param deviceName device name
      */    
-    protected BlindsControllerDevice(RemoteHomeManager m, int deviceId, String deviceName) {
+    protected MotorControllerDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);
         setSubDeviceNumber("");
     }

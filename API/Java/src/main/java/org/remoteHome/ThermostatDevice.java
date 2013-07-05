@@ -67,7 +67,27 @@ public class ThermostatDevice extends AbstractDevice {
      */
     private TemperatureSchedule temperatureSchedule;   
     
-   /**
+    /*
+     * This is id of the heating controller
+     */
+    private int heatingController;   
+
+    /*
+     * This is id of the remote temperature meter
+     */
+    private boolean heatingControllerEnabled = false;   
+
+    /*
+     * This is id of the remote temperature meter
+     */
+    private int remoteTemperatureMeter;   
+
+    /*
+     * This is id of the remote temperature meter
+     */
+    private boolean remoteTemperatureMeterEnabled = false;   
+
+    /**
      * The constructor is protected. The object should be constructed using
      * ThermostatDevice device = 
      *          (ThermostatDevice)remoteHomeManager.getRemoteHomeDevice(deviceId,deviceName, AbstractDevice.Thermostat)
@@ -92,7 +112,16 @@ public class ThermostatDevice extends AbstractDevice {
     protected void manageAsynchronousCommand(String[] items) {
          if (items[0].equals("6")) {
             //This is the status
-            this.temperature = (Integer.parseInt(items[1]));
+            if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
+                try {
+                    TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeter());
+                    this.temperature = Integer.parseInt(Float.toString(tsd.getTemperature()*10));
+                } catch (RemoteHomeManagerException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                this.temperature = (Integer.parseInt(items[1]));
+            }
             this.frequency = (Integer.parseInt(items[2])*10); //Frequency in seconds * 10
             this.deviceExpectedTemperature = ((Integer.parseInt(items[3])*10)/2); //0.5 is one degree celsius
             if (items[4].equals("1")) {
@@ -110,7 +139,7 @@ public class ThermostatDevice extends AbstractDevice {
         }
     }
     
-       /**
+   /**
      * This method will update the values in this object from the hardware device
      * 
      * @throws RemoteHomeConnectionException if there is a problem with communication
@@ -246,7 +275,12 @@ public class ThermostatDevice extends AbstractDevice {
         if (manualControl) {
             m.sendCommand(getDeviceId(), "x");
         } else {
-            m.sendCommand(getDeviceId(), "y");
+            if (!isRemoteTemperatureMeterEnabled()) {
+                m.sendCommand(getDeviceId(), "y");
+            } else {
+                throw new RemoteHomeConnectionException("The remote temperature meter is enabled. "
+                        + "Disable remote temperature meter first.", RemoteHomeConnectionException.NOT_ALLOWED);
+            }
         }
         this.manualControl = manualControl;
     }
@@ -281,6 +315,65 @@ public class ThermostatDevice extends AbstractDevice {
     }
 
     /**
+     * @return the heatingController
+     */
+    public int getHeatingController() {
+        return heatingController;
+    }
+
+    /**
+     * @param heatingController the heatingController to set
+     */
+    public void setHeatingController(int heatingController) {
+        this.heatingController = heatingController;
+    }
+
+    /**
+     * @return the remoteTemperatureMeter
+     */
+    public int getRemoteTemperatureMeter() {
+        return remoteTemperatureMeter;
+    }
+
+    /**
+     * @param remoteTemperatureMeter the remoteTemperatureMeter to set
+     */
+    public void setRemoteTemperatureMeter(int remoteTemperatureMeter) {
+        this.remoteTemperatureMeter = remoteTemperatureMeter;
+    }
+
+    /**
+     * @return the remoteTemperatureMeterEnabled
+     */
+    public boolean isRemoteTemperatureMeterEnabled() {
+        return remoteTemperatureMeterEnabled;
+    }
+
+    /**
+     * @param remoteTemperatureMeterEnabled the remoteTemperatureMeterEnabled to set
+     */
+    public void setRemoteTemperatureMeterEnabled(boolean remoteTemperatureMeterEnabled) throws RemoteHomeConnectionException {
+        this.remoteTemperatureMeterEnabled = remoteTemperatureMeterEnabled;
+        if (!this.isManualControl()) {
+            this.setManualControl(true);
+        }
+    }
+
+    /**
+     * @return the heatingControllerEnabled
+     */
+    public boolean isHeatingControllerEnabled() {
+        return heatingControllerEnabled;
+    }
+
+    /**
+     * @param heatingControllerEnabled the heatingControllerEnabled to set
+     */
+    public void setHeatingControllerEnabled(boolean heatingControllerEnabled) {
+        this.heatingControllerEnabled = heatingControllerEnabled;
+    }
+
+    /**
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
@@ -291,19 +384,47 @@ public class ThermostatDevice extends AbstractDevice {
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(30000);                        
-                        if (!isEnabledScheduler()) continue;
-                        if (isManualControl()) continue;
+                        Thread.sleep(60000);
+                        //manage heating controller
+                        if (isHeatingControllerEnabled() && getHeatingController() != 0) {
+                            try {
+                                //ok heating controller enabled check the status of the relay
+                                updateDevice();
+                                if (isRelayOn()) {
+                                    //ok, get the device and check if it is on
+                                    SimpleSwitchDevice ssd = (SimpleSwitchDevice)m.getDevice(getHeatingController());
+                                    if (ssd.updatedBefore(1)) ssd.updateDevice();
+                                    if (!ssd.isCurrentState() || ssd.getCurrentCounter() < 2) {
+                                        if (ssd.getConfiguredPeriod() != 3) {
+                                            ssd.configurePeriod(3);
+                                        }
+                                        ssd.switchOnForConfiguredPeriod();
+                                    }
+                                }
+                            } catch (RemoteHomeConnectionException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        //manage the remote temperature meter and device relay
+                        if (!isEnabledScheduler()) {
+                            manageRemoteTemperatureSensorAndDeviceRelay();
+                            continue;
+                        }
+                        if (isManualControl() && !isRemoteTemperatureMeterEnabled()) continue;
                         Calendar c = Calendar.getInstance();
                         int min = c.get(Calendar.MINUTE);
-                        if ((min % 15) == 0) {
+                        if (((min % 15) == 0) || (min == 0)) {
                             Integer temperature = getTemperatureSchedule().processSchedule();
                             if (temperature != null) {
                                 //something has to be done.
-                                setDeviceExpectedTemperature((temperature*10)/2);
+                                if (!isRemoteTemperatureMeterEnabled()) {
+                                    setDeviceExpectedTemperature((temperature*10)/2);
+                                } else {
+                                    manageRemoteTemperatureSensorAndDeviceRelay();
+                                }
                             }
                         }
-                        Thread.sleep(30000);
+                        Thread.sleep(60000);
                     } catch (InterruptedException e) {
                         return;
                     } catch (RemoteHomeConnectionException e) {
@@ -314,5 +435,19 @@ public class ThermostatDevice extends AbstractDevice {
                 }
             }
         }).start();                
-    }    
+    }
+    
+    private void manageRemoteTemperatureSensorAndDeviceRelay() throws RemoteHomeConnectionException {
+                        if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
+                            if (!isManualControl()) {
+                                setManualControl(true);
+                            }
+                            if (getDeviceExpectedTemperature() > (getTemperature() + getThreshold()) ) {
+                                if (!isRelayOn()) setRelayOn(true);
+                            } else {
+                                if (isRelayOn()) setRelayOn(false);                                
+                            }
+                        }
+        
+    }
 }

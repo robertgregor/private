@@ -146,8 +146,8 @@
                 <server.host>localhost</server.host>
                 <listenPort>8080</listenPort>
                 <socket.host>localhost</socket.host>
-                <port>COM18</port>
-                <serialize.filepath>c:/RemoteHome/test.ser</serialize.filepath>
+                <port>COM9</port>
+                <serialize.filepath>c:/RH/test.ser</serialize.filepath>
             </properties>
         </profile>
     </profiles>

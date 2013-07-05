@@ -24,7 +24,9 @@ public class AddNewDevice extends AbstractWebService {
         try {
             if ((requestParameters.get("addSubDeviceId") != null) && requestParameters.get("addSubDeviceId").length() > 0) {
                 if (Integer.parseInt(requestParameters.get("addSubDeviceId")) == 1) {
-                    r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));                    
+                    if (Integer.parseInt(requestParameters.get("type")) != AbstractDevice.ThermostatWithSwitchAndTempSensor) {
+                        r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));
+                    }
                 }
                 AbstractDevice newDevice = r.createRemoteHomeMultipleDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
                     Integer.parseInt(requestParameters.get("addSubDeviceId")),
@@ -33,7 +35,9 @@ public class AddNewDevice extends AbstractWebService {
                     r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);
                 
             } else {
-                r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));
+                if (Integer.parseInt(requestParameters.get("type")) != AbstractDevice.ThermostatWithSwitchAndTempSensor) {
+                    r.addDevice(Integer.parseInt(requestParameters.get("addDeviceId")));
+                }
                 AbstractDevice newDevice = r.createRemoteHomeDevice(Integer.parseInt(requestParameters.get("addDeviceId")),
                     requestParameters.get("addDeviceName"),
                     Integer.parseInt(requestParameters.get("type")));

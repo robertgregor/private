@@ -213,12 +213,13 @@ s - return status 6|temperature|frequency|expected temperature|relay|treshold
 	treshold - Current treshold 0 - 9
 m=nnn - set the frequency of the notifications and relay changes. 1 means 10 seconds, 255 means 2550 seconds.
 	If not set, or set to 0, then no relay changes - Manual mode
-t=nnn - Expected temperature - if set, the header is running in self managed mode - each frequency period checks the current temperature, and if it is lower, switch on the
+t=nnn - Expected temperature - if set, the header is running in self managed mode - each frequency period checks            the current temperature, and if it is lower, switch on the
     	relay. The value is temperature * 2, it means, that 23.5 celsius = 47, or 17 celsius = 34.
 	If it is set to 0, then relay is operated manually.
-r=n  -  Treshhold 0 - 9. For the self managed mode, the treshhold could be set. It means that relay will go off when currentTemperature + treshold / 10 > expected temperature and will
-	go on, when currentTemperature - treshold / 10 < expected temperature
-
+r=n  -  Threshold 0 - 9. For the self managed mode, the treshhold could be set. It means that relay will go off             when currentTemperature + treshold / 10 > expected temperature and will
+	go on, when currentTemperature - threshold / 10 < expected temperature
+x - Set manual control on
+y - Set manual control off
         
     Quick startup:
     1. Put the power
@@ -232,9 +233,6 @@ r=n  -  Treshhold 0 - 9. For the self managed mode, the treshhold could be set. 
     After 10 minutes the status is sent	again						    After 10 minutes the status is sent
     7. AT+9=t=34<ENTER> Lower the temperature for the night                                 AT+9=o<ENTER> Swith relay on if necessary
 
-Manual mode:
-o - start to move up
-f - start to move down
 
 
 raspberry setup:

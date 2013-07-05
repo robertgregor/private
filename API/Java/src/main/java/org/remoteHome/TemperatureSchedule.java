@@ -121,7 +121,7 @@ public class TemperatureSchedule  extends AbstractSchedule {
     public Integer processSchedule() {
         Calendar c = Calendar.getInstance();
         int min = c.get(Calendar.MINUTE);
-        if ((min % 15) == 0) {
+        if (((min % 15) == 0) || (min == 0)) {
             int day = 0;
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int d = c.get(Calendar.DAY_OF_WEEK);
