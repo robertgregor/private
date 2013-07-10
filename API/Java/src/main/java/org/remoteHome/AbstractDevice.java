@@ -1,10 +1,7 @@
 package org.remoteHome;
 
+import com.google.gson.Gson;
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 
 /**
  * This is the implementation class for all hardware devices. All the devices should extend this class.
@@ -152,7 +149,11 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     public int compareTo(AbstractDevice device) {
         return getDeviceName().compareTo(device.getDeviceName());
     }
-    
+    public static String generateJsonData(Object o) {
+         Gson gson = new Gson();
+         return gson.toJson(o);
+    }
+    /*
     public static String generateJsonData(Object o) {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
@@ -191,7 +192,8 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
         sb.append("\n}");
         return sb.toString();
     }
-
+    */
+    
     /**
      * This is timestamp, when the values has been last updated
      * @return the timestamp
