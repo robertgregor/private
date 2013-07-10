@@ -28,6 +28,7 @@ public class ThermostatWithSwitchAndTempSensorDeviceManager extends AbstractWebS
                 String nm = requestParameters.get("nm");
                 int thr = Integer.parseInt(requestParameters.get("thr"));
                 int temp = Integer.parseInt(requestParameters.get("temp"));
+                int simpleswithId = Integer.parseInt(requestParameters.get("remoteSsId"));
                 int heatingId = Integer.parseInt(requestParameters.get("heatingId"));
                 int remoteTempId = Integer.parseInt(requestParameters.get("remoteTempId"));                
                 Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
@@ -37,6 +38,7 @@ public class ThermostatWithSwitchAndTempSensorDeviceManager extends AbstractWebS
                 if (device.getHeatingController()!= heatingId) device.setHeatingController(heatingId);
                 if (device.getRemoteTemperatureMeterId() != remoteTempId) device.setRemoteTemperatureMeterId(remoteTempId);                
                 if (device.getDeviceExpectedTemperature() != temp) device.setDeviceExpectedTemperature(temp);
+                if (device.getSimpleSwitchDeviceId() != simpleswithId) device.setSimpleSwitchDeviceId(simpleswithId);
                 if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
                 if (device.isHeatingControllerEnabled()!= heatingEnabled) device.setHeatingControllerEnabled(heatingEnabled);                
                 r.savePersistentData();        

@@ -1,12 +1,14 @@
 package org.remoteHome;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Calendar;
-import javax.xml.bind.DatatypeConverter;
+import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 /**
   * Light/Alarm controller<BR/><BR/>
@@ -159,7 +161,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                     public void run() {
                         try {
                             sendEmail();
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -553,8 +555,8 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
     public void setEnabledLightOnWhenMovementScheduler(boolean enabledLightOnWhenMovementScheduler) {
         this.enabledLightOnWhenMovementScheduler = enabledLightOnWhenMovementScheduler;
     }
-    
-        private void sendSMTPcmd(String s, PrintWriter out, BufferedReader in) throws IOException {
+    /*    
+    private void sendSMTPcmd(String s, PrintWriter out, BufferedReader in) throws IOException {
         // Send the SMTP command
         if (s != null) {
             out.println(s);
@@ -602,6 +604,26 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
             in.close();
             s.close();
     }
+    */
+    private void sendEmail() throws Exception {
+        Properties properties = System.getProperties();
+        properties.setProperty("mail.smtp.host", getSmtpHost());
+        properties.put("mail.smtp.port", "25");
+        if (getSmtpUser() != null) {
+            properties.put("mail.smtp.auth", "true");
+            properties.setProperty("mail.user", getSmtpUser());
+            properties.setProperty("mail.password", getSmtpPassword());
+        }
+        Session session = Session.getDefaultInstance(properties);
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(getSmtpEmailFrom()));
+        message.addRecipient(Message.RecipientType.TO,
+                                  new InternetAddress(getSmtpEmailTo()));
+        message.setSubject(getSmtpSubject());
+        message.setText(getSmtpMessage());
+        Transport.send(message);
+    }
+    
     /**
      * This method will start the scheduler thread to process the schedule.
      */

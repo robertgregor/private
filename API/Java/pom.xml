@@ -39,6 +39,21 @@
             <artifactId>nrjavaserial</artifactId>
             <version>${nrjavaserial.version}</version>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.db4o</groupId>
+            <artifactId>db4o-full-java5</artifactId>
+            <version>7.13-SNAPSHOT</version>
+        </dependency>                
     </dependencies>
 
     <build>
@@ -165,6 +180,10 @@
             <url>http://repo2.maven.org/maven2</url>
         </repository>
         <repository>
+            <id>repo1_maven_org</id>
+            <url>http://repo1.maven.org</url>
+        </repository>
+        <repository>
             <id>Sonatype snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
@@ -177,6 +196,10 @@
             <id>Remote-Home thirdparty</id>
             <url>http://nexus.remote-home.org/content/repositories/thirdparty/</url>
         </repository>
+        <repository>
+            <id>source.db4o</id>
+            <url>http://source.db4o.com/maven</url>
+        </repository>        
     </repositories>
 
     <licenses>

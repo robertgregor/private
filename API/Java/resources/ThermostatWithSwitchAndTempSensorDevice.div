@@ -23,6 +23,8 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("remoteTemperatureMeterCOMPONENTID").innerHTML=data.remoteTemperatureMeterId;
           document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value=(data.remoteTemperatureMeterId);
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+          document.getElementById("remoteSimpleSwitchCOMPONENTID").innerHTML=data.simpleSwitchDeviceId;
+          document.getElementById("remoteSimpleSwitchFormCOMPONENTID").value=(data.simpleSwitchDeviceId);
           if (data.enabledScheduler) {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
                 document.getElementById("enabledSchedulerCOMPONENTID").innerHTML='YES';
@@ -99,17 +101,14 @@ $(function() {
               alert('Heating controller Id should be number!');
               return;
           }
-          if ((heatingId > 255) || (heatingId < 0)) {
-              alert('Heating controller Id should be number between 0 and 255!');
-              return;
-          }
           var remoteTempId = parseInt(document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value);
           if (remoteTempId == NaN) {
               alert('Remote temperature meter Id should be number!');
               return;
           }
-          if ((remoteTempId > 255) || (remoteTempId < 0)) {
-              alert('Remote temperature meter Id should be number between 0 and 255!');
+          var remoteSsId = parseInt(document.getElementById("remoteSimpleSwitchFormCOMPONENTID").value);
+          if (remoteSsId == NaN) {
+              alert('Remote simple switch Id should be number!');
               return;
           }
           var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
@@ -119,7 +118,7 @@ $(function() {
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=ThermostatWithSwitchAndTempSensorDeviceManager&deviceId=COMPONENTID&thr="+thr+"&heatingId="+heatingId+"&remoteTempId="+remoteTempId+"&schenabled="+schenabled+"&heatingEnabled="+heatingEnabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+              data: "ServiceName=ThermostatWithSwitchAndTempSensorDeviceManager&deviceId=COMPONENTID&thr="+thr+"&heatingId="+heatingId+"&remoteSsId="+remoteSsId+"&remoteTempId="+remoteTempId+"&schenabled="+schenabled+"&heatingEnabled="+heatingEnabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
                 updateStatusCOMPONENTID();
             },
@@ -308,18 +307,23 @@ $(function() {
                 <tr>
                 <td>Enabled scheduler</td>
                 <td><span id='enabledSchedulerCOMPONENTID'></span></td>
-                <td>Enabled scheduler:</td>
-                <td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td>
+                <td>Configure simple switch device Id:</td>
+                <td><input type="text" id="remoteSimpleSwitchFormCOMPONENTID" /></td>
                 </tr>
                 <tr>
                 <td>Enabled heating unit</td>
                 <td><span id='heatingControllerEnabledCOMPONENTID'></span></td>
                 <td>Enabled heating unit:</td>
-                <td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td>
+                <td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td>
                 </tr>
                 <tr>
                 <td>Remote temperature meter Id</td>
                 <td><span id='remoteTemperatureMeterCOMPONENTID'></span></td>
+                <td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td>
+                </tr>
+                <tr>
+                <td>Simple switch component Id</td>
+                <td><span id='remoteSimpleSwitchCOMPONENTID'></span></td>
                 <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>

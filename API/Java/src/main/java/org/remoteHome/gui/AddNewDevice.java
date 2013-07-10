@@ -43,7 +43,7 @@ public class AddNewDevice extends AbstractWebService {
                     Integer.parseInt(requestParameters.get("type")));
                     r.addDeviceToRoom(requestParameters.get("roomName"), newDevice);
                     if (newDevice instanceof TemperatureSensorDevice) {
-                        ((TemperatureSensorDevice)newDevice).setInitialFrequency();
+                        ((TemperatureSensorDevice)newDevice).setExpectedFrequency(60);
                     }
             }
             r.savePersistentData();
