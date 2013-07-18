@@ -24,8 +24,7 @@ public class LoadChannelPassword extends AbstractWebService {
         sb.append(r.getChannel());
         sb.append("\n");
         sb.append(r.getPassword());
-        //sendAjaxAnswer(sb.toString());
-        sendAjaxAnswer("40\nROBIK");
+        sendAjaxAnswer(sb.toString());
     }
     
 }

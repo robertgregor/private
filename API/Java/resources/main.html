@@ -9,13 +9,31 @@
 <script src="jquery-1.9.1.js"></script>
 <script src="jquery-ui-1.10.2.custom.js"></script>
 <script type="text/javascript" src="jquery.validate.js"></script>
+<script type="text/javascript" src="jquery.i18n.properties-min-1.0.9.js"></script>
 <script src="schedulers.js"></script>
 
 <script>
 var addTabJs = null;
 var isMouseDown = false;
+function changeLang(lang) {
+    jQuery.i18n.properties({
+        name: 'Messages', 
+        path: '', 
+        mode: 'both',
+        language: lang, 
+        callback: function() {
+        }
+    });
+}
+function setLabel(lbl) {
+    document.getElementById(lbl).innerHTML = jQuery.i18n.prop(lbl);
+}
+function setLabelBasedOnId(id, lbl) {
+    document.getElementById(id).innerHTML = jQuery.i18n.prop(lbl);
+}
 $(function() {
   var tabs = $( "#tabs" ).tabs();
+  changeLang('PREFLANG');
   //$( document ).tooltip();
   $( "input[type=submit], a, button" ).button();
   $('tbody tr').hover(function() { $(this).toggleClass('ui-state-highlight'); });
@@ -58,18 +76,19 @@ $(document).ready(function(){
                     addTabJs(rooms[i]);
                }
            }
-           $( "#tabs" ).find( ".ui-tabs-nav" ).append( "<li><a href='systemManagement.html'>System management</a></li>" );
+           $( "#tabs" ).find( ".ui-tabs-nav" ).append( "<li><a href='systemManagement.html'>"+main_system_mngmt+"</a></li>" );
            $( "#tabs" ).tabs( "refresh" );
            $("#tabs").tabs("option", {"active": 0});
       },
       error:function(){
-          alert('Error when tried to get the list of rooms.');
+          alert(err_no_rooms);
       }   
   });
 });
 </script>
 </head>
 <body>
+<p align="right"><img src="cz.png" onclick="changeLang('cz');document.location.reload(true);"/><img src="gb.png" onclick="changeLang('en');document.location.reload(true);"/></p>
 <div id="tabs">
 <ul>
 </ul>

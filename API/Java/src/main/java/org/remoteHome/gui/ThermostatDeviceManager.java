@@ -20,6 +20,7 @@ public class ThermostatDeviceManager  extends AbstractWebService {
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
+        boolean refresh = false;
         try {
             ThermostatDevice device = (ThermostatDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
             String action = requestParameters.get("action");
@@ -33,7 +34,8 @@ public class ThermostatDeviceManager  extends AbstractWebService {
                 Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
                 Boolean manualMode = new Boolean(requestParameters.get("manual"));
                 Boolean heatingEnabled = new Boolean(requestParameters.get("heatingEnabled"));
-                Boolean tempEnabled = new Boolean(requestParameters.get("tempEnabled"));                
+                Boolean tempEnabled = new Boolean(requestParameters.get("tempEnabled"));
+                String room = requestParameters.get("room");
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getFrequency() != tm) device.setFrequency(tm);
                 if (device.getThreshold() != thr) device.setThreshold(thr);
@@ -43,7 +45,12 @@ public class ThermostatDeviceManager  extends AbstractWebService {
                 if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
                 if (device.isManualControl()!= manualMode) device.setManualControl(manualMode);                
                 if (device.isHeatingControllerEnabled()!= heatingEnabled) device.setHeatingControllerEnabled(heatingEnabled);                
-                if (device.isRemoteTemperatureMeterEnabled()!= tempEnabled) device.setRemoteTemperatureMeterEnabled(tempEnabled);                
+                if (device.isRemoteTemperatureMeterEnabled()!= tempEnabled) {
+                    device.setRemoteTemperatureMeterEnabled(tempEnabled);
+                    if (device.isRemoteTemperatureMeterEnabled()) device.setManualControl(true);
+                }
+                if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
+                r.savePersistentData();
             } else if (action.equals("ON")) {
                 device.setRelayOn(true);
             } else if (action.equals("OFF")) {
@@ -52,12 +59,13 @@ public class ThermostatDeviceManager  extends AbstractWebService {
                 for (int i=0; i<14;i++) {
                     device.getTemperatureSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
                 }
+                if (device.isEnabledScheduler()) device.setDeviceExpectedTemperature(device.getTemperatureSchedule().getCurrentExpectedValue());
                 r.savePersistentData();        
             } else if (action.equals("LOADSCH")) {
                 sendAjaxAnswer(device.getTemperatureSchedule().loadSchedule());
                 return;
             }
-            sendAjaxAnswer("OK");
+            if (refresh) sendAjaxAnswer("REFRESH"); else sendAjaxAnswer("OK");
         } catch (Exception e) {
             sendAjaxError(e.getMessage());
         }

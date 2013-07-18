@@ -35,7 +35,7 @@ class RemoteHomeCommunicator extends Thread  {
         this.port = port;
         this.manager = manager;
         connect();
-        getUserNamePassword();
+        //getUserNamePassword();
         this.start();
     }
         
@@ -203,6 +203,7 @@ class RemoteHomeCommunicator extends Thread  {
                             } else {
                                 //Asynchronous command
                                 manager.manageAsynchronousCommand(dataReceived);
+                                dataReceived="";
                             }
                         }
                     }

@@ -2,16 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<!--
-<title>ROOMNAME</title>
-<link rel="stylesheet" href="jquery-ui-1.10.2.custom.css" />
-<link rel="stylesheet" href="brute-select.css" />
-<link rel="stylesheet" href="style.css" />
-<script src="jquery-1.9.1.js"></script>
-<script src="jquery-ui-1.10.2.custom.js"></script>
-<script src="jquery.validate.js"></script>
-<script src="brute-select.js"></script>
--->
 <script>
     (function ($) {
         $.fn.multiAccordion = function() {
@@ -41,11 +31,11 @@
         var dateObject = this;
         YY = ((YYYY=dateObject.getFullYear())+"").slice(-2);
         MM = (M=dateObject.getMonth()+1)<10?('0'+M):M;
-        MMM = (MMMM=["January","February","March","April","May","June","July","August","September","October","November","December"][M-1]).substring(0,3);
+        MMM = (MMMM=[january,february,march,april,may,june,july,august,september,october,november,december][M-1]).substring(0,3);
         DD = (D=dateObject.getDate())<10?('0'+D):D;
-        DDD = (DDDD=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][dateObject.getDay()]).substring(0,3);
-        th=(D>=10&&D<=20)?'th':((dMod=D%10)==1)?'st':(dMod==2)?'nd':(dMod==3)?'rd':'th';
-        formatString = formatString.replace("#YYYY#",YYYY).replace("#YY#",YY).replace("#MMMM#",MMMM).replace("#MMM#",MMM).replace("#MM#",MM).replace("#M#",M).replace("#DDDD#",DDDD).replace("#DDD#",DDD).replace("#DD#",DD).replace("#D#",D).replace("#th#",th);
+        DDD = (DDDD=[sunday,monday,tuesday,wednesday,thursday,friday,saturday][dateObject.getDay()]).substring(0,3);
+        th_=(D>=10&&D<=20)?th:((dMod=D%10)==1)?st:(dMod==2)?nd:(dMod==3)?rd:th;
+        formatString = formatString.replace("#YYYY#",YYYY).replace("#YY#",YY).replace("#MMMM#",MMMM).replace("#MMM#",MMM).replace("#MM#",MM).replace("#M#",M).replace("#DDDD#",DDDD).replace("#DDD#",DDD).replace("#DD#",DD).replace("#D#",D).replace("#th#",th_);
 
         h=(hhh=dateObject.getHours());
         if (h==0) h=24;
@@ -57,7 +47,7 @@
         return formatString.replace("#hhh#",hhh).replace("#hh#",hh).replace("#h#",h).replace("#mm#",mm).replace("#m#",m).replace("#ss#",ss).replace("#s#",s).replace("#ampm#",ampm).replace("#AMPM#",AMPM);
     }
     Date.prototype.europeDate=function(){
-		return this.customFormat("#DD#/#MM#/#YYYY# #hh#:#mm#:#ss#");
+		return this.customFormat("#DD#/#MM#/#YYYY# #hh#:#mm#:#ss# #AMPM#");
     }
  });
  

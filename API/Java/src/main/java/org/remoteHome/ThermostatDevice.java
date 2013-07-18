@@ -37,6 +37,11 @@ public class ThermostatDevice extends AbstractDevice {
     private int deviceExpectedTemperature;
     
     /**
+     * Device Expected temperature, which has been set manually. It is value backed up, when scheduler is enabled.
+     */
+    private int deviceExpectedTemperatureBackedUp;
+    
+    /**
      * State of the relay, true if the relay is ON
      */
     private boolean relayOn;
@@ -115,7 +120,7 @@ public class ThermostatDevice extends AbstractDevice {
             if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
                 try {
                     TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeter());
-                    this.temperature = Integer.parseInt(Float.toString(tsd.getTemperature()*10));
+                    this.temperature = (int)Math.round(tsd.getTemperature()*10);
                 } catch (RemoteHomeManagerException e) {
                     e.printStackTrace();
                 }
@@ -190,6 +195,20 @@ public class ThermostatDevice extends AbstractDevice {
         }        
         m.sendCommand(getDeviceId(), "t="+(deviceExpectedTemperature*2)/10);
         this.deviceExpectedTemperature = deviceExpectedTemperature;
+    }
+
+    /**
+     * @return the deviceExpectedTemperatureBackedUp
+     */
+    public int getDeviceExpectedTemperatureBackedUp() {
+        return deviceExpectedTemperatureBackedUp;
+    }
+
+    /**
+     * @param deviceExpectedTemperatureBackedUp the deviceExpectedTemperatureBackedUp to set
+     */
+    public void setDeviceExpectedTemperatureBackedUp(int deviceExpectedTemperatureBackedUp) {
+        this.deviceExpectedTemperatureBackedUp = deviceExpectedTemperatureBackedUp;
     }
 
     /**
@@ -438,16 +457,19 @@ public class ThermostatDevice extends AbstractDevice {
     }
     
     private void manageRemoteTemperatureSensorAndDeviceRelay() throws RemoteHomeConnectionException {
-                        if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
-                            if (!isManualControl()) {
-                                setManualControl(true);
-                            }
-                            if (getDeviceExpectedTemperature() > (getTemperature() + getThreshold()) ) {
-                                if (!isRelayOn()) setRelayOn(true);
-                            } else {
-                                if (isRelayOn()) setRelayOn(false);                                
-                            }
-                        }
-        
+        if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
+            if (!isManualControl()) {
+               setManualControl(true);
+            }
+            int finalTemp = getTemperature() + getThreshold();
+            if (finalTemp > getDeviceExpectedTemperature()) {
+               if (isRelayOn()) setRelayOn(false);
+            } else {
+               finalTemp = getTemperature() - getThreshold();
+               if (finalTemp < getDeviceExpectedTemperature()) {
+                    if (!isRelayOn()) setRelayOn(true);
+               }
+            }
+        }
     }
 }

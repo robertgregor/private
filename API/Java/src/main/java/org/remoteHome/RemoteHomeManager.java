@@ -1,14 +1,14 @@
 package org.remoteHome;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import com.db4o.Db4oEmbedded;
+import com.db4o.ObjectContainer;
+import com.db4o.config.EmbeddedConfiguration;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,11 +50,9 @@ import java.util.Set;
 public class RemoteHomeManager {
     
     private HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
-    private HashMap<String, HashSet<AbstractDevice>> rooms = new HashMap<String, HashSet<AbstractDevice>>();
     private HashMap<String, AbstractSchedule> schedulers = new HashMap<String, AbstractSchedule>();
     private RemoteHomeCommunicator comm;
-    private File persistentFile;
-    
+    private ApiPersistance persistance = null;
     /**
      * 
      * @param host hostname or IP address of the machine, to which is the communicator connected.
@@ -68,13 +66,14 @@ public class RemoteHomeManager {
      * 
      * @param host hostname or IP address of the machine, to which is the communicator connected.
      * @param port the TCP port, on which the ser2net or comport redirector is listening. (e.g. 2000)
-     * @param file the file to save the configuration and current status of the system.
+     * @param file the file to save the configuration and current status of the system. The ApiPersistance is implemented using db4o
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      */
     public RemoteHomeManager(String host, String port, String file) throws RemoteHomeConnectionException, RemoteHomeManagerException {
         this(host, port);
-        persistentFile = new File(file);
         try {
+            persistance = new Db4oPersistance();
+            persistance.open(file);
             loadPersistentData();
             /*
             HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
@@ -87,6 +86,26 @@ public class RemoteHomeManager {
             throw new RemoteHomeManagerException(e.getMessage(), RemoteHomeManagerException.SERIALIZATION_ERROR);
         }
     }
+
+    /**
+     * 
+     * @param host hostname or IP address of the machine, to which is the communicator connected.
+     * @param port the TCP port, on which the ser2net or comport redirector is listening. (e.g. 2000)
+     * @param persistance the persistance class, which implements the interface to persist the data about devices
+     * @param persistanceOpenParams are the parameters to use in the open method (e.g. DB connection parameters...)
+     * @throws RemoteHomeConnectionException if there is a problem with the connection
+     */
+    public RemoteHomeManager(String host, String port, ApiPersistance persistance, String[] persistanceOpenParams) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        this(host, port);
+        try {
+            this.persistance = persistance;
+            persistance.open(persistanceOpenParams);
+            loadPersistentData();
+        } catch (Exception e) {
+            throw new RemoteHomeManagerException(e.getMessage(), RemoteHomeManagerException.SERIALIZATION_ERROR);
+        }
+    }
+    
     /**
      * This method creates the device inside the API. API is using it to e.g. update the device, when the status arrives.
      * For multiple devices, use the method createRemoteHomeMultipleDevice.<br/><br/>
@@ -212,32 +231,6 @@ public class RemoteHomeManager {
                }
            }
     }
-    /**
-     * Adds the new room to the system
-     * 
-     * @param name is the name of the room
-     * @return false if the room already exist. Returns true if the room has been added.
-     */
-    public boolean addRoom(String name) {
-        if (rooms.containsKey(name)) return false;
-        rooms.put(name, new HashSet<AbstractDevice>());
-        return true;
-    }
-    /**
-     * Removes empty room from the system
-     * 
-     * @param name is the name of the room
-     * @return false if the room cannot be removed, because it is not empty or doesn't exist. Returns true if the room has been removed.
-     */
-    public boolean removeRoom(String name) {
-        if (!rooms.containsKey(name)) return false;
-        if (rooms.get(name).size() == 0) {
-            rooms.remove(name);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * Get devices in the room
@@ -246,39 +239,33 @@ public class RemoteHomeManager {
      * @return HashSet of the room objects
      */
     public HashSet<AbstractDevice> getDevicesInRoom(String name) {
-        if (!rooms.containsKey(name)) return new HashSet<AbstractDevice>();
-        return rooms.get(name);
+        HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
+        Iterator devs = devices.values().iterator();
+        while (devs.hasNext()) {
+            AbstractDevice d = (AbstractDevice)devs.next();
+            if (d.getRoomName().equals(name)) {
+                h.add(d);
+            } 
+        }
+        return h;
     }
-
-    /**
-     * Add device to room
-     * @param roomName is the name of the room. If it is not exist, it will be added.
-     * @param device is the device to add
-     * @return false if the device already exist in that room or the room name doesn't exist.
-     */
-    public boolean addDeviceToRoom(String roomName, AbstractDevice device) {
-        if (!rooms.containsKey(roomName)) rooms.put(roomName, new HashSet<AbstractDevice>());
-        boolean status = rooms.get(roomName).add(device);        
-        return status;
-    }    
     
-    /**
-     * Remove device from room
-     * @param roomName is the name of the room.
-     * @param device is the device to remove
-     * @return false if the device or room not exist.
-     */
-    public boolean removeDeviceFromRoom(String roomName, AbstractDevice device) {
-        if (!rooms.containsKey(roomName)) return false;
-        return rooms.get(roomName).remove(device);
-    }    
-
     /**
      * Get rooms
      * @return list of the rooms
      */
     public HashMap<String, HashSet<AbstractDevice>> getRooms() {
-        return rooms;
+        HashSet<String> rooms = new HashSet<String>();
+        Iterator devs = devices.values().iterator();
+        while (devs.hasNext()) {
+            AbstractDevice d = (AbstractDevice)devs.next();
+            rooms.add(d.getRoomName());
+        }        
+        HashMap<String, HashSet<AbstractDevice>> h = new HashMap<String, HashSet<AbstractDevice>>();
+        for (String room : rooms) {
+            h.put(room, getDevicesInRoom(room));
+        }
+        return h;
     }
 
     /**
@@ -334,6 +321,7 @@ public class RemoteHomeManager {
             comm.disconnect();
             try {
                 savePersistentData();
+                getPersistance().close();
             } catch (IOException e) {
                 throw new RemoteHomeManagerException(e.getMessage(),RemoteHomeManagerException.SERIALIZATION_ERROR);
             }
@@ -343,31 +331,30 @@ public class RemoteHomeManager {
      * This method will load the configuration from the file
      */
     private void loadPersistentData() throws Exception {
-        if (persistentFile.exists()) {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(persistentFile));
-            devices = (HashMap<Integer, AbstractDevice>)ois.readObject();
-            if (devices == null) devices = new HashMap<Integer, AbstractDevice>();
-            rooms = (HashMap<String, HashSet<AbstractDevice>>)ois.readObject();
-            if (rooms == null) rooms = new HashMap<String, HashSet<AbstractDevice>>();
-            schedulers = ((HashMap<String, AbstractSchedule>)ois.readObject());
-            if (schedulers == null) schedulers = new HashMap<String, AbstractSchedule>();
-            ois.close();
+        if (getPersistance() != null) {
+            devices = getPersistance().loadDevices();
+            schedulers = getPersistance().loadSchedulers();
             for (AbstractDevice dev : devices.values()) {
                 dev.m = this;
                 dev.startScheduling();
-            }
-        }      
+            }      
+        }
     }
+
+    /**
+     * @return the persistance
+     */
+    public ApiPersistance getPersistance() {
+        return persistance;
+    }
+
     /*
      * This method will save the configuration to the file on the disk.
      */
     public void savePersistentData() throws IOException {
-        if (persistentFile != null) {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(persistentFile));
-            out.writeObject(devices);
-            out.writeObject(rooms);
-            out.writeObject(getSchedulers());
-            out.close();
+        if (getPersistance() != null) {
+            getPersistance().saveDevices(devices);
+            getPersistance().saveSchedulers(schedulers);
         }
     }
     /*
@@ -414,7 +401,7 @@ public class RemoteHomeManager {
     
     public static void main(String... args) throws Exception {
         if ((args.length < 2) && (args.length > 4)) {        
-            System.out.println("2 parametrs host, port; 3 parameters host, port, file; 4 parameters host, port, file, webServerPort;");
+            System.out.println("2 parametrs: host, port\n3 parameters: host, port, file\n4 parameters: host, port, file, webServerPort\n");
             return;
         }        
         if (args.length == 2) {
@@ -429,5 +416,5 @@ public class RemoteHomeManager {
             webServer.startServer();
             manager.joinCommThread();            
         }
-    }    
+    }
 }

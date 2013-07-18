@@ -14,6 +14,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
+import org.remoteHome.AbstractDevice;
 import org.remoteHome.RemoteHomeManager;
 
 /**
@@ -58,7 +60,6 @@ public class WebServerHandler implements HttpHandler {
                 String parameters = getRequest.replaceAll("/", "");
                 parameters = parameters.substring(parameters.indexOf('?')+1);
                 HashMap<String, String> parsedParameters = parseParameters(parameters);
-                System.out.println(parameters);
                 WebService w = (WebService)Class.forName("org.remoteHome.gui."+parsedParameters.get("ServiceName")).newInstance();
                 w.setParameters(remoteHomemanager);
                 w.processRequest(parsedParameters, out, t);

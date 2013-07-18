@@ -28,7 +28,7 @@ public class SchedulersManager extends AbstractWebService {
             String action = requestParameters.get("action");
             if (action.equals("LOAD")) {
                 if (requestParameters.get("type").equalsIgnoreCase("OnOff")) {
-                    if (r.getSchedulers().keySet() == null) {
+                    if ((r.getSchedulers().keySet() == null) || (r.getSchedulers().isEmpty())) {
                         sendAjaxAnswer("");                        
                     } else {
                         TreeSet<String> names = new TreeSet<String>(r.getSchedulers().keySet());
@@ -42,7 +42,7 @@ public class SchedulersManager extends AbstractWebService {
                         sendAjaxAnswer(sb.toString());
                     }
                 } else if (requestParameters.get("type").equalsIgnoreCase("Temperature")) {
-                    if (r.getSchedulers().keySet() == null) {
+                    if ((r.getSchedulers().keySet() == null) || (r.getSchedulers().isEmpty())) {
                         sendAjaxAnswer("");                        
                     } else {
                         TreeSet<String> names = new TreeSet<String>(r.getSchedulers().keySet());
@@ -56,7 +56,7 @@ public class SchedulersManager extends AbstractWebService {
                         sendAjaxAnswer(sb.toString());
                     }
                 } else if (requestParameters.get("type").equalsIgnoreCase("Percentage")) {
-                    if (r.getSchedulers().keySet() == null) {
+                    if ((r.getSchedulers().keySet() == null) || (r.getSchedulers().isEmpty())) {
                         sendAjaxAnswer("");                        
                     } else {
                         TreeSet<String> names = new TreeSet<String>(r.getSchedulers().keySet());
@@ -79,6 +79,7 @@ public class SchedulersManager extends AbstractWebService {
                         return;
                     }
                     OnOffSchedule schd = new OnOffSchedule();
+                    schd.setName(name);
                     for (int i=0; i<14;i++) {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
@@ -92,6 +93,7 @@ public class SchedulersManager extends AbstractWebService {
                         return;
                     }
                     TemperatureSchedule schd = new TemperatureSchedule();
+                    schd.setName(name);
                     for (int i=0; i<14;i++) {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
@@ -105,6 +107,7 @@ public class SchedulersManager extends AbstractWebService {
                         return;
                     }
                     PercentageSchedule schd = new PercentageSchedule();
+                    schd.setName(name);
                     for (int i=0; i<14;i++) {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
@@ -158,8 +161,8 @@ public class SchedulersManager extends AbstractWebService {
                 }
             }
             if (action.equals("DELETE")) {
+                r.getPersistance().deleteScheduler(r.getSchedulers().get("name"));
                 r.getSchedulers().remove(requestParameters.get("name"));
-                    r.savePersistentData();
                     sendAjaxAnswer("OK");                
             }
             if (action.equals("GET")) {

@@ -4,7 +4,9 @@
 <meta charset="utf-8" />
 <script>
 $(function() {
-  $("#accordion").accordion();  
+  $("#accordion").accordion();
+  $("#addNewDeviceForm").button();
+  $("#setChPwd").button();
   $("#addDeviceForm").submit(function(event) {
   event.preventDefault();    
   if ($(this).valid()) {
@@ -20,28 +22,10 @@ $(function() {
            $("#addDeviceForm").each(function(){ 
                this.reset();
            });
+           document.location.reload(true);
       },
       error:function(){
-          $("#addDeviceResult").html('Error when tried to add the device.');
-      }   
-    });
-  }
-  });
-  $("#addRoomForm").submit(function(event) {
-  event.preventDefault();
-  if ($(this).valid()) {
-   $("#addRoomResult").html('');
-   var values = $(this).serialize();
-    $.ajax({
-      url: "/",
-      'cache' : false,
-      type: "get",
-      data: values,
-      success: function(data){
-           window.location.reload(true);
-      },
-      error:function(){
-          $("#addRoomResult").html('Error when tried to add the room.');
+          $("#addDeviceResult").html(err_add_device);
       }   
     });
   }
@@ -60,12 +44,12 @@ $(function() {
            $("#changeChannelPassowrdResult").html(data);
       },
       error:function(){
-          $("#changeChannelPassowrdResult").html('Error when tried to change the channel / password.');
+          $("#changeChannelPassowrdResult").html(err_change_channelPwd);
       }   
     });
   }
   });
-  $("#deviceIdLoader").click(function(){  
+  $("#deviceIdLoader").button().click(function(){  
     $.ajax({
       url: "/",
       'cache' : false,
@@ -75,7 +59,7 @@ $(function() {
           document.getElementById("addDeviceId").value = freeId;
       },
       error:function(){
-          alert('Error when tried to get the free device id.');
+          alert(err_free_deviceId);
       }   
     });
   });
@@ -90,29 +74,21 @@ $(document).ready(function(){
      roomName : { required : true }
     },
     messages: {
-        addDeviceId : { required : "Please enter some device Id.", range: "Your device ID should be in the range 1..255."},
-        addSubDeviceId : { range: "Your sub device ID should be the number."},
-        addDeviceName : { required : "Please enter some device name." },
-        type : { required : "Please enter the type of the device." },
-        roomName : { required : "Please select the room, where the device is placed." }
-    }
-  });
-  $("#addRoomForm").validate({
-    rules: {
-     roomName : { required : true }
-    },
-    messages: {
-        addDeviceId : { required : "Please enter the room name."}        
+        addDeviceId : { required : err_enter_device_id, range: err_device_id_range},
+        addSubDeviceId : { range: err_subdevice_number},
+        addDeviceName : { required : err_device_name },
+        type : { required : err_device_type },
+        roomName : { required : err_device_room }
     }
   });
   $("#changeChannelPassowrd").validate({
     rules: {
      channel : { required : true, range: [1, 83] },
-     password : { required : true, exactlength : 5 }
+     password : { required : true, exactlength : 9 }
     },
     messages: {
-        channel : { required : "Please enter the channel.", range : "The radio has 83 channels, the range is 1 - 83." },
-        password : { required : "Please enter the password.", exactlength : "The password should have exactly 5 characters." }
+        channel : { required : err_channel_empty, range : err_channel_range },
+        password : { required : err_pwd_empty, exactlength : err_pwd_range }
     }
   });
   $.ajax({
@@ -122,12 +98,13 @@ $(document).ready(function(){
       data: "ServiceName=LoadAllRooms&"+Math.floor((Math.random()*100)+1),
       success: function(roomsData) {
            rooms = roomsData.split("\n");
-           for (var i=0; i<rooms.length; i++) {
-                $('#addDeviceLocation').append('<option value="'+rooms[i]+'">'+rooms[i]+'</option>');
-           }
+           $( "#addDeviceLocation" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#addDeviceLocation').val().length == 0) $('#addDeviceLocation').autocomplete(\"search\", \"\"); ",1);
+              });
       },
       error:function(){
-          alert('Error when tried to get the list of rooms.');
+          alert(err_no_rooms);
       }   
   });
   $.ajax({
@@ -140,99 +117,94 @@ $(document).ready(function(){
            document.getElementById("password").value = data.split("\n")[1];
       },
       error:function(){
-          alert('Error when tried to get the channel password.');
+          alert(err_get_channel_pwd);
       }   
   });
 });
+setLabel("add_new_device");
+setLabel("add_new_device_desc");
+setLabel("new_device_id");
+setLabel("new_subdevice_id");
+document.getElementById('addDeviceId').title = new_device_id_desc;
+document.getElementById('addSubDeviceId').title = new_subdevice_id_desc;
+document.getElementById('addDeviceName').title = new_device_name_desc;
+document.getElementById('addDeviceLocation').title = room_name_desc;
+document.getElementById('deviceIdLoader').value = get_device_id;
+document.getElementById('addNewDeviceForm').value = add_new_device_form;
+document.getElementById('setChPwd').value = setChPwd_form;
+setLabel("new_device_name");
+setLabel("room_name");
+setLabel("device_type");
+setLabel("LightAlarmDevice");
+setLabel("TemperatureSensor");
+setLabel("SimpleSwitch");
+setLabel("HeatingHeader");
+setLabel("BlindsControllerDevice");
+setLabel("Thermostat");
+setLabel("ThermostatWithSwitchAndTempSensorDevice");
+setLabel("channel_password_cfg");
+setLabel("channel_device");
+setLabel("password_device");
+document.getElementById('channel').title = channel_device_desc;
+document.getElementById('password').title = password_device_desc;
+setLabel("wifi_configuration");
+
 </script>
 </head>
 <body>
     <div id="accordion">
-<h3>Add new device</h3>
+<h3><span id="add_new_device"></span></h3>
     <div>    
-        <p>Here you can add new device. Please note that the only <b>one</b> new device (with id = 0) should be powered on.</p>
+        <p><span id="add_new_device_desc"></span></p>
         <form id="addDeviceForm">
            <input type="hidden" name="ServiceName" value="AddNewDevice"/>
-           <table>
+           <table style="text-align:left;">
            <tr>
-           <td><label for="addDeviceId">New device ID:</label></td><td><input name="addDeviceId" id="addDeviceId" title="The new device ID should not exist in the system."/></td><td><button id="deviceIdLoader">Get available ID</button></td>
+           <td><label for="addDeviceId"><span id="new_device_id"></span></label></td><td><input name="addDeviceId" id="addDeviceId"/></td><td><input id="deviceIdLoader" /></td>
            </tr>
-           <td><label for="addSubDeviceId">New sub device ID:</label></td><td><input name="addSubDeviceId" id="addSubDeviceId" title="The sub device id is used only if you have multiple device board."/></td><td>&nbsp;</td>
+           <tr>
+           <td><label for="addSubDeviceId"><span id="new_subdevice_id"></span></label></td><td><input name="addSubDeviceId" id="addSubDeviceId"/></td><td>&nbsp;</td>
            </tr>           
            <tr>
-           <td><label for="addDeviceName">New device name:</label></td><td><input name="addDeviceName" id="addDeviceName" title="Identifier, which represents the device."/></td><td>&nbsp;</td>
-           </tr><tr><td><label for="addDeviceLocation">Room name:</label></td><td colspan="2">
-                   <select name="roomName" id="addDeviceLocation">
-                   </select>
-           </td></tr><td><label for="type">Type of the device:</label></td><td colspan="2">
+           <td><label for="addDeviceName"><span id="new_device_name"></span></label></td><td><input name="addDeviceName" id="addDeviceName"/></td><td>&nbsp;</td>
+           </tr>
+           <tr>
+           <td><label for="addDeviceLocation"><span id="room_name"></span></label></td><td><input name="roomName" id="addDeviceLocation" /></td><td>&nbsp;</td>
+           </tr>
+           <tr>
+           <td><label for="type"><span id="device_type"></span></label></td><td>
                <select name="type" id="typeOfTheDevice" >
-                    <option value="1">LightAlarmDevice</option>
-                    <option value="2">TemperatureSensor</option>
-                    <option value="3">SimpleSwitch</option>
-                    <option value="4">HeatingHeader</option>
-                    <option value="5">BlindsControllerDevice</option>
-                    <option value="6">Thermostat</option>
-                    <option value="8">ThermostatWithSwitchAndTempSensorDevice</option>
-                    
-               </select>               
-           </td></tr><tr><td>&nbsp;</td><td>
-           <input type="submit" value="Add new device"/></td><td><div id="addDeviceResult">&nbsp;</div></td>
+                    <option id="LightAlarmDevice" value="1"></option>
+                    <option id="TemperatureSensor" value="2"></option>
+                    <option id="SimpleSwitch" value="3"></option>
+                    <option id="HeatingHeader" value="4"></option>
+                    <option id="BlindsControllerDevice" value="5"></option>
+                    <option id="Thermostat" value="6"></option>
+                    <option id="ThermostatWithSwitchAndTempSensorDevice" value="8"></option>                    
+               </select></td><td>&nbsp;</td>               
+           </tr>
+           <tr><td>&nbsp;</td><td><input id="addNewDeviceForm" type="submit"/></td><td><div id="addDeviceResult">&nbsp;</div></td>
            </tr></table>
         </form>
     </div>
-<h3>Rooms management</h3>
+<h3><span id="channel_password_cfg"></span></h3>
     <div>
-        <p>Here you can manage the rooms of your home.</p>
-        <form id="addRoomForm">        
-        <p><label for="roomName">New room name:</label><input name="roomName" id="roomName" title="The room name to be added."/></p>
-           <input type="hidden" name="ServiceName" value="AddRoom"/>
-           <input type="submit" value="Add new room"/>
-        </form>
-        <div id="addRoomResult">&nbsp;</div>        
-    </div>
-<h3>Channel/Password configuration</h3>
-    <div>
-        <p>Here you can see and change the settings of the system. Please note, that this should be done only at the beginning of the configuration. If you 
-            change the channel or password here, it is done only locally so the already existing devices stop to work. You have to reset the device one by one and 
-            assign the device id again. (During the assigning procedure, the device will obtain correct channel and password.)
-        </p>
+        <p><span id="channel_password_cfg_text"></span></p>
         <form id="changeChannelPassowrd">
             <table><tr>
-            <td><label for="channel">Channel:</label></td><td><input name="channel" id="channel" title="The communication channel."/></td>
+            <td><label for="channel"><span id="channel_device"></span></label></td><td><input name="channel" id="channel" /></td>
             </tr>
             <tr>
-            <td><label for="password">Password:</label></td><td><input name="password" id="password" title="The password for communication."/></td>
+            <td><label for="password"><span id="password_device"></span></label></td><td><input name="password" id="password" /></td>
             </tr>
             <tr>
-            <td><input type="hidden" name="ServiceName" value="ChangeChannelPwd"/><input type="submit" value="Configure"/></td><td><div id="changeChannelPassowrdResult">&nbsp;</div></td>
+            <td><input type="hidden" name="ServiceName" value="ChangeChannelPwd"/><input id="setChPwd" type="submit" /></td><td><div id="changeChannelPassowrdResult">&nbsp;</div></td>
             </tr>           
             </table>
         </form>                
     </div>
-<h3>Wireless network configuration</h3>
+<h3><span id="wifi_configuration"></span></h3>
     <div>
-        <p>Wifi configuration</p>
-            <table class="ui-widget" style="border-collapse: collapse;">
-              <thead class="ui-widget-header">
-                <tr>
-                <th>Title</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                </tr>
-                </thead>
-                <tbody class="ui-widget-content">
-                <tr>
-                <td><span>[title]</span></td>
-                <td><span>[start date]</span> </td>
-                <td><span>[end date]</span></td>
-                </tr>
-                <tr>
-                <td><span>[title]</span></td>
-                <td><span>[start date]</span> </td>
-                <td><span>[end date]</span></td>
-                </tr>
-                </tbody>
-                </table>
     </div>
 </div>    
 </body>

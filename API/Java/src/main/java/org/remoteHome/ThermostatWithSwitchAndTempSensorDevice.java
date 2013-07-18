@@ -21,8 +21,27 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
    /**
      * Device Expected temperature
      */
+    private int temperature;
+    
+   /**
+     * Device Expected temperature
+     */
     private int deviceExpectedTemperature;
     
+   /**
+     * Device Expected temperature, which has been set manually. It is value backed up, when scheduler is enabled.
+     */
+    private int deviceExpectedTemperatureBackedUp;
+   /**
+     * State of the relay, true if the relay is ON
+     */
+    private boolean relayOn;
+    
+    /**
+     * State of the manual control mode, true if the manual control is ON (Relay is not controlled using the expected temperature.)
+     */
+    private boolean manualControl;
+
     /**
      * Threshold 0 - 9. For the self managed mode, the threshold could be set. It means that relay will go off when currentTemperature + threshold / 10 > expected temperature and will<br/>
      * go on, when currentTemperature - threshold / 10 < expected temperature<br/>
@@ -93,7 +112,22 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
     @Override
     protected void manageAsynchronousCommand(String[] items) {
     }
-    
+    /**
+     * Set state of the relay, true if the relay should go ON
+     * @param relayOn the relayState to set
+     * @throws RemoteHomeConnectionException if there is a problem with communication
+     */
+    public void relayOn(boolean relayOn) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        SimpleSwitchDevice ssd = (SimpleSwitchDevice)m.getDevice(getSimpleSwitchDeviceId());
+        setManualControl(true);
+        if (relayOn) {
+            ssd.switchOn();
+            setRelayOn(true);
+        } else {
+            ssd.switchOff();
+            setRelayOn(false);
+        }
+    }
     /**
      * This method will start the scheduler thread to process the schedule.
      */
@@ -101,11 +135,13 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
         String deviceTemp = Integer.toString((getDeviceExpectedTemperature()*2)/10,16).toUpperCase();
         while (deviceTemp.length() < 2) deviceTemp = "0" + deviceTemp;
         getTemperatureSchedule().setCurrentState(deviceTemp);
+        if (isEnabledScheduler()) setDeviceExpectedTemperature(getTemperatureSchedule().getCurrentExpectedValue());
         new Thread(new Runnable() {
             public void run() {
                 while(true) {
                     try {
                         Thread.sleep(60000);
+                        if (isManualControl()) continue;
                         //manage heating controller
                         if (getSimpleSwitchDeviceId() == 0) continue;
                         if (getRemoteTemperatureMeterId() == 0) continue;
@@ -115,6 +151,7 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
                                 SimpleSwitchDevice ssd = (SimpleSwitchDevice)m.getDevice(getSimpleSwitchDeviceId());
                                 ssd.updateDevice();
                                 if (ssd.isCurrentState()) {
+                                    setRelayOn(true);
                                     //ok, get the device and check if it is on
                                     SimpleSwitchDevice heatingUnit = (SimpleSwitchDevice)m.getDevice(getHeatingController());
                                     if (heatingUnit.updatedBefore(1)) heatingUnit.updateDevice();
@@ -124,6 +161,8 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
                                         }
                                         heatingUnit.switchOnForConfiguredPeriod();
                                     }
+                                } else {
+                                    setRelayOn(false);
                                 }
                             } catch (RemoteHomeConnectionException e) {
                                 e.printStackTrace();
@@ -139,11 +178,11 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
                         if (((min % 15) == 0) || (min == 0)) {
                             Integer temperature = getTemperatureSchedule().processSchedule();
                             if (temperature != null) {
+                                setDeviceExpectedTemperature(temperature);
                                 //something has to be done.
                                 manageRemoteTemperatureSensorAndDeviceRelay();
                             }
                         }
-                        Thread.sleep(60000);
                     } catch (InterruptedException e) {
                         return;
                     } catch (RemoteHomeConnectionException e) {
@@ -157,15 +196,53 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
     }
     
     private void manageRemoteTemperatureSensorAndDeviceRelay() throws RemoteHomeConnectionException, RemoteHomeManagerException {        
-        TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeterId());        
-        int temperature = Integer.parseInt(Float.toString(tsd.getTemperature()*10));
+        TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeterId());  
+        int temperature = (int)Math.round(tsd.getTemperature()*10);
+        setTemperature(temperature);
         SimpleSwitchDevice ssd = (SimpleSwitchDevice)m.getDevice(getSimpleSwitchDeviceId());        
-        
-        if (getDeviceExpectedTemperature() > (temperature + getThreshold()) ) {
-               if (!ssd.isCurrentState()) ssd.switchOn();
+        int finalTemp = temperature + getThreshold();
+        if (finalTemp > getDeviceExpectedTemperature()) {
+               if (ssd.isCurrentState()) {
+                   ssd.switchOff();
+                   setRelayOn(false);
+               }
         } else {
-               if (ssd.isCurrentState()) ssd.switchOff();                                
+               finalTemp = temperature - getThreshold();
+               if (finalTemp < getDeviceExpectedTemperature()) {
+                    if (!ssd.isCurrentState()) {
+                        ssd.switchOn();
+                        setRelayOn(true);
+                    }
+               }
         }        
+    }
+
+    /**
+     * @return the relayOn
+     */
+    public boolean isRelayOn() {
+        return relayOn;
+    }
+
+    /**
+     * @param relayOn the relayOn to set
+     */
+    public void setRelayOn(boolean relayOn) {
+        this.relayOn = relayOn;
+    }
+
+    /**
+     * @return the manualControl
+     */
+    public boolean isManualControl() {
+        return manualControl;
+    }
+
+    /**
+     * @param manualControl the manualControl to set
+     */
+    public void setManualControl(boolean manualControl) {
+        this.manualControl = manualControl;
     }
 
 
@@ -181,6 +258,34 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
      */
     public void setDeviceExpectedTemperature(int deviceExpectedTemperature) {
         this.deviceExpectedTemperature = deviceExpectedTemperature;
+    }
+
+    /**
+     * @return the deviceExpectedTemperatureBackedUp
+     */
+    public int getDeviceExpectedTemperatureBackedUp() {
+        return deviceExpectedTemperatureBackedUp;
+    }
+
+    /**
+     * @param deviceExpectedTemperatureBackedUp the deviceExpectedTemperatureBackedUp to set
+     */
+    public void setDeviceExpectedTemperatureBackedUp(int deviceExpectedTemperatureBackedUp) {
+        this.deviceExpectedTemperatureBackedUp = deviceExpectedTemperatureBackedUp;
+    }
+
+    /**
+     * @return the temperature
+     */
+    public int getTemperature() {
+        return temperature;
+    }
+
+    /**
+     * @param temperature the temperature to set
+     */
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
     }
 
     /**
@@ -208,6 +313,11 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
      * @param enabledScheduler the enabledScheduler to set
      */
     public void setEnabledScheduler(boolean enabledScheduler) {
+        if (enabledScheduler) {
+            if (!this.enabledScheduler) setDeviceExpectedTemperatureBackedUp(getDeviceExpectedTemperature());
+        } else {
+            if (this.enabledScheduler) setDeviceExpectedTemperature(getDeviceExpectedTemperatureBackedUp());
+        }
         this.enabledScheduler = enabledScheduler;
     }
 

@@ -19,7 +19,8 @@ public abstract class AbstractSchedule implements Serializable {
     protected String scheduleStreamFriday =    "";
     protected String scheduleStreamSaturday =  "";
     protected String scheduleStreamSunday =    "";
-
+    
+    private String name;
     /**
      * If true, schedule is enabled, false disabled
      */
@@ -140,5 +141,19 @@ public abstract class AbstractSchedule implements Serializable {
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

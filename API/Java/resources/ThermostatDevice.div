@@ -13,6 +13,8 @@ function updateStatusCOMPONENTID(showError) {
           var data = JSON.parse(indata);
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           document.getElementById("periodCOMPONENTID").innerHTML=data.frequency;          
           document.getElementById("currPeriodFormCOMPONENTID").value=data.frequency;
@@ -72,6 +74,7 @@ function updateStatusCOMPONENTID(showError) {
   });
 }
 $(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs();
     $( "#onThermostatCOMPONENTID" ).button().click(function() {
           $.ajax({
               url: "/",
@@ -86,6 +89,10 @@ $(function() {
             }   
           });
     });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
     $( "#offThermostatCOMPONENTID" ).button().click(function() {
           $.ajax({
               url: "/",
@@ -191,17 +198,26 @@ $(function() {
               alert('Remote temperature meter Id should be number between 0 and 255!');
               return;
           }
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert('Room name should exist!');
+              return;
+          }
           var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
           var manual = document.getElementById("checkboxManualModeCOMPONENTID").checked?"TRUE":"FALSE";
           var heatingEnabled = document.getElementById("checkboxHeatingControllerEnabledCOMPONENTID").checked?"TRUE":"FALSE";
           var tempEnabled = document.getElementById("checkboxRemoteTemperatureMeterEnabledCOMPONENTID").checked?"TRUE":"FALSE";
-
+          if ((tempEnabled == "TRUE") && (manual = "FALSE")) {
+                alert('If remote temperature meter is enabled, manual mode should be enabled!');
+                return;
+          }
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&tm="+tm+"&thr="+thr+"&heatingId="+heatingId+"&remoteTempId="+remoteTempId+"&schenabled="+schenabled+"&manual="+manual+"&heatingEnabled="+heatingEnabled+"&tempEnabled="+tempEnabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&tm="+tm+"&thr="+thr+"&room="+encodeURIComponent(room)+"&heatingId="+heatingId+"&remoteTempId="+remoteTempId+"&schenabled="+schenabled+"&manual="+manual+"&heatingEnabled="+heatingEnabled+"&tempEnabled="+tempEnabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
+                if (data == "REFRESH") document.location.reload(true);
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
@@ -334,120 +350,109 @@ $(function() {
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
-    }, 120000);
+    }, 300000);
 });
 </script>
-<table width="100%"><tr>
-<td>
-    <table width="100%">
-      <tr>
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-1">Actions</a></li>
+        <li><a href="#componentTabsCOMPONENTID-2">Status</a></li>
+        <li><a href="#componentTabsCOMPONENTID-3">Configuration</a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-1">
+        <br/>
+        <br/>
+        <table><tr>
         <td><input type="submit" id="onThermostatCOMPONENTID" value="Switch on" /></td>
         <td><input type="submit" id="offThermostatCOMPONENTID" value="Switch off" /></td>
-      </tr>
-      <tr><td  width="100%" colspan="2">&nbsp;</td></tr>
-      <tr><td  width="100%" colspan="2">&nbsp;</td></tr>
-      <tr><td  width="100%" colspan="2"><button id="scheduleButtCOMPONENTID">Scheduler</button></td></tr>
-    </table>
-</td>
-<td>
-    <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+        <td><button id="scheduleButtCOMPONENTID">Scheduler</button></td>
+        </tr></table>
+    </div>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
               <thead class="ui-widget-header">
                 <tr>
                 <th>Property</th>
                 <th>Value</th>
-                <th>Parameter</th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td>Name:</td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td>Temperature:</td><td><span id='temperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td></tr>
+                <tr><td>State:</td><td><span id='stateCOMPONENTID'></span></td></tr>
+                <tr><td>Temperature meter ID:</td><td><span id='remoteTemperatureMeterCOMPONENTID'></span></td></tr>
+                <tr><td>Remote temperature meter enabled:</td><td><span id='remoteTemperatureMeterEnabledCOMPONENTID'></span></td></tr>
+                <tr><td>Heating control enabled:</td><td><span id='heatingControllerEnabledCOMPONENTID'></span></td></tr>
+                <tr><td>Scheduler enabled:</td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th>Property</th>
                 <th>Value</th>
                 </tr>
-                </thead>
-                <tbody class="ui-widget-content">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td>Component id:</td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td>Expected temperature:</td><td><span id='expTemperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td></tr>
+                <tr><td>Threshold:</td><td><span id='thresholdCOMPONENTID'></span>&nbsp;Deg. celsius</td></tr>
+                <tr><td>Mode:</td><td><span id='manualModeCOMPONENTID'></span></span></td></tr>
+                <tr><td>Heating controller ID:</td><td><span id='heatingControllerCOMPONENTID'></span></td></tr>
+                <tr><td>Last update timestamp:</td><td><span id='timestampCOMPONENTID'></span></td></tr>
+                <tr><td>Room name:</td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td>Measuring period:</td><td><span id='periodCOMPONENTID'></span>&nbsp;seconds</td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" />
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Name</td>
-                <td><span id='nameCOMPONENTID'></span></td>
-                <td>Name:</td>
-                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                <th>Property</th>
+                <th>Value</th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td>Name:</td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td>Expected temperature:</td><td><input type="text" id="expTemperatureFormCOMPONENTID" /></td></tr>
+                <tr><td>Threshold:</td><td><input type="text" id="thresholdFormCOMPONENTID" /></td></tr>
+                <tr><td>Enabled scheduler:</td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td>Enabled manual mode:</td><td><input type="checkbox" id="checkboxManualModeCOMPONENTID" /><label for="checkboxManualModeCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td>Heating control enabled:</td><td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>State</td>
-                <td><span id='stateCOMPONENTID'></span></td>
-                <td>Sending configure period:</td>
-                <td><input type="text" id="currPeriodFormCOMPONENTID" /></td>
+                <th>Property</th>
+                <th>Value</th>
                 </tr>
-                <tr>
-                <td>Component id</td>
-                <td><span id='compIdCOMPONENTID'></span></td>
-                <td>Configure expected temperature:</td>
-                <td><input type="text" id="expTemperatureFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Period</td>
-                <td><span id='periodCOMPONENTID'></span>&nbsp;seconds</td>
-                <td>Configure threshold:</td>
-                <td><input type="text" id="thresholdFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Expected temperature</td>
-                <td><span id='expTemperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
-                <td>Configure heating unit Id:</td>
-                <td><input type="text" id="heatingControllerFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Threshold</td>
-                <td>0.<span id='thresholdCOMPONENTID'></span>&nbsp;Deg. celsius</td>
-                <td>Configure remote temperature meter Id:</td>
-                <td><input type="text" id="remoteTemperatureMeterFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Current temperature</td>
-                <td><span id='temperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
-                <td>Enabled scheduler:</td>
-                <td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Enabled scheduler</td>
-                <td><span id='enabledSchedulerCOMPONENTID'></span></td>
-                <td>Manual mode:</td>
-                <td><input type="checkbox" id="checkboxManualModeCOMPONENTID" /><label for="checkboxManualModeCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Mode</td>
-                <td><span id='manualModeCOMPONENTID'></span></td>
-                <td>Enabled heating unit:</td>
-                <td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Enabled heating unit</td>
-                <td><span id='heatingControllerEnabledCOMPONENTID'></span></td>
-                <td>Enabled remote temperature meter:</td>
-                <td><input type="checkbox" id="checkboxRemoteTemperatureMeterEnabledCOMPONENTID" /><label for="checkboxRemoteTemperatureMeterEnabledCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Heating unit Id</td>
-                <td><span id='heatingControllerCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Enabled remote temperature meter</td>
-                <td><span id='remoteTemperatureMeterEnabledCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Remote temperature meter Id</td>
-                <td><span id='remoteTemperatureMeterCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Last update timestamp</td>
-                <td><span id='timestampCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
-                </tr>
-                </tbody>
-    </table>
-</td>
-</tr></table>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td>Measuring period:</td><td><input type="text" id="currPeriodFormCOMPONENTID" /></td></tr>
+                <tr><td>Remote temperature meter ID:</td><td><input type="text" id="remoteTemperatureMeterFormCOMPONENTID" /></td></tr>
+                <tr><td>Heating controller ID:</td><td><input type="text" id="heatingControllerFormCOMPONENTID" /></td></tr>
+                <tr><td>Room name:</td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td>Remote temperature meter enabled:</td><td><input type="checkbox" id="checkboxRemoteTemperatureMeterEnabledCOMPONENTID" /><label for="checkboxRemoteTemperatureMeterEnabledCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" value="Change configuration" />        
+    </div>
 <div id="schDialogCOMPONENTID" title="Temperature scheduler">
     <div id="schDialog2COMPONENTID">
     </div>

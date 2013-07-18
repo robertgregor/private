@@ -115,7 +115,7 @@ public class TemperatureSchedule  extends AbstractSchedule {
     
     /**
      * This method will process the realtime schedule
-     * @return decimal value of the expected temperature or null, if the value has not been changed.
+     * @return decimal value of the expected temperature ( e.g. 41 means 205 (20.5) degree celsius - (41 * 10) / 2) or null, if the value has not been changed.
      * It also returns null, if the min % 15 != 0
      */
     public Integer processSchedule() {
@@ -137,11 +137,43 @@ public class TemperatureSchedule  extends AbstractSchedule {
             String temperature = hourValues.substring((min/15)*2, ((min/15)*2)+2);
             if (!temperature.equalsIgnoreCase(getCurrentState())) {
                 setCurrentState(temperature);
-                return Integer.parseInt(temperature, 16);
+                return (Integer.parseInt(temperature, 16) * 10) / 2;
             } else {
                 return null;
             }            
         }
         return null;
+    }
+    /**
+     * This method will return current expected temperature value 
+     * @return decimal value of the expected temperature ( e.g. 41 means 205 (20.5) degree celsius - (41 * 10) / 2)
+     */
+    public Integer getCurrentExpectedValue() {
+        Calendar c = Calendar.getInstance();
+        int min = c.get(Calendar.MINUTE);
+        int minRange = 0;
+        if (min <= 15) {
+            minRange = 0;
+        } else if ((min > 15) && (min <= 30)) {
+            minRange = 15;
+        } else if ((min > 30) && (min <= 45)) {
+            minRange = 30;
+        } else if (min > 45) {
+            minRange = 45;
+        }
+        int day = 0;
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int d = c.get(Calendar.DAY_OF_WEEK);
+        if (d == Calendar.MONDAY) day = 0;
+        else if (d == Calendar.TUESDAY) day = 1;
+        else if (d == Calendar.WEDNESDAY) day = 2;
+        else if (d == Calendar.THURSDAY) day = 3;
+        else if (d == Calendar.FRIDAY) day = 4;
+        else if (d == Calendar.SATURDAY) day = 5;
+        else if (d == Calendar.SUNDAY) day = 6;
+        String sch = loadSchedule();
+        String hourValues = sch.substring((day*24*8)+(hour*8), (day*24*8)+(hour*8)+8);
+        String temperature = hourValues.substring((minRange/15)*2, ((minRange/15)*2)+2);
+        return (Integer.parseInt(temperature, 16) * 10) / 2;
     }
 }

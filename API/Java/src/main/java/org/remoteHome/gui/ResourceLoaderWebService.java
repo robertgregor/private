@@ -10,6 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import org.remoteHome.RemoteHomeManager;
 
@@ -22,7 +25,8 @@ public class ResourceLoaderWebService extends AbstractWebService {
     private String name = null;
     private Properties mimeTypes = null;
     
-    public void init() {}
+    public void init() {
+    }
 
     public void setParameters(RemoteHomeManager r, String... name) {
         this.r = r;
@@ -37,6 +41,33 @@ public class ResourceLoaderWebService extends AbstractWebService {
         while ((length = br.read(buffer)) != -1) out.write(buffer, 0, length);
         br.close();
         byte[] result = out.toByteArray();
+        if (name.equals("main.html")) {
+            //OK, replace the language placeholder PREFLANG - preferred language
+            org.remoteHome.Properties p = r.getPersistance().loadProperties();
+            String lang = "en";
+            if (p==null) {
+                org.remoteHome.Properties newP = new org.remoteHome.Properties();
+                newP.language = "en";
+                r.getPersistance().saveProperties(newP);
+            } else {
+                if (p.language == null) {
+                    p.language = "en";
+                    r.getPersistance().saveProperties(p);                   
+                } else {
+                    lang = p.language;
+                }
+            }
+            String page = new String(result);
+            page = page.replaceAll("PREFLANG", lang);
+            result = page.getBytes();
+        }
+        //Save the preferred language
+        if (name.startsWith("Messages_") && name.endsWith(".properties")) {
+            String prefLang = name.substring(9,11);
+            org.remoteHome.Properties p = r.getPersistance().loadProperties();
+            p.language = prefLang;
+            r.getPersistance().saveProperties(p);
+        }
         Headers headers = t.getResponseHeaders();
         headers.add("Content-Type", getContentType(name));
         t.sendResponseHeaders(200, result.length);

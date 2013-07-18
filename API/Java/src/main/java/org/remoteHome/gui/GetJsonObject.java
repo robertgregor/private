@@ -7,6 +7,7 @@ package org.remoteHome.gui;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import org.remoteHome.AbstractDevice;
 import org.remoteHome.BatteryThermostatDevice;
 import org.remoteHome.HeatingHeaderDevice;

@@ -352,6 +352,9 @@ $(function() {
           });          
     });
     updateStatusCOMPONENTID();
+    window.setInterval(function() {
+        updateStatusCOMPONENTID(false);
+    }, 300000);
 });
 </script>
 <table width="100%"><tr>

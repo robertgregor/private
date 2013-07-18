@@ -64,7 +64,7 @@ public class RemoteHomeManagerException extends Exception {
             case WRONG_DEVICE_TYPE:
                     return "Invalid device type: "+super.getMessage();
             case SERIALIZATION_ERROR:
-                    return "Error in serialization procedure: "+super.getMessage();
+                    return "Error in persistance: "+super.getMessage();
             case NOT_SUPPORTED:
                     return "This feature is not supported for this device type.";
             default:

@@ -2,6 +2,7 @@ package org.remoteHome;
 
 import com.google.gson.Gson;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * This is the implementation class for all hardware devices. All the devices should extend this class.
@@ -70,11 +71,11 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
      */
     protected transient RemoteHomeManager m;
     
+    private String roomName;
     /**
      * This is timestamp, when the values has been last updated
      */
     private long timestamp = 0;
-    
     
     protected AbstractDevice (RemoteHomeManager m, int deviceId, String deviceName) {
         this.m = m;
@@ -221,6 +222,20 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
      */
     public void setSubDeviceNumber(String subDeviceNumber) {
         this.subDeviceNumber = subDeviceNumber;
+    }
+
+    /**
+     * @return the roomName
+     */
+    public String getRoomName() {
+        return roomName;
+    }
+
+    /**
+     * @param roomName the roomName to set
+     */
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
     
     protected int parseDeviceIdForMultipleDevice(int deviceId) {

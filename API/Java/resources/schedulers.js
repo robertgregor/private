@@ -115,7 +115,8 @@
                 tdid.style.backgroundColor = sel.options[sel.selectedIndex].style.backgroundColor;
                 var tempValue = sel.options[sel.selectedIndex].value;
                 var temp = tempValue.split(" ");
-                tdid.title = temp[0]+String.fromCharCode(176)+"C "+tdid.title;
+                var degCelsius = String.fromCharCode(176)+"C";
+                tdid.title = temp[0]+degCelsius+tdid.title.split(degCelsius)[1];
 
             }
         }
@@ -129,8 +130,7 @@
                 tdid.style.backgroundColor = sel.options[sel.selectedIndex].style.backgroundColor;
                 var percentValue = sel.options[sel.selectedIndex].value;
                 var temp = percentValue.split(" ");
-                tdid.title = temp[0]+"% "+tdid.title;
-
+                tdid.title = temp[0]+"%"+tdid.title.split("%")[1];
             }
         }
         function createOnOffSchTable(id) {
@@ -144,20 +144,20 @@
                 html += "<th class=\"schtd\" colspan=\"3\">"+hour+":30&nbsp;</th>";
             }
             html += "</TR></thead><tbody>";
-            html += pL("Monday AM","0",id);
-            html += pL("Monday PM","1",id);
-            html += pL("Tuesday AM","2",id);
-            html += pL("Tuesday PM","3",id);
-            html += pL("Wednesday AM","4",id);
-            html += pL("Wednesday PM","5",id);
-            html += pL("Thursday AM","6",id);
-            html += pL("Thursday PM","7",id);
-            html += pL("Friday AM","8",id);
-            html += pL("Friday PM","9",id);
-            html += pL("Saturday AM","10",id);
-            html += pL("Saturday PM","11",id);
-            html += pL("Sunday AM","12",id);
-            html += pL("Sunday PM","13",id);
+            html += pL(monday+" AM","0",id);
+            html += pL(monday+" PM","1",id);
+            html += pL(tuesday+" AM","2",id);
+            html += pL(tuesday+" PM","3",id);
+            html += pL(wednesday+" AM","4",id);
+            html += pL(wednesday+" PM","5",id);
+            html += pL(thursday+" AM","6",id);
+            html += pL(thursday+" PM","7",id);
+            html += pL(friday+" AM","8",id);
+            html += pL(friday+" PM","9",id);
+            html += pL(saturday+" AM","10",id);
+            html += pL(saturday+" PM","11",id);
+            html += pL(sunday+" AM","12",id);
+            html += pL(sunday+" PM","13",id);
             html += "</TR></tbody></table></td><td>"+scheduleOnOffProgramsManager(id)+"</td></table>";
             return html;
         }
@@ -172,20 +172,20 @@
                 html += "<th class=\"schtd\" colspan=\"3\">"+hour+":30&nbsp;</th>";
             }
             html += "</TR></thead><tbody>";
-            html += pLpercent("Monday AM","0",id);
-            html += pLpercent("Monday PM","1",id);
-            html += pLpercent("Tuesday AM","2",id);
-            html += pLpercent("Tuesday PM","3",id);
-            html += pLpercent("Wednesday AM","4",id);
-            html += pLpercent("Wednesday PM","5",id);
-            html += pLpercent("Thursday AM","6",id);
-            html += pLpercent("Thursday PM","7",id);
-            html += pLpercent("Friday AM","8",id);
-            html += pLpercent("Friday PM","9",id);
-            html += pLpercent("Saturday AM","10",id);
-            html += pLpercent("Saturday PM","11",id);
-            html += pLpercent("Sunday AM","12",id);
-            html += pLpercent("Sunday PM","13",id);
+            html += pLpercent(monday+" AM","0",id);
+            html += pLpercent(monday+" PM","1",id);
+            html += pLpercent(tuesday+" AM","2",id);
+            html += pLpercent(tuesday+" PM","3",id);
+            html += pLpercent(wednesday+" AM","4",id);
+            html += pLpercent(wednesday+" PM","5",id);
+            html += pLpercent(thursday+" AM","6",id);
+            html += pLpercent(thursday+" PM","7",id);
+            html += pLpercent(friday+" AM","8",id);
+            html += pLpercent(friday+" PM","9",id);
+            html += pLpercent(saturday+" AM","10",id);
+            html += pLpercent(saturday+" PM","11",id);
+            html += pLpercent(sunday+" AM","12",id);
+            html += pLpercent(sunday+" PM","13",id);
             html += "</TR></tbody></table></td><td>"+schedulePercentProgramsManager(id)+"</td></table>";
             return html;
         }
@@ -200,85 +200,85 @@
                 html += "<th class=\"schtd\" colspan=\"2\">"+hour+":30&nbsp;</th>";
             }
             html += "</TR></thead><tbody>";
-            html += pLTemp("Monday AM","0",id);
-            html += pLTemp("Monday PM","1",id);
-            html += pLTemp("Tuesday AM","2",id);
-            html += pLTemp("Tuesday PM","3",id);
-            html += pLTemp("Wednesday AM","4",id);
-            html += pLTemp("Wednesday PM","5",id);
-            html += pLTemp("Thursday AM","6",id);
-            html += pLTemp("Thursday PM","7",id);
-            html += pLTemp("Friday AM","8",id);
-            html += pLTemp("Friday PM","9",id);
-            html += pLTemp("Saturday AM","10",id);
-            html += pLTemp("Saturday PM","11",id);
-            html += pLTemp("Sunday AM","12",id);
-            html += pLTemp("Sunday PM","13",id);
+            html += pLTemp(monday+" AM","0",id);
+            html += pLTemp(monday+" PM","1",id);
+            html += pLTemp(tuesday+" AM","2",id);
+            html += pLTemp(tuesday+" PM","3",id);
+            html += pLTemp(wednesday+" AM","4",id);
+            html += pLTemp(wednesday+" PM","5",id);
+            html += pLTemp(thursday+" AM","6",id);
+            html += pLTemp(thursday+" PM","7",id);
+            html += pLTemp(friday+" AM","8",id);
+            html += pLTemp(friday+" PM","9",id);
+            html += pLTemp(saturday+" AM","10",id);
+            html += pLTemp(saturday+" PM","11",id);
+            html += pLTemp(sunday+" AM","12",id);
+            html += pLTemp(sunday+" PM","13",id);
             html += "</TR><tr><td colspan=\"49\">"+scheduleTempProgramsManager(id)+"</td></tr></tbody></table>";
             return html;
         }
         function scheduleOnOffProgramsManager(id) {
             var html = "";
-            html += "Saved programs:<BR><SELECT id=\"onoffProgs"+id+"\"></select><BR>";
-            html += "<BUTTON title=\"Load\" id=\"onoffProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Update\" id=\"onoffProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Delete\" id=\"onoffProgsDelete"+id+"\">&nbsp;</BUTTON><BR><BR><BR>";
-            html += "<BR>New program:<BR><INPUT id=\"onoffProgsName"+id+"\" type=\"text\"/>";
-            html += "<BUTTON title=\"Save new program\" id=\"onoffProgsSave"+id+"\">&nbsp;</BUTTON>";
+            html += sch_saved_programs+"<BR><SELECT id=\"onoffProgs"+id+"\"></select><BR>";
+            html += "<BUTTON title=\""+sch_load+"\" id=\"onoffProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_update+"\" id=\"onoffProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_delete+"\" id=\"onoffProgsDelete"+id+"\">&nbsp;</BUTTON><BR><BR><BR>";
+            html += sch_new_program+"<BR><BR><INPUT id=\"onoffProgsName"+id+"\" type=\"text\"/>";
+            html += "<BUTTON title=\""+sch_save_new_program+"\" id=\"onoffProgsSave"+id+"\">&nbsp;</BUTTON>";
             return html;
         }
         function scheduleTempProgramsManager(id) {
             var html = "";
-            html += "Temperature selection:<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"temperatureSelect"+id+"\">"+populateTempOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            html += "Saved programs:<SELECT id=\"temperatureProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-            html += "<BUTTON title=\"Load\" id=\"temperatureProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Update\" id=\"temperatureProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Delete\" id=\"temperatureProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            html += "New program:<INPUT id=\"temperatureProgsName"+id+"\" type=\"text\"/>";
-            html += "<BUTTON title=\"Save new program\" id=\"temperatureProgsSave"+id+"\">&nbsp;</BUTTON>";
+            html += sch_temperature_selection+"<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"temperatureSelect"+id+"\">"+populateTempOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += sch_saved_programs+"<SELECT id=\"temperatureProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            html += "<BUTTON title=\""+sch_load+"\" id=\"temperatureProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_update+"\" id=\"temperatureProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_delete+"\" id=\"temperatureProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += sch_new_program+"<INPUT id=\"temperatureProgsName"+id+"\" type=\"text\"/>";
+            html += "<BUTTON title=\""+sch_save_new_program+"\" id=\"temperatureProgsSave"+id+"\">&nbsp;</BUTTON>";
             return html;
         }
         function populateTempOptions() {
             var statusData = "";
-            statusData += "<option style=\"background-color:black; color:white;\">10 deg. celsius</option>";
-            statusData += "<option style=\"background-color: white; color:black;\">15 deg. celsius</option>";
-            statusData += "<option style=\"background-color: lightblue; color:black;\">17 deg. celsius</option>";
-            statusData += "<option style=\"background-color: blue; color:white;\">18 deg. celsius</option>";
-            statusData += "<option style=\"background-color: darkblue; color:white;\">19 deg. celsius</option>";
-            statusData += "<option style=\"background-color: lightgreen; color:black;\">20 deg. celsius</option>";
-            statusData += "<option style=\"background-color: green; color:white;\" selected=\"selected\">20,5 deg. celsius</option>";
-            statusData += "<option style=\"background-color: darkgreen; color:white;\">21 deg. celsius</option>";
-            statusData += "<option style=\"background-color: lightgoldenrodyellow; color:black;\">21,5 deg. celsius</option>";
-            statusData += "<option style=\"background-color: yellow; color:black;\">22 deg. celsius</option>";
-            statusData += "<option style=\"background-color: gold; color:black;\">22,5 deg. celsius</option>";
-            statusData += "<option style=\"background-color: lightpink; color:black;\">23 deg. celsius</option>";
-            statusData += "<option style=\"background-color: pink; color:black;\">23,5 deg. celsius</option>";
-            statusData += "<option style=\"background-color: darksalmon; color:black;\">24 deg. celsius</option>";
-            statusData += "<option style=\"background-color: orange; color:black;\">24,5 deg. celsius</option>";
-            statusData += "<option style=\"background-color: lightcoral; color:black;\">25 deg. celsius</option>";
-            statusData += "<option style=\"background-color: red; color:black;\">26 deg. celsius</option>";
-            statusData += "<option style=\"background-color: darkred; color:white;\">28 deg. celsius</option>";
-            statusData += "<option style=\"background-color: orangered; color:black;\">30 deg. celsius</option>";
+            statusData += "<option style=\"background-color:black; color:white;\">10 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: white; color:black;\">15 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: lightblue; color:black;\">17 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: blue; color:white;\">18 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: darkblue; color:white;\">19 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: lightgreen; color:black;\">20 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: green; color:white;\" selected=\"selected\">20,5 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: darkgreen; color:white;\">21 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: lightgoldenrodyellow; color:black;\">21,5 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: yellow; color:black;\">22 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: gold; color:black;\">22,5 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: lightpink; color:black;\">23 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: pink; color:black;\">23,5 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: darksalmon; color:black;\">24 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: orange; color:black;\">24,5 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: lightcoral; color:black;\">25 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: red; color:black;\">26 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: darkred; color:white;\">28 "+deg_celsius+"</option>";
+            statusData += "<option style=\"background-color: orangered; color:black;\">30 "+deg_celsius+"</option>";
             return statusData;
         }
         function schedulePercentProgramsManager(id) {
             var html = "";
             html += "Percentage selection:<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"percentSelect"+id+"\">"+populatePercentOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            html += "Saved programs:<SELECT id=\"percentProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-            html += "<BUTTON title=\"Load\" id=\"percentProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Update\" id=\"percentProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\"Delete\" id=\"percentProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            html += "New program:<INPUT id=\"percentProgsName"+id+"\" type=\"text\"/>";
-            html += "<BUTTON title=\"Save new program\" id=\"percentProgsSave"+id+"\">&nbsp;</BUTTON>";
+            html += saved_programs+"<SELECT id=\"percentProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            html += "<BUTTON title=\""+sch_load+"\" id=\"percentProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_update+"\" id=\"percentProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_delete+"\" id=\"percentProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += sch_new_program+"<INPUT id=\"percentProgsName"+id+"\" type=\"text\"/>";
+            html += "<BUTTON title=\""+sch_save_new_program+"\" id=\"percentProgsSave"+id+"\">&nbsp;</BUTTON>";
             return html;
         }
         function populatePercentOptions() {
             var statusData = "";
-            statusData += "<option style=\"background-color: green; color:white;\" selected=\"selected\">0 percent</option>";
-            statusData += "<option style=\"background-color: white; color:black;\">10 percent</option>";
-            statusData += "<option style=\"background-color: lightblue; color:black;\">20 percent</option>";
-            statusData += "<option style=\"background-color: yellow; color:black;\">30 percent</option>";
-            statusData += "<option style=\"background-color: darkblue; color:white;\">40 percent</option>";
-            statusData += "<option style=\"background-color: pink; color:black;\">50 percent</option>";
-            statusData += "<option style=\"background-color: black; color:white;\">60 percent</option>";
-            statusData += "<option style=\"background-color: orange; color:black;\">70 percent</option>";
-            statusData += "<option style=\"background-color: red; color:white;\">80 percent</option>";
-            statusData += "<option style=\"background-color: darkred; color:white;\">90 percent</option>";
-            statusData += "<option style=\"background-color: lightcoral; color:black;\">100 percent</option>";
+            statusData += "<option style=\"background-color: green; color:white;\" selected=\"selected\">0 "+percent+"</option>";
+            statusData += "<option style=\"background-color: white; color:black;\">10 "+percent+"</option>";
+            statusData += "<option style=\"background-color: lightblue; color:black;\">20 "+percent+"</option>";
+            statusData += "<option style=\"background-color: yellow; color:black;\">30 "+percent+"</option>";
+            statusData += "<option style=\"background-color: darkblue; color:white;\">40 "+percent+"</option>";
+            statusData += "<option style=\"background-color: pink; color:black;\">50 "+percent+"</option>";
+            statusData += "<option style=\"background-color: black; color:white;\">60 "+percent+"</option>";
+            statusData += "<option style=\"background-color: orange; color:black;\">70 "+percent+"</option>";
+            statusData += "<option style=\"background-color: red; color:white;\">80 "+percent+"</option>";
+            statusData += "<option style=\"background-color: darkred; color:white;\">90 "+percent+"</option>";
+            statusData += "<option style=\"background-color: lightcoral; color:black;\">100 "+percent+"</option>";
             return statusData;
         }
         function loadPrograms(data, id) {
