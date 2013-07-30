@@ -37,9 +37,7 @@ public class LoadRoomPage extends AbstractWebService {
         HashSet<AbstractDevice> devices = r.getDevicesInRoom(requestParameters.get("room"));
         StringBuilder accordionBody = new StringBuilder();
         for (AbstractDevice device : devices) {
-            //accordionBody.append("<H3>"+device.getDeviceName()+"</H3>\n");
-            accordionBody.append("<H3><a href=\"#\">"+device.getDeviceName()+"</a></H3>");
-
+            accordionBody.append("<h3>"+device.getDeviceName()+"</h3>\n");
             if (device instanceof LightAlarmDevice) {
                 accordionBody.append(getDiv("LightAlarmDevice.div",Integer.toString(device.getDeviceId())));
             } else if (device instanceof SimpleSwitchDevice) {
@@ -59,7 +57,7 @@ public class LoadRoomPage extends AbstractWebService {
             }
         }
         if (accordionBody.toString().length()==0) {
-            accordionBody.append("<H3>No device exist in the room<H3><div>&nbsp;</div>\n");
+            accordionBody.append("<h3><p>No device exist in the room</p></h3><div>&nbsp;</div>\n");
         }
         roomHtml = roomHtml.substring(0, roomHtml.indexOf("BBBODYYY")) + accordionBody.toString() + roomHtml.substring(roomHtml.indexOf("BBBODYYY")+8);
         //System.out.println(roomHtml);

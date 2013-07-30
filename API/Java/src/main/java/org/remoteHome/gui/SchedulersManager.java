@@ -161,7 +161,8 @@ public class SchedulersManager extends AbstractWebService {
                 }
             }
             if (action.equals("DELETE")) {
-                r.getPersistance().deleteScheduler(r.getSchedulers().get("name"));
+                String name = requestParameters.get("name");
+                r.getPersistance().deleteScheduler(r.getSchedulers().get(name));
                 r.getSchedulers().remove(requestParameters.get("name"));
                     sendAjaxAnswer("OK");                
             }

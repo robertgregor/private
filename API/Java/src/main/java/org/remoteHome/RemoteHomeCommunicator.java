@@ -29,13 +29,14 @@ class RemoteHomeCommunicator extends Thread  {
     private boolean cmdWithResponse = false;
     private int cmdWithResponseId = 0;
     private final Object semaphore = new Object();
+    private boolean simulate = false;
 
     protected RemoteHomeCommunicator(String host, String port, RemoteHomeManager manager) throws RemoteHomeConnectionException {
         this.host = host;
         this.port = port;
         this.manager = manager;
         connect();
-        //getUserNamePassword();
+        getUserNamePassword();
         this.start();
     }
         
@@ -47,7 +48,12 @@ class RemoteHomeCommunicator extends Thread  {
                 dataInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (NumberFormatException e) {
                 //OK, the port is COM port.
-                connectComPort();
+                if (!getPort().equalsIgnoreCase("SIMULATE")) {
+                    connectComPort();
+                } else {
+                    simulate = true;
+                    System.out.println("!!!!!!!!!!!    Simulation mode     !!!!!!!!!!!!!");
+                }
             } catch (UnknownHostException e) {
                 throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);
             } catch (IOException e) {
@@ -57,6 +63,11 @@ class RemoteHomeCommunicator extends Thread  {
     }
     private void getUserNamePassword() throws RemoteHomeConnectionException {
         try {
+            if (isSimulate()) {
+                if (channel==0) channel = 40;
+                if (password==null) password = "REMOTEHOM";
+                return;
+            }
             dataOutputStream.write("AT+s\n".getBytes());
             dataOutputStream.flush();
             Thread.sleep(50);
@@ -73,6 +84,7 @@ class RemoteHomeCommunicator extends Thread  {
         }
     }
     protected void connectComPort() throws RemoteHomeConnectionException {
+            if (isSimulate()) return;
             disconnect();
             try {
 		NativeResource nr = new NativeResource();
@@ -87,6 +99,7 @@ class RemoteHomeCommunicator extends Thread  {
     }
 
     protected void disconnect() {
+        if (isSimulate()) return;
         try { dataOutputStream.close(); } catch (Throwable e) {}
         try { dataInputStream.close(); } catch (Throwable e) {}
         try { if (socket != null) socket.close(); } catch (Throwable e) {}
@@ -94,6 +107,7 @@ class RemoteHomeCommunicator extends Thread  {
     }
     
     protected synchronized String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
+        if (isSimulate()) return null;
         cmdWithResponse = true;
         cmdWithResponseId = deviceId;
         try {
@@ -106,6 +120,7 @@ class RemoteHomeCommunicator extends Thread  {
     }
     
     protected synchronized void addDevice(int deviceId) throws RemoteHomeConnectionException {
+        if (isSimulate()) return;
         cmdWithResponse = true;
         cmdWithResponseId = deviceId;
         try {
@@ -140,6 +155,7 @@ class RemoteHomeCommunicator extends Thread  {
     }
 
     protected synchronized void sendCommand(int deviceId, String command) throws RemoteHomeConnectionException {
+        if (isSimulate()) return;
         try {
             dataReceived = "";
             String cmd = null;
@@ -178,6 +194,7 @@ class RemoteHomeCommunicator extends Thread  {
         while (true) {
             try {            
                 Thread.sleep(50);
+                if (isSimulate()) continue;
                 while (dataInputStream.ready()) {
                     dataReceived = dataInputStream.readLine();
                     System.out.println("R:"+dataReceived);
@@ -260,7 +277,7 @@ class RemoteHomeCommunicator extends Thread  {
      * @param password the password to set
      */
     public void setPassword(String password) throws RemoteHomeConnectionException {
-        if (password.length() != 5) throw new RemoteHomeConnectionException("Invalid password length. Should be exactly 5 characters.", 
+        if (password.length() != 9) throw new RemoteHomeConnectionException("Invalid password length. Should be exactly 9 characters.", 
                                 RemoteHomeConnectionException.INVALID_PARAMETER);
         sendCommand(-1, "p="+password+(char)10);
         this.password = password;
@@ -280,5 +297,12 @@ class RemoteHomeCommunicator extends Thread  {
         sendCommand(-1, "c="+Integer.toString(channel)+(char)10);
         this.channel = channel;
         
+    }
+
+    /**
+     * @return the simulate
+     */
+    public boolean isSimulate() {
+        return simulate;
     }
 }

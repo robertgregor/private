@@ -7,7 +7,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath org.remoteHome.RemoteHomeManager localhost COM1 C:/RH/test.ser 8080</exec.args>
+                <exec.args>-classpath %classpath org.remoteHome.RemoteHomeManager localhost SIMULATE C:/RH/test.ser 8080</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>C:\RH\private\API\Java</exec.workingdir>
             </properties>
@@ -19,7 +19,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath org.remoteHome.RemoteHomeManager localhost COM1 C:/RH/test.ser 8080</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath org.remoteHome.RemoteHomeManager localhost SIMULATE C:/RH/test.ser 8080</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir>C:\RH\private\API\Java</exec.workingdir>
@@ -32,7 +32,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -classpath %classpath org.remoteHome.RemoteHomeManager localhost COM1 C:/RH/test.ser 8080</exec.args>
+                <exec.args>${profiler.args} -classpath %classpath org.remoteHome.RemoteHomeManager localhost SIMULATE C:/RH/test.ser 8080</exec.args>
                 <exec.executable>${profiler.java}</exec.executable>
                 <exec.workingdir>C:\RH\private\API\Java</exec.workingdir>
             </properties>

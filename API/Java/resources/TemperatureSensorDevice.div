@@ -1,6 +1,9 @@
 <div>
 <script>
 function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
   $.ajax({
       url: "/",
       type: "get",
@@ -10,6 +13,8 @@ function updateStatusCOMPONENTID() {
           var data = JSON.parse(indata);
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           document.getElementById("currPeriodCOMPONENTID").innerHTML=data.frequency;
           document.getElementById("currPeriodFormCOMPONENTID").value=data.expectedFrequency;
@@ -19,15 +24,22 @@ function updateStatusCOMPONENTID() {
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
 
       },
-      error:function(){
-          alert('Error when tried to get the status of the device.');
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
       }
   });
 }
 $(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs();
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
@@ -43,83 +55,119 @@ $(function() {
               alert('Sending period should be number between 10 and 2550!');
               return;
           }
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=TemperatureSensorDeviceManager&deviceId=COMPONENTID&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+              data: "ServiceName=TemperatureSensorDeviceManager&deviceId=COMPONENTID&tm="+tm+"&room="+encodeURIComponent(room)+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
+                if (data == "REFRESH") document.location.reload(true);
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
           updateStatusCOMPONENTID();
     });
 });
 $(document).ready(function() {
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("statusCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("battVoltageLabelCOMPONENTID", "batt_voltage");
+    setLabelBasedOnId("temperatureLCOMPONENTID", "temperature");
+    setLabelBasedOnId("degCelsius1COMPONENTID", "deg_celsius");
+    setLabelBasedOnId("secondsL1COMPONENTID", "seconds");
+    setLabelBasedOnId("secondsL2COMPONENTID", "seconds");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("sending_periodCOMPONENTID", "sending_period");
+    setLabelBasedOnId("sending_periodExpectedCOMPONENTID", "sending_period_expected");
+    setLabelBasedOnId("sending_periodFCOMPONENTID", "sending_period");
+
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
     }, 300000);
 });
 </script>
-<table width="100%"><tr>
-<td>
-<table class="ui-widget" style="border-collapse: collapse;" width="100%">
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
               <thead class="ui-widget-header">
                 <tr>
-                <th>Property</th>
-                <th>Value</th>
-                <th>Parameter</th>
-                <th>Value</th>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
                 </tr>
-                </thead>
-                <tbody class="ui-widget-content">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="battVoltageLabelCOMPONENTID"></div></td><td><span id='battVoltageCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Name</td>
-                <td><span id='nameCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="temperatureLCOMPONENTID"></div></td><td><span id='temperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius1COMPONENTID"></span></td></tr>
+                <tr><td><div id="sending_periodCOMPONENTID"></div></td><td><span id='currPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL2COMPONENTID"></span></td></tr>
+                <tr><td><div id="sending_periodExpectedCOMPONENTID"></div></td><td><span id='expPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL1COMPONENTID"></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Component id</td>
-                <td><span id='compIdCOMPONENTID'></span></td>
-                <td>Name:</td>
-                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
                 </tr>
-                <tr>
-                <td>Current period</td>
-                <td><span id='currPeriodCOMPONENTID'></span>&nbsp;seconds</td>
-                <td>Configure period:</td>
-                <td><input type="text" id="currPeriodFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Expected period to configure:</td>
-                <td><span id='expPeriodCOMPONENTID'></span>&nbsp;seconds</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Temperature</td>
-                <td><span id='temperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Battery voltage</td>
-                <td><span id='battVoltageCOMPONENTID'></span>&nbsp;V</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Last update timestamp</td>
-                <td><span id='timestampCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
-                </tr>
-                </tbody>
-</table>
-</td>
-</tr></table>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="currPeriodFormCOMPONENTID" /></td></tr>
+            </table>
+          </td><td>&nbsp;
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+</div>
 </div>

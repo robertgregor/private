@@ -13,12 +13,14 @@ function updateStatusCOMPONENTID(showError) {
           var data = JSON.parse(indata);
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
-          document.getElementById("statusCOMPONENTID").innerHTML='Positioned';
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
+          document.getElementById("statusMCOMPONENTID").innerHTML=positioned;
           if (data.movingUp) {
-              document.getElementById("statusCOMPONENTID").innerHTML='Moving UP';
+              document.getElementById("statusMCOMPONENTID").innerHTML=moving_up;
           }
           if (data.movingDown) {
-              document.getElementById("statusCOMPONENTID").innerHTML='Moving DOWN';
+              document.getElementById("statusMCOMPONENTID").innerHTML=moving_down;
           }
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           document.getElementById("timeOpeningCurrentCOMPONENTID").innerHTML=data.currentOpening;
@@ -26,20 +28,23 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("timeOpeningCOMPONENTID").innerHTML=data.fullRangeTimeout;
           if (data.enabledScheduler) {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
-                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML='YES';
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=yes;
           } else {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', false);
-                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML='NO';
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=no;
           }
           $("#checkboxEnabledSchedulerCOMPONENTID").trigger("change");
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
       },
-      error:function(){
-          alert('Error when tried to get the status of the device.');
+      error:function(xhr, ajaxOptions, thrownError) {
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
       }   
   });
 }
 $(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs();
     $( "#closeBlindCOMPONENTID" ).button().click(function() {
           $.ajax({
               url: "/",
@@ -50,7 +55,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -64,7 +69,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -78,7 +83,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -92,7 +97,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -106,7 +111,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -120,12 +125,12 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
     $( "#setToPositionCOMPONENTID" ).button().click(function() {
-          var period = $( "#closedPercentage" ).val();
+          var period = $( "#closedPercentageCOMPONENTID" ).val();
           $.ajax({
               url: "/",
               type: "get",
@@ -135,13 +140,17 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
     $( "#checkboxEnabledSchedulerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
     $( "#checkboxEnabledSchedulerCOMPONENTID" ).change(function () {
                 if (this.checked) {
@@ -167,16 +176,22 @@ $(function() {
               return;
           }
           var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=MotorControllerDeviceManager&deviceId=COMPONENTID&tm="+tm+"&schenabled="+schenabled+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=MotorControllerDeviceManager&deviceId=COMPONENTID&tm="+tm+"&schenabled="+schenabled+"&room="+encodeURIComponent(room)+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
+                if (data == "REFRESH") document.location.reload(true);
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
           updateStatusCOMPONENTID();
@@ -184,10 +199,11 @@ $(function() {
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
             height: 420,
-            width: 980,
+            width: 940,
+            title: sch_percent_scheduler,
             modal: true,
-            buttons: {
-                "Assign schedule": function() {
+            buttons: [
+                { text: sch_button_assign_schedule, click: function() {
                   var schData="&0="+savePercentSchedule("schPercentTableCOMPONENTID", 0)+"&1="+savePercentSchedule("schPercentTableCOMPONENTID", 1)+"&2="+savePercentSchedule("schPercentTableCOMPONENTID", 2)+"&3="+savePercentSchedule("schPercentTableCOMPONENTID", 3)+"&4="+savePercentSchedule("schPercentTableCOMPONENTID", 4)+"&5="+savePercentSchedule("schPercentTableCOMPONENTID", 5)+"&6="+savePercentSchedule("schPercentTableCOMPONENTID", 6)+"&7="+savePercentSchedule("schPercentTableCOMPONENTID", 7)+"&8="+savePercentSchedule("schPercentTableCOMPONENTID", 8)+"&9="+savePercentSchedule("schPercentTableCOMPONENTID", 9)+"&10="+savePercentSchedule("schPercentTableCOMPONENTID", 10)+"&11="+savePercentSchedule("schPercentTableCOMPONENTID", 11)+"&12="+savePercentSchedule("schPercentTableCOMPONENTID", 12)+"&13="+savePercentSchedule("schPercentTableCOMPONENTID", 13);
                   $.ajax({
                         url: "/",
@@ -197,29 +213,29 @@ $(function() {
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
                   $( this ).dialog( "close" );
-                },
-                Cancel: function() {
+                }},
+                { text: sch_button_cancel, click: function() {
                       $( this ).dialog( "close" );        
-                }
-          }
+                }}
+          ]
     });
     $( "#scheduleButtCOMPONENTID" ).button().click(function() {
-          $( "#schDialog2COMPONENTID" ).replaceWith(createPercentSchTable('schPercentTableCOMPONENTID'));        
+          $( "#schDialogInnerCOMPONENTID" ).replaceWith(createPercentSchTable('schPercentTableCOMPONENTID'));        
           $.ajax({
                         url: "/",
                         type: "get",
                         'cache' : false,
                         data: "ServiceName=MotorControllerDeviceManager&deviceId=COMPONENTID&action=LOADSCH&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
-                        loadTempSchedule(data, 'schPercentTableCOMPONENTID');
+                        loadPercentSchedule(data, 'schPercentTableCOMPONENTID');
                         $( "#schDialogCOMPONENTID" ).dialog( "open" );          
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
           });
           $.ajax({
@@ -231,13 +247,13 @@ $(function() {
                         loadPrograms(data, 'percentProgsschPercentTableCOMPONENTID');
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
           });
-          $( "#percentProgsSaveschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+          $( "#percentProgsSaveschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
                   var name = document.getElementById("percentProgsNameschPercentTableCOMPONENTID").value;
                   if (name == '') {
-                        alert('The name of the program cannot be empty');
+                        alert(error_name_prog_empty);
                         return;
                   }
                   var schData="&0="+savePercentSchedule("schPercentTableCOMPONENTID", 0)+"&1="+savePercentSchedule("schPercentTableCOMPONENTID", 1)+"&2="+savePercentSchedule("schPercentTableCOMPONENTID", 2)+"&3="+savePercentSchedule("schPercentTableCOMPONENTID", 3)+"&4="+savePercentSchedule("schPercentTableCOMPONENTID", 4)+"&5="+savePercentSchedule("schPercentTableCOMPONENTID", 5)+"&6="+savePercentSchedule("schPercentTableCOMPONENTID", 6)+"&7="+savePercentSchedule("schPercentTableCOMPONENTID", 7)+"&8="+savePercentSchedule("schPercentTableCOMPONENTID", 8)+"&9="+savePercentSchedule("schPercentTableCOMPONENTID", 9)+"&10="+savePercentSchedule("schPercentTableCOMPONENTID", 10)+"&11="+savePercentSchedule("schPercentTableCOMPONENTID", 11)+"&12="+savePercentSchedule("schPercentTableCOMPONENTID", 12)+"&13="+savePercentSchedule("schPercentTableCOMPONENTID", 13);
@@ -251,11 +267,11 @@ $(function() {
                         $('#percentProgsschPercentTableCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
-          $( "#percentProgsUpdateschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+          $( "#percentProgsUpdateschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
                   var name = $("#percentProgsschPercentTableCOMPONENTID option:selected").val();
                   var schData="&0="+savePercentSchedule("schPercentTableCOMPONENTID", 0)+"&1="+savePercentSchedule("schPercentTableCOMPONENTID", 1)+"&2="+savePercentSchedule("schPercentTableCOMPONENTID", 2)+"&3="+savePercentSchedule("schPercentTableCOMPONENTID", 3)+"&4="+savePercentSchedule("schPercentTableCOMPONENTID", 4)+"&5="+savePercentSchedule("schPercentTableCOMPONENTID", 5)+"&6="+savePercentSchedule("schPercentTableCOMPONENTID", 6)+"&7="+savePercentSchedule("schPercentTableCOMPONENTID", 7)+"&8="+savePercentSchedule("schPercentTableCOMPONENTID", 8)+"&9="+savePercentSchedule("schPercentTableCOMPONENTID", 9)+"&10="+savePercentSchedule("schPercentTableCOMPONENTID", 10)+"&11="+savePercentSchedule("schPercentTableCOMPONENTID", 11)+"&12="+savePercentSchedule("schPercentTableCOMPONENTID", 12)+"&13="+savePercentSchedule("schPercentTableCOMPONENTID", 13);
                   schData += "&name=" + name;
@@ -263,15 +279,15 @@ $(function() {
                         url: "/",
                         type: "get",
                         'cache' : false,
-                        data: "ServiceName=SchedulersManager"+schData+"&action=UPDATE&type=Temperature&"+Math.floor((Math.random()*100)+1),
+                        data: "ServiceName=SchedulersManager"+schData+"&action=UPDATE&type=Percentage&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
-          $( "#percentProgsDeleteschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).click(function() {
+          $( "#percentProgsDeleteschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).unbind('click').click(function() {
                 var name = $("#percentProgsschPercentTableCOMPONENTID option:selected").val();
                   $.ajax({
                         url: "/",
@@ -282,11 +298,11 @@ $(function() {
                         $("#percentProgsschPercentTableCOMPONENTID option:selected").remove();
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
-          $( "#percentProgsLoadschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).click(function() {
+          $( "#percentProgsLoadschPercentTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).unbind('click').click(function() {
                 var name = $("#percentProgsschPercentTableCOMPONENTID option:selected").val();
                   $.ajax({
                         url: "/",
@@ -294,36 +310,66 @@ $(function() {
                         'cache' : false,
                         data: "ServiceName=SchedulersManager&name="+name+"&action=GET&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
-                        loadTempSchedule(data, 'schPercentTableCOMPONENTID');                        
+                        loadPercentSchedule(data, 'schPercentTableCOMPONENTID');                        
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
     });
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('closeBlindCOMPONENTID').value = close_blind;
+    document.getElementById('stopBlindCOMPONENTID').value = stop_blind;
+    document.getElementById('openBlindCOMPONENTID').value = open_blind;
+    document.getElementById('setToPositionCOMPONENTID').value = set_To_position;
+    document.getElementById('closeAllBlindsCOMPONENTID').value = close_all_blinds;
+    document.getElementById('stopAllBlindsCOMPONENTID').value = stop_all_blinds;
+    document.getElementById('openAllBlindsCOMPONENTID').value = open_all_blinds;
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("stateCOMPONENTID", "state");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("scheduler_enabledCOMPONENTID", "scheduler_enabled");
+    setLabelBasedOnId("scheduler_enabledFCOMPONENTID", "scheduler_enabled");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("actionsCOMPONENTID", "actions");
+    setLabelBasedOnId("statusCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("schedulerCOMPONENTID", "scheduler");
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    setLabelBasedOnId("timeOpeningCurrentLabelCOMPONENTID", "time_opening_current");
+    setLabelBasedOnId("timeOpeningLabelCOMPONENTID", "time_opening");
+    setLabelBasedOnId("timeOpeningLabelFCOMPONENTID", "time_opening");
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
     }, 300000);
 });
 </script>
-<table width="100%"><tr>
-<td>
-    <table width="100%">
-    <tr>
-    <td><input type="submit" id="closeBlindCOMPONENTID" value="Close blind" /></td>
-    <td><input type="submit" id="stopBlindCOMPONENTID" value="Stop blind" /></td>
-    <td><input type="submit" id="openBlindCOMPONENTID" value="Open blind" /></td>
-    </tr>
-    <tr>
-    <td><input type="submit" id="closeAllBlindsCOMPONENTID" value="Close all blinds" /></td>
-    <td><input type="submit" id="stopAllBlindsCOMPONENTID" value="Stop all blinds" /></td>
-    <td><input type="submit" id="openAllBlindsCOMPONENTID" value="Open all blinds" /></td>
-    </tr>
-    <tr>
-        <td colspan="3">
-            <select id="closedPercentage">
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-1"><div id="actionsCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-1">
+        <br/>
+        <br/>
+    <input type="submit" id="closeBlindCOMPONENTID" />
+    <input type="submit" id="stopBlindCOMPONENTID" />
+    <input type="submit" id="openBlindCOMPONENTID" />
+    &nbsp;&nbsp;&nbsp;
+    <select id="closedPercentageCOMPONENTID">
+                <option value="0">0%</option>
                 <option value="10">10%</option>
                 <option value="20">20%</option>
                 <option value="30">30%</option>
@@ -333,74 +379,75 @@ $(function() {
                 <option value="70">70%</option>
                 <option value="80">80%</option>
                 <option value="90">90%</option>
-            </select>
-            &nbsp;&nbsp;
-            <input type="submit" id="setToPositionCOMPONENTID" value="Set blinds to position" />
-        </td>
-    </tr>
-      <tr><td  width="100%" colspan="3">&nbsp;</td></tr>
-      <tr><td  width="100%" colspan="3"><button id="scheduleButtCOMPONENTID">Scheduler</button></td></tr>
-    </table>
-</td>
-<td>
-<table class="ui-widget" style="border-collapse: collapse;" width="100%">
+                <option value="100">100%</option>
+            </select>&nbsp;<input type="submit" id="setToPositionCOMPONENTID" />
+    &nbsp;&nbsp;&nbsp;
+    <input type="submit" id="closeAllBlindsCOMPONENTID" />
+    <input type="submit" id="stopAllBlindsCOMPONENTID" />
+    <input type="submit" id="openAllBlindsCOMPONENTID" />
+    &nbsp;&nbsp;&nbsp;
+    <button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button> 
+    </div>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
               <thead class="ui-widget-header">
                 <tr>
-                <th>Property</th>
-                <th>Value</th>
-                <th>Parameter</th>
-                <th>Value</th>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
                 </tr>
-                </thead>
-                <tbody class="ui-widget-content">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="stateCOMPONENTID"></div></td><td><span id='statusMCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Name</td>
-                <td><span id='nameCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="timeOpeningCurrentLabelCOMPONENTID"></div></td><td><span id='timeOpeningCurrentCOMPONENTID'></span></td></tr>
+                <tr><td><div id="timeOpeningLabelCOMPONENTID"></div></td><td><span id='timeOpeningCOMPONENTID'></span></td></tr>
+                <tr><td><div id="scheduler_enabledCOMPONENTID"></div></td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Status</td>
-                <td><span id='statusCOMPONENTID'></span></td>
-                <td>Name:</td>
-                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
                 </tr>
-                <tr>
-                <td>Component id</td>
-                <td><span id='compIdCOMPONENTID'></span></td>
-                <td>100% time opening period</td>
-                <td><input type="text" id="timeOpeningFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>100% time opening period</td>
-                <td><span id='timeOpeningCOMPONENTID'></span></td>
-                <td>Enabled scheduler:</td>
-                <td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Current position</td>
-                <td><span id='openingCurrentCOMPONENTID'></span>&nbsp;%</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Enabled scheduler</td>
-                <td><span id='enabledSchedulerCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Last update timestamp</td>
-                <td><span id='timestampCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
-                </tr>
-                </tbody>
-</table>
-</td>
-</tr></table>
-<div id="schDialogCOMPONENTID" title="Motor scheduler">
-    <div id="schDialog2COMPONENTID">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="timeOpeningLabelFCOMPONENTID"></div></td><td><input type="text" id="timeOpeningFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="scheduler_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>
+            </table>
+          </td><td>&nbsp;
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+</div>
+<div id="schDialogCOMPONENTID">
+    <div id="schDialogInnerCOMPONENTID">
     </div>
 </div>
 </div>

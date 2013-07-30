@@ -1,6 +1,9 @@
 <div>
 <script>
 function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
   $.ajax({
       url: "/",
       type: "get",

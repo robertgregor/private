@@ -39,14 +39,16 @@
                 for (var j=1; j<7; j++) {
                     var idElem = id+day.toString(10)+hour+j.toString(10);
                     var element = document.getElementById(idElem);
-                    s+=getPercentFromTitle(element.title.split(' ')[0]);
+                    s+=getPercentFromTitle(element.title);
                 }
             }
             return s;
         }
         function getPercentFromTitle(title) {
             var ts = title.split("%");
-            return ts[0].toString(16).toUpperCase();
+            var hxVal = (ts[0]*1).toString(16);
+            if (hxVal.length == 1) hxVal = "0" + hxVal;
+            return hxVal.toUpperCase();
         }        
         function getTemperatureFromTitle(title) {
             var ts = title.split(",");
@@ -66,6 +68,19 @@
             }
             return r+"</tr>";
         }
+        function pLpercent(n,ii,id) {
+            var r="<tr><td class=\"schtd\"><span>"+n+"</span></TD>";
+            for (var i=0;i<12;i++) {
+		var h=i.toString(10);
+		if (h.length==1) h="0"+h;
+		for (var j=1;j<7;j++) {
+                    var mn = ((j-1)*10).toString(10);
+                    while (mn.length == 1) mn = "0"+mn;
+                    r+="<td title=\"0% "+i+":"+mn+" "+n+"\" class=\"schtd\" style=\"background-color: green;\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\" onMouseOver=\"manageSchPercentTableMouseOver(this,'"+id+"');\" onMouseDown=\"manageSchPercentTableMouseDown(this,'"+id+"');\"></td>";
+                }
+            }
+            return r+"</tr>";
+        }
         function pLTemp(n,ii,id) {
             var r="<tr><td class=\"schtd\"><span>"+n+"</span></TD>";
             for (var i=0;i<12;i++) {
@@ -75,19 +90,6 @@
                     var mn = ((j-1)*15).toString(10);
                     while (mn.length == 1) mn = "0"+mn;
                     r+="<td title=\"20,5"+String.fromCharCode(176)+"C "+i+":"+mn+" "+n+"\" class=\"schtd\" style=\"background-color: green;\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\" onMouseOver=\"manageSchTempTableMouseOver(this,'"+id+"');\" onMouseDown=\"manageSchTempTableMouseDown(this,'"+id+"');\"></td>";
-                }
-            }
-            return r+"</tr>";
-        }
-        function pLpercent(n,ii,id) {
-            var r="<tr><td class=\"schtd\"><span>"+n+"</span></TD>";
-            for (var i=0;i<12;i++) {
-		var h=i.toString(10);
-		if (h.length==1) h="0"+h;
-		for (var j=1;j<5;j++) {
-                    var mn = ((j-1)*15).toString(10);
-                    while (mn.length == 1) mn = "0"+mn;
-                    r+="<td title=\"0% "+i+":"+mn+" "+n+"\" class=\"schtd\" style=\"background-color: green;\" name=\""+id+ii+h+j+"\" id=\""+id+ii+h+j+"\" onMouseOver=\"manageSchPercentTableMouseOver(this,'"+id+"');\" onMouseDown=\"manageSchPercentTableMouseDown(this,'"+id+"');\"></td>";
                 }
             }
             return r+"</tr>";
@@ -135,7 +137,7 @@
         }
         function createOnOffSchTable(id) {
             var html = "";
-            html += "<TABLE><TR><TD width=\"90%\"><TABLE id=\""+id+"table\" class=\"schtable\">";
+            html += "<TABLE id=\""+id+"table\" class=\"schtable\">";
 	    html += "<thead><TR><th class=\"schtd\">&nbsp</th>";
             for (var i=0; i<12; i++) {
 		var hour = i.toString(10);
@@ -158,12 +160,12 @@
             html += pL(saturday+" PM","11",id);
             html += pL(sunday+" AM","12",id);
             html += pL(sunday+" PM","13",id);
-            html += "</TR></tbody></table></td><td>"+scheduleOnOffProgramsManager(id)+"</td></table>";
+            html += "</TR><tr><td colspan=\"73\">"+scheduleOnOffProgramsManager(id)+"</td></tr></tbody></table>";
             return html;
         }
         function createPercentSchTable(id) {
             var html = "";
-            html += "<TABLE><TR><TD width=\"90%\"><TABLE id=\""+id+"table\" class=\"schtable\">";
+            html += "<TABLE id=\""+id+"table\" class=\"schtable\">";
 	    html += "<thead><TR><th class=\"schtd\">&nbsp</th>";
             for (var i=0; i<12; i++) {
 		var hour = i.toString(10);
@@ -186,7 +188,7 @@
             html += pLpercent(saturday+" PM","11",id);
             html += pLpercent(sunday+" AM","12",id);
             html += pLpercent(sunday+" PM","13",id);
-            html += "</TR></tbody></table></td><td>"+schedulePercentProgramsManager(id)+"</td></table>";
+            html += "</TR><tr><td colspan=\"73\">"+schedulePercentProgramsManager(id)+"</td></tr></tbody></table>";
             return html;
         }
         function createTempSchTable(id) {
@@ -219,9 +221,9 @@
         }
         function scheduleOnOffProgramsManager(id) {
             var html = "";
-            html += sch_saved_programs+"<BR><SELECT id=\"onoffProgs"+id+"\"></select><BR>";
-            html += "<BUTTON title=\""+sch_load+"\" id=\"onoffProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_update+"\" id=\"onoffProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_delete+"\" id=\"onoffProgsDelete"+id+"\">&nbsp;</BUTTON><BR><BR><BR>";
-            html += sch_new_program+"<BR><BR><INPUT id=\"onoffProgsName"+id+"\" type=\"text\"/>";
+            html += sch_saved_programs+"<SELECT id=\"onoffProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;";
+            html += "<BUTTON title=\""+sch_load+"\" id=\"onoffProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_update+"\" id=\"onoffProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_delete+"\" id=\"onoffProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;";
+            html += sch_new_program+"<INPUT id=\"onoffProgsName"+id+"\" type=\"text\"/>";
             html += "<BUTTON title=\""+sch_save_new_program+"\" id=\"onoffProgsSave"+id+"\">&nbsp;</BUTTON>";
             return html;
         }
@@ -259,8 +261,8 @@
         }
         function schedulePercentProgramsManager(id) {
             var html = "";
-            html += "Percentage selection:<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"percentSelect"+id+"\">"+populatePercentOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            html += saved_programs+"<SELECT id=\"percentProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            html += sch_percentage_selection+"<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"percentSelect"+id+"\">"+populatePercentOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            html += sch_saved_programs+"<SELECT id=\"percentProgs"+id+"\"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
             html += "<BUTTON title=\""+sch_load+"\" id=\"percentProgsLoad"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_update+"\" id=\"percentProgsUpdate"+id+"\">&nbsp;</BUTTON><BUTTON title=\""+sch_delete+"\" id=\"percentProgsDelete"+id+"\">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
             html += sch_new_program+"<INPUT id=\"percentProgsName"+id+"\" type=\"text\"/>";
             html += "<BUTTON title=\""+sch_save_new_program+"\" id=\"percentProgsSave"+id+"\">&nbsp;</BUTTON>";
@@ -420,7 +422,7 @@
         }
         function populateStyleFromPercent(element, temperature) {
             var title = "%"+((element.title.split("%"))[1]); 
-            if (temperature == "0") {
+            if (temperature == "00") {
                 element.style.backgroundColor = "green";
                 element.style.color = "white";
                 element.title = "0"+title;

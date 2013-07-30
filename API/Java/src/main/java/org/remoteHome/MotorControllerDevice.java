@@ -43,7 +43,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * This listenner listen for the event, when the blind is moved to required position. The user of this API should implement this interface
      * and register it for that event.
      */    
-    private BlindsControllerListener blindsControllerListener;
+    private MotorControllerListener blindsControllerListener;
     
     /**
      * When the blinds are moving already, this is true.
@@ -93,6 +93,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
     protected MotorControllerDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);
         setSubDeviceNumber("");
+        positionSchedule = new PercentageSchedule();
     }
     /**
      * Receive asynchronous command - blinds positioned
@@ -251,7 +252,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * and register it for that event.
      * @return the blindsControllerListener
      */
-    public BlindsControllerListener getBlindsControllerListener() {
+    public MotorControllerListener getBlindsControllerListener() {
         return blindsControllerListener;
     }
 
@@ -260,7 +261,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * and register it for that event.
      * @param blindsControllerListener the blindsControllerListener to set
      */
-    public void setBlindsControllerListener(BlindsControllerListener blindsControllerListener) {
+    public void setBlindsControllerListener(MotorControllerListener blindsControllerListener) {
         this.blindsControllerListener = blindsControllerListener;
     }
 

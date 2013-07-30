@@ -20,6 +20,7 @@ public class SimpleSwitchDeviceManager extends AbstractWebService {
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
+        boolean refresh = false;
         try {
             SimpleSwitchDevice device = (SimpleSwitchDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
             String action = requestParameters.get("action");
@@ -40,11 +41,14 @@ public class SimpleSwitchDeviceManager extends AbstractWebService {
                 int tm = Integer.parseInt(requestParameters.get("tm"));
                 Boolean onWhenPower = new Boolean(requestParameters.get("pw"));
                 Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
+                String room = requestParameters.get("room");
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getConfiguredPeriod() != tm) device.configurePeriod(tm);
                 if (device.isOnWhenAppliedPower() != onWhenPower) device.switchOnWhenAppliedPower(onWhenPower);
                 if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
-                sendAjaxAnswer("OK");
+                if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
+                r.savePersistentData();
+                if (refresh) sendAjaxAnswer("REFRESH"); else sendAjaxAnswer("OK");
             } else if (action.equals("SAVESCH")) {
                 for (int i=0; i<14;i++) {
                     device.getLightSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));

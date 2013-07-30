@@ -100,8 +100,17 @@ public class BatteryThermostatDevice extends AbstractDevice {
      */
     private boolean manageThresholdAuto;
     
+    /*
+     * This is true if scheduler is enabled.
+     */
+    private boolean enabledScheduler;
+
+    /*
+     * This is automatic scheduler
+     */
+    private TemperatureSchedule temperatureSchedule;   
     
-   /**
+    /**
      * The constructor is protected. The object should be constructed using
      * BatteryThermostatDevice device = 
      *          (BatteryThermostatDevice)remoteHomeManager.getRemoteHomeDevice(deviceId,deviceName, AbstractDevice.BatteryThermostat)
@@ -109,7 +118,7 @@ public class BatteryThermostatDevice extends AbstractDevice {
      * @param m remote manager reference
      * @param deviceId deviceId assigned to this device
      * @param deviceName device name
-     **/
+    **/
 
     protected BatteryThermostatDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);        
@@ -393,6 +402,34 @@ public class BatteryThermostatDevice extends AbstractDevice {
      */
     protected void setManageThresholdAuto(boolean manageThresholdAuto) {
         this.manageThresholdAuto = manageThresholdAuto;
+    }
+
+    /**
+     * @return the enabledScheduler
+     */
+    public boolean isEnabledScheduler() {
+        return enabledScheduler;
+    }
+
+    /**
+     * @param enabledScheduler the enabledScheduler to set
+     */
+    public void setEnabledScheduler(boolean enabledScheduler) {
+        this.enabledScheduler = enabledScheduler;
+    }
+
+    /**
+     * @return the temperatureSchedule
+     */
+    public TemperatureSchedule getTemperatureSchedule() {
+        return temperatureSchedule;
+    }
+
+    /**
+     * @param temperatureSchedule the temperatureSchedule to set
+     */
+    public void setTemperatureSchedule(TemperatureSchedule temperatureSchedule) {
+        this.temperatureSchedule = temperatureSchedule;
     }
     
     /*

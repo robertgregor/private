@@ -70,7 +70,6 @@ $(function() {
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
-    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
     $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
                    focus(function() {
                    setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
@@ -192,14 +191,10 @@ $(function() {
             }   
           });
     });
-    updateStatusCOMPONENTID();
-    document.getElementById('configureCOMPONENTID').value = change_config_p;
-    document.getElementById('onThermostatCOMPONENTID').value = on_thermostat;
-    document.getElementById('offThermostatCOMPONENTID').value = off_thermostat;
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
             height: 420,
-            width: 980,
+            width: 940,
             title: sch_temp_scheduler,
             modal: true,
             buttons: [
@@ -223,8 +218,8 @@ $(function() {
                 }}
           ]
     });
-    $( "#scheduleButtCOMPONENTID" ).button().click(function() {
-          $( "#schDialog2COMPONENTID" ).replaceWith(createTempSchTable('schTempTableCOMPONENTID'));        
+    $( "#scheduleButtCOMPONENTID" ).button().unbind('click').click(function() {
+          $( "#schDialogInnerCOMPONENTID" ).replaceWith(createTempSchTable('schTempTableCOMPONENTID'));        
           $.ajax({
                         url: "/",
                         type: "get",
@@ -250,10 +245,10 @@ $(function() {
                         alert(thrownError+"\n\n"+xhr.responseText);
                     }   
           });
-          $( "#temperatureProgsSaveschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+          $( "#temperatureProgsSaveschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
                   var name = document.getElementById("temperatureProgsNameschTempTableCOMPONENTID").value;
                   if (name == '') {
-                        alert('The name of the program cannot be empty');
+                        alert(error_name_prog_empty);
                         return;
                   }
                   var schData="&0="+saveTempSchedule("schTempTableCOMPONENTID", 0)+"&1="+saveTempSchedule("schTempTableCOMPONENTID", 1)+"&2="+saveTempSchedule("schTempTableCOMPONENTID", 2)+"&3="+saveTempSchedule("schTempTableCOMPONENTID", 3)+"&4="+saveTempSchedule("schTempTableCOMPONENTID", 4)+"&5="+saveTempSchedule("schTempTableCOMPONENTID", 5)+"&6="+saveTempSchedule("schTempTableCOMPONENTID", 6)+"&7="+saveTempSchedule("schTempTableCOMPONENTID", 7)+"&8="+saveTempSchedule("schTempTableCOMPONENTID", 8)+"&9="+saveTempSchedule("schTempTableCOMPONENTID", 9)+"&10="+saveTempSchedule("schTempTableCOMPONENTID", 10)+"&11="+saveTempSchedule("schTempTableCOMPONENTID", 11)+"&12="+saveTempSchedule("schTempTableCOMPONENTID", 12)+"&13="+saveTempSchedule("schTempTableCOMPONENTID", 13);
@@ -271,7 +266,7 @@ $(function() {
                     }   
                   });
           });
-          $( "#temperatureProgsUpdateschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+          $( "#temperatureProgsUpdateschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
                   var name = $("#temperatureProgsschTempTableCOMPONENTID option:selected").val();
                   var schData="&0="+saveTempSchedule("schTempTableCOMPONENTID", 0)+"&1="+saveTempSchedule("schTempTableCOMPONENTID", 1)+"&2="+saveTempSchedule("schTempTableCOMPONENTID", 2)+"&3="+saveTempSchedule("schTempTableCOMPONENTID", 3)+"&4="+saveTempSchedule("schTempTableCOMPONENTID", 4)+"&5="+saveTempSchedule("schTempTableCOMPONENTID", 5)+"&6="+saveTempSchedule("schTempTableCOMPONENTID", 6)+"&7="+saveTempSchedule("schTempTableCOMPONENTID", 7)+"&8="+saveTempSchedule("schTempTableCOMPONENTID", 8)+"&9="+saveTempSchedule("schTempTableCOMPONENTID", 9)+"&10="+saveTempSchedule("schTempTableCOMPONENTID", 10)+"&11="+saveTempSchedule("schTempTableCOMPONENTID", 11)+"&12="+saveTempSchedule("schTempTableCOMPONENTID", 12)+"&13="+saveTempSchedule("schTempTableCOMPONENTID", 13);
                   schData += "&name=" + name;
@@ -287,7 +282,7 @@ $(function() {
                     }   
                   });
           });
-          $( "#temperatureProgsDeleteschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).click(function() {
+          $( "#temperatureProgsDeleteschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).unbind('click').click(function() {
                 var name = $("#temperatureProgsschTempTableCOMPONENTID option:selected").val();
                   $.ajax({
                         url: "/",
@@ -302,7 +297,7 @@ $(function() {
                     }   
                   });
           });
-          $( "#temperatureProgsLoadschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).click(function() {
+          $( "#temperatureProgsLoadschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).unbind('click').click(function() {
                 var name = $("#temperatureProgsschTempTableCOMPONENTID option:selected").val();
                   $.ajax({
                         url: "/",
@@ -318,6 +313,10 @@ $(function() {
                   });
           });
     });
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    document.getElementById('onThermostatCOMPONENTID').value = on_thermostat;
+    document.getElementById('offThermostatCOMPONENTID').value = off_thermostat;
     setLabelBasedOnId("actionsCOMPONENTID", "actions");
     setLabelBasedOnId("statusCOMPONENTID", "status");
     setLabelBasedOnId("configurationCOMPONENTID", "configuration");
@@ -343,7 +342,6 @@ $(function() {
     setLabelBasedOnId("controlled_switch_idFCOMPONENTID", "controlled_switch_id");
     setLabelBasedOnId("heating_controller_idCOMPONENTID", "heating_controller_id");
     setLabelBasedOnId("heating_controller_idFCOMPONENTID", "heating_controller_id");
-    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
     setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
     setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
     setLabelBasedOnId("property_1COMPONENTID", "property");
@@ -450,7 +448,7 @@ $(function() {
                 <tr><td><div id="temp_meter_idFCOMPONENTID"></div></td><td><input type="text" id="remoteTemperatureMeterFormCOMPONENTID" /></td></tr>
                 <tr><td><div id="controlled_switch_idFCOMPONENTID"></div></td><td><input type="text" id="remoteSimpleSwitchFormCOMPONENTID" /></td></tr>
                 <tr><td><div id="heating_controller_idFCOMPONENTID"></div></td><td><input type="text" id="heatingControllerFormCOMPONENTID" /></td></tr>
-               <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
                </tbody>
             </table>
           </td></tr>
@@ -458,8 +456,8 @@ $(function() {
         <input type="submit" id="configureCOMPONENTID" />        
     </div>
 </div>
-<div id="schDialogCOMPONENTID" title="Temperature scheduler">
-    <div id="schDialog2COMPONENTID">
+<div id="schDialogCOMPONENTID">
+    <div id="schDialogInnerCOMPONENTID">
     </div>
 </div>
 </div>

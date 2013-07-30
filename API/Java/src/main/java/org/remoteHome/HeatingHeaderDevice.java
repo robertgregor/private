@@ -96,6 +96,16 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * Battery
      */
     private int battery;
+
+    /*
+     * This is true if scheduler is enabled.
+     */
+    private boolean enabledScheduler;
+
+    /*
+     * This is automatic scheduler
+     */
+    private TemperatureSchedule temperatureSchedule;   
     
    /**
      * The constructor is protected. The object should be constructed using
@@ -372,6 +382,34 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      */
     private void setBattery(int battery) {
         this.battery = battery;
+    }
+
+    /**
+     * @return the enabledScheduler
+     */
+    public boolean isEnabledScheduler() {
+        return enabledScheduler;
+    }
+
+    /**
+     * @param enabledScheduler the enabledScheduler to set
+     */
+    public void setEnabledScheduler(boolean enabledScheduler) {
+        this.enabledScheduler = enabledScheduler;
+    }
+
+    /**
+     * @return the temperatureSchedule
+     */
+    public TemperatureSchedule getTemperatureSchedule() {
+        return temperatureSchedule;
+    }
+
+    /**
+     * @param temperatureSchedule the temperatureSchedule to set
+     */
+    public void setTemperatureSchedule(TemperatureSchedule temperatureSchedule) {
+        this.temperatureSchedule = temperatureSchedule;
     }
     
     /*

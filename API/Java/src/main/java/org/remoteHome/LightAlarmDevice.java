@@ -116,16 +116,6 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
     private OnOffSchedule lightOnWhenMovementDetectedSchedule;
     
     /*
-     * This is the schedule allows to set the light on hardly
-     */
-    private OnOffSchedule lightSchedule;
-    
-    /*
-     * This is true if scheduler is enabled.
-     */
-    private boolean enabledScheduler;
-    
-    /*
      * This is true if movement scheduler is enabled.
      */
     private boolean enabledLightOnWhenMovementScheduler;
@@ -181,7 +171,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
     public void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException {
         String[] statusResponse = m.sendCommandWithAnswer(getDeviceId(), "sc").split("\\|");
         if (!statusResponse[0].equals("1")) {
-            throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+            throw new RemoteHomeManagerException("This response belongs to different device type: "+statusResponse[0], RemoteHomeManagerException.WRONG_DEVICE_TYPE);
         }
         if (statusResponse[1].equals("c")) {
             if (statusResponse[2].equals("1")) {
@@ -205,7 +195,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
         }
         statusResponse = m.sendCommandWithAnswer(getDeviceId(), "sa").split("\\|");
         if (!statusResponse[0].equals("1")) {
-            throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+            throw new RemoteHomeManagerException("This response belongs to different device type: "+statusResponse[0], RemoteHomeManagerException.WRONG_DEVICE_TYPE);
         }
         if (statusResponse[1].equals("a")) {
             setAlarmStatus(Integer.parseInt(statusResponse[2]));            
@@ -514,35 +504,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
         this.lightOnWhenMovementDetectedSchedule = lightOnWhenMovementDetectedSchedule;
     }
 
-    /**
-     * @return the lightSchedule
-     */
-    public OnOffSchedule getLightSchedule() {
-        return lightSchedule;
-    }
-
-    /**
-     * @param lightSchedule the lightSchedule to set
-     */
-    public void setLightSchedule(OnOffSchedule lightSchedule) {
-        this.lightSchedule = lightSchedule;
-    }
-
-    /**
-     * @return the enabledScheduler
-     */
-    public boolean isEnabledScheduler() {
-        return enabledScheduler;
-    }
-
-    /**
-     * @param enabledScheduler the enabledScheduler to set
-     */
-    public void setEnabledScheduler(boolean enabledScheduler) {
-        this.enabledScheduler = enabledScheduler;
-    }
-
-    /**
+     /**
      * @return the enabledLightOnWhenMovementScheduler
      */
     public boolean isEnabledLightOnWhenMovementScheduler() {

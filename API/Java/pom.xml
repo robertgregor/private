@@ -161,7 +161,7 @@
                 <server.host>localhost</server.host>
                 <listenPort>8080</listenPort>
                 <socket.host>localhost</socket.host>
-                <port>COM9</port>
+                <port>SIMULATE</port>
                 <serialize.filepath>c:/RH/test.ser</serialize.filepath>
             </properties>
         </profile>

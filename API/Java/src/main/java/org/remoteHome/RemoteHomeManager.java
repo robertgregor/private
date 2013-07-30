@@ -75,13 +75,6 @@ public class RemoteHomeManager {
             persistance = new Db4oPersistance();
             persistance.open(file);
             loadPersistentData();
-            /*
-            HashSet<AbstractDevice> h = new HashSet<AbstractDevice>();
-            h.add(createRemoteHomeDevice(1, "TestDevice", 6));
-            h.add(createRemoteHomeDevice(2, "Kotel", 3));
-            h.add(createRemoteHomeDevice(3, "TempSensor", 2));
-            rooms.put("aaaaaaa", h);
-            */
         } catch (Exception e) {
             throw new RemoteHomeManagerException(e.getMessage(), RemoteHomeManagerException.SERIALIZATION_ERROR);
         }
@@ -121,11 +114,13 @@ public class RemoteHomeManager {
         if (deviceType == AbstractDevice.HeatingHeader) {
             HeatingHeaderDevice device = new HeatingHeaderDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            
             device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.SimpleSwitch) {
             SimpleSwitchDevice device = new SimpleSwitchDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.setLightSchedule(new OnOffSchedule());
             device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.TemperatureSensor) {
@@ -136,26 +131,32 @@ public class RemoteHomeManager {
         } else if (deviceType == AbstractDevice.LightAlarmDevice) {
             LightAlarmDevice device = new LightAlarmDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.setLightSchedule(new OnOffSchedule());
+            device.setLightOnWhenMovementDetectedSchedule(new OnOffSchedule());
             device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.BlindsControllerDevice) {
             MotorControllerDevice device = new MotorControllerDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.setPositionSchedule(new PercentageSchedule());
             device.startScheduling();
             return device;            
         } else if (deviceType == AbstractDevice.Thermostat) {
             ThermostatDevice device = new ThermostatDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.setTemperatureSchedule(new TemperatureSchedule());
             device.startScheduling();
             return device;            
         } else if (deviceType == AbstractDevice.BatteryThermostat) {
             BatteryThermostatDevice device = new BatteryThermostatDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.setTemperatureSchedule(new TemperatureSchedule());
             device.startScheduling();
             return device;            
         } else if (deviceType == AbstractDevice.ThermostatWithSwitchAndTempSensor) {
             ThermostatWithSwitchAndTempSensorDevice device = new ThermostatWithSwitchAndTempSensorDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
+            device.setTemperatureSchedule(new TemperatureSchedule());
             device.startScheduling();
             return device;            
         } else {
@@ -299,7 +300,27 @@ public class RemoteHomeManager {
      * @throws RemoteHomeConnectionException if there is an error with the communication.
      */
     public String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
-        return comm.sendCommandWithAnswer(deviceId, command);
+        if (comm.isSimulate()) {
+            try {
+                AbstractDevice dev = this.getDevice(deviceId);
+                if (dev instanceof MotorControllerDevice) {
+                    return "5|0|0|10|5"; 
+                } else if (dev instanceof ThermostatDevice) {
+                    return "6|233|10|47|0|5|0"; 
+                } else if (dev instanceof TemperatureSensorDevice) {
+                    return "2|+23.32|3|10"; 
+                } else if (dev instanceof LightAlarmDevice) {
+                    if (command.startsWith("sa")) return "1|a|0|0|10|20";
+                    else return "1|c|0|0|0|10|0";
+                } else if (dev instanceof SimpleSwitchDevice) {
+                    return "3|0|0|3|3";
+                } else return "";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "";
+            }
+        } else
+            return comm.sendCommandWithAnswer(deviceId, command);
     }
     /**
      * Sends the add command and waits for the answer from the device.

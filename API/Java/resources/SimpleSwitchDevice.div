@@ -13,18 +13,20 @@ function updateStatusCOMPONENTID(showError) {
           var data = JSON.parse(indata);
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
           if (data.currentState) {
-              document.getElementById("statusCOMPONENTID").innerHTML='ON';
+              document.getElementById("statusCOMPONENTID").innerHTML=on;
           } else {
-              document.getElementById("statusCOMPONENTID").innerHTML='OFF';
+              document.getElementById("statusCOMPONENTID").innerHTML=off;
           }
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           if (data.onWhenAppliedPower) {
                 $( "#checkboxOnWhenPowerCOMPONENTID" ).prop('checked', true);
-                document.getElementById("onWhenPowerCOMPONENTID").innerHTML='YES';
+                document.getElementById("onWhenPowerCOMPONENTID").innerHTML=yes;
           } else {
                 $( "#checkboxOnWhenPowerCOMPONENTID" ).prop('checked', false);
-                document.getElementById("onWhenPowerCOMPONENTID").innerHTML='NO';
+                document.getElementById("onWhenPowerCOMPONENTID").innerHTML=no;
           }
           $("#checkboxOnWhenPowerCOMPONENTID").trigger("change");
           document.getElementById("configuredPeriodCOMPONENTID").innerHTML=data.configuredPeriod;
@@ -33,21 +35,26 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
           if (data.enabledScheduler) {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
-                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML='YES';
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=yes;
           } else {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', false);
-                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML='NO';
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=no;
           }
           $("#checkboxEnabledSchedulerCOMPONENTID").trigger("change");
       },
-      error:function(){
-        if (showError) {
-             alert('Error when tried to get the status of the device.');
-        }
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
       }   
   });
 }
 $(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs();
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
     $( "#checkboxOnWhenPowerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
     $( "#checkboxOnWhenPowerCOMPONENTID" ).change(function () {
                 if (this.checked) {
@@ -76,7 +83,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -90,7 +97,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -105,7 +112,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -127,25 +134,31 @@ $(function() {
               alert('Switch off period should be number between 0 and 255!');
               return;
           }
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
           var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").checked?"TRUE":"FALSE";
           var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&schenabled="+schenabled+"&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&schenabled="+schenabled+"&pw="+pw+"&room="+encodeURIComponent(room)+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
+                if (data == "REFRESH") document.location.reload(true);
+                updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
-          updateStatusCOMPONENTID();
     });
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
-            height: 390,
-            width: 1024,
+            height: 420,
+            width: 940,
             modal: true,
             buttons: {
                 "Assign schedule": function() {
@@ -158,7 +171,7 @@ $(function() {
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
                   $( this ).dialog( "close" );
@@ -169,7 +182,7 @@ $(function() {
           }
     });
     $( "#scheduleButtCOMPONENTID" ).button().click(function() {
-          $( "#schDialog2COMPONENTID" ).replaceWith(createOnOffSchTable('schTableCOMPONENTID'));
+          $( "#schDialogInnerCOMPONENTID" ).replaceWith(createOnOffSchTable('schTableCOMPONENTID'));
           $.ajax({
                         url: "/",
                         type: "get",
@@ -180,7 +193,7 @@ $(function() {
                         $( "#schDialogCOMPONENTID" ).dialog( "open" );          
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
           });          
           $.ajax({
@@ -192,7 +205,7 @@ $(function() {
                         loadPrograms(data, 'onoffProgsschTableCOMPONENTID');
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
           });
           $( "#onoffProgsSaveschTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
@@ -212,7 +225,7 @@ $(function() {
                         $('#onoffProgsschTableCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
@@ -228,7 +241,7 @@ $(function() {
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
@@ -243,7 +256,7 @@ $(function() {
                         $("#onoffProgsschTableCOMPONENTID option:selected").remove();
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
@@ -258,119 +271,148 @@ $(function() {
                         loadSchedule(data, 'schTableCOMPONENTID');                        
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
           });
     });
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    setLabelBasedOnId("property_4COMPONENTID", "property");
+    setLabelBasedOnId("value_4COMPONENTID", "value");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("actionsCOMPONENTID", "actions");
+    setLabelBasedOnId("statusTabCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("schedulerCOMPONENTID", "scheduler");
+    document.getElementById('SwitchOnSimpleSwitchCOMPONENTID').value = switch_on;
+    document.getElementById('SwitchOffSimpleSwitchCOMPONENTID').value = switch_off;
+    document.getElementById('SwitchOffTimeoutSimpleSwitchCOMPONENTID').value = switch_on_timeout;
+    var selectSSCOMPONENTID = document.getElementById("periodCOMPONENTID");
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_5min, '5');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_15min, '15');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_30min, '30');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_1hrs, '60');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_2hrs, '120');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_4hrs, '240');
+    setLabelBasedOnId("configured_period_LabelCOMPONENTID", "configured_off_period");
+    setLabelBasedOnId("configured_period_LabelFCOMPONENTID", "configured_off_period");
+    setLabelBasedOnId("current_period_LabelCOMPONENTID", "off_current_period");
+    setLabelBasedOnId("on_when_power_LabelCOMPONENTID", "on_when_power");
+    setLabelBasedOnId("on_when_power_LabelFCOMPONENTID", "on_when_power");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("stateCOMPONENTID", "state");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("scheduler_enabledFCOMPONENTID", "scheduler_enabled");
+    setLabelBasedOnId("scheduler_enabledCOMPONENTID", "scheduler_enabled");
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
     }, 300000);
 });
 </script>
-<table width="100%"><tr>
-<td>
-    <table width="100%"><tr><td width="50%">
-    <input width="100%" type="submit" id="SwitchOnSimpleSwitchCOMPONENTID" value="Switch On" />
-    </td><td width="50%">
-    <input width="100%" type="submit" id="SwitchOffSimpleSwitchCOMPONENTID" value="Switch Off" />
-    </td></tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-        <td  width="50%">
-            <select  width="100%" id="periodCOMPONENTID">
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-1"><div id="actionsCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusTabCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-1">
+        <br/>
+        <br/>
+        <input width="100%" type="submit" id="SwitchOnSimpleSwitchCOMPONENTID"/>
+        <input width="100%" type="submit" id="SwitchOffSimpleSwitchCOMPONENTID"/>
+        &nbsp;&nbsp;
+        <select  width="100%" id="periodCOMPONENTID">
                 <option value="0">&nbsp;</option>
-                <option value="5">5 min</option>
-                <option value="15">15 min</option>
-                <option value="30">30 min</option>
-                <option value="60">1 hour</option>
-                <option value="120">2 hours</option>
-                <option value="240">4 hours</option>
-            </select></td><td  width="50%">
-            &nbsp;&nbsp;
-            <input width="100%" type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID" value="Switch On with period" />
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr><td  width="100%" colspan="2"><button id="scheduleButtCOMPONENTID">Scheduler</button></td></tr>
-    </table>
-</td>
-<td>
-<table class="ui-widget" style="border-collapse: collapse;" width="100%">
+        </select>
+        <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID"/>
+        &nbsp;&nbsp;
+        <button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button> 
+    </div>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
               <thead class="ui-widget-header">
                 <tr>
-                <th>Property</th>
-                <th>Value</th>
-                <th>Parameter</th>
-                <th>Value</th>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
                 </tr>
-                </thead>
-                <tbody class="ui-widget-content">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="stateCOMPONENTID"></div></td><td><span id='statusCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="scheduler_enabledCOMPONENTID"></div></td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Name</td>
-                <td><span id='nameCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="configured_period_LabelCOMPONENTID"></div></td><td><span id='configuredPeriodCOMPONENTID'></span></td></tr>
+                <tr><td><div id="current_period_LabelCOMPONENTID"></div></td><td><span id='currentPeriodCOMPONENTID'></span></td></tr>
+                <tr><td><div id="on_when_power_LabelCOMPONENTID"></div></td><td><span id='onWhenPowerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Status</td>
-                <td><span id='statusCOMPONENTID'></span></td>
-                <td>Name:</td>
-                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="configured_period_LabelFCOMPONENTID"></div></td><td><input type="text" id="offPeriodFormCOMPONENTID" /></td></tr>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Component id</td>
-                <td><span id='compIdCOMPONENTID'></span></td>
-                <td>Switch off period:</td>
-                <td><input type="text" id="offPeriodFormCOMPONENTID" /></td>
+                <th><div id="property_4COMPONENTID"></div></th>
+                <th><div id="value_4COMPONENTID"></div></th>
                 </tr>
-                <tr>
-                <td>On when applied power</td>
-                <td><span id='onWhenPowerCOMPONENTID'></span></td>
-                <td>On when applied power:</td>
-                <td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Switch off period</td>
-                <td><span id='configuredPeriodCOMPONENTID'></span></td>
-                <td>Enabled scheduler:</td>
-                <td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td>
-                </tr>
-                <tr>
-                <td>Current period</td>
-                <td><span id='currentPeriodCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Scheduler enabled</td>
-                <td><span id='enabledSchedulerCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Last update timestamp</td>
-                <td><span id='timestampCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
-                </tr>
-                </tbody>
-</table>
-</td>
-</tr></table>
-<div id="schDialogCOMPONENTID" title="Switch Scheduler">
-    <div id="schDialog2COMPONENTID">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="scheduler_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="on_when_power_LabelFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td></tr>
+               <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+               </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+</div>
+<div id="schDialogCOMPONENTID">
+    <div id="schDialogInnerCOMPONENTID">
     </div>
 </div>
 </div>

@@ -22,6 +22,7 @@ public class MotorControllerDeviceManager extends AbstractWebService {
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
+        boolean refresh = false;
         try {
             MotorControllerDevice device = (MotorControllerDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
             String action = requestParameters.get("action");
@@ -38,9 +39,11 @@ public class MotorControllerDeviceManager extends AbstractWebService {
                 String nm = requestParameters.get("nm");
                 int tm = Integer.parseInt(requestParameters.get("tm"));
                 Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
+                String room = requestParameters.get("room");
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getFullRangeTimeout() != tm) device.configureFullRangeTimeout(tm);
-                if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);                
+                if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);   
+                if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
             } else if (action.equals("CLOSEALL")) {
                 for (AbstractDevice dev : r.getDevices()) {
                     if (dev instanceof MotorControllerDevice) {
@@ -68,7 +71,7 @@ public class MotorControllerDeviceManager extends AbstractWebService {
                 sendAjaxAnswer(device.getPositionSchedule().loadSchedule());
                 return;
             }
-            sendAjaxAnswer("OK");
+            if (refresh) sendAjaxAnswer("REFRESH"); else sendAjaxAnswer("OK");
         } catch (Exception e) {
             sendAjaxError(e.getMessage());
         }
