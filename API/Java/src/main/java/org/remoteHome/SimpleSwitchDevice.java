@@ -272,7 +272,17 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
         getLightSchedule().setEnabled(enabledScheduler);
         this.enabledScheduler = enabledScheduler;
     }
-    
+    /**
+     * This method will save the current state of the device to the database together with the timestamp.
+     */
+    protected void saveHistoryData() {
+          OnOffHistoryData historyProto = new OnOffHistoryData();
+          historyProto.setDeviceId(getDeviceId());
+          OnOffHistoryData history = (OnOffHistoryData)m.getPersistance().loadHistoryData(historyProto);
+          if (history == null) history = historyProto;
+          history.saveSampleData(System.currentTimeMillis(), (isCurrentState()) ? 1 : 0);
+          m.getPersistance().saveHistoryData(history);
+    }  
     /**
      * This method will start the scheduler thread to process the schedule.
      */
@@ -296,6 +306,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
                                     switchOff();
                                 }
                             }
+                            saveHistoryData();
                         }
                         Thread.sleep(30000);
                     } catch (InterruptedException e) {

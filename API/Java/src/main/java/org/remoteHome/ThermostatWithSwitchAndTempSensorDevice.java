@@ -129,6 +129,17 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
         }
     }
     /**
+     * This method will save the current state of the device to the database together with the timestamp.
+     */
+    protected void saveHistoryData() {
+          TemperatureHistoryData historyProto = new TemperatureHistoryData();
+          historyProto.setDeviceId(getDeviceId());
+          TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
+          if (history == null) history = historyProto;
+          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10));
+          m.getPersistance().saveHistoryData(history);
+    }
+    /**
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
@@ -140,7 +151,7 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(60000);
+                        Thread.sleep(50000);
                         if (isManualControl()) continue;
                         //manage heating controller
                         if (getSimpleSwitchDeviceId() == 0) continue;
@@ -182,6 +193,9 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
                                 //something has to be done.
                                 manageRemoteTemperatureSensorAndDeviceRelay();
                             }
+                        }
+                        if (((min % 15) == 0) || (min == 0)) {
+                            saveHistoryData();
                         }
                     } catch (InterruptedException e) {
                         return;

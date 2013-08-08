@@ -391,7 +391,17 @@ public class ThermostatDevice extends AbstractDevice {
     public void setHeatingControllerEnabled(boolean heatingControllerEnabled) {
         this.heatingControllerEnabled = heatingControllerEnabled;
     }
-
+    /**
+     * This method will save the current state of the device to the database together with the timestamp.
+     */
+    protected void saveHistoryData() {
+          TemperatureHistoryData historyProto = new TemperatureHistoryData();
+          historyProto.setDeviceId(getDeviceId());
+          TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
+          if (history == null) history = historyProto;
+          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10));
+          m.getPersistance().saveHistoryData(history);
+    }
     /**
      * This method will start the scheduler thread to process the schedule.
      */
@@ -403,7 +413,7 @@ public class ThermostatDevice extends AbstractDevice {
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(60000);
+                        Thread.sleep(50000);
                         //manage heating controller
                         if (isHeatingControllerEnabled() && getHeatingController() != 0) {
                             try {
@@ -443,7 +453,10 @@ public class ThermostatDevice extends AbstractDevice {
                                 }
                             }
                         }
-                        Thread.sleep(60000);
+                        if (((min % 15) == 0) || (min == 0)) {
+                            saveHistoryData();
+                        }
+                        Thread.sleep(50000);
                     } catch (InterruptedException e) {
                         return;
                     } catch (RemoteHomeConnectionException e) {

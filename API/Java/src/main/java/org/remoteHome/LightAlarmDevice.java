@@ -618,6 +618,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                                     switchOff();
                                 }
                             }
+                            saveHistoryData();
                         }
                         Thread.sleep(30000);
                     } catch (InterruptedException e) {

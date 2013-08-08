@@ -344,6 +344,17 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
     protected void setFullRangeTimeout(int fullRangeTimeout) {
         this.fullRangeTimeout = fullRangeTimeout;
     }
+    /**
+     * This method will save the current state of the device to the database together with the timestamp.
+     */
+    protected void saveHistoryData() {
+          PercentageHistoryData historyProto = new PercentageHistoryData();
+          historyProto.setDeviceId(getDeviceId());
+          PercentageHistoryData history = (PercentageHistoryData)m.getPersistance().loadHistoryData(historyProto);
+          if (history == null) history = historyProto;
+          history.saveSampleData(System.currentTimeMillis(), getCurrentOpening());
+          m.getPersistance().saveHistoryData(history);
+    }
    /**
      * This method will start the scheduler thread to process the schedule.
      */
@@ -363,6 +374,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
                                 //something has to be done.
                                 moveBlindsToPosition(action);
                             }
+                            saveHistoryData();
                         }
                         Thread.sleep(30000);
                     } catch (InterruptedException e) {

@@ -1,6 +1,7 @@
 package org.remoteHome;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 /**
   * Temperature sensor<BR/>
@@ -196,9 +197,35 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
         throw new RemoteHomeManagerException(RemoteHomeManagerException.NOT_SUPPORTED);
     }
     /**
+     * This method will save the current state of the device to the database together with the timestamp.
+     */
+    protected void saveHistoryData() {
+          TemperatureHistoryData historyProto = new TemperatureHistoryData();
+          historyProto.setDeviceId(getDeviceId());
+          TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
+          if (history == null) history = historyProto;
+          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10));
+          m.getPersistance().saveHistoryData(history);
+    }
+    /**
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
-        
+        new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    try {
+                        Calendar c = Calendar.getInstance();
+                        int min = c.get(Calendar.MINUTE);
+                        if (((min % 10) == 0) || (min == 0)) {
+                            saveHistoryData();
+                        }
+                        Thread.sleep(50000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }    
+            }
+        }).start();
     }    
 }
