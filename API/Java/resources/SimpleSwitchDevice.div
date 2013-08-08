@@ -122,16 +122,16 @@ $(function() {
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
-                alert('Name of the component cannot be empty!');
+                alert(error_name_cannot_be_empty);
                 return;
           }
           var tm = parseInt(document.getElementById("offPeriodFormCOMPONENTID").value);
           if (tm == NaN) {
-              alert('Switch off period should be number!');
+              alert(error_switch_off_period);
               return;
           }
           if (tm > 255) {
-              alert('Switch off period should be number between 0 and 255!');
+              alert(error_switch_off_period_range);
               return;
           }
           var room = document.getElementById("roomFormCOMPONENTID").value;
@@ -159,9 +159,10 @@ $(function() {
             autoOpen: false,
             height: 420,
             width: 940,
+            title: sch_onoff_scheduler,
             modal: true,
-            buttons: {
-                "Assign schedule": function() {
+            buttons: [
+                { text: sch_button_assign_schedule, click: function() {
                   var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);
                   $.ajax({
                         url: "/",
@@ -175,11 +176,11 @@ $(function() {
                     }   
                   });
                   $( this ).dialog( "close" );
-                },
-                Cancel: function() {
+                }},
+                { text: sch_button_cancel, click: function() {
                       $( this ).dialog( "close" );        
-                }
-          }
+                }}
+          ]
     });
     $( "#scheduleButtCOMPONENTID" ).button().click(function() {
           $( "#schDialogInnerCOMPONENTID" ).replaceWith(createOnOffSchTable('schTableCOMPONENTID'));
@@ -211,7 +212,7 @@ $(function() {
           $( "#onoffProgsSaveschTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
                   var name = document.getElementById("onoffProgsNameschTableCOMPONENTID").value;
                   if (name == '') {
-                        alert('The name of the program cannot be empty');
+                        alert(error_program_empty);
                         return;
                   }
                   var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);

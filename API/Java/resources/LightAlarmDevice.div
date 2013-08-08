@@ -13,68 +13,100 @@ function updateStatusCOMPONENTID(showError) {
           var data = JSON.parse(indata);
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
           if (data.currentState) {
-              document.getElementById("statusCOMPONENTID").innerHTML='ON';
+              document.getElementById("statusCOMPONENTID").innerHTML=on;
           } else {
-              document.getElementById("statusCOMPONENTID").innerHTML='OFF';
+              document.getElementById("statusCOMPONENTID").innerHTML=off;
           }
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           if (data.onWhenAppliedPower) {
                 $( "#checkboxOnWhenPowerCOMPONENTID" ).prop('checked', true);
-                document.getElementById("onWhenPowerCOMPONENTID").innerHTML='YES';
+                document.getElementById("onWhenPowerCOMPONENTID").innerHTML=yes;
           } else {
                 $( "#checkboxOnWhenPowerCOMPONENTID" ).prop('checked', false);
-                document.getElementById("onWhenPowerCOMPONENTID").innerHTML='NO';
+                document.getElementById("onWhenPowerCOMPONENTID").innerHTML=no;
           }
           $("#checkboxOnWhenPowerCOMPONENTID").trigger("change");
           document.getElementById("configuredPeriodCOMPONENTID").innerHTML=data.configuredPeriod;
           document.getElementById("offPeriodFormCOMPONENTID").value = data.configuredPeriod;
           document.getElementById("currentPeriodCOMPONENTID").innerHTML=data.currentCounter;
-          document.getElementById("enterTimeoutCOMPONENTID").innerHTML=data.alarmEnterTimeout;
-          document.getElementById("enterPeriodFormCOMPONENTID").value = data.alarmEnterTimeout;
-          document.getElementById("leaveTimeoutCOMPONENTID").innerHTML=data.alarmLeaveTimeout;
-          document.getElementById("leavePeriodFormCOMPONENTID").value = data.alarmLeaveTimeout;
           if (data.onWhenMovementDetected) {
                 $( "#checkboxOnWhenMovementCOMPONENTID" ).prop('checked', true);
-                document.getElementById("onWhenMovementCOMPONENTID").innerHTML='YES';
+                document.getElementById("onWhenMovementCOMPONENTID").innerHTML=yes;
           } else {
                 $( "#checkboxOnWhenMovementCOMPONENTID" ).prop('checked', false);
-                document.getElementById("onWhenMovementCOMPONENTID").innerHTML='NO';
+                document.getElementById("onWhenMovementCOMPONENTID").innerHTML=no;
           }
           $("#checkboxOnWhenMovementCOMPONENTID").trigger("change");
-          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
-          document.getElementById("smtpHostFormCOMPONENTID").value = data.smtpHost;
-          document.getElementById("smtpUserFormCOMPONENTID").value = data.smtpUser;
-          document.getElementById("smtpPasswordFormCOMPONENTID").value = data.smtpPassword;
-          document.getElementById("smtpEmailFromFormCOMPONENTID").value = data.smtpEmailFrom;
-          document.getElementById("smtpEmailToFormCOMPONENTID").value = data.smtpEmailTo;
-          document.getElementById("smtpSubjectFormCOMPONENTID").value = data.smtpSubject;
-          document.getElementById("smtpMessageFormCOMPONENTID").value = data.smtpMessage;
+          document.getElementById("enterTimeoutCOMPONENTID").innerHTML = data.alarmEnterTimeout;
+          document.getElementById("enterPeriodFormCOMPONENTID").value = data.alarmEnterTimeout;
+          document.getElementById("leaveTimeoutCOMPONENTID").innerHTML = data.alarmLeaveTimeout;
+          document.getElementById("leavePeriodFormCOMPONENTID").value = data.alarmLeaveTimeout;
+          document.getElementById("smtpHostFormCOMPONENTID").value = (data.smtpHost==null)?'':data.smtpHost;
+          document.getElementById("smtpUserFormCOMPONENTID").value = (data.smtpUser==null)?'':data.smtpUser;
+          document.getElementById("smtpPasswordFormCOMPONENTID").value = (data.smtpPassword==null)?'':data.smtpPassword;
+          document.getElementById("smtpEmailFromFormCOMPONENTID").value = (data.smtpEmailFrom==null)?'':data.smtpEmailFrom;
+          document.getElementById("smtpEmailToFormCOMPONENTID").value = (data.smtpEmailTo==null)?'':data.smtpEmailTo;
+          document.getElementById("smtpSubjectFormCOMPONENTID").value = (data.smtpSubject==null)?'':data.smtpSubject;
+          document.getElementById("smtpMessageFormCOMPONENTID").value = (data.smtpMessage==null)?'':data.smtpMessage;
+          document.getElementById("smtpHostCOMPONENTID").innerHTML = (data.smtpHost==null)?'':data.smtpHost;
+          document.getElementById("smtpUserCOMPONENTID").innerHTML = (data.smtpUser==null)?'':data.smtpUser;
+          document.getElementById("smtpPasswordCOMPONENTID").innerHTML = (data.smtpPassword==null)?'':data.smtpPassword;
+          document.getElementById("smtpEmailFromCOMPONENTID").innerHTML = (data.smtpEmailFrom==null)?'':data.smtpEmailFrom;
+          document.getElementById("smtpEmailToCOMPONENTID").innerHTML = (data.smtpEmailTo==null)?'':data.smtpEmailTo;
+          document.getElementById("smtpSubjectCOMPONENTID").innerHTML = (data.smtpSubject==null)?'':data.smtpSubject;
+          document.getElementById("smtpMessageCOMPONENTID").innerHTML = (data.smtpMessage==null)?'':data.smtpMessage;
           if (data.alarmStatus == 0)
-            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Disabled';
+            document.getElementById("statusAlCOMPONENTID").innerHTML = al_disabled;
           else if (data.alarmStatus == 1)
-            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Enabled';
+            document.getElementById("statusAlCOMPONENTID").innerHTML = al_enabled;
           else if (data.alarmStatus == 2)
-            document.getElementById("statusAlCOMPONENTID").innerHTML = 'activated';
+            document.getElementById("statusAlCOMPONENTID").innerHTML = al_activated;
           else if (data.alarmStatus == 3)
-            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Leave timeout running';
+            document.getElementById("statusAlCOMPONENTID").innerHTML = al_leave_timeout;
           else if (data.alarmStatus == 4)
-            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Enter timeout running';
+            document.getElementById("statusAlCOMPONENTID").innerHTML = al_enter_timeout;
           else
-            document.getElementById("statusAlCOMPONENTID").innerHTML = 'Unknown';
+            document.getElementById("statusAlCOMPONENTID").innerHTML = al_unknown;
           if (data.alarmSensorCurrentState == 0)
-            document.getElementById("statusSenCOMPONENTID").innerHTML = 'Nothing detected';
+            document.getElementById("statusSenCOMPONENTID").innerHTML = al_nothing_detected;
           else if (data.alarmSensorCurrentState == 1)
-            document.getElementById("statusSenCOMPONENTID").innerHTML = 'Movement detected';
+            document.getElementById("statusSenCOMPONENTID").innerHTML = al_movement_detected;
           else
-            document.getElementById("statusSenCOMPONENTID").innerHTML = 'Unknown';
+            document.getElementById("statusSenCOMPONENTID").innerHTML = al_unknown;
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+          if (data.enabledScheduler) {
+                $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=yes;
+          } else {
+                $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', false);
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=no;
+          }
+          $("#checkboxEnabledSchedulerCOMPONENTID").trigger("change");
+          if (data.enabledLightOnWhenMovementScheduler) {
+                $( "#checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID" ).prop('checked', true);
+                document.getElementById("enabledLightOnWhenMovementSchedulerCOMPONENTID").innerHTML=yes;
+          } else {
+                $( "#checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID" ).prop('checked', false);
+                document.getElementById("enabledLightOnWhenMovementSchedulerCOMPONENTID").innerHTML=no;
+          }
+          $("#checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID").trigger("change");
       },
-      error:function(){
-          alert('Error when tried to get the status of the device.');
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
       }   
   });
 }
 $(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs();
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
     $( "#checkboxOnWhenPowerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
     $( "#checkboxOnWhenPowerCOMPONENTID" ).change(function () {
                 if (this.checked) {
@@ -84,7 +116,24 @@ $(function() {
                 }
             });
     $( "#checkboxOnWhenPowerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
-
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+    $( "#checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#checkboxOnWhenMovementCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
     $( "#checkboxOnWhenMovementCOMPONENTID" ).change(function () {
                 if (this.checked) {
@@ -94,7 +143,6 @@ $(function() {
                 }
             });
     $( "#checkboxOnWhenMovementCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
-
     $( "#SwitchOnSimpleSwitchCOMPONENTID" ).button().click(function() {
           $.ajax({
               url: "/",
@@ -105,7 +153,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -119,7 +167,7 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
@@ -134,50 +182,54 @@ $(function() {
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
-    $( "#RefreshStatusAlCOMPONENTID" ).button().click(function() {
-          updateStatusCOMPONENTID();
-    });
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
-                alert('Name of the component cannot be empty!');
+                alert(error_name_cannot_be_empty);
                 return;
           }
           var tm = parseInt(document.getElementById("offPeriodFormCOMPONENTID").value);
           if (tm == NaN) {
-              alert('Switch off period should be number!');
+              alert(error_switch_off_period);
               return;
           }
           if (tm > 255) {
-              alert('Switch off period should be number between 0 and 255!');
+              alert(error_switch_off_period_range);
               return;
           }
-          var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").checked?"TRUE":"FALSE";
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
           var et = parseInt(document.getElementById("enterPeriodFormCOMPONENTID").value);
           if (et == NaN) {
-              alert('Alarm enter timeout period should be number!');
+              alert(err_enter_number);
               return;
           }
           if (et > 255) {
-              alert('Alarm enter timeout should be number between 0 and 255!');
+              alert(err_enter_number_range);
               return;
           }
           var lt = parseInt(document.getElementById("leavePeriodFormCOMPONENTID").value);
           if (lt == NaN) {
-              alert('Alarm leave timeout period should be number!');
+              alert(err_leave_number);
               return;
           }
           if (lt > 255) {
-              alert('Alarm leave timeout period should be number between 0 and 255!');
+              alert(err_leave_number_range);
               return;
           }
+          var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").checked?"TRUE":"FALSE";
+          var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
+          var schEnabledPIR = document.getElementById("checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
           var apw = document.getElementById("checkboxOnWhenMovementCOMPONENTID").checked?"TRUE":"FALSE";
           var smtpHost = encodeURIComponent(document.getElementById("smtpHostFormCOMPONENTID").value);
           var smtpUser = encodeURIComponent(document.getElementById("smtpUserFormCOMPONENTID").value);
@@ -190,80 +242,25 @@ $(function() {
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&pw="+pw+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&et="+et+"&lt="+lt+"&apw="+apw+"&smtpHost="+smtpHost+"&smtpUser="+smtpUser+"&smtpPassword="+smtpPassword+"&smtpFrom="+smtpFrom+"&smtpTo="+smtpTo+"&smtpSubject="+smtpSubject+"&smtpMessage="+smtpMessage+"&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&schenabled="+schenabled+"&pw="+pw+"&apw="+apw+"&schEnabledPIR="+schEnabledPIR+"&room="+encodeURIComponent(room)+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&et="+et+"&lt="+lt+"&smtpHost="+encodeURIComponent(smtpHost)+"&smtpUser="+encodeURIComponent(smtpUser)+"&smtpPassword="+encodeURIComponent(smtpPassword)+"&smtpFrom="+encodeURIComponent(smtpFrom)+"&smtpTo="+encodeURIComponent(smtpTo)+"&smtpSubject="+encodeURIComponent(smtpSubject)+"&smtpMessage="+encodeURIComponent(smtpMessage)+"&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
+                if (data == "REFRESH") document.location.reload(true);
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
-            }   
-          });
-          updateStatusCOMPONENTID();
-    });
-    $( "#activateAlarmCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALON&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
     });
-    $( "#deactivateAlarmCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALOFF&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
-            }   
-          });
-    });
-    $( "#activateAllAlarmCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALALLON&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
-            }   
-          });
-    });
-    $( "#deactivateAllAlarmCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=ALALLOFF&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
-            }   
-          });
-    });
-    $( "#schDialogLaCOMPONENTID" ).dialog({      
+    $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
-            height: 385,
-            width: 830,
+            height: 420,
+            width: 940,
+            title: sch_onoff_scheduler,
             modal: true,
-            buttons: {
-                "Save schedule": function() {
-                  var schData="&0="+saveSchedule("schTableLaCOMPONENTID", 0)+"&1="+saveSchedule("schTableLaCOMPONENTID", 1)+"&2="+saveSchedule("schTableLaCOMPONENTID", 2)+"&3="+saveSchedule("schTableLaCOMPONENTID", 3)+"&4="+saveSchedule("schTableLaCOMPONENTID", 4)+"&5="+saveSchedule("schTableLaCOMPONENTID", 5)+"&6="+saveSchedule("schTableLaCOMPONENTID", 6)+"&7="+saveSchedule("schTableLaCOMPONENTID", 7)+"&8="+saveSchedule("schTableLaCOMPONENTID", 8)+"&9="+saveSchedule("schTableLaCOMPONENTID", 9)+"&10="+saveSchedule("schTableLaCOMPONENTID", 10)+"&11="+saveSchedule("schTableLaCOMPONENTID", 11)+"&12="+saveSchedule("schTableLaCOMPONENTID", 12)+"&13="+saveSchedule("schTableLaCOMPONENTID", 13);
+            buttons: [
+                { text: sch_button_assign_schedule, click: function() {
+                  var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);
                   $.ajax({
                         url: "/",
                         type: "get",
@@ -272,252 +269,425 @@ $(function() {
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
                   $( this ).dialog( "close" );
-                },
-                Cancel: function() {
+                }},
+                { text: sch_button_cancel, click: function() {
                       $( this ).dialog( "close" );        
-                }
-          }
+                }}
+          ]
     });
-    $( "#scheduleButtLightAlmCOMPONENTID" ).button().click(function() {
-          $( "#schDialogLa2COMPONENTID" ).replaceWith(createSchTable('schTableLaCOMPONENTID'));
-          mouseDown==0;
-          $( 'table.schtable' ).delegate('td', 'mouseover', function () {
-            if (mouseDown == 1) $(this).toggleClass('schtds');
-          });
-          $( 'table.schtable' ).delegate('td', 'mousedown', function () {
-            $(this).toggleClass('schtds');
-          });
+    $( "#scheduleButtCOMPONENTID" ).button().click(function() {
+          $( "#schDialogInnerCOMPONENTID" ).replaceWith(createOnOffSchTable('schTableCOMPONENTID'));
           $.ajax({
                         url: "/",
                         type: "get",
                         'cache' : false,
                         data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=LOADSCH&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
-                        loadSchedule(data, 'schTableLaCOMPONENTID');
-                        $( "#schDialogLaCOMPONENTID" ).dialog( "open" );          
+                        loadSchedule(data, 'schTableCOMPONENTID');
+                        $( "#schDialogCOMPONENTID" ).dialog( "open" );          
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
           });          
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&type=OnOff&action=LOAD&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadPrograms(data, 'onoffProgsschTableCOMPONENTID');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+          });
+          $( "#onoffProgsSaveschTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+                  var name = document.getElementById("onoffProgsNameschTableCOMPONENTID").value;
+                  if (name == '') {
+                        alert(error_program_empty);
+                        return;
+                  }
+                  var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);
+                  schData += "&name=" + name;
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager"+schData+"&action=SAVE&type=OnOff&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $('#onoffProgsschTableCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#onoffProgsUpdateschTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+                  var name = $("#onoffProgsschTableCOMPONENTID option:selected").val();
+                  var schData="&0="+saveSchedule("schTableCOMPONENTID", 0)+"&1="+saveSchedule("schTableCOMPONENTID", 1)+"&2="+saveSchedule("schTableCOMPONENTID", 2)+"&3="+saveSchedule("schTableCOMPONENTID", 3)+"&4="+saveSchedule("schTableCOMPONENTID", 4)+"&5="+saveSchedule("schTableCOMPONENTID", 5)+"&6="+saveSchedule("schTableCOMPONENTID", 6)+"&7="+saveSchedule("schTableCOMPONENTID", 7)+"&8="+saveSchedule("schTableCOMPONENTID", 8)+"&9="+saveSchedule("schTableCOMPONENTID", 9)+"&10="+saveSchedule("schTableCOMPONENTID", 10)+"&11="+saveSchedule("schTableCOMPONENTID", 11)+"&12="+saveSchedule("schTableCOMPONENTID", 12)+"&13="+saveSchedule("schTableCOMPONENTID", 13);
+                  schData += "&name=" + name;
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager"+schData+"&action=UPDATE&type=OnOff&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#onoffProgsDeleteschTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).click(function() {
+                var name = $("#onoffProgsschTableCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=DELETE&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $("#onoffProgsschTableCOMPONENTID option:selected").remove();
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#onoffProgsLoadschTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).click(function() {
+                var name = $("#onoffProgsschTableCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=GET&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadSchedule(data, 'schTableCOMPONENTID');                        
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
     });
-    $( "#schDialogMovementCOMPONENTID" ).dialog({      
+    $( "#schDialogOnWhenMovementCOMPONENTID" ).dialog({      
             autoOpen: false,
-            height: 385,
-            width: 830,
+            height: 420,
+            width: 940,
+            title: sch_onoff_scheduler,
             modal: true,
-            buttons: {
-                "Save schedule": function() {
+            buttons: [
+                { text: sch_button_assign_schedule, click: function() {
                   var schData="&0="+saveSchedule("schTableMovementCOMPONENTID", 0)+"&1="+saveSchedule("schTableMovementCOMPONENTID", 1)+"&2="+saveSchedule("schTableMovementCOMPONENTID", 2)+"&3="+saveSchedule("schTableMovementCOMPONENTID", 3)+"&4="+saveSchedule("schTableMovementCOMPONENTID", 4)+"&5="+saveSchedule("schTableMovementCOMPONENTID", 5)+"&6="+saveSchedule("schTableMovementCOMPONENTID", 6)+"&7="+saveSchedule("schTableMovementCOMPONENTID", 7)+"&8="+saveSchedule("schTableMovementCOMPONENTID", 8)+"&9="+saveSchedule("schTableMovementCOMPONENTID", 9)+"&10="+saveSchedule("schTableMovementCOMPONENTID", 10)+"&11="+saveSchedule("schTableMovementCOMPONENTID", 11)+"&12="+saveSchedule("schTableMovementCOMPONENTID", 12)+"&13="+saveSchedule("schTableMovementCOMPONENTID", 13);
                   $.ajax({
                         url: "/",
                         type: "get",
                         'cache' : false,
-                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCHMOVEMENT&"+Math.floor((Math.random()*100)+1),
+                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCHONWHENMOVEMENT&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
                   });
                   $( this ).dialog( "close" );
-                },
-                Cancel: function() {
+                }},
+                { text: sch_button_cancel, click: function() {
                       $( this ).dialog( "close" );        
-                }
-          }
+                }}
+          ]
     });
-    $( "#scheduleLightOnMovementCOMPONENTID" ).button().click(function() {
-          $( "#schDialogMovement2COMPONENTID" ).replaceWith(createSchTable('schTableMovementCOMPONENTID'));
-          mouseDown==0;
-          $( 'table.schtable' ).delegate('td', 'mouseover', function () {
-            if (mouseDown == 1) $(this).toggleClass('schtds');
-          });
-          $( 'table.schtable' ).delegate('td', 'mousedown', function () {
-            $(this).toggleClass('schtds');
-          });
+    $( "#scheduleButtOnWhenMovementCOMPONENTID" ).button().click(function() {
+          $( "#schDialogOnWhenMovementInnerCOMPONENTID" ).replaceWith(createOnOffSchTable('schTableMovementCOMPONENTID'));
           $.ajax({
                         url: "/",
                         type: "get",
                         'cache' : false,
-                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=LOADSCHMOVEMENT&"+Math.floor((Math.random()*100)+1),
+                        data: "ServiceName=LightAlarmDeviceManager&deviceId=COMPONENTID&action=LOADSCHONWHENMOVEMENT&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
                         loadSchedule(data, 'schTableMovementCOMPONENTID');
-                        $( "#schDialogMovementCOMPONENTID" ).dialog( "open" );          
+                        $( "#schDialogOnWhenMovementCOMPONENTID" ).dialog( "open" );          
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError);
+                        alert(thrownError+"\n\n"+xhr.responseText);
                     }   
           });          
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&type=OnOff&action=LOAD&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadPrograms(data, 'onoffProgsschTableMovementCOMPONENTID');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+          });
+          $( "#onoffProgsSaveschTableMovementCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+                  var name = document.getElementById("onoffProgsNameschTableMovementCOMPONENTID").value;
+                  if (name == '') {
+                        alert(error_program_empty);
+                        return;
+                  }
+                  var schData="&0="+saveSchedule("schTableMovementCOMPONENTID", 0)+"&1="+saveSchedule("schTableMovementCOMPONENTID", 1)+"&2="+saveSchedule("schTableMovementCOMPONENTID", 2)+"&3="+saveSchedule("schTableMovementCOMPONENTID", 3)+"&4="+saveSchedule("schTableMovementCOMPONENTID", 4)+"&5="+saveSchedule("schTableMovementCOMPONENTID", 5)+"&6="+saveSchedule("schTableMovementCOMPONENTID", 6)+"&7="+saveSchedule("schTableMovementCOMPONENTID", 7)+"&8="+saveSchedule("schTableMovementCOMPONENTID", 8)+"&9="+saveSchedule("schTableMovementCOMPONENTID", 9)+"&10="+saveSchedule("schTableMovementCOMPONENTID", 10)+"&11="+saveSchedule("schTableMovementCOMPONENTID", 11)+"&12="+saveSchedule("schTableMovementCOMPONENTID", 12)+"&13="+saveSchedule("schTableMovementCOMPONENTID", 13);
+                  schData += "&name=" + name;
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager"+schData+"&action=SAVE&type=OnOff&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $('#onoffProgsschTableMovementCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#onoffProgsUpdateschTableMovementCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).click(function() {
+                  var name = $("#onoffProgsschTableMovementCOMPONENTID option:selected").val();
+                  var schData="&0="+saveSchedule("schTableMovementCOMPONENTID", 0)+"&1="+saveSchedule("schTableMovementCOMPONENTID", 1)+"&2="+saveSchedule("schTableMovementCOMPONENTID", 2)+"&3="+saveSchedule("schTableMovementCOMPONENTID", 3)+"&4="+saveSchedule("schTableMovementCOMPONENTID", 4)+"&5="+saveSchedule("schTableMovementCOMPONENTID", 5)+"&6="+saveSchedule("schTableMovementCOMPONENTID", 6)+"&7="+saveSchedule("schTableMovementCOMPONENTID", 7)+"&8="+saveSchedule("schTableMovementCOMPONENTID", 8)+"&9="+saveSchedule("schTableMovementCOMPONENTID", 9)+"&10="+saveSchedule("schTableMovementCOMPONENTID", 10)+"&11="+saveSchedule("schTableMovementCOMPONENTID", 11)+"&12="+saveSchedule("schTableMovementCOMPONENTID", 12)+"&13="+saveSchedule("schTableMovementCOMPONENTID", 13);
+                  schData += "&name=" + name;
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager"+schData+"&action=UPDATE&type=OnOff&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#onoffProgsDeleteschTableMovementCOMPONENTID" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).click(function() {
+                var name = $("#onoffProgsschTableMovementCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=DELETE&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $("#onoffProgsschTableMovementCOMPONENTID option:selected").remove();
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#onoffProgsLoadschTableMovementCOMPONENTID" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).click(function() {
+                var name = $("#onoffProgsschTableMovementCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=GET&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadSchedule(data, 'schTableMovementCOMPONENTID');                        
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
     });
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    setLabelBasedOnId("property_4COMPONENTID", "property");
+    setLabelBasedOnId("value_4COMPONENTID", "value");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("actionsCOMPONENTID", "actions");
+    setLabelBasedOnId("statusTabCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("schedulerCOMPONENTID", "scheduler");
+    setLabelBasedOnId("schedulerOnWhenMovementCOMPONENTID", "scheduler_on_when_movement");
+    document.getElementById('SwitchOnSimpleSwitchCOMPONENTID').value = switch_on;
+    document.getElementById('SwitchOffSimpleSwitchCOMPONENTID').value = switch_off;
+    document.getElementById('SwitchOffTimeoutSimpleSwitchCOMPONENTID').value = switch_on_timeout;
+    var selectSSCOMPONENTID = document.getElementById("periodCOMPONENTID");
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_5min, '5');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_15min, '15');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_30min, '30');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_1hrs, '60');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_2hrs, '120');
+    selectSSCOMPONENTID.options[selectSSCOMPONENTID.options.length] = new Option(switch_on_timeout_4hrs, '240');
+    setLabelBasedOnId("configured_period_LabelCOMPONENTID", "configured_off_period");
+    setLabelBasedOnId("configured_period_LabelFCOMPONENTID", "configured_off_period");
+    setLabelBasedOnId("current_period_LabelCOMPONENTID", "off_current_period");
+    setLabelBasedOnId("on_when_power_LabelCOMPONENTID", "on_when_power");
+    setLabelBasedOnId("on_when_power_LabelFCOMPONENTID", "on_when_power");
+    setLabelBasedOnId("on_when_movement_LabelCOMPONENTID", "on_when_movement");
+    setLabelBasedOnId("on_when_movement_LabelFCOMPONENTID", "on_when_movement");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("stateCOMPONENTID", "state");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("scheduler_enabledFCOMPONENTID", "scheduler_enabled");
+    setLabelBasedOnId("scheduler_enabledCOMPONENTID", "scheduler_enabled");
+    setLabelBasedOnId("scheduler_movement_enabledFCOMPONENTID", "scheduler_movement_enabled");
+    setLabelBasedOnId("scheduler_movement_enabledCOMPONENTID", "scheduler_movement_enabled");
+    setLabelBasedOnId("enterTimeoutLabelCOMPONENTID", "enter_timeout_label");
+    setLabelBasedOnId("leaveTimeoutLabelCOMPONENTID", "leave_timeout_label");
+    setLabelBasedOnId("enterTimeoutLabelFormCOMPONENTID", "enter_timeout_label");
+    setLabelBasedOnId("leaveTimeoutLabelFormCOMPONENTID", "leave_timeout_label");
+    setLabelBasedOnId("statusAlLabelCOMPONENTID", "al_status_label");
+    setLabelBasedOnId("statusSenLabelCOMPONENTID", "al_sensor_label");
+    setLabelBasedOnId("smtpHostLabelCOMPONENTID", "smtp_host_label");
+    setLabelBasedOnId("smtpHostLabelFormCOMPONENTID", "smtp_host_label");
+    setLabelBasedOnId("smtpUserLabelCOMPONENTID", "smtp_user_label");
+    setLabelBasedOnId("smtpUserLabelFormCOMPONENTID", "smtp_user_label");
+    setLabelBasedOnId("smtpPasswordLabelCOMPONENTID", "smtp_password_label");
+    setLabelBasedOnId("smtpPasswordLabelFormCOMPONENTID", "smtp_password_label");
+    setLabelBasedOnId("smtpEmailFromLabelCOMPONENTID", "smtp_email_from_label");
+    setLabelBasedOnId("smtpEmailFromLabelFormCOMPONENTID", "smtp_email_from_label");
+    setLabelBasedOnId("smtpEmailToLabelCOMPONENTID", "smtp_email_to_label");
+    setLabelBasedOnId("smtpEmailToLabelFormCOMPONENTID", "smtp_email_to_label");
+    setLabelBasedOnId("smtpSubjectLabelCOMPONENTID", "smtp_subject_label");
+    setLabelBasedOnId("smtpSubjectLabelFormCOMPONENTID", "smtp_subject_label");
+    setLabelBasedOnId("smtpMessageLabelCOMPONENTID", "smtp_message_label");
+    setLabelBasedOnId("smtpMessageLabelFormCOMPONENTID", "smtp_message_label");
+
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
     }, 300000);
 });
 </script>
-<table width="100%"><tr>
-<td>
-    <table width="100%"><tr><td>
-    <input type="submit" id="SwitchOnSimpleSwitchCOMPONENTID" value="Switch On" />
-    </td><td>
-    <input type="submit" id="SwitchOffSimpleSwitchCOMPONENTID" value="Switch Off" />
-    </td></tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <select id="periodCOMPONENTID">
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-1"><div id="actionsCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusTabCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-1">
+        <br/>
+        <br/>
+        <input width="100%" type="submit" id="SwitchOnSimpleSwitchCOMPONENTID"/>
+        <input width="100%" type="submit" id="SwitchOffSimpleSwitchCOMPONENTID"/>
+        &nbsp;&nbsp;
+        <select  width="100%" id="periodCOMPONENTID">
                 <option value="0">&nbsp;</option>
-                <option value="5">5 min</option>
-                <option value="15">15 min</option>
-                <option value="30">30 min</option>
-                <option value="60">1 hour</option>
-                <option value="120">2 hours</option>
-                <option value="240">4 hours</option>
-            </select>
-            &nbsp;&nbsp;
-            <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID" value="Switch On with period" />
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-    <td>
-    <button id="scheduleButtLightAlmCOMPONENTID">Light scheduler</button>
-    </td>
-    <td>
-    <button id="scheduleLightOnMovementCOMPONENTID">Movement sensor scheduler</button>
-    </td>
-    </tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr><td>
-    <input type="submit" id="activateAlarmCOMPONENTID" value="Activate alarm" />
-    </td><td>
-    <input type="submit" id="deactivateAlarmCOMPONENTID" value="Deactivate alarm" />
-    </td></tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-        <td><input type="submit" id="activateAllAlarmCOMPONENTID" value="Activate all alarms" /></td>
-        <td><input type="submit" id="deactivateAllAlarmCOMPONENTID" value="Deactivate all alarms" /></td>
-    <tr>
-    </tr>
-    </table>
-</td>
-<td>
-    <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+        </select>
+        <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID"/>
+        &nbsp;&nbsp;
+        <button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button>
+        <button id="scheduleButtOnWhenMovementCOMPONENTID"><div id="schedulerOnWhenMovementCOMPONENTID"></div></button> 
+    </div>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
               <thead class="ui-widget-header">
                 <tr>
-                <th>Property</th>
-                <th>Value</th>
-                <th>Parameter</th>
-                <th>Value</th>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
                 </tr>
-                </thead>
-                <tbody class="ui-widget-content">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="stateCOMPONENTID"></div></td><td><span id='statusCOMPONENTID'></span></td></tr>
+                <tr><td><div id="scheduler_enabledCOMPONENTID"></div></td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="scheduler_movement_enabledCOMPONENTID"></div></td><td><span id='enabledLightOnWhenMovementSchedulerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="configured_period_LabelCOMPONENTID"></div></td><td><span id='configuredPeriodCOMPONENTID'></span></td></tr>
+                <tr><td><div id="current_period_LabelCOMPONENTID"></div></td><td><span id='currentPeriodCOMPONENTID'></span></td></tr>
+                <tr><td><div id="on_when_power_LabelCOMPONENTID"></div></td><td><span id='onWhenPowerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="on_when_movement_LabelCOMPONENTID"></div></td><td><span id='onWhenMovementCOMPONENTID'></span></td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Name</td>
-                <td><span id='nameCOMPONENTID'></span></td>
-                <td>Name:</td>
-                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="statusAlLabelCOMPONENTID"></div></td><td><span id='statusAlCOMPONENTID'></span></td></tr>
+                <tr><td><div id="statusSenLabelCOMPONENTID"></div></td><td><span id='statusSenCOMPONENTID'></span></td></tr>
+                <tr><td><div id="enterTimeoutLabelCOMPONENTID"></div></td><td><span id='enterTimeoutCOMPONENTID'></span></td></tr>
+                <tr><td><div id="leaveTimeoutLabelCOMPONENTID"></div></td><td><span id='leaveTimeoutCOMPONENTID'></span></td></tr>
+                <tr><td><div id="smtpHostLabelCOMPONENTID"></div></td><td><span id='smtpHostCOMPONENTID'></span></td></tr>
+                <tr><td><div id="smtpUserLabelCOMPONENTID"></div></td><td><span id='smtpUserCOMPONENTID'></span></td></tr>
+                <tr><td><div id="smtpPasswordLabelCOMPONENTID"></div></td><td><span id='smtpPasswordCOMPONENTID'></span></td></tr>
+                <tr><td><div id="smtpEmailFromLabelCOMPONENTID"></div></td><td><span id='smtpEmailFromCOMPONENTID'></span></td></tr>
+                <tr><td><div id="smtpEmailToLabelCOMPONENTID"></div></td><td><span id='smtpEmailToCOMPONENTID'></span></td></tr>
+                <tr><td><div id="smtpSubjectLabelCOMPONENTID"></div></td><td><span id='smtpSubjectCOMPONENTID'></span></td></tr>
+                <tr><td><div id="smtpMessageLabelCOMPONENTID"></div></td><td><span id='smtpMessageCOMPONENTID'></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Switch status</td>
-                <td><span id='statusCOMPONENTID'></span></td>
-                <td>Switch off period:</td>
-                <td><input type="text" id="offPeriodFormCOMPONENTID" /></td>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="configured_period_LabelFCOMPONENTID"></div></td><td><input type="text" id="offPeriodFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="scheduler_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="scheduler_movement_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID" /><label for="checkboxEnabledLightOnWhenMovementSchedulerCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="smtpHostLabelFormCOMPONENTID"></div></td><td><input type="text" id="smtpHostFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="smtpUserLabelFormCOMPONENTID"></div></td><td><input type="text" id="smtpUserFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="smtpPasswordLabelFormCOMPONENTID"></div></td><td><input type="text" id="smtpPasswordFormCOMPONENTID" /></td></tr>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Component id</td>
-                <td><span id='compIdCOMPONENTID'></span></td>
-                <td>On when applied power:</td>
-                <td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td>
+                <th><div id="property_4COMPONENTID"></div></th>
+                <th><div id="value_4COMPONENTID"></div></th>
                 </tr>
-                <tr>
-                <td>On when applied power</td>
-                <td><span id='onWhenPowerCOMPONENTID'></span></td>
-                <td>Alarm enter timeout:</td>
-                <td><input type="text" id="enterPeriodFormCOMPONENTID"/></td>
-                </tr>
-                <tr>
-                <td>Switch off period</td>
-                <td><span id='configuredPeriodCOMPONENTID'></span></td>
-                <td>Alarm leave timeout:</td>
-                <td><input type="text" id="leavePeriodFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Current period</td>
-                <td><span id='currentPeriodCOMPONENTID'></span></td>
-                <td>Light on when movement detected:</td>
-                <td><input type="checkbox" id="checkboxOnWhenMovementCOMPONENTID" /><label for="checkboxOnWhenMovementCOMPONENTID">&nbsp;</label></td>                
-                </tr>
-                <tr>
-                <td>Enter alarm timeout</td>
-                <td><span id='enterTimeoutCOMPONENTID'></span></td>
-                <td>SMTP server host:</td>
-                <td><input type="text" id="smtpHostFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Leave alarm timeout</td>
-                <td><span id='leaveTimeoutCOMPONENTID'></span></td>
-                <td>SMTP login user:</td>
-                <td><input type="text" id="smtpUserFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>On when movement detected</td>
-                <td><span id='onWhenMovementCOMPONENTID'></span></td>
-                <td>SMTP login password:</td>
-                <td><input type="text" id="smtpPasswordFormCOMPONENTID" /></td>
-                </tr>
-                <td>Realtime movement sensor state</td>
-                <td><span id='statusSenCOMPONENTID'></span></td>
-                <td>SMTP email address from:</td>
-                <td><input type="text" id="smtpEmailFromFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Alarm status</td>
-                <td><span id='statusAlCOMPONENTID'></span></td>
-                <td>SMTP email address to:</td>
-                <td><input type="text" id="smtpEmailToFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td colspan="2">&nbsp;</td>
-                <td>SMTP subject:</td>
-                <td><input type="text" id="smtpSubjectFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td colspan="2">&nbsp;</td>
-                <td>SMTP message:</td>
-                <td><input type="text" id="smtpMessageFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Last update timestamp</td>
-                <td><span id='timestampCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
-                </tr>
-                </tbody>
-    </table>
-</td>
-</tr></table>
-<div id="schDialogLaCOMPONENTID" title="Light Scheduler">
-    <div id="schDialogLa2COMPONENTID">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="enterTimeoutLabelFormCOMPONENTID"></div></td><td><input type="text" id="enterPeriodFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="leaveTimeoutLabelFormCOMPONENTID"></div></td><td><input type="text" id="leavePeriodFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="on_when_power_LabelFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="on_when_movement_LabelFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxOnWhenMovementCOMPONENTID" /><label for="checkboxOnWhenMovementCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="smtpEmailFromLabelFormCOMPONENTID"></div></td><td><input type="text" id="smtpEmailFromFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="smtpEmailToLabelFormCOMPONENTID"></div></td><td><input type="text" id="smtpEmailToFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="smtpSubjectLabelFormCOMPONENTID"></div></td><td><input type="text" id="smtpSubjectFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="smtpMessageLabelFormCOMPONENTID"></div></td><td><input type="text" id="smtpMessageFormCOMPONENTID" /></td></tr>
+               </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
     </div>
 </div>
-<div id="schDialogMovementCOMPONENTID" title="Switch Scheduler">
-    <div id="schDialogMovement2COMPONENTID">
+<div id="schDialogCOMPONENTID">
+    <div id="schDialogInnerCOMPONENTID">
+    </div>
+</div>
+<div id="schDialogOnWhenMovementCOMPONENTID">
+    <div id="schDialogOnWhenMovementInnerCOMPONENTID">
     </div>
 </div>
 </div>

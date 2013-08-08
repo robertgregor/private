@@ -591,6 +591,7 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      */
     public void startScheduling() {
         getLightOnWhenMovementDetectedSchedule().setCurrentState("0");
+        getLightSchedule().setCurrentState("0");
         new Thread(new Runnable() {
             public void run() {
                 while(true) {

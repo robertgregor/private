@@ -44,6 +44,7 @@ public class MotorControllerDeviceManager extends AbstractWebService {
                 if (device.getFullRangeTimeout() != tm) device.configureFullRangeTimeout(tm);
                 if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);   
                 if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
+                r.getPersistance().saveDevice(device);
             } else if (action.equals("CLOSEALL")) {
                 for (AbstractDevice dev : r.getDevices()) {
                     if (dev instanceof MotorControllerDevice) {
@@ -66,7 +67,7 @@ public class MotorControllerDeviceManager extends AbstractWebService {
                 for (int i=0; i<14;i++) {
                     device.getPositionSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
                 }
-                r.savePersistentData();        
+                r.getPersistance().saveDevice(device);        
             } else if (action.equals("LOADSCH")) {
                 sendAjaxAnswer(device.getPositionSchedule().loadSchedule());
                 return;

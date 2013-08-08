@@ -41,6 +41,10 @@ public class Db4oPersistance implements ApiPersistance {
             for (AbstractSchedule sch : map.values()) db.store(sch);
             db.commit();
     }
+    public void saveSchedule(AbstractSchedule sch) {
+            db.store(sch);
+            db.commit();
+    }
     public HashMap<Integer, AbstractDevice> loadDevices() {
         HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
         List <AbstractDevice> ad = db.query(AbstractDevice.class);
@@ -71,5 +75,14 @@ public class Db4oPersistance implements ApiPersistance {
     public void deleteScheduler(AbstractSchedule sch) {
         db.delete(sch);
         db.commit();
+    }
+    public void saveHistoryData(AbstractHistoryData data) {
+            db.store(data);
+            db.commit();
+    }
+    public AbstractHistoryData loadHistoryData(AbstractHistoryData proto) {
+        List <AbstractHistoryData> ahs = db.queryByExample(proto);
+        if (ahs.size()==0) return null;
+        else return ahs.get(0);
     }
 }

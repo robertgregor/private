@@ -21,6 +21,7 @@ public class LightAlarmDeviceManager extends AbstractWebService {
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
+        boolean refresh = false;
         try {
             LightAlarmDevice device = (LightAlarmDevice)r.getDevice(Integer.parseInt(requestParameters.get("deviceId")));
             String action = requestParameters.get("action");
@@ -36,9 +37,15 @@ public class LightAlarmDeviceManager extends AbstractWebService {
                 String nm = requestParameters.get("nm");
                 int tm = Integer.parseInt(requestParameters.get("tm"));
                 Boolean onWhenPower = new Boolean(requestParameters.get("pw"));
+                Boolean enabledScheduler = new Boolean(requestParameters.get("schenabled"));
+                Boolean enabledSchedulerPIR = new Boolean(requestParameters.get("schEnabledPIR"));
+                String room = requestParameters.get("room");
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getConfiguredPeriod() != tm) device.configurePeriod(tm);
                 if (device.isOnWhenAppliedPower() != onWhenPower) device.switchOnWhenAppliedPower(onWhenPower);
+                if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
+                if (device.isEnabledLightOnWhenMovementScheduler() != enabledSchedulerPIR) device.setEnabledLightOnWhenMovementScheduler(enabledSchedulerPIR);
+                if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
                 //alarm params
                 int et = Integer.parseInt(requestParameters.get("et"));
                 int lt = Integer.parseInt(requestParameters.get("lt"));
@@ -53,7 +60,7 @@ public class LightAlarmDeviceManager extends AbstractWebService {
                 if (requestParameters.get("smtpTo") != device.getSmtpEmailTo()) device.setSmtpEmailTo(requestParameters.get("smtpTo"));
                 if (requestParameters.get("smtpSubject") != device.getSmtpSubject()) device.setSmtpSubject(requestParameters.get("smtpSubject"));
                 if (requestParameters.get("smtpMessage") != device.getSmtpMessage()) device.setSmtpMessage(requestParameters.get("smtpMessage"));
-                r.savePersistentData();
+                r.getPersistance().saveDevice(device);
             } else if (action.equals("ALON")) {
                 device.alarmOn();
             } else if (action.equals("ALOFF")) {
@@ -73,19 +80,21 @@ public class LightAlarmDeviceManager extends AbstractWebService {
             } else if (action.equals("SAVESCH")) {
                 for (int i=0; i<14;i++) {
                     device.getLightSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
+                    r.getPersistance().saveDevice(device);
                 }
             } else if (action.equals("LOADSCH")) {
                 sendAjaxAnswer(device.getLightSchedule().loadSchedule());
                 return;
-            } else if (action.equals("SAVESCHMOVEMENT")) {
+            } else if (action.equals("SAVESCHONWHENMOVEMENT")) {
                 for (int i=0; i<14;i++) {
                     device.getLightOnWhenMovementDetectedSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
+                    r.getPersistance().saveDevice(device);
                 }                
-            } else if (action.equals("LOADSCHMOVEMENT")) {
+            } else if (action.equals("LOADSCHONWHENMOVEMENT")) {
                 sendAjaxAnswer(device.getLightOnWhenMovementDetectedSchedule().loadSchedule());
                 return;
             }
-            sendAjaxAnswer("OK");
+            if (refresh) sendAjaxAnswer("REFRESH"); else sendAjaxAnswer("OK");
         } catch (Exception e) {
             sendAjaxError(e.getMessage());
         }        

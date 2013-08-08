@@ -47,13 +47,13 @@ public class SimpleSwitchDeviceManager extends AbstractWebService {
                 if (device.isOnWhenAppliedPower() != onWhenPower) device.switchOnWhenAppliedPower(onWhenPower);
                 if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
                 if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
-                r.savePersistentData();
+                r.getPersistance().saveDevice(device);
                 if (refresh) sendAjaxAnswer("REFRESH"); else sendAjaxAnswer("OK");
             } else if (action.equals("SAVESCH")) {
                 for (int i=0; i<14;i++) {
                     device.getLightSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
                 }
-                r.savePersistentData();
+                r.getPersistance().saveDevice(device);
                 sendAjaxAnswer("OK");
             } else if (action.equals("LOADSCH")) {
                 sendAjaxAnswer(device.getLightSchedule().loadSchedule());

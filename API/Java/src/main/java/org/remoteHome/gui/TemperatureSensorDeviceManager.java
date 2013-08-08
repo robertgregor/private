@@ -31,7 +31,7 @@ public class TemperatureSensorDeviceManager  extends AbstractWebService {
                 if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                 if (device.getFrequency() != tm) device.setExpectedFrequency(tm);
                 if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
-                r.savePersistentData();
+                r.getPersistance().saveDevice(device);
                 if (refresh) sendAjaxAnswer("REFRESH"); else sendAjaxAnswer("OK");
             }
         } catch (Exception e) {

@@ -32,6 +32,7 @@ public class HeatingHeaderDeviceManager  extends AbstractWebService {
                 if (device.getFrequency() != tm) device.setExpectedFrequency(tm);
                 if ((device.getOpenAngle() != oa) && temp == 0) device.setExpectedOpenAngle(oa);
                 if (device.getTemperature() != temp) device.setExpectedTemperature(temp);
+                r.getPersistance().saveDevice(device);
             }
             sendAjaxAnswer("OK");
         } catch (Exception e) {

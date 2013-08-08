@@ -84,7 +84,7 @@ public class SchedulersManager extends AbstractWebService {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
                     r.getSchedulers().put(name, schd);
-                    r.savePersistentData();
+                    r.getPersistance().saveSchedule(schd);
                     sendAjaxAnswer("OK");
                 } else if (requestParameters.get("type").equalsIgnoreCase("Temperature")) {
                     String name = requestParameters.get("name");
@@ -98,7 +98,7 @@ public class SchedulersManager extends AbstractWebService {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
                     r.getSchedulers().put(name, schd);
-                    r.savePersistentData();
+                    r.getPersistance().saveSchedule(schd);
                     sendAjaxAnswer("OK");
                 } else if (requestParameters.get("type").equalsIgnoreCase("Percentage")) {
                     String name = requestParameters.get("name");
@@ -112,7 +112,7 @@ public class SchedulersManager extends AbstractWebService {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
                     r.getSchedulers().put(name, schd);
-                    r.savePersistentData();
+                    r.getPersistance().saveSchedule(schd);
                     sendAjaxAnswer("OK");
                 }
             }
@@ -124,7 +124,7 @@ public class SchedulersManager extends AbstractWebService {
                     for (int i=0; i<14;i++) {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
-                    r.savePersistentData();
+                    r.getPersistance().saveSchedule(schd);
                     sendAjaxAnswer("OK");
                     } else {
                         sendAjaxError("This program name does not exist. Cannot update this program. Please reopen the schedule frame.");
@@ -138,7 +138,7 @@ public class SchedulersManager extends AbstractWebService {
                     for (int i=0; i<14;i++) {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
-                    r.savePersistentData();
+                    r.getPersistance().saveSchedule(schd);
                     sendAjaxAnswer("OK");
                     } else {
                         sendAjaxError("This program name does not exist. Cannot update this program. Please reopen the schedule frame.");
@@ -152,7 +152,7 @@ public class SchedulersManager extends AbstractWebService {
                     for (int i=0; i<14;i++) {
                        schd.saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));                       
                     }
-                    r.savePersistentData();
+                    r.getPersistance().saveSchedule(schd);
                     sendAjaxAnswer("OK");
                     } else {
                         sendAjaxError("This program name does not exist. Cannot update this program. Please reopen the schedule frame.");

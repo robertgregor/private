@@ -341,9 +341,12 @@ public class RemoteHomeManager {
         } finally {
             comm.disconnect();
             try {
-                savePersistentData();
-                getPersistance().close();
-            } catch (IOException e) {
+                if (getPersistance() != null) {
+                    getPersistance().saveDevices(devices);
+                    getPersistance().saveSchedulers(schedulers);
+                    getPersistance().close();
+                }
+            } catch (Exception e) {
                 throw new RemoteHomeManagerException(e.getMessage(),RemoteHomeManagerException.SERIALIZATION_ERROR);
             }
         }
@@ -369,15 +372,6 @@ public class RemoteHomeManager {
         return persistance;
     }
 
-    /*
-     * This method will save the configuration to the file on the disk.
-     */
-    public void savePersistentData() throws IOException {
-        if (getPersistance() != null) {
-            getPersistance().saveDevices(devices);
-            getPersistance().saveSchedulers(schedulers);
-        }
-    }
     /*
      * This method will return unused device id.
      */

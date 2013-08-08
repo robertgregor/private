@@ -46,7 +46,7 @@ public class ThermostatWithSwitchAndTempSensorDeviceManager extends AbstractWebS
                 if (device.isHeatingControllerEnabled()!= heatingEnabled) device.setHeatingControllerEnabled(heatingEnabled);
                 if (device.isManualControl()!= manualControl) device.setManualControl(manualControl);
                 if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
-                r.savePersistentData();
+                r.getPersistance().saveDevice(device);
             } else if (action.equals("ON")) {
                 device.relayOn(true);
             } else if (action.equals("OFF")) {
@@ -56,7 +56,7 @@ public class ThermostatWithSwitchAndTempSensorDeviceManager extends AbstractWebS
                     device.getTemperatureSchedule().saveSchedule(requestParameters.get(Integer.toString(i)), Integer.toString(i));
                 }
                 if (device.isEnabledScheduler()) device.setDeviceExpectedTemperature(device.getTemperatureSchedule().getCurrentExpectedValue());
-                r.savePersistentData();        
+                r.getPersistance().saveDevice(device);     
             } else if (action.equals("LOADSCH")) {
                 sendAjaxAnswer(device.getTemperatureSchedule().loadSchedule());
                 return;

@@ -16,9 +16,12 @@ public interface ApiPersistance {
     void saveDevices(HashMap<Integer, AbstractDevice> map);
     void saveDevice(AbstractDevice device);
     void saveSchedulers(HashMap<String, AbstractSchedule> map);
+    void saveSchedule(AbstractSchedule sch);
     void deleteScheduler(AbstractSchedule sch);
     HashMap<Integer, AbstractDevice> loadDevices();
     HashMap<String, AbstractSchedule> loadSchedulers();
     void saveProperties(Properties prop);
     Properties loadProperties();
+    void saveHistoryData(AbstractHistoryData data);
+    AbstractHistoryData loadHistoryData(AbstractHistoryData proto);
 }
