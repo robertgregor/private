@@ -204,7 +204,7 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
           historyProto.setDeviceId(getDeviceId());
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
           if (history == null) history = historyProto;
-          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10));
+          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10),0);
           m.getPersistance().saveHistoryData(history);
     }
     /**

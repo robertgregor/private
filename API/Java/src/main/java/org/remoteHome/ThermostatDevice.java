@@ -399,7 +399,12 @@ public class ThermostatDevice extends AbstractDevice {
           historyProto.setDeviceId(getDeviceId());
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
           if (history == null) history = historyProto;
-          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10));
+          int expected = getDeviceExpectedTemperature();
+          if (isEnabledScheduler()) {
+              Integer tmp = getTemperatureSchedule().processSchedule();
+              if (tmp != null) expected = tmp*10 / 2;
+          }
+          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()), expected);
           m.getPersistance().saveHistoryData(history);
     }
     /**
@@ -413,6 +418,11 @@ public class ThermostatDevice extends AbstractDevice {
             public void run() {
                 while(true) {
                     try {
+                        Calendar c = Calendar.getInstance();
+                        int min = c.get(Calendar.MINUTE);
+                        if (((min % 10) == 0) || (min == 0)) {
+                            saveHistoryData();
+                        }
                         Thread.sleep(50000);
                         //manage heating controller
                         if (isHeatingControllerEnabled() && getHeatingController() != 0) {
@@ -440,8 +450,8 @@ public class ThermostatDevice extends AbstractDevice {
                             continue;
                         }
                         if (isManualControl() && !isRemoteTemperatureMeterEnabled()) continue;
-                        Calendar c = Calendar.getInstance();
-                        int min = c.get(Calendar.MINUTE);
+                        c = Calendar.getInstance();
+                        min = c.get(Calendar.MINUTE);
                         if (((min % 15) == 0) || (min == 0)) {
                             Integer temperature = getTemperatureSchedule().processSchedule();
                             if (temperature != null) {
@@ -452,9 +462,6 @@ public class ThermostatDevice extends AbstractDevice {
                                     manageRemoteTemperatureSensorAndDeviceRelay();
                                 }
                             }
-                        }
-                        if (((min % 15) == 0) || (min == 0)) {
-                            saveHistoryData();
                         }
                         Thread.sleep(50000);
                     } catch (InterruptedException e) {

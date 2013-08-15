@@ -346,6 +346,7 @@ $(function() {
     setLabelBasedOnId("actionsCOMPONENTID", "actions");
     setLabelBasedOnId("statusCOMPONENTID", "status");
     setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("graphsCOMPONENTID", "graphs");
     setLabelBasedOnId("schedulerCOMPONENTID", "scheduler");
     setLabelBasedOnId("nameLabelCOMPONENTID", "name");
     setLabelBasedOnId("nameFCOMPONENTID", "name");
@@ -392,11 +393,12 @@ $(function() {
     }, 300000);
 });
 </script>
-<div id="componentTabsCOMPONENTID">
+  <div id="componentTabsCOMPONENTID">
      <ul>
         <li><a href="#componentTabsCOMPONENTID-1"><div id="actionsCOMPONENTID"></div></a></li>
         <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
         <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
     </ul>
     <div id="componentTabsCOMPONENTID-1">
         <br/>
@@ -491,6 +493,10 @@ $(function() {
           </td></tr>
         </table>
         <input type="submit" id="configureCOMPONENTID"/>        
+    </div>
+    <div id="componentTabsCOMPONENTID-4">
+        <div id="chartAreaCOMPONENTID">
+        </div>
     </div>
   </div>
 <div id="schDialogCOMPONENTID">

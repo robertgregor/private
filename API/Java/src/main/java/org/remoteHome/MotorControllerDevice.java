@@ -352,7 +352,9 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
           historyProto.setDeviceId(getDeviceId());
           PercentageHistoryData history = (PercentageHistoryData)m.getPersistance().loadHistoryData(historyProto);
           if (history == null) history = historyProto;
-          history.saveSampleData(System.currentTimeMillis(), getCurrentOpening());
+          int expected = getCurrentOpening();
+          if (isEnabledScheduler()) expected = (getPositionSchedule().processSchedule()!=null)?getPositionSchedule().processSchedule():getCurrentOpening();
+          history.saveSampleData(System.currentTimeMillis(), getCurrentOpening(), expected);
           m.getPersistance().saveHistoryData(history);
     }
    /**
@@ -364,19 +366,23 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(30000);                        
-                        if (!isEnabledScheduler()) continue;
                         Calendar c = Calendar.getInstance();
                         int min = c.get(Calendar.MINUTE);
+                        if (((min % 10) == 0) || (min == 0)) {
+                            saveHistoryData();
+                        }
+                        Thread.sleep(30000);                        
+                        if (!isEnabledScheduler()) continue;
+                        c = Calendar.getInstance();
+                        min = c.get(Calendar.MINUTE);
                         if (((min % 10) == 0) || (min == 0)) {
                             Integer action = getPositionSchedule().processSchedule();
                             if (action != null) {
                                 //something has to be done.
                                 moveBlindsToPosition(action);
                             }
-                            saveHistoryData();
                         }
-                        Thread.sleep(30000);
+                        Thread.sleep(20000);
                     } catch (InterruptedException e) {
                         return;
                     } catch (RemoteHomeConnectionException e) {

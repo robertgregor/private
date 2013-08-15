@@ -280,7 +280,14 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
           historyProto.setDeviceId(getDeviceId());
           OnOffHistoryData history = (OnOffHistoryData)m.getPersistance().loadHistoryData(historyProto);
           if (history == null) history = historyProto;
-          history.saveSampleData(System.currentTimeMillis(), (isCurrentState()) ? 1 : 0);
+          int expected = (isCurrentState()) ? 1 : 0;
+          if (isEnabledScheduler()) {
+              Boolean action = getLightSchedule().processSchedule();
+              if (action != null) {
+                  expected = action?1:0;
+              }
+          }
+          history.saveSampleData(System.currentTimeMillis(), (isCurrentState()) ? 1 : 0, expected);
           m.getPersistance().saveHistoryData(history);
     }  
     /**

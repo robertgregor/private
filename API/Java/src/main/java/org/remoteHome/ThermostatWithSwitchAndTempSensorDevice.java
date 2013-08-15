@@ -136,7 +136,21 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
           historyProto.setDeviceId(getDeviceId());
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
           if (history == null) history = historyProto;
-          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10));
+          if (getRemoteTemperatureMeterId() != 0) {
+              try {
+                  TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeterId());
+                  int temperature = (int)Math.round(tsd.getTemperature()*10);
+                  setTemperature(temperature);
+              } catch (Exception e) {
+                  e.printStackTrace();
+              }
+          }
+          int expected = getDeviceExpectedTemperature();
+          if (isEnabledScheduler()) {
+              Integer tmp = getTemperatureSchedule().processSchedule();
+              if (tmp != null) expected = tmp*10 / 2;
+          }
+          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10), expected);
           m.getPersistance().saveHistoryData(history);
     }
     /**
@@ -151,6 +165,11 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
             public void run() {
                 while(true) {
                     try {
+                        Calendar c = Calendar.getInstance();
+                        int min = c.get(Calendar.MINUTE);
+                        if (((min % 10) == 0) || (min == 0)) {
+                            saveHistoryData();
+                        }
                         Thread.sleep(50000);
                         if (isManualControl()) continue;
                         //manage heating controller
@@ -184,8 +203,8 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
                             manageRemoteTemperatureSensorAndDeviceRelay();
                             continue;
                         }
-                        Calendar c = Calendar.getInstance();
-                        int min = c.get(Calendar.MINUTE);
+                        c = Calendar.getInstance();
+                        min = c.get(Calendar.MINUTE);
                         if (((min % 15) == 0) || (min == 0)) {
                             Integer temperature = getTemperatureSchedule().processSchedule();
                             if (temperature != null) {
@@ -193,9 +212,6 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
                                 //something has to be done.
                                 manageRemoteTemperatureSensorAndDeviceRelay();
                             }
-                        }
-                        if (((min % 15) == 0) || (min == 0)) {
-                            saveHistoryData();
                         }
                     } catch (InterruptedException e) {
                         return;
