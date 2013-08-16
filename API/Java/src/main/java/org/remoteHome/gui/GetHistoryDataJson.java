@@ -56,7 +56,7 @@ public class GetHistoryDataJson extends AbstractWebService{
                 else if (range.equalsIgnoreCase("month")) map = jsonData.getLastMonthSamples();
                 else if (range.equalsIgnoreCase("threemonth")) map = jsonData.getLastThreeMonthSamples();
                 else if (range.equalsIgnoreCase("year")) map = jsonData.getLastYearSamples();
-                else if (range.equalsIgnoreCase("threeyear")) map = jsonData.getLastThreeYearsSamples();
+                else if (range.equalsIgnoreCase("threeyears")) map = jsonData.getLastThreeYearsSamples();
             } else {
                 map = new TreeMap<Long, AbstractHistoryData.HistoryItems>();
             }

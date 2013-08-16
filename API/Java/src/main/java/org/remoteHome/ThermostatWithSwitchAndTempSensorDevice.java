@@ -147,8 +147,8 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
           }
           int expected = getDeviceExpectedTemperature();
           if (isEnabledScheduler()) {
-              Integer tmp = getTemperatureSchedule().processSchedule();
-              if (tmp != null) expected = tmp*10 / 2;
+              Integer tmp = getTemperatureSchedule().getCurrentExpectedValue();
+              if (tmp != null) expected = tmp;
           }
           history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10), expected);
           m.getPersistance().saveHistoryData(history);

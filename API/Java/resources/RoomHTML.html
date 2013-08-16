@@ -29,7 +29,53 @@
 		return this.customFormat("#DD#/#MM#/#YYYY# #hh#:#mm#:#ss# #AMPM#");
     }
  });
- 
+ function drawChart(divId, compId, range, type) {
+                $.ajax({
+                    url: "/",
+                    type: "get",
+                    'cache' : false,
+                    data: "ServiceName=GetHistoryDataJson&deviceId="+compId+"&range="+range+"&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        var items = JSON.parse(data);
+                        if (type == "onoff") {
+                            divId.chart({
+                                gallery:cfx.Gallery.CurveArea,
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value }, { name: "yDataExpected", displayName: chart_expected, usage: cfx.FieldUsage.Value },
+                                    { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                axisX: {DataFormat:Date}
+                            });                            
+                        } else if (type == "percentage") {
+                            divId.chart({
+                                gallery:cfx.Gallery.CurveArea,
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value }, { name: "yDataExpected", displayName: chart_expected, usage: cfx.FieldUsage.Value },
+                                    { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                axisX: {DataFormat:Date},
+                                axisY: {DataFormat:Number}
+                            });
+                        } else if (type == "temperature") {
+                            divId.chart({
+                                gallery:cfx.Gallery.CurveArea,
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value }, { name: "yDataExpected", displayName: chart_expected, usage: cfx.FieldUsage.Value },
+                                    { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                axisX: {DataFormat:Date},
+                                axisY: {DataFormat:Number}
+                            });
+                        }
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                });
+ }
 </script>
 </head>
 <body>

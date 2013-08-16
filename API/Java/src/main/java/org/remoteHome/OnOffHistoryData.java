@@ -22,8 +22,8 @@ public class OnOffHistoryData extends AbstractHistoryData {
         int cnt = 0;
         for (long key : items.keySet()) {
             ChartItem it = new ChartItem();
-            it.yData = (items.get(key).getItem()==0)?"Off":"On";
-            it.yDataExpected = (items.get(key).getItemExpected()==0)?"Off":"On";
+            it.yData = (items.get(key).getItem()==0)?0:1;
+            it.yDataExpected = (items.get(key).getItemExpected()==0)?0:1;
             Date d = new Date(key*600000);
             it.xData = df.format(d);
             i[cnt++] = it;
@@ -33,7 +33,7 @@ public class OnOffHistoryData extends AbstractHistoryData {
     
     class ChartItem {
         String xData;
-        String yData;    
-        String yDataExpected;    
+        int yData;    
+        int yDataExpected;    
     }
 }

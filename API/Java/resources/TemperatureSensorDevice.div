@@ -32,7 +32,35 @@ function updateStatusCOMPONENTID(showError) {
   });
 }
 $(function() {
-    $( "#componentTabsCOMPONENTID" ).tabs();
+    $( "#componentTabsCOMPONENTID" ).tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 2) {
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+            }
+        }
+    });
+    $( "#chartButtHourCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+    });
+    $( "#chartButtDayCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "temperature");
+    });
+    $( "#chartButtWeekCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "temperature");
+    });
+    $( "#chartButtMonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "temperature");
+    });
+    $( "#chartButt3MonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "temperature");
+    });
+    $( "#chartButtYearCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "temperature");
+    });
+    $( "#chartButt3YearsCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "temperature");
+    });
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
@@ -87,6 +115,7 @@ $(document).ready(function() {
     document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
     setLabelBasedOnId("statusCOMPONENTID", "status");
     setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("graphsCOMPONENTID", "graphs");
     setLabelBasedOnId("nameLabelCOMPONENTID", "name");
     setLabelBasedOnId("nameFCOMPONENTID", "name");
     setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
@@ -101,7 +130,13 @@ $(document).ready(function() {
     setLabelBasedOnId("sending_periodCOMPONENTID", "sending_period");
     setLabelBasedOnId("sending_periodExpectedCOMPONENTID", "sending_period_expected");
     setLabelBasedOnId("sending_periodFCOMPONENTID", "sending_period");
-
+    setLabelBasedOnId("chartButtHourLabelCOMPONENTID", "chart_butt_hour");
+    setLabelBasedOnId("chartButtDayLabelCOMPONENTID", "chart_butt_day");
+    setLabelBasedOnId("chartButtWeekLabelCOMPONENTID", "chart_butt_week");
+    setLabelBasedOnId("chartButtMonthLabelCOMPONENTID", "chart_butt_month");
+    setLabelBasedOnId("chartButt3MonthLabelCOMPONENTID", "chart_butt_3month");
+    setLabelBasedOnId("chartButtYearLabelCOMPONENTID", "chart_butt_year");
+    setLabelBasedOnId("chartButt3YearsLabelCOMPONENTID", "chart_butt_3years");
     updateStatusCOMPONENTID();
     window.setInterval(function() {
         updateStatusCOMPONENTID(false);
@@ -112,6 +147,7 @@ $(document).ready(function() {
      <ul>
         <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
         <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
     </ul>
     <div id="componentTabsCOMPONENTID-2">
         <table>
@@ -168,6 +204,17 @@ $(document).ready(function() {
           </td></tr>
         </table>
         <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+    <div id="componentTabsCOMPONENTID-4">
+        <button id="chartButtHourCOMPONENTID"><div id="chartButtHourLabelCOMPONENTID"></div></button>
+        <button id="chartButtDayCOMPONENTID"><div id="chartButtDayLabelCOMPONENTID"></div></button>
+        <button id="chartButtWeekCOMPONENTID"><div id="chartButtWeekLabelCOMPONENTID"></div></button>
+        <button id="chartButtMonthCOMPONENTID"><div id="chartButtMonthLabelCOMPONENTID"></div></button>
+        <button id="chartButt3MonthCOMPONENTID"><div id="chartButt3MonthLabelCOMPONENTID"></div></button>
+        <button id="chartButtYearCOMPONENTID"><div id="chartButtYearLabelCOMPONENTID"></div></button>
+        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button>
+        <div id="chartAreaCOMPONENTID" style="width:800px;height:300px;display:inline-block">
+        </div>
     </div>
 </div>
 </div>

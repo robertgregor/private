@@ -304,7 +304,7 @@ public class RemoteHomeManager {
             try {
                 AbstractDevice dev = this.getDevice(deviceId);
                 if (dev instanceof MotorControllerDevice) {
-                    return "5|0|0|10|5"; 
+                    return "5|0|0|10|50"; 
                 } else if (dev instanceof ThermostatDevice) {
                     return "6|233|10|47|0|5|0"; 
                 } else if (dev instanceof TemperatureSensorDevice) {
