@@ -1,14 +1,10 @@
 package org.remoteHome;
 
-import com.db4o.Db4oEmbedded;
-import com.db4o.ObjectContainer;
-import com.db4o.config.EmbeddedConfiguration;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -304,11 +300,11 @@ public class RemoteHomeManager {
             try {
                 AbstractDevice dev = this.getDevice(deviceId);
                 if (dev instanceof MotorControllerDevice) {
-                    return "5|0|0|10|50"; 
+                    return "5|0|0|10|"+Integer.toString((int)Math.random()*100);
                 } else if (dev instanceof ThermostatDevice) {
-                    return "6|233|10|47|0|5|0"; 
+                    return "6|"+Integer.toString(150+(int)Math.random()*100)+"|10|47|0|5|0"; 
                 } else if (dev instanceof TemperatureSensorDevice) {
-                    return "2|+23.32|3|10"; 
+                    return "2|+"+Integer.toString(15+(int)Math.random()*10)+"."+Integer.toString((int)Math.random()*100)+"|3|10"; 
                 } else if (dev instanceof LightAlarmDevice) {
                     if (command.startsWith("sa")) return "1|a|0|0|10|20";
                     else return "1|c|0|0|0|10|0";

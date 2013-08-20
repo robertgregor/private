@@ -1,6 +1,9 @@
 <div>
 <script>
 function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
   $.ajax({
       url: "/",
       type: "get",
@@ -10,28 +13,65 @@ function updateStatusCOMPONENTID() {
           var data = JSON.parse(indata);
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           document.getElementById("currPeriodCOMPONENTID").innerHTML=data.frequency;
           document.getElementById("currPeriodFormCOMPONENTID").value=data.expectedFrequency;
-          document.getElementById("expPeriodCOMPONENTID").innerHTML=data.expectedFrequency;
           document.getElementById("temperatureCOMPONENTID").innerHTML=data.temperature / 10;
-          document.getElementById("expTemperatureCOMPONENTID").innerHTML=(data.expectedTemperature / 2);
-          document.getElementById("currTemperatureFormCOMPONENTID").value=(data.expectedTemperature / 2);
-          document.getElementById("expOpenAngleCOMPONENTID").innerHTML=data.openAngle;
+          document.getElementById("expTemperatureCOMPONENTID").innerHTML=(data.expectedTemperature / 10);
+          document.getElementById("expTemperatureFormCOMPONENTID").value=(data.expectedTemperature / 10);
           document.getElementById("openAngleCOMPONENTID").innerHTML=(data.expectedOpenAngle);
-          document.getElementById("currOpenAngleFormCOMPONENTID").value=(data.expectedOpenAngle);
+          document.getElementById("openAngleFormCOMPONENTID").value=(data.expectedOpenAngle);
           document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery;
+          document.getElementById("expPeriodCOMPONENTID").innerHTML=data.expectedFrequency;
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+
       },
-      error:function(){
-          alert('Error when tried to get the status of the device.');
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
       }
   });
 }
 $(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 2) {
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+            }
+        }
+    });
+    $( "#chartButtHourCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+    });
+    $( "#chartButtDayCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "temperature");
+    });
+    $( "#chartButtWeekCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "temperature");
+    });
+    $( "#chartButtMonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "temperature");
+    });
+    $( "#chartButt3MonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "temperature");
+    });
+    $( "#chartButtYearCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "temperature");
+    });
+    $( "#chartButt3YearsCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "temperature");
+    });
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
@@ -47,116 +87,271 @@ $(function() {
               alert('Sending period should be number between 10 and 2550!');
               return;
           }
-          var oa = parseInt(document.getElementById("currOpenAngleFormCOMPONENTID").value);
-          if (oa == NaN) {
-              alert('Sending period should be number!');
-              return;
-          }
-          if ((oa > 100) || (oa < 0)) {
-              alert('Open angle value should be number between 0 and 100!');
-              return;
-          }
-          var temp = parseFloat(document.getElementById("currTemperatureFormCOMPONENTID").value);
-          if (oa == NaN) {
-              alert('Temperature should be number!');
-              return;
-          }
-          temp = temp * 2;
-          if ((temp > 80) || (temp < 0)) {
-              alert('Temperature should be a number 0.0 and 40.0 with steps 0.5!');
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
               return;
           }
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=HeatingHeaderDeviceManager&deviceId=COMPONENTID&tm="+tm+"&oa="+oa+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+              data: "ServiceName=HeatingHeaderDeviceManager&deviceId=COMPONENTID&tm="+tm+"&room="+encodeURIComponent(room)+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
+                if (data == "REFRESH") document.location.reload(true);
                 updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError);
+                alert(thrownError+"\n\n"+xhr.responseText);
             }   
           });
           updateStatusCOMPONENTID();
     });
-});
-$(document).ready(function() {
+    $( "#schDialogCOMPONENTID" ).dialog({      
+            autoOpen: false,
+            height: 420,
+            width: 940,
+            modal: true,
+            buttons: {
+                "Assign schedule": function() {
+                  var schData="&0="+saveTempSchedule("schTempTableCOMPONENTID", 0)+"&1="+saveTempSchedule("schTempTableCOMPONENTID", 1)+"&2="+saveTempSchedule("schTempTableCOMPONENTID", 2)+"&3="+saveTempSchedule("schTempTableCOMPONENTID", 3)+"&4="+saveTempSchedule("schTempTableCOMPONENTID", 4)+"&5="+saveTempSchedule("schTempTableCOMPONENTID", 5)+"&6="+saveTempSchedule("schTempTableCOMPONENTID", 6)+"&7="+saveTempSchedule("schTempTableCOMPONENTID", 7)+"&8="+saveTempSchedule("schTempTableCOMPONENTID", 8)+"&9="+saveTempSchedule("schTempTableCOMPONENTID", 9)+"&10="+saveTempSchedule("schTempTableCOMPONENTID", 10)+"&11="+saveTempSchedule("schTempTableCOMPONENTID", 11)+"&12="+saveTempSchedule("schTempTableCOMPONENTID", 12)+"&13="+saveTempSchedule("schTempTableCOMPONENTID", 13);
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=HeatingHeaderDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+                  $( this ).dialog( "close" );
+                },
+                Cancel: function() {
+                      $( this ).dialog( "close" );        
+                }
+          }
+    });
+    $( "#scheduleButtCOMPONENTID" ).button().click(function() {
+          $( "#schDialogInnerCOMPONENTID" ).replaceWith(createTempSchTable('schTempTableCOMPONENTID'));        
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=HeatingHeaderDeviceManager&deviceId=COMPONENTID&action=LOADSCH&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadTempSchedule(data, 'schTempTableCOMPONENTID');
+                        $( "#schDialogCOMPONENTID" ).dialog( "open" );          
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+          });
+          $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&type=Temperature&action=LOAD&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadPrograms(data, 'temperatureProgsschTempTableCOMPONENTID');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+          });
+          $( "#temperatureProgsSaveschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
+                  var name = document.getElementById("temperatureProgsNameschTempTableCOMPONENTID").value;
+                  if (name == '') {
+                        alert(error_name_prog_empty);
+                        return;
+                  }
+                  var schData="&0="+saveTempSchedule("schTempTableCOMPONENTID", 0)+"&1="+saveTempSchedule("schTempTableCOMPONENTID", 1)+"&2="+saveTempSchedule("schTempTableCOMPONENTID", 2)+"&3="+saveTempSchedule("schTempTableCOMPONENTID", 3)+"&4="+saveTempSchedule("schTempTableCOMPONENTID", 4)+"&5="+saveTempSchedule("schTempTableCOMPONENTID", 5)+"&6="+saveTempSchedule("schTempTableCOMPONENTID", 6)+"&7="+saveTempSchedule("schTempTableCOMPONENTID", 7)+"&8="+saveTempSchedule("schTempTableCOMPONENTID", 8)+"&9="+saveTempSchedule("schTempTableCOMPONENTID", 9)+"&10="+saveTempSchedule("schTempTableCOMPONENTID", 10)+"&11="+saveTempSchedule("schTempTableCOMPONENTID", 11)+"&12="+saveTempSchedule("schTempTableCOMPONENTID", 12)+"&13="+saveTempSchedule("schTempTableCOMPONENTID", 13);
+                  schData += "&name=" + name;
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager"+schData+"&action=SAVE&type=Temperature&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $('#temperatureProgsschTempTableCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#temperatureProgsUpdateschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
+                  var name = $("#temperatureProgsschTempTableCOMPONENTID option:selected").val();
+                  var schData="&0="+saveTempSchedule("schTempTableCOMPONENTID", 0)+"&1="+saveTempSchedule("schTempTableCOMPONENTID", 1)+"&2="+saveTempSchedule("schTempTableCOMPONENTID", 2)+"&3="+saveTempSchedule("schTempTableCOMPONENTID", 3)+"&4="+saveTempSchedule("schTempTableCOMPONENTID", 4)+"&5="+saveTempSchedule("schTempTableCOMPONENTID", 5)+"&6="+saveTempSchedule("schTempTableCOMPONENTID", 6)+"&7="+saveTempSchedule("schTempTableCOMPONENTID", 7)+"&8="+saveTempSchedule("schTempTableCOMPONENTID", 8)+"&9="+saveTempSchedule("schTempTableCOMPONENTID", 9)+"&10="+saveTempSchedule("schTempTableCOMPONENTID", 10)+"&11="+saveTempSchedule("schTempTableCOMPONENTID", 11)+"&12="+saveTempSchedule("schTempTableCOMPONENTID", 12)+"&13="+saveTempSchedule("schTempTableCOMPONENTID", 13);
+                  schData += "&name=" + name;
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager"+schData+"&action=UPDATE&type=Temperature&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#temperatureProgsDeleteschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).unbind('click').click(function() {
+                var name = $("#temperatureProgsschTempTableCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=DELETE&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $("#temperatureProgsschTempTableCOMPONENTID option:selected").remove();
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+          $( "#temperatureProgsLoadschTempTableCOMPONENTID" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).unbind('click').click(function() {
+                var name = $("#temperatureProgsschTempTableCOMPONENTID option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SchedulersManager&name="+name+"&action=GET&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        loadTempSchedule(data, 'schTempTableCOMPONENTID');                        
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+          });
+    });
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    setLabelBasedOnId("actionsCOMPONENTID", "actions");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("schedulerCOMPONENTID", "scheduler");
+    setLabelBasedOnId("statusCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("graphsCOMPONENTID", "graphs");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("battVoltageLabelCOMPONENTID", "batt_voltage");
+    setLabelBasedOnId("temperatureLCOMPONENTID", "temperature");
+    setLabelBasedOnId("degCelsius1COMPONENTID", "deg_celsius");
+    setLabelBasedOnId("secondsL1COMPONENTID", "seconds");
+    setLabelBasedOnId("secondsL2COMPONENTID", "seconds");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("sending_periodCOMPONENTID", "sending_period");
+    setLabelBasedOnId("sending_periodExpectedCOMPONENTID", "sending_period_expected");
+    setLabelBasedOnId("sending_periodFCOMPONENTID", "sending_period");
+    setLabelBasedOnId("chartButtHourLabelCOMPONENTID", "chart_butt_hour");
+    setLabelBasedOnId("chartButtDayLabelCOMPONENTID", "chart_butt_day");
+    setLabelBasedOnId("chartButtWeekLabelCOMPONENTID", "chart_butt_week");
+    setLabelBasedOnId("chartButtMonthLabelCOMPONENTID", "chart_butt_month");
+    setLabelBasedOnId("chartButt3MonthLabelCOMPONENTID", "chart_butt_3month");
+    setLabelBasedOnId("chartButtYearLabelCOMPONENTID", "chart_butt_year");
+    setLabelBasedOnId("chartButt3YearsLabelCOMPONENTID", "chart_butt_3years");
     updateStatusCOMPONENTID();
+    window.setInterval(function() {
+        updateStatusCOMPONENTID(false);
+    }, 300000);
 });
 </script>
-<table width="100%"><tr>
-<td>
-<table class="ui-widget" style="border-collapse: collapse;" width="100%">
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-1"><div id="actionsCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-1">
+        <br/>
+        <br/>
+        <table><tr>
+        <td><button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button></td>
+        </tr></table>
+    </div>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
               <thead class="ui-widget-header">
                 <tr>
-                <th>Property</th>
-                <th>Value</th>
-                <th>Parameter</th>
-                <th>Value</th>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
                 </tr>
-                </thead>
-                <tbody class="ui-widget-content">
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="battVoltageLabelCOMPONENTID"></div></td><td><span id='battVoltageCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Name</td>
-                <td><span id='nameCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
                 </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="temperatureLCOMPONENTID"></div></td><td><span id='temperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius1COMPONENTID"></span></td></tr>
+                <tr><td><div id="sending_periodCOMPONENTID"></div></td><td><span id='currPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL2COMPONENTID"></span></td></tr>
+                <tr><td><div id="sending_periodExpectedCOMPONENTID"></div></td><td><span id='expPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL1COMPONENTID"></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
                 <tr>
-                <td>Component id</td>
-                <td><span id='compIdCOMPONENTID'></span></td>
-                <td>Name:</td>
-                <td><input type="text" id="nameFormCOMPONENTID" /></td>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
                 </tr>
-                <tr>
-                <td>Current period</td>
-                <td><span id='currPeriodCOMPONENTID'></span>&nbsp;seconds</td>
-                <td>Configure period:</td>
-                <td><input type="text" id="currPeriodFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Expected period to configure:</td>
-                <td><span id='expPeriodCOMPONENTID'></span>&nbsp;seconds</td>
-                <td>Configure temperature:</td>
-                <td><input type="text" id="currTemperatureFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Current temperature</td>
-                <td><span id='temperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
-                <td>Configure open angle:</td>
-                <td><input type="text" id="currOpenAngleFormCOMPONENTID" /></td>
-                </tr>
-                <tr>
-                <td>Expected temperature to configure</td>
-                <td><span id='expTemperatureCOMPONENTID'></span>&nbsp;Deg. celsius</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Current open angle</td>
-                <td><span id='openAngleCOMPONENTID'></span>&nbsp;%</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Expected open angle</td>
-                <td><span id='expOpenAngleCOMPONENTID'></span>&nbsp;%</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Battery voltage</td>
-                <td><span id='battVoltageCOMPONENTID'></span>&nbsp;V</td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td>Last update timestamp</td>
-                <td><span id='timestampCOMPONENTID'></span></td>
-                <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                <td colspan ="2"><input type="submit" id="RefreshStatusCOMPONENTID" value="Refresh" /></td>
-                <td colspan ="2"><input type="submit" id="configureCOMPONENTID" value="Change configuration" /></td>
-                </tr>
-                </tbody>
-</table>
-</td>
-</tr></table>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="currPeriodFormCOMPONENTID" /></td></tr>
+            </table>
+          </td><td>&nbsp;
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+    <div id="componentTabsCOMPONENTID-4">
+        <button id="chartButtHourCOMPONENTID"><div id="chartButtHourLabelCOMPONENTID"></div></button>
+        <button id="chartButtDayCOMPONENTID"><div id="chartButtDayLabelCOMPONENTID"></div></button>
+        <button id="chartButtWeekCOMPONENTID"><div id="chartButtWeekLabelCOMPONENTID"></div></button>
+        <button id="chartButtMonthCOMPONENTID"><div id="chartButtMonthLabelCOMPONENTID"></div></button>
+        <button id="chartButt3MonthCOMPONENTID"><div id="chartButt3MonthLabelCOMPONENTID"></div></button>
+        <button id="chartButtYearCOMPONENTID"><div id="chartButtYearLabelCOMPONENTID"></div></button>
+        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button>
+        <div id="chartAreaCOMPONENTID" style="width:800px;height:300px;display:inline-block">
+        </div>
+    </div>
+</div>
+<div id="schDialogCOMPONENTID">
+    <div id="schDialogInnerCOMPONENTID">
+    </div>
+</div>
 </div>
