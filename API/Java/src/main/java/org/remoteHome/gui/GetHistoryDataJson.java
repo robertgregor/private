@@ -49,7 +49,7 @@ public class GetHistoryDataJson extends AbstractWebService{
             AbstractHistoryData jsonData = r.getPersistance().loadHistoryData(data);
             String range = requestParameters.get("range");
             SortedMap<Long, AbstractHistoryData.HistoryItems> map = null;
-            if (jsonData != null) {
+            if (jsonData != data) {
                 if (range.equalsIgnoreCase("hour")) map = jsonData.getLastHourSamples();
                 else if (range.equalsIgnoreCase("day")) map = jsonData.getLastDaySamples();
                 else if (range.equalsIgnoreCase("week")) map = jsonData.getLastWeekSamples();

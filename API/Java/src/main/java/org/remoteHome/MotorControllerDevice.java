@@ -347,11 +347,10 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
     /**
      * This method will save the current state of the device to the database together with the timestamp.
      */
-    protected void saveHistoryData() {
+    protected void saveHistoryData() throws RemoteHomeManagerException {
           PercentageHistoryData historyProto = new PercentageHistoryData();
           historyProto.setDeviceId(getDeviceId());
           PercentageHistoryData history = (PercentageHistoryData)m.getPersistance().loadHistoryData(historyProto);
-          if (history == null) history = historyProto;
           int expected = getCurrentOpening();
           if (isEnabledScheduler()) expected = (getPositionSchedule().processSchedule()!=null)?getPositionSchedule().processSchedule():getCurrentOpening();
           history.saveSampleData(System.currentTimeMillis(), getCurrentOpening(), expected);

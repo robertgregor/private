@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import org.remoteHome.RemoteHomeManager;
+import org.remoteHome.RemoteHomeManagerException;
 
 /**
  *
@@ -26,9 +27,9 @@ public abstract class AbstractWebService implements WebService {
         this.r = r;
     }
 
-    public abstract void processRequest(OutputStream o, HttpExchange t) throws IOException;
+    public abstract void processRequest(OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException;
     
-    public void processRequest(HashMap<String, String> requestParameters, OutputStream o, HttpExchange t) throws IOException {
+    public void processRequest(HashMap<String, String> requestParameters, OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException {
         this.requestParameters = requestParameters;
         this.o = o;
         this.t = t;

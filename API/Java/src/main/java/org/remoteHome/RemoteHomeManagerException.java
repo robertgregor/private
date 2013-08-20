@@ -32,6 +32,11 @@ public class RemoteHomeManagerException extends Exception {
      */
     public static final int NOT_SUPPORTED = 5;  
 
+   /**
+     * Not supported error
+     */
+    public static final int PERSISTANCE_NOT_INITIALIZED = 6;  
+
     private int type;
 
    /**
@@ -67,6 +72,8 @@ public class RemoteHomeManagerException extends Exception {
                     return "Error in persistance: "+super.getMessage();
             case NOT_SUPPORTED:
                     return "This feature is not supported for this device type.";
+            case PERSISTANCE_NOT_INITIALIZED:
+                    return "Persistance layer is not initialized.";
             default:
                 return super.getMessage();
         }        

@@ -10,11 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import org.remoteHome.RemoteHomeManager;
+import org.remoteHome.RemoteHomeManagerException;
 
 /**
  *
@@ -33,7 +31,7 @@ public class ResourceLoaderWebService extends AbstractWebService {
         this.name = name[0];
     }
     
-    public synchronized void processRequest(OutputStream o, HttpExchange t) throws IOException {
+    public synchronized void processRequest(OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException {
         DataInputStream br = new DataInputStream(this.getClass().getClassLoader().getResourceAsStream(name));
         ByteArrayOutputStream out = new ByteArrayOutputStream();        
         byte[] buffer = new byte[65535];

@@ -394,11 +394,10 @@ public class ThermostatDevice extends AbstractDevice {
     /**
      * This method will save the current state of the device to the database together with the timestamp.
      */
-    protected void saveHistoryData() {
+    protected void saveHistoryData() throws RemoteHomeManagerException {
           TemperatureHistoryData historyProto = new TemperatureHistoryData();
           historyProto.setDeviceId(getDeviceId());
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
-          if (history == null) history = historyProto;
           int expected = getDeviceExpectedTemperature();
           if (isEnabledScheduler()) {
               Integer tmp = getTemperatureSchedule().getCurrentExpectedValue();

@@ -275,11 +275,10 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
     /**
      * This method will save the current state of the device to the database together with the timestamp.
      */
-    protected void saveHistoryData() {
+    protected void saveHistoryData() throws RemoteHomeManagerException {
           OnOffHistoryData historyProto = new OnOffHistoryData();
           historyProto.setDeviceId(getDeviceId());
           OnOffHistoryData history = (OnOffHistoryData)m.getPersistance().loadHistoryData(historyProto);
-          if (history == null) history = historyProto;
           int expected = (isCurrentState()) ? 1 : 0;
           if (isEnabledScheduler()) {
               Boolean action = getLightSchedule().processSchedule();
@@ -319,6 +318,8 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
                     } catch (InterruptedException e) {
                         return;
                     } catch (RemoteHomeConnectionException e) {
+                        e.printStackTrace();
+                    } catch (RemoteHomeManagerException e) {
                         e.printStackTrace();
                     }
                 }

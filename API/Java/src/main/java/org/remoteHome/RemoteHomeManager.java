@@ -364,7 +364,8 @@ public class RemoteHomeManager {
     /**
      * @return the persistance
      */
-    public ApiPersistance getPersistance() {
+    public ApiPersistance getPersistance() throws RemoteHomeManagerException {
+        if (persistance == null) throw new RemoteHomeManagerException(RemoteHomeManagerException.PERSISTANCE_NOT_INITIALIZED);
         return persistance;
     }
 

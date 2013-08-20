@@ -530,7 +530,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     /**
      * This method will save the current state of the device to the database together with the timestamp.
      */
-    protected void saveHistoryData() {
+    protected void saveHistoryData() throws RemoteHomeManagerException {
           TemperatureHistoryData historyProto = new TemperatureHistoryData();
           historyProto.setDeviceId(getDeviceId());
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);

@@ -131,11 +131,10 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
     /**
      * This method will save the current state of the device to the database together with the timestamp.
      */
-    protected void saveHistoryData() {
+    protected void saveHistoryData() throws RemoteHomeManagerException {
           TemperatureHistoryData historyProto = new TemperatureHistoryData();
           historyProto.setDeviceId(getDeviceId());
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
-          if (history == null) history = historyProto;
           if (getRemoteTemperatureMeterId() != 0) {
               try {
                   TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeterId());

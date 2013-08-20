@@ -199,11 +199,10 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
     /**
      * This method will save the current state of the device to the database together with the timestamp.
      */
-    protected void saveHistoryData() {
+    protected void saveHistoryData() throws RemoteHomeManagerException {
           TemperatureHistoryData historyProto = new TemperatureHistoryData();
           historyProto.setDeviceId(getDeviceId());
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
-          if (history == null) history = historyProto;
           history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()*10),0);
           m.getPersistance().saveHistoryData(history);
     }
@@ -223,6 +222,8 @@ public class TemperatureSensorDevice extends AbstractDevice implements Serializa
                         Thread.sleep(50000);
                     } catch (InterruptedException e) {
                         return;
+                    } catch (RemoteHomeManagerException e) {
+                        e.printStackTrace();
                     }
                 }    
             }

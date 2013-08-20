@@ -82,7 +82,7 @@ public class Db4oPersistance implements ApiPersistance {
     }
     public AbstractHistoryData loadHistoryData(AbstractHistoryData proto) {
         List <AbstractHistoryData> ahs = db.queryByExample(proto);
-        if (ahs.size()==0) return null;
+        if (ahs.size()==0) return proto;
         else return ahs.get(0);
     }
 }
