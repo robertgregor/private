@@ -6,6 +6,7 @@
         $(function () {
             $("#accordion").accordion({heightStyle: "content"});
             $("#addNewDeviceForm").button();
+            $("#deleteObjectSubmit").button();
             $("#setChPwd").button();
             $("#addDeviceForm").submit(function (event) {
                 event.preventDefault();
@@ -29,6 +30,27 @@
                         }
                     });
                 }
+            });
+            $("#deleteDeviceForm").submit(function (event) {
+                event.preventDefault();
+                /*
+                if ($(this).valid()) {
+                    $("#deleteObjectResult").html('');
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            $("#deleteObjectResult").html(data);
+                        },
+                        error: function () {
+                            $("#deleteObjectResult").html(err_change_channelPwd);
+                        }
+                    });
+                }
+                */
             });
             $("#changeChannelPassowrd").submit(function (event) {
                 event.preventDefault();
@@ -145,6 +167,10 @@
         setLabel("channel_password_cfg");
         setLabel("channel_device");
         setLabel("password_device");
+        setLabel("delete_device_cfg");
+        setLabel("delete_device");
+        setLabel("delete_room");
+        setLabel("deleteObjectSubmit");
         document.getElementById('channel').title = channel_device_desc;
         document.getElementById('password').title = password_device_desc;
         setLabel("wifi_configuration");
@@ -214,14 +240,22 @@
             <table>
                 <tr>
                     <td><label for="deleteDeviceId"><span id="delete_device"></span></label></td>
-                    <td><input name="deleteDeviceId" id="deleteDeviceId"/></td>
+                    <td>
+                        <select  width="100%" id="deleteDeviceId">
+                            <option value="-1">&nbsp;</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td><label for="deleteRoomId"><span id="delete_room"></span></label></td>
-                    <td><input name="deleteRoomId" id="deleteRoomId"/></td>
+                    <td>
+                        <select  width="100%" id="deleteRoomId">
+                            <option value="-1">&nbsp;</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
-                    <td><input type="hidden" name="ServiceName" value="DeleteObject"/><input id="deleteObject"
+                    <td><input type="hidden" name="ServiceName" value="DeleteObject"/><input id="deleteObjectSubmit"
                                                                                              type="submit"/></td>
                     <td>
                         <div id="deleteObjectResult">&nbsp;</div>
