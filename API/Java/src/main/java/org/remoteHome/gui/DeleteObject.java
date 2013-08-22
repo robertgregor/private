@@ -38,6 +38,7 @@ public class DeleteObject extends AbstractWebService {
                         Room r = new Room(roomName);
                         rooms.add(r);
                     }
+                    System.out.println(AbstractDevice.generateJsonData(rooms));
                     sendAjaxAnswer(AbstractDevice.generateJsonData(rooms));
                 } else if(loadDevices != null && loadDevices.equals("true")
                             && loadRooms != null && loadRooms.equals("false")) {
@@ -47,6 +48,7 @@ public class DeleteObject extends AbstractWebService {
                         Device device = new Device(dev.getDeviceName(), dev.getDeviceId());
                         devices.add(device);
                     }
+                    System.out.println(AbstractDevice.generateJsonData(devices));
                     sendAjaxAnswer(AbstractDevice.generateJsonData(devices));
                 } else {
                     sendAjaxAnswer("Something went wrong.");

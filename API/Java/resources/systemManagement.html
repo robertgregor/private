@@ -146,12 +146,17 @@
                 type: "get",
                 data: "ServiceName=DeleteObject&loadData=true&loadRooms=false&loadDevices=true&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
+                    /*
+                    //var select = document.getElementsByTagName('deleteDeviceName')[0];
                     var deleteDeviceId = document.getElementById("deleteDeviceId");
-                    deleteDeviceId.options.length = 0; // clear out existing items
+                    select.options.length = 0; // clear out existing items
+                    select.options.add(new Option("Device", i))
                     for(var i=0; i < data.length; i++) {
                         var d = data[i];
-                        deleteDeviceId.options.add(new Option(d.name, d.id))
+                        // select.options.add(new Option(d.name, d.id))
+                        select.options.add(new Option("Device", i))
                     }
+                    */
                 },
                 error: function () {
                     alert(err_get_objects);
@@ -164,11 +169,22 @@
                 data: "ServiceName=DeleteObject&loadData=true&loadRooms=true&loadDevices=false&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
                     var deleteRoomId = document.getElementById("deleteRoomId");
-                    deleteRoomId.options.length = 0; // clear out existing items
+                    /*
+                    $.each(data, function(i, optionHtml){
+                        $('#deleteRoomId').append($('<option>').text(value).attr('value', value));
+                    });
+                    */
+                    /*
+                    //var select = document.getElementsByTagName('deleteRoomName')[0];
+                    var deleteRoomId = document.getElementById("deleteRoomId");
+                    select.options.length = 0; // clear out existing items
+                    select.options.add(new Option("Room", i))
                     for(var i=0; i < data.length; i++) {
                         var d = data[i];
-                        deleteRoomId.options.add(new Option(d.name, i))
+                        //select.options.add(new Option(d.name, i))
+                        select.options.add(new Option("Room", i))
                     }
+                    */
                 },
                 error: function () {
                     alert(err_get_objects);
@@ -273,16 +289,16 @@
                 <tr>
                     <td><label for="deleteDeviceId"><span id="delete_device"></span></label></td>
                     <td>
-                        <select  width="100%" id="deleteDeviceId">
-                            <option value="-1">&nbsp;</option>
+                        <select  width="100%" id="deleteDeviceId" name="deleteDeviceName">
+                            <option value="0">&nbsp;</option>
                         </select>
                     </td>
                 </tr>
                 <tr>
                     <td><label for="deleteRoomId"><span id="delete_room"></span></label></td>
                     <td>
-                        <select  width="100%" id="deleteRoomId">
-                            <option value="-1">&nbsp;</option>
+                        <select  width="100%" id="deleteRoomId" name="deleteRoomName">
+                            <option value="0">&nbsp;</option>
                         </select>
                     </td>
                 </tr>
