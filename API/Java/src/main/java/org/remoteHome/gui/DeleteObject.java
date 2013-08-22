@@ -30,8 +30,8 @@ public class DeleteObject extends AbstractWebService {
 
         try {
             if (loadData != null && loadData.equals("true")) {
-                if(loadDevices != null && loadDevices.equals("true")
-                    && loadRooms != null && loadRooms.equals("false")) {
+                if(loadDevices != null && loadDevices.equals("false")
+                    && loadRooms != null && loadRooms.equals("true")) {
                     Map<String, HashSet<AbstractDevice>> map = r.getRooms();
                     List<Room> rooms = new ArrayList<Room>();
                     for(String roomName: map.keySet()) {
@@ -39,21 +39,20 @@ public class DeleteObject extends AbstractWebService {
                         rooms.add(r);
                     }
                     sendAjaxAnswer(AbstractDevice.generateJsonData(rooms));
-                } else if(loadDevices != null && loadDevices.equals("false")
-                            && loadRooms != null && loadRooms.equals("true")) {
-                    List<AbstractDevice> devs = (ArrayList<AbstractDevice>) r.getDevices();
+                } else if(loadDevices != null && loadDevices.equals("true")
+                            && loadRooms != null && loadRooms.equals("false")) {
                     List<Device> devices = new ArrayList<Device>();
-                    for(AbstractDevice dev : devs ) {
+                    for (AbstractDevice dev : r.getDevices()) {
+                    //for(AbstractDevice dev : devs ) {
                         Device device = new Device(dev.getDeviceName(), dev.getDeviceId());
                         devices.add(device);
                     }
                     sendAjaxAnswer(AbstractDevice.generateJsonData(devices));
-
                 } else {
-                    sendAjaxAnswer("Deleted object.");
+                    sendAjaxAnswer("Something went wrong.");
                 }
             } else {
-                sendAjaxAnswer("Channel and / or password configured. Please reset all your devices and add them again.");
+                sendAjaxAnswer("Deleted object.");
             }
         } catch (Exception e) {
             sendAjaxAnswer(e.getMessage());
