@@ -33,7 +33,6 @@
             });
             $("#deleteDeviceForm").submit(function (event) {
                 event.preventDefault();
-                /*
                 if ($(this).valid()) {
                     $("#deleteObjectResult").html('');
                     var values = $(this).serialize();
@@ -46,11 +45,10 @@
                             $("#deleteObjectResult").html(data);
                         },
                         error: function () {
-                            $("#deleteObjectResult").html(err_change_channelPwd);
+                            $("#deleteObjectResult").html(err_delete_object);
                         }
                     });
                 }
-                */
             });
             $("#changeChannelPassowrd").submit(function (event) {
                 event.preventDefault();
@@ -140,6 +138,40 @@
                 },
                 error: function () {
                     alert(err_get_channel_pwd);
+                }
+            });
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=DeleteObject&loadData=true&loadRooms=false&loadDevices=true&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    var deleteDeviceId = document.getElementById("deleteDeviceId");
+                    deleteDeviceId.options.length = 0; // clear out existing items
+                    for(var i=0; i < data.length; i++) {
+                        var d = data[i];
+                        deleteDeviceId.options.add(new Option(d.name, d.id))
+                    }
+                },
+                error: function () {
+                    alert(err_get_objects);
+                }
+            });
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=DeleteObject&loadData=true&loadRooms=true&loadDevices=false&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    var deleteRoomId = document.getElementById("deleteRoomId");
+                    deleteRoomId.options.length = 0; // clear out existing items
+                    for(var i=0; i < data.length; i++) {
+                        var d = data[i];
+                        deleteRoomId.options.add(new Option(d.name, i))
+                    }
+                },
+                error: function () {
+                    alert(err_get_objects);
                 }
             });
         });
