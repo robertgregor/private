@@ -102,6 +102,9 @@ public class DeleteObject extends AbstractWebService {
                         sendAjaxAnswer("Not a valid DeviceId");
                     }
                     sendAjaxAnswer("Deleted device: " + deleteDevice + " and room: " + deleteRoom);
+                } else if(deleteDevice != null && deleteDevice.equals("0")
+                        && deleteRoom != null && deleteRoom.equals("0")) {
+                    sendAjaxAnswer("EMPTY");
                 } else {
                     sendAjaxAnswer("Something went wrong.");
                 }
