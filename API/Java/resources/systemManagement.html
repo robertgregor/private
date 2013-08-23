@@ -146,17 +146,12 @@
                 type: "get",
                 data: "ServiceName=DeleteObject&loadData=true&loadRooms=false&loadDevices=true&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
-                    /*
-                    //var select = document.getElementsByTagName('deleteDeviceName')[0];
-                    var deleteDeviceId = document.getElementById("deleteDeviceId");
-                    select.options.length = 0; // clear out existing items
-                    select.options.add(new Option("Device", i))
-                    for(var i=0; i < data.length; i++) {
-                        var d = data[i];
-                        // select.options.add(new Option(d.name, d.id))
-                        select.options.add(new Option("Device", i))
+                    var select = document.getElementById("deleteDeviceId");
+                    var json = JSON.parse(data);
+                    for(var i=0; i < json.length; i++) {
+                        var d = json[i];
+                        select.options.add(new Option(d.name, d.id));
                     }
-                    */
                 },
                 error: function () {
                     alert(err_get_objects);
@@ -168,23 +163,12 @@
                 type: "get",
                 data: "ServiceName=DeleteObject&loadData=true&loadRooms=true&loadDevices=false&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
-                    var deleteRoomId = document.getElementById("deleteRoomId");
-                    /*
-                    $.each(data, function(i, optionHtml){
-                        $('#deleteRoomId').append($('<option>').text(value).attr('value', value));
-                    });
-                    */
-                    /*
-                    //var select = document.getElementsByTagName('deleteRoomName')[0];
-                    var deleteRoomId = document.getElementById("deleteRoomId");
-                    select.options.length = 0; // clear out existing items
-                    select.options.add(new Option("Room", i))
-                    for(var i=0; i < data.length; i++) {
-                        var d = data[i];
-                        //select.options.add(new Option(d.name, i))
-                        select.options.add(new Option("Room", i))
+                    var select = document.getElementById("deleteRoomId");
+                    var json = JSON.parse(data);
+                    for(var i=0; i < json.length; i++) {
+                        var d = json[i];
+                        select.options.add(new Option(d.name));
                     }
-                    */
                 },
                 error: function () {
                     alert(err_get_objects);
