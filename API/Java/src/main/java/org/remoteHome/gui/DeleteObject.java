@@ -63,13 +63,28 @@ public class DeleteObject extends AbstractWebService {
                     } catch (NumberFormatException e) {
                         sendAjaxAnswer("Not a valid DeviceId");
                     }
-                    sendAjaxAnswer("Deleted device: ");
+                    sendAjaxAnswer("Deleted device: " + deleteDevice);
                 } else if(deleteDevice != null && deleteDevice.equals("")
                             && deleteRoom != null && !deleteRoom.equals("")) {
-                    sendAjaxAnswer("Deleted room: ");
+                    for (AbstractDevice dev : r.getDevices()) {
+                        if(dev.getRoomName().equals(deleteRoom)) {
+                            r.removeDevice(dev.getDeviceId());
+                        }
+                    }
+                    sendAjaxAnswer("Deleted room: " + deleteRoom);
                 } else if(deleteDevice != null && !deleteDevice.equals("")
                         && deleteRoom != null && !deleteRoom.equals("")) {
-                    sendAjaxAnswer("Deleted device: " + " and room: ");
+                    try {
+                        r.removeDevice(Integer.valueOf(deleteDevice));
+                        for (AbstractDevice dev : r.getDevices()) {
+                            if(dev.getRoomName().equals(deleteRoom)) {
+                                r.removeDevice(dev.getDeviceId());
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        sendAjaxAnswer("Not a valid DeviceId");
+                    }
+                    sendAjaxAnswer("Deleted device: " + deleteDevice + " and room: " + deleteRoom);
                 } else {
                     sendAjaxAnswer("Something went wrong.");
                 }
