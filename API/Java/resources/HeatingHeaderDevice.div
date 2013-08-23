@@ -202,7 +202,7 @@ $(function() {
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=MotorControllerDeviceManager&deviceId=COMPONENTID&action=SETPOS&period="+period+"&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=HeatingHeaderDeviceManager&deviceId=COMPONENTID&action=SETPOS&period="+period+"&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
                 updateStatusCOMPONENTID();
             },

@@ -28,7 +28,6 @@ public class HeatingHeaderDeviceManager  extends AbstractWebService {
                 String nm = requestParameters.get("nm");
                 String roomName = requestParameters.get("room");
                 int tm = Integer.parseInt(requestParameters.get("tm"));
-                //int oa = Integer.parseInt(requestParameters.get("oa"));
                 int temp = Integer.parseInt(requestParameters.get("temp"));
                 int cfgTemp = (temp * 2) / 10;
                 if ((temp % 10) > 4) cfgTemp++;
@@ -44,12 +43,14 @@ public class HeatingHeaderDeviceManager  extends AbstractWebService {
                 if (device.getHeatingController()!= heatingId) device.setHeatingController(heatingId);
                 if (device.getRemoteTemperatureMeter() != remoteTempId) device.setRemoteTemperatureMeter(remoteTempId);                
                 if (device.getHeatingControllerOpenAngle()!= openAngleHeating) device.setHeatingControllerOpenAngle(openAngleHeating);  
-                //if ((device.getExpectedOpenAngle() != oa) && temp == 0) device.setExpectedOpenAngle(oa);
                 if (device.getExpectedTemperature() != cfgTemp) device.setExpectedTemperature(cfgTemp);
                 if (device.isEnabledScheduler() != enabledScheduler) device.setEnabledScheduler(enabledScheduler);
                 if (device.isHeatingControllerEnabled()!= heatingEnabled) device.setHeatingControllerEnabled(heatingEnabled);                
                 if (device.isRemoteTemperatureMeterEnabled()!= tempEnabled) device.setRemoteTemperatureMeterEnabled(tempEnabled);
                 r.getPersistance().saveDevice(device);
+            } else if (action.equals("SETPOS")) {
+                int oa = Integer.parseInt(requestParameters.get("period"));
+                if ((device.getExpectedOpenAngle() != oa)) { device.setExpectedOpenAngle(oa); device.setExpectedTemperature(0); }
             }
             if (refresh) sendAjaxAnswer("REFRESH"); else sendAjaxAnswer("OK");
         } catch (Exception e) {
