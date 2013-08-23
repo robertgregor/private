@@ -198,11 +198,18 @@ public class RemoteHomeManager {
      * 
      * @return the devices
      */
-    
     public Collection<AbstractDevice> getDevices() {
         return devices.values();
     }
-    
+
+    /**
+     *  Delete Device
+     * @return void
+     */
+    public void removeDevice(int deviceId) {
+        if(devices.containsKey(deviceId)) devices.remove(deviceId);
+    }
+
     /**
      * This method is called by the communicator, when the asynchronous command is received.
      * It will parse the device Id and call the device object manageAsynchronousCommand method.

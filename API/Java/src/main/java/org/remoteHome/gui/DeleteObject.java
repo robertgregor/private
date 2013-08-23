@@ -27,6 +27,8 @@ public class DeleteObject extends AbstractWebService {
         String loadData = requestParameters.get("loadData");
         String loadDevices = requestParameters.get("loadDevices");
         String loadRooms = requestParameters.get("loadRooms");
+        String deleteDevice = requestParameters.get("deleteDeviceId");
+        String deleteRoom = requestParameters.get("deleteRoomId");
 
         try {
             if (loadData != null && loadData.equals("true")) {
@@ -54,7 +56,23 @@ public class DeleteObject extends AbstractWebService {
                     sendAjaxAnswer("Something went wrong.");
                 }
             } else {
-                sendAjaxAnswer("Deleted object.");
+                if(deleteDevice != null && !deleteDevice.equals("")
+                    && deleteRoom != null && deleteRoom.equals("")) {
+                    try {
+                        r.removeDevice(Integer.valueOf(deleteDevice));
+                    } catch (NumberFormatException e) {
+                        sendAjaxAnswer("Not a valid DeviceId");
+                    }
+                    sendAjaxAnswer("Deleted device: ");
+                } else if(deleteDevice != null && deleteDevice.equals("")
+                            && deleteRoom != null && !deleteRoom.equals("")) {
+                    sendAjaxAnswer("Deleted room: ");
+                } else if(deleteDevice != null && !deleteDevice.equals("")
+                        && deleteRoom != null && !deleteRoom.equals("")) {
+                    sendAjaxAnswer("Deleted device: " + " and room: ");
+                } else {
+                    sendAjaxAnswer("Something went wrong.");
+                }
             }
         } catch (Exception e) {
             sendAjaxAnswer(e.getMessage());
