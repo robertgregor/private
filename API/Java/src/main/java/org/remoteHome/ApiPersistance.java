@@ -25,6 +25,5 @@ public interface ApiPersistance {
     Properties loadProperties();
     void saveHistoryData(AbstractHistoryData data);
     AbstractHistoryData loadHistoryData(AbstractHistoryData proto);
-    void deleteDevice(Collection<AbstractDevice> devices, int deviceId);
-    void deleteRoom(Collection<AbstractDevice> devices, String roomName);
+    void deleteObjects(Collection<AbstractDevice> devices);
 }

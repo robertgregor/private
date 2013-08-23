@@ -5,10 +5,7 @@ import org.remoteHome.AbstractDevice;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -59,32 +56,48 @@ public class DeleteObject extends AbstractWebService {
                 if(deleteDevice != null && !deleteDevice.equals("0")
                     && deleteRoom != null && deleteRoom.equals("0")) {
                     try {
-                        r.removeDevice(Integer.valueOf(deleteDevice));
-                        r.getPersistance().deleteDevice(r.getDevices(), Integer.valueOf(deleteDevice));
+                        List<AbstractDevice> deleteDevices = new ArrayList<AbstractDevice>();
+                        for (AbstractDevice dev : r.getDevices()) {
+                            if(dev.getDeviceId() == Integer.valueOf(deleteDevice)) {
+                                deleteDevices.add(dev);
+                            }
+                        }
+                        for(AbstractDevice dev : deleteDevices) {
+                            r.removeDevice(dev.getDeviceId());
+                        }
+                        r.getPersistance().deleteObjects(deleteDevices);
                     } catch (NumberFormatException e) {
                         sendAjaxAnswer("Not a valid DeviceId");
                     }
                     sendAjaxAnswer("Deleted device: " + deleteDevice);
                 } else if(deleteDevice != null && deleteDevice.equals("0")
                             && deleteRoom != null && !deleteRoom.equals("0")) {
+                    List<AbstractDevice> deleteDevices = new ArrayList<AbstractDevice>();
                     for (AbstractDevice dev : r.getDevices()) {
                         if(dev.getRoomName().equals(deleteRoom)) {
-                            r.removeDevice(dev.getDeviceId());
-                            r.getPersistance().deleteRoom(r.getDevices(), dev.getRoomName());
+                            deleteDevices.add(dev);
                         }
                     }
+                    for(AbstractDevice dev : deleteDevices) {
+                        r.removeDevice(dev.getDeviceId());
+                    }
+                    r.getPersistance().deleteObjects(deleteDevices);
                     sendAjaxAnswer("Deleted room: " + deleteRoom);
                 } else if(deleteDevice != null && !deleteDevice.equals("0")
                         && deleteRoom != null && !deleteRoom.equals("0")) {
                     try {
-                        r.removeDevice(Integer.valueOf(deleteDevice));
-                        r.getPersistance().deleteDevice(r.getDevices(), Integer.valueOf(deleteDevice));
+                        List<AbstractDevice> deleteDevices = new ArrayList<AbstractDevice>();
                         for (AbstractDevice dev : r.getDevices()) {
-                            if(dev.getRoomName().equals(deleteRoom)) {
-                                r.removeDevice(dev.getDeviceId());
-                                r.getPersistance().deleteRoom(r.getDevices(), dev.getRoomName());
+                            if(dev.getDeviceId() == Integer.valueOf(deleteDevice)
+                                    || dev.getRoomName().equals(deleteRoom)) {
+                                deleteDevices.add(dev);
                             }
                         }
+                        for(AbstractDevice dev : deleteDevices) {
+                            r.removeDevice(dev.getDeviceId());
+                        }
+                        r.getPersistance().deleteObjects(deleteDevices);
+
                     } catch (NumberFormatException e) {
                         sendAjaxAnswer("Not a valid DeviceId");
                     }
@@ -94,7 +107,8 @@ public class DeleteObject extends AbstractWebService {
                 }
             }
         } catch (Exception e) {
-            sendAjaxAnswer(e.getMessage());
+            e.printStackTrace();
+            //sendAjaxAnswer(e.getMessage());
         }
 
     }
