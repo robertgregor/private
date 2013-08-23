@@ -43,6 +43,7 @@
                         data: values,
                         success: function (data) {
                             $("#deleteObjectResult").html(data);
+                            document.location.reload(true);
                         },
                         error: function () {
                             $("#deleteObjectResult").html(err_delete_object);
