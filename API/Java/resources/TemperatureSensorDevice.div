@@ -71,16 +71,16 @@ $(function() {
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
-                alert('Name of the component cannot be empty!');
+                alert(error_name_cannot_be_empty);
                 return;
           }
           var tm = parseInt(document.getElementById("currPeriodFormCOMPONENTID").value);
           if (tm == NaN) {
-              alert('Sending period should be number!');
+              alert(error_period_exist);
               return;
           }
           if ((tm > 2550) || (tm < 10)) {
-              alert('Sending period should be number between 10 and 2550!');
+              alert(error_period_range);
               return;
           }
           var room = document.getElementById("roomFormCOMPONENTID").value;

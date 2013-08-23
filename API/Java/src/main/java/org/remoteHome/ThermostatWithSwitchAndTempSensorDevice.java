@@ -138,7 +138,7 @@ public class ThermostatWithSwitchAndTempSensorDevice extends AbstractDevice {
           if (getRemoteTemperatureMeterId() != 0) {
               try {
                   TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeterId());
-                  int temperature = (int)Math.round(tsd.getTemperature()*10);
+                  int temperature = (int)Math.round(tsd.getTemperature());
                   setTemperature(temperature);
               } catch (Exception e) {
                   e.printStackTrace();

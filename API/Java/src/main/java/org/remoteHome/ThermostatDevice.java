@@ -456,7 +456,7 @@ public class ThermostatDevice extends AbstractDevice {
                             if (temperature != null) {
                                 //something has to be done.
                                 if (!isRemoteTemperatureMeterEnabled()) {
-                                    setDeviceExpectedTemperature((temperature*10)/2);
+                                    setDeviceExpectedTemperature(temperature);
                                 } else {
                                     manageRemoteTemperatureSensorAndDeviceRelay();
                                 }

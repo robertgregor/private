@@ -451,7 +451,7 @@ $(function() {
                 </tr>
               </thead>
               <tbody class="ui-widget-content">
-                <tr><td><div id="timeOpeningCurrentLabelCOMPONENTID"></div></td><td><span id='timeOpeningCurrentCOMPONENTID'></span></td></tr>
+                <tr><td><div id="timeOpeningCurrentLabelCOMPONENTID"></div></td><td><span id='timeOpeningCurrentCOMPONENTID'></span>&nbsp;%</td></tr>
                 <tr><td><div id="timeOpeningLabelCOMPONENTID"></div></td><td><span id='timeOpeningCOMPONENTID'></span></td></tr>
                 <tr><td><div id="scheduler_enabledCOMPONENTID"></div></td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
                 <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>

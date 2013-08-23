@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 /**
  *
@@ -53,6 +54,33 @@ class RemoteHomeCommunicator extends Thread  {
                 } else {
                     simulate = true;
                     System.out.println("!!!!!!!!!!!    Simulation mode     !!!!!!!!!!!!!");
+                    new Thread(new Runnable(){
+                        public void run() {
+                            while (true) {
+                                try {
+                                    Thread.sleep(150000);
+                                    for (AbstractDevice dev : manager.getDevices()) {
+                                        if (dev instanceof TemperatureSensorDevice) {
+                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 2|+"+Integer.toString(15+(new Random()).nextInt(10))+"."+Integer.toString((new Random()).nextInt(99))+"|3.2|10");
+                                        } else if (dev instanceof ThermostatDevice) {
+                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 6|"+Integer.toString(150+(new Random()).nextInt(100))+"|10|47|0|5|0");
+                                        } else if (dev instanceof MotorControllerDevice) {
+                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" l|"+Integer.toString((new Random()).nextInt(100)));
+                                        } else if (dev instanceof HeatingHeaderDevice) {
+                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 4|"+Integer.toString(150+(new Random()).nextInt(100))+"|31|60|42|"+(new Random()).nextInt(100));
+                                        } else if (dev instanceof LightAlarmDevice) {
+                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" ALARM");
+                                        }
+                                    }
+                                    Thread.sleep(150000);
+                                } catch (InterruptedException e) {
+                                    return;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }).start();
                 }
             } catch (UnknownHostException e) {
                 throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);

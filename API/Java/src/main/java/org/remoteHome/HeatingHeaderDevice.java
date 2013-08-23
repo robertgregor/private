@@ -554,7 +554,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
-        String deviceTemp = Integer.toString((getDeviceExpectedTemperature()*2)/10,16).toUpperCase();
+        String deviceTemp = Integer.toString(getDeviceExpectedTemperature(),16).toUpperCase();
         while (deviceTemp.length() < 2) deviceTemp = "0" + deviceTemp;
         getTemperatureSchedule().setCurrentState(deviceTemp);
         new Thread(new Runnable() {
@@ -571,7 +571,6 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
                         if (isHeatingControllerEnabled() && getHeatingController() != 0) {
                             try {
                                 if (getHeatingControllerOpenAngle() >= getOpenAngle()) {
-                                    //ok, get the device and check if it is on
                                     SimpleSwitchDevice ssd = (SimpleSwitchDevice)m.getDevice(getHeatingController());
                                     if (ssd.updatedBefore(1)) ssd.updateDevice();
                                     if (!ssd.isCurrentState() || ssd.getCurrentCounter() < 2) {
@@ -598,7 +597,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
                             if (temperature != null) {
                                 //something has to be done.
                                 if (!isRemoteTemperatureMeterEnabled()) {
-                                    setDeviceExpectedTemperature((temperature*10)/2);
+                                    setExpectedTemperature((temperature*2)/10);
                                 } else {
                                     manageRemoteTemperatureSensorAndHeader();
                                 }

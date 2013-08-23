@@ -18,15 +18,45 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           document.getElementById("currPeriodCOMPONENTID").innerHTML=data.frequency;
           document.getElementById("currPeriodFormCOMPONENTID").value=data.expectedFrequency;
+          document.getElementById("expPeriodCOMPONENTID").innerHTML=data.expectedFrequency;
           document.getElementById("temperatureCOMPONENTID").innerHTML=data.temperature / 10;
           document.getElementById("expTemperatureCOMPONENTID").innerHTML=(data.expectedTemperature / 10);
           document.getElementById("expTemperatureFormCOMPONENTID").value=(data.expectedTemperature / 10);
-          document.getElementById("openAngleCOMPONENTID").innerHTML=(data.expectedOpenAngle);
-          document.getElementById("openAngleFormCOMPONENTID").value=(data.expectedOpenAngle);
-          document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery;
-          document.getElementById("expPeriodCOMPONENTID").innerHTML=data.expectedFrequency;
+          document.getElementById("openAngleCOMPONENTID").innerHTML=data.openAngle;
+          document.getElementById("openAngleFormCOMPONENTID").selectedIndex=(data.expectedOpenAngle / 10);
+          document.getElementById("expOpenAngleCOMPONENTID").innerHTML=data.expectedOpenAngle;
+          document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery/10 + "." + data.battery//10;
+          document.getElementById("heatingControllerCOMPONENTID").innerHTML=data.heatingController;
+          document.getElementById("heatingControllerFormCOMPONENTID").value=(data.heatingController);
+          document.getElementById("remoteTemperatureMeterCOMPONENTID").innerHTML=data.remoteTemperatureMeter;
+          document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value=(data.remoteTemperatureMeter);
+          document.getElementById("heatingControllerOpenAngleCOMPONENTID").innerHTML=data.heatingControllerOpenAngle;
+          document.getElementById("heatingControllerOpenAngleFormCOMPONENTID").value=(data.heatingControllerOpenAngle);
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
-
+          if (data.enabledScheduler) {
+                $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=yes;
+          } else {
+                $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', false);
+                document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=no;
+          }
+          $("#checkboxEnabledSchedulerCOMPONENTID").trigger("change");
+          if (data.heatingControllerEnabled) {
+                $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).prop('checked', true);
+                document.getElementById("heatingControllerEnabledCOMPONENTID").innerHTML=yes;
+          } else {
+                $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).prop('checked', false);
+                document.getElementById("heatingControllerEnabledCOMPONENTID").innerHTML=no;
+          }
+          $("#checkboxHeatingControllerEnabledCOMPONENTID").trigger("change");
+          if (data.remoteTemperatureMeterEnabled) {
+                $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).prop('checked', true);
+                document.getElementById("remoteTemperatureMeterEnabledCOMPONENTID").innerHTML=yes;
+          } else {
+                $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).prop('checked', false);
+                document.getElementById("remoteTemperatureMeterEnabledCOMPONENTID").innerHTML=no;
+          }
+          $("#checkboxRemoteTemperatureMeterEnabledCOMPONENTID").trigger("change");
       },
       error:function(xhr){
           if (showError) {
@@ -72,19 +102,46 @@ $(function() {
                    focus(function() {
                    setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
               });
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxEnabledSchedulerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+    $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
-                alert('Name of the component cannot be empty!');
+                alert(error_name_cannot_be_empty);
                 return;
           }
           var tm = parseInt(document.getElementById("currPeriodFormCOMPONENTID").value);
           if (tm == NaN) {
-              alert('Sending period should be number!');
+              alert(error_period_exist);
               return;
           }
           if ((tm > 2550) || (tm < 10)) {
-              alert('Sending period should be number between 10 and 2550!');
+              alert(error_period_range);
               return;
           }
           var room = document.getElementById("roomFormCOMPONENTID").value;
@@ -92,11 +149,43 @@ $(function() {
               alert(error_room_exist);
               return;
           }
+          var temp = parseFloat(document.getElementById("expTemperatureFormCOMPONENTID").value);
+          if (temp == NaN) {
+              alert(error_temperature_number);
+              return;
+          }
+          temp = temp * 10;
+          if ((temp > 400) || (temp < 0)) {
+              alert(error_temperature_range);
+              return;
+          }
+          var heatingId = parseInt(document.getElementById("heatingControllerFormCOMPONENTID").value);
+          if (heatingId == NaN) {
+              alert(error_heating_id_number);
+              return;
+          }
+          var remoteTempId = parseInt(document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value);
+          if (remoteTempId == NaN) {
+              alert(error_temperature_id_number);
+              return;
+          }
+          var openAngleHeating = parseInt(document.getElementById("heatingControllerOpenAngleFormCOMPONENTID").value);
+          if (openAngleHeating == NaN) {
+              alert(error_open_angle_number);
+              return;
+          }
+          if ((openAngleHeating > 100) || (openAngleHeating < 0)) {
+              alert(error_open_angle_range);
+              return;
+          }
+          var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
+          var heatingEnabled = document.getElementById("checkboxHeatingControllerEnabledCOMPONENTID").checked?"TRUE":"FALSE";
+          var tempEnabled = document.getElementById("checkboxRemoteTemperatureMeterEnabledCOMPONENTID").checked?"TRUE":"FALSE";
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=HeatingHeaderDeviceManager&deviceId=COMPONENTID&tm="+tm+"&room="+encodeURIComponent(room)+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+              data: "ServiceName=HeatingHeaderDeviceManager&deviceId=COMPONENTID&temp="+temp+"&openAngleHeating="+openAngleHeating+"&schenabled="+schenabled+"&heatingEnabled="+heatingEnabled+"&tempEnabled="+tempEnabled+"&tm="+tm+"&heatingId="+heatingId+"&remoteTempId="+remoteTempId+"&room="+encodeURIComponent(room)+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
                 if (data == "REFRESH") document.location.reload(true);
                 updateStatusCOMPONENTID();
@@ -106,6 +195,21 @@ $(function() {
             }   
           });
           updateStatusCOMPONENTID();
+    });
+    $( "#setToPositionCOMPONENTID" ).button().click(function() {
+          var period = $( "#openAngleFormCOMPONENTID" ).val();
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=MotorControllerDeviceManager&deviceId=COMPONENTID&action=SETPOS&period="+period+"&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(thrownError+"\n\n"+xhr.responseText);
+            }   
+          });
     });
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
@@ -228,12 +332,15 @@ $(function() {
                   });
           });
     });
+    document.getElementById('setToPositionCOMPONENTID').value = set_To_position;
     setLabelBasedOnId("property_1COMPONENTID", "property");
     setLabelBasedOnId("value_1COMPONENTID", "value");
     setLabelBasedOnId("property_2COMPONENTID", "property");
     setLabelBasedOnId("value_2COMPONENTID", "value");
     setLabelBasedOnId("property_3COMPONENTID", "property");
     setLabelBasedOnId("value_3COMPONENTID", "value");
+    setLabelBasedOnId("property_4COMPONENTID", "property");
+    setLabelBasedOnId("value_4COMPONENTID", "value");
     setLabelBasedOnId("actionsCOMPONENTID", "actions");
     document.getElementById('configureCOMPONENTID').value = change_config_p;
     document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
@@ -248,13 +355,31 @@ $(function() {
     setLabelBasedOnId("component_idCOMPONENTID", "component_id");
     setLabelBasedOnId("battVoltageLabelCOMPONENTID", "batt_voltage");
     setLabelBasedOnId("temperatureLCOMPONENTID", "temperature");
+    setLabelBasedOnId("temperatureExpLCOMPONENTID", "expected_temperature");
+    setLabelBasedOnId("temperatureExpFCOMPONENTID", "expected_temperature");
     setLabelBasedOnId("degCelsius1COMPONENTID", "deg_celsius");
+    setLabelBasedOnId("degCelsius2COMPONENTID", "deg_celsius");
     setLabelBasedOnId("secondsL1COMPONENTID", "seconds");
     setLabelBasedOnId("secondsL2COMPONENTID", "seconds");
     setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
     setLabelBasedOnId("sending_periodCOMPONENTID", "sending_period");
     setLabelBasedOnId("sending_periodExpectedCOMPONENTID", "sending_period_expected");
     setLabelBasedOnId("sending_periodFCOMPONENTID", "sending_period");
+    setLabelBasedOnId("open_AngleCOMPONENTID", "open_angle");
+    setLabelBasedOnId("open_AngleExpectedCOMPONENTID", "open_angle_expected");
+    setLabelBasedOnId("open_AngleExpectedFormCOMPONENTID", "open_angle");
+    setLabelBasedOnId("heating_ctrl_enabledCOMPONENTID", "heating_ctrl_enabled");
+    setLabelBasedOnId("heating_ctrl_enabledFCOMPONENTID", "heating_ctrl_enabled");
+    setLabelBasedOnId("scheduler_enabledCOMPONENTID", "scheduler_enabled");
+    setLabelBasedOnId("scheduler_enabledFCOMPONENTID", "scheduler_enabled");
+    setLabelBasedOnId("temperature_ctrl_enabledCOMPONENTID", "remote_temp_meter_enabled");
+    setLabelBasedOnId("temperature_ctrl_enabledFCOMPONENTID", "remote_temp_meter_enabled");
+    setLabelBasedOnId("temp_meter_idCOMPONENTID", "temp_meter_id");
+    setLabelBasedOnId("temp_meter_idFCOMPONENTID", "temp_meter_id");
+    setLabelBasedOnId("heating_controller_idCOMPONENTID", "heating_controller_id");
+    setLabelBasedOnId("heating_controller_idFCOMPONENTID", "heating_controller_id");
+    setLabelBasedOnId("heatingControllerOpenAngle_LabelCOMPONENTID", "heating_controller_open_angle");
+    setLabelBasedOnId("heatingControllerOpenAngle_Form_LabelFCOMPONENTID", "heating_controller_open_angle");
     setLabelBasedOnId("chartButtHourLabelCOMPONENTID", "chart_butt_hour");
     setLabelBasedOnId("chartButtDayLabelCOMPONENTID", "chart_butt_day");
     setLabelBasedOnId("chartButtWeekLabelCOMPONENTID", "chart_butt_week");
@@ -278,8 +403,22 @@ $(function() {
     <div id="componentTabsCOMPONENTID-1">
         <br/>
         <br/>
-        <table><tr>
-        <td><button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button></td>
+        <table><tr><td>
+            <div id="open_AngleExpectedFormCOMPONENTID"></div></td><td>
+            <select id="openAngleFormCOMPONENTID">
+                <option value="0">0%</option>
+                <option value="10">10%</option>
+                <option value="20">20%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
+                <option value="60">60%</option>
+                <option value="70">70%</option>
+                <option value="80">80%</option>
+                <option value="90">90%</option>
+                <option value="100">100%</option>
+            </select></td><td>&nbsp;<input type="submit" id="setToPositionCOMPONENTID" />&nbsp;&nbsp;&nbsp;</td><td>
+        <button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button></td>
         </tr></table>
     </div>
     <div id="componentTabsCOMPONENTID-2">
@@ -297,6 +436,11 @@ $(function() {
                 <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
                 <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
                 <tr><td><div id="battVoltageLabelCOMPONENTID"></div></td><td><span id='battVoltageCOMPONENTID'></span></td></tr>
+                <tr><td><div id="temperature_ctrl_enabledCOMPONENTID"></div></td><td><span id='remoteTemperatureMeterEnabledCOMPONENTID'></span></td></tr>
+                <tr><td><div id="heating_ctrl_enabledCOMPONENTID"></div></td><td><span id='heatingControllerEnabledCOMPONENTID'></span></td></tr>
+                <tr><td><div id="scheduler_enabledCOMPONENTID"></div></td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="heating_controller_idCOMPONENTID"></div></td><td><span id='heatingControllerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="temp_meter_idCOMPONENTID"></div></td><td><span id='remoteTemperatureMeterCOMPONENTID'></span></td></tr>
               </tbody>
             </table>
           </td><td>
@@ -309,11 +453,14 @@ $(function() {
               </thead>
               <tbody class="ui-widget-content">
                 <tr><td><div id="temperatureLCOMPONENTID"></div></td><td><span id='temperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius1COMPONENTID"></span></td></tr>
-                <tr><td><div id="temperatureLCOMPONENTID"></div></td><td><span id='expTemperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius1COMPONENTID"></span></td></tr>
+                <tr><td><div id="temperatureExpLCOMPONENTID"></div></td><td><span id='expTemperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius2COMPONENTID"></span></td></tr>
                 <tr><td><div id="sending_periodCOMPONENTID"></div></td><td><span id='currPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL2COMPONENTID"></span></td></tr>
                 <tr><td><div id="sending_periodExpectedCOMPONENTID"></div></td><td><span id='expPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL1COMPONENTID"></span></td></tr>
-                <tr><td><div id="sending_periodExpectedCOMPONENTID"></div></td><td><span id='openAngleCOMPONENTID'></span>&nbsp;<span id="secondsL1COMPONENTID"></span></td></tr>
+                <tr><td><div id="open_AngleCOMPONENTID"></div></td><td><span id='openAngleCOMPONENTID'></span>&nbsp;%</td></tr>
+                <tr><td><div id="open_AngleExpectedCOMPONENTID"></div></td><td><span id='expOpenAngleCOMPONENTID'></span>&nbsp;%</td></tr>
+                <tr><td><div id="heatingControllerOpenAngle_LabelCOMPONENTID"></div></td><td><span id='heatingControllerOpenAngleCOMPONENTID'></span>&nbsp;%</td></tr>
                 <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+                <tr><td>&nbsp;</td></tr>
               </tbody>
             </table>
           </td></tr>
@@ -334,11 +481,27 @@ $(function() {
                 <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
                 <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
                 <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="currPeriodFormCOMPONENTID" /></td></tr>
-                <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="expTemperatureFormCOMPONENTID" /></td></tr>
-                <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="openAngleFormCOMPONENTID" /></td></tr>
-
+                <tr><td><div id="temperatureExpFCOMPONENTID"></div></td><td><input type="text" id="expTemperatureFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="temp_meter_idFCOMPONENTID"></div></td><td><input type="text" id="remoteTemperatureMeterFormCOMPONENTID" /></td></tr>
+                <tr><td>&nbsp;</td></tr>
+              </tbody>
             </table>
-          </td><td>&nbsp;
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_4COMPONENTID"></div></th>
+                <th><div id="value_4COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="heating_controller_idFCOMPONENTID"></div></td><td><input type="text" id="heatingControllerFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="heatingControllerOpenAngle_Form_LabelFCOMPONENTID"></div></td><td><input type="text" id="heatingControllerOpenAngleFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="scheduler_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="heating_ctrl_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="temperature_ctrl_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxRemoteTemperatureMeterEnabledCOMPONENTID" /><label for="checkboxRemoteTemperatureMeterEnabledCOMPONENTID">&nbsp;</label></td></tr>
+              </tbody>
+            </table>
           </td></tr>
         </table>
         <input type="submit" id="configureCOMPONENTID" />        

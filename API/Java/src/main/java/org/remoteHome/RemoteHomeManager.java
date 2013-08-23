@@ -304,19 +304,20 @@ public class RemoteHomeManager {
      */
     public String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
         if (comm.isSimulate()) {
+            Random rnd = new Random();
             try {
                 AbstractDevice dev = this.getDevice(deviceId);
                 if (dev instanceof MotorControllerDevice) {
-                    return "5|0|0|10|"+Integer.toString((int)Math.random()*100);
+                    return "5|0|0|10|"+Integer.toString(rnd.nextInt(100));
                 } else if (dev instanceof ThermostatDevice) {
-                    return "6|"+Integer.toString(150+(int)Math.random()*100)+"|10|47|0|5|0"; 
+                    return "6|"+Integer.toString(150+rnd.nextInt(100))+"|10|47|0|5|0"; 
                 } else if (dev instanceof TemperatureSensorDevice) {
-                    return "2|+"+Integer.toString(15+(int)Math.random()*10)+"."+Integer.toString((int)Math.random()*100)+"|3|10"; 
+                    return "2|+"+Integer.toString(15+rnd.nextInt(10))+"."+Integer.toString(rnd.nextInt(99))+"|3|10"; 
                 } else if (dev instanceof LightAlarmDevice) {
-                    if (command.startsWith("sa")) return "1|a|0|0|10|20";
-                    else return "1|c|0|0|0|10|0";
+                    if (command.startsWith("sa")) return "1|a|0|"+Integer.toString(rnd.nextInt(1))+"|10|20";
+                    else return "1|c|"+Integer.toString(rnd.nextInt(1))+"|0|0|10|0";
                 } else if (dev instanceof SimpleSwitchDevice) {
-                    return "3|0|0|3|3";
+                    return "3|"+Integer.toString(rnd.nextInt(1))+"|0|3|3";
                 } else return "";
             } catch (Exception e) {
                 e.printStackTrace();
