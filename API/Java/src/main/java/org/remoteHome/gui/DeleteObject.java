@@ -60,6 +60,7 @@ public class DeleteObject extends AbstractWebService {
                     && deleteRoom != null && deleteRoom.equals("0")) {
                     try {
                         r.removeDevice(Integer.valueOf(deleteDevice));
+                        r.getPersistance().deleteDevice(r.getDevices(), Integer.valueOf(deleteDevice));
                     } catch (NumberFormatException e) {
                         sendAjaxAnswer("Not a valid DeviceId");
                     }
@@ -69,6 +70,7 @@ public class DeleteObject extends AbstractWebService {
                     for (AbstractDevice dev : r.getDevices()) {
                         if(dev.getRoomName().equals(deleteRoom)) {
                             r.removeDevice(dev.getDeviceId());
+                            r.getPersistance().deleteRoom(r.getDevices(), dev.getRoomName());
                         }
                     }
                     sendAjaxAnswer("Deleted room: " + deleteRoom);
@@ -76,9 +78,11 @@ public class DeleteObject extends AbstractWebService {
                         && deleteRoom != null && !deleteRoom.equals("0")) {
                     try {
                         r.removeDevice(Integer.valueOf(deleteDevice));
+                        r.getPersistance().deleteDevice(r.getDevices(), Integer.valueOf(deleteDevice));
                         for (AbstractDevice dev : r.getDevices()) {
                             if(dev.getRoomName().equals(deleteRoom)) {
                                 r.removeDevice(dev.getDeviceId());
+                                r.getPersistance().deleteRoom(r.getDevices(), dev.getRoomName());
                             }
                         }
                     } catch (NumberFormatException e) {

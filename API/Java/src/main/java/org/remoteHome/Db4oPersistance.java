@@ -7,6 +7,8 @@ package org.remoteHome;
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.config.EmbeddedConfiguration;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -85,4 +87,21 @@ public class Db4oPersistance implements ApiPersistance {
         if (ahs.size()==0) return proto;
         else return ahs.get(0);
     }
+
+    public void deleteDevice(Collection<AbstractDevice> devices, int deviceId) {
+        for (AbstractDevice device : devices) {
+            if(device.getDeviceId() == deviceId) {
+                db.delete(device);
+            }
+        }
+    }
+
+    public void deleteRoom(Collection<AbstractDevice> devices, String roomName) {
+        for (AbstractDevice device : devices) {
+            if(device.getRoomName().equals(roomName)) {
+                db.delete(device);
+            }
+        }
+    }
+
 }

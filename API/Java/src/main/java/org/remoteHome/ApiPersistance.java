@@ -4,6 +4,7 @@
  */
 package org.remoteHome;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -24,4 +25,6 @@ public interface ApiPersistance {
     Properties loadProperties();
     void saveHistoryData(AbstractHistoryData data);
     AbstractHistoryData loadHistoryData(AbstractHistoryData proto);
+    void deleteDevice(Collection<AbstractDevice> devices, int deviceId);
+    void deleteRoom(Collection<AbstractDevice> devices, String roomName);
 }
