@@ -170,7 +170,7 @@
         <profile>
             <id>dr</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
                 </os>
