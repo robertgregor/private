@@ -24,6 +24,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.7</java.version>
         <nrjavaserial.version>3.8.8</nrjavaserial.version>
+        <gson.version>2.2.4</gson.version>
+        <db4o.version>8.0-SNAPSHOT</db4o.version>
         <!-- Maven plugins -->
         <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>2.7</maven-dependency-plugin.version>
@@ -47,12 +49,12 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.4</version>
+            <version>${gson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.db4o</groupId>
             <artifactId>db4o-full-java5</artifactId>
-            <version>8.0-SNAPSHOT</version>
+            <version>${db4o.version}</version>
         </dependency>                
     </dependencies>
 
@@ -165,6 +167,22 @@
                 <serialize.filepath>c:/RH/test.ser</serialize.filepath>
             </properties>
         </profile>
+        <profile>
+            <id>dr</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <server.host>localhost</server.host>
+                <listenPort>8080</listenPort>
+                <socket.host>localhost</socket.host>
+                <port>SIMULATE</port>
+                <serialize.filepath>${basedir}/test.ser</serialize.filepath>
+            </properties>
+        </profile>
     </profiles>
     <repositories>
         <repository>
@@ -191,15 +209,15 @@
             <id>Sonatype releases</id>
             <url>https://oss.sonatype.org/content/repositories/releases</url>
         </repository>
+        <repository>
+            <id>source.db4o</id>
+            <url>http://source.db4o.com/maven</url>
+        </repository>
         <!-- nrjavaserial -->
         <repository>
             <id>Remote-Home thirdparty</id>
             <url>http://nexus.remote-home.org/content/repositories/thirdparty/</url>
         </repository>
-        <repository>
-            <id>source.db4o</id>
-            <url>http://source.db4o.com/maven</url>
-        </repository>        
     </repositories>
 
     <licenses>
