@@ -65,8 +65,8 @@
             setLabel("user_confirm_password");
             setLabel("group_id");
             var selectGROUP = document.getElementById("groupId");
-            seletcGROUP.options[selectGROUP.options.length] = new Option(admin_label, '1');
-            seletcGROUP.options[selectGROUP.options.length] = new Option(reader_label, '2');
+            selectGROUP.options[1].text = admin_label;
+            selectGROUP.options[2].text = reader_label;
         });
 
     </script>
@@ -96,8 +96,8 @@
                     <td>
                         <select width="100%" id="groupId" name="groupId">
                             <option value="0">&nbsp;</option>
-                            <option value="1"></option>
-                            <option value="2"></option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
                         </select>
                     </td>
                 </tr>
