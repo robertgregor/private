@@ -40,11 +40,32 @@
                             $("#addUserResult").html(data);
                         },
                         error: function () {
-                            $("#addUserResult").html(err_change_channelPwd);
+                            $("#addUserResult").html(err_add_user);
                         }
                     });
                 }
             });
+            $("#modifyUser").button();
+            $("#modifyUserForm").submit(function (event) {
+                event.preventDefault();
+                if ($(this).valid()) {
+                    $("#modifyUserResult").html('');
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            $("#modifyUserResult").html(data);
+                        },
+                        error: function () {
+                            $("#modifyUserResult").html(err_change_user);
+                        }
+                    });
+                }
+            });
+
         });
         $(document).ready(function () {
             $("#changeChannelPassowrd").validate({
@@ -73,6 +94,7 @@
 
             document.getElementById('setChPwd').value = setChPwd_form;
             document.getElementById('addUser').value = adduser_form;
+            document.getElementById('modifyUser').value = modifyuser_form;
             setLabel("channel_password_cfg");
             setLabel("channel_device");
             setLabel("password_device");
@@ -80,6 +102,7 @@
             document.getElementById('password').title = password_device_desc;
             setLabel("wifi_configuration");
             setLabel("user_management");
+            setLabel("user_management_text");
             setLabel("user_name");
             setLabel("user_password");
             setLabel("user_confirm_password");
@@ -87,6 +110,13 @@
             var selectGROUP = document.getElementById("groupId");
             selectGROUP.options[1].text = admin_label;
             selectGROUP.options[2].text = reader_label;
+            setLabel("modify_user_text");
+            setLabel("groupId2");
+            setLabel("group_id_2");
+            setLabel("user_name_modify");
+            setLabel("user_password_modify_actual");
+            setLabel("user_confirm_password_modify");
+            setLabel("user_confirm_password_modify_confirm");
         });
 
     </script>
@@ -96,7 +126,7 @@
 
     <h3><span id="user_management"></span></h3>
     <div>
-        <p><span id="user_management_text"></span></p>
+        <p><h3 id="user_management_text"></h3></p>
         <form id="userManagementForm">
             <table>
                 <tr>
@@ -122,14 +152,59 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><input type="hidden" name="ServiceName" value="UserManagement"/><input id="addUser"
-                                                                                                 type="submit"/></td>
+                    <td><input type="hidden" name="ServiceName" value="UserManagement"/>
+                        <input type="hidden" name="method" value="addUser"/>
+                        <input id="addUser" type="submit"/></td>
                     <td>
                         <div id="addUserResult">&nbsp;</div>
                     </td>
                 </tr>
             </table>
         </form>
+        <p><h3 id="modify_user_text"></h3></p>
+        <form id="modifyUserForm">
+            <table>
+                <tr>
+                    <td><label for="user_name_modify"><span id="user_name_modify"></span></label></td>
+                    <td>
+                        <select width="100%" id="userNameModify" name="userNameModify">
+                            <option value="0">&nbsp;</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="user_password_modify_actual"><span id="user_password_modify_actual"></span></label></td>
+                    <td><input type="password" name="userPasswordModifyActual" id="userPasswordModifyActual"/></td>
+                </tr>
+                <tr>
+                    <td><label for="user_confirm_password_modify"><span id="user_confirm_password_modify"></span></label></td>
+                    <td><input type="password" name="userConfirmPasswordModify" id="userConfirmPasswordModify"/></td>
+                </tr>
+                <tr>
+                    <td><label for="user_confirm_password_modify_confirm"><span id="user_confirm_password_modify_confirm"></span></label></td>
+                    <td><input type="password" name="userConfirmPasswordModifyConfirm" id="userConfirmPasswordModifyConfirm"/></td>
+                </tr>
+                <tr>
+                    <td><label for="group_id_2"><span id="group_id_2"></span></label></td>
+                    <td>
+                        <select width="100%" id="groupId2" name="groupId2">
+                            <option value="0">&nbsp;</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="hidden" name="ServiceName" value="UserManagement"/>
+                        <input type="hidden" name="method" value="modifyUser"/>
+                        <input id="modifyUser" type="submit"/></td>
+                    <td>
+                        <div id="modifyUserResult">&nbsp;</div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
     </div>
 
     <h3><span id="channel_password_cfg"></span></h3>
