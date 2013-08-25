@@ -50,23 +50,24 @@
                     alert(err_get_channel_pwd);
                 }
             });
+
+            document.getElementById('setChPwd').value = setChPwd_form;
+            document.getElementById('addUser').value = adduser_form;
+            setLabel("channel_password_cfg");
+            setLabel("channel_device");
+            setLabel("password_device");
+            document.getElementById('channel').title = channel_device_desc;
+            document.getElementById('password').title = password_device_desc;
+            setLabel("wifi_configuration");
+            setLabel("user_management");
+            setLabel("user_name");
+            setLabel("user_password");
+            setLabel("user_confirm_password");
+            setLabel("group_id");
+            var selectGROUP = document.getElementById("groupId");
+            seletcGROUP.options[selectGROUP.options.length] = new Option(admin_label, '1');
+            seletcGROUP.options[selectGROUP.options.length] = new Option(reader_label, '2');
         });
-        document.getElementById('setChPwd').value = setChPwd_form;
-        document.getElementById('addUser').value = adduser_form;
-        setLabel("channel_password_cfg");
-        setLabel("channel_device");
-        setLabel("password_device");
-        document.getElementById('channel').title = channel_device_desc;
-        document.getElementById('password').title = password_device_desc;
-        setLabel("wifi_configuration");
-        setLabel("user_management");
-        setLabel("user_name");
-        setLabel("user_password");
-        setLabel("user_confirm_password");
-        setLabel("group_id");
-        var selectGROUP = document.getElementById("groupId");
-        seletcGROUP.options[selectGROUP.options.length] = new Option(admin_label, '1');
-        seletcGROUP.options[selectGROUP.options.length] = new Option(reader_label, '2');
 
     </script>
 </head>
@@ -95,6 +96,8 @@
                     <td>
                         <select width="100%" id="groupId" name="groupId">
                             <option value="0">&nbsp;</option>
+                            <option value="1"></option>
+                            <option value="2"></option>
                         </select>
                     </td>
                 </tr>
