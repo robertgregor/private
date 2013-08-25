@@ -47,7 +47,7 @@ public class RemoteHomeManager {
     
     private HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
     private HashMap<String, AbstractSchedule> schedulers = new HashMap<String, AbstractSchedule>();
-    private UserManagement userManagement = new UserManagement();
+    private UserManagement userManagement;
     private RemoteHomeCommunicator comm;
     private ApiPersistance persistance = null;
     /**
@@ -364,6 +364,10 @@ public class RemoteHomeManager {
             devices = getPersistance().loadDevices();
             schedulers = getPersistance().loadSchedulers();
             userManagement = getPersistance().loadUserManagement();
+            if(userManagement == null) {
+                userManagement = new UserManagement();
+                userManagement.init();
+            }
             for (AbstractDevice dev : devices.values()) {
                 dev.m = this;
                 dev.startScheduling();
