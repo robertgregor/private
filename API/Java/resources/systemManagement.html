@@ -52,6 +52,7 @@
             });
         });
         document.getElementById('setChPwd').value = setChPwd_form;
+        document.getElementById('addUser').value = adduser_form;
         setLabel("channel_password_cfg");
         setLabel("channel_device");
         setLabel("password_device");
@@ -59,6 +60,13 @@
         document.getElementById('password').title = password_device_desc;
         setLabel("wifi_configuration");
         setLabel("user_management");
+        setLabel("user_name");
+        setLabel("user_password");
+        setLabel("user_confirm_password");
+        setLabel("group_id");
+        var selectGROUP = document.getElementById("groupId");
+        seletcGROUP.options[selectGROUP.options.length] = new Option(admin_label, '1');
+        seletcGROUP.options[selectGROUP.options.length] = new Option(reader_label, '2');
 
     </script>
 </head>
@@ -67,10 +75,38 @@
 
     <h3><span id="user_management"></span></h3>
     <div>
-    </div>
-
-    <h3><span id="group_management"></span></h3>
-    <div>
+        <p><span id="user_management_text"></span></p>
+        <form id="userManagementForm">
+            <table>
+                <tr>
+                    <td><label for="user_name"><span id="user_name"></span></label></td>
+                    <td><input name="userName" id="userName"/></td>
+                </tr>
+                <tr>
+                    <td><label for="user_password"><span id="user_password"></span></label></td>
+                    <td><input type="password" name="userPassword" id="userPassword"/></td>
+                </tr>
+                <tr>
+                    <td><label for="user_confirm_password"><span id="user_confirm_password"></span></label></td>
+                    <td><input type="password" name="userConfirmPassword" id="userConfirmPassword"/></td>
+                </tr>
+                <tr>
+                    <td><label for="group_id"><span id="group_id"></span></label></td>
+                    <td>
+                        <select width="100%" id="groupId" name="groupId">
+                            <option value="0">&nbsp;</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="hidden" name="ServiceName" value="UserManagement"/><input id="addUser"
+                                                                                                 type="submit"/></td>
+                    <td>
+                        <div id="addUserResult">&nbsp;</div>
+                    </td>
+                </tr>
+            </table>
+        </form>
     </div>
 
     <h3><span id="channel_password_cfg"></span></h3>
