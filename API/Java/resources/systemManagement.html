@@ -25,6 +25,26 @@
                     });
                 }
             });
+            $("#addUser").button();
+            $("#userManagementForm").submit(function (event) {
+                event.preventDefault();
+                if ($(this).valid()) {
+                    $("#addUserResult").html('');
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            $("#addUserResult").html(data);
+                        },
+                        error: function () {
+                            $("#addUserResult").html(err_change_channelPwd);
+                        }
+                    });
+                }
+            });
         });
         $(document).ready(function () {
             $("#changeChannelPassowrd").validate({

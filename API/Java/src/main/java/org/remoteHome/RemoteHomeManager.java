@@ -47,6 +47,7 @@ public class RemoteHomeManager {
     
     private HashMap<Integer, AbstractDevice> devices = new HashMap<Integer, AbstractDevice>();
     private HashMap<String, AbstractSchedule> schedulers = new HashMap<String, AbstractSchedule>();
+    private UserManagement userManagement = new UserManagement();
     private RemoteHomeCommunicator comm;
     private ApiPersistance persistance = null;
     /**
