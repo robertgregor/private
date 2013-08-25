@@ -85,19 +85,6 @@
                     roomName: { required: err_device_room }
                 }
             });
-            $.validator.addMethod('notbothyes', function (val, el, param) {
-                return (val != '0' || ('0' != $(param).find('option:selected').val()));
-            }, err_empty_device_room);
-            $("#deleteDeviceForm").validate({
-                rules: {
-                    deleteDeviceName: {
-                        notbothyes: '#deleteRoomId'
-                    },
-                    deleteRoomName: {
-                        notbothyes: '#deleteDeviceId'
-                    }
-                }
-            });
             $.ajax({
                 url: "/",
                 type: "get",
