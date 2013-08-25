@@ -23,8 +23,7 @@ public class UserManagementService extends AbstractWebService {
         String userName = requestParameters.get("userName");
         String password = requestParameters.get("userPassword");
         String group = requestParameters.get("groupId");
-
-
+        String loadUsers = requestParameters.get("loadUsers");
 
     }
 

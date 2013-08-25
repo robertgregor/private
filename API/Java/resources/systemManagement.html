@@ -91,7 +91,25 @@
                     alert(err_get_channel_pwd);
                 }
             });
-
+            /*
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=UserManagement&loadUsers=true&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    var select = document.getElementById("userNameModify");
+                    var json = JSON.parse(data);
+                    for (var i = 0; i < json.length; i++) {
+                        var d = json[i];
+                        select.options.add(new Option(d.name), d.id);
+                    }
+                },
+                error: function () {
+                    alert(err_get_channel_pwd);
+                }
+            });
+            */
             document.getElementById('setChPwd').value = setChPwd_form;
             document.getElementById('addUser').value = adduser_form;
             document.getElementById('modifyUser').value = modifyuser_form;
@@ -126,85 +144,95 @@
 
     <h3><span id="user_management"></span></h3>
     <div>
-        <p><h3 id="user_management_text"></h3></p>
-        <form id="userManagementForm">
-            <table>
-                <tr>
-                    <td><label for="user_name"><span id="user_name"></span></label></td>
-                    <td><input name="userName" id="userName"/></td>
-                </tr>
-                <tr>
-                    <td><label for="user_password"><span id="user_password"></span></label></td>
-                    <td><input type="password" name="userPassword" id="userPassword"/></td>
-                </tr>
-                <tr>
-                    <td><label for="user_confirm_password"><span id="user_confirm_password"></span></label></td>
-                    <td><input type="password" name="userConfirmPassword" id="userConfirmPassword"/></td>
-                </tr>
-                <tr>
-                    <td><label for="group_id"><span id="group_id"></span></label></td>
-                    <td>
-                        <select width="100%" id="groupId" name="groupId">
-                            <option value="0">&nbsp;</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="hidden" name="ServiceName" value="UserManagement"/>
-                        <input type="hidden" name="method" value="addUser"/>
-                        <input id="addUser" type="submit"/></td>
-                    <td>
-                        <div id="addUserResult">&nbsp;</div>
-                    </td>
-                </tr>
-            </table>
-        </form>
-        <p><h3 id="modify_user_text"></h3></p>
-        <form id="modifyUserForm">
-            <table>
-                <tr>
-                    <td><label for="user_name_modify"><span id="user_name_modify"></span></label></td>
-                    <td>
-                        <select width="100%" id="userNameModify" name="userNameModify">
-                            <option value="0">&nbsp;</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="user_password_modify_actual"><span id="user_password_modify_actual"></span></label></td>
-                    <td><input type="password" name="userPasswordModifyActual" id="userPasswordModifyActual"/></td>
-                </tr>
-                <tr>
-                    <td><label for="user_confirm_password_modify"><span id="user_confirm_password_modify"></span></label></td>
-                    <td><input type="password" name="userConfirmPasswordModify" id="userConfirmPasswordModify"/></td>
-                </tr>
-                <tr>
-                    <td><label for="user_confirm_password_modify_confirm"><span id="user_confirm_password_modify_confirm"></span></label></td>
-                    <td><input type="password" name="userConfirmPasswordModifyConfirm" id="userConfirmPasswordModifyConfirm"/></td>
-                </tr>
-                <tr>
-                    <td><label for="group_id_2"><span id="group_id_2"></span></label></td>
-                    <td>
-                        <select width="100%" id="groupId2" name="groupId2">
-                            <option value="0">&nbsp;</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="hidden" name="ServiceName" value="UserManagement"/>
-                        <input type="hidden" name="method" value="modifyUser"/>
-                        <input id="modifyUser" type="submit"/></td>
-                    <td>
-                        <div id="modifyUserResult">&nbsp;</div>
-                    </td>
-                </tr>
-            </table>
-        </form>
-
+        <table>
+            <tr>
+                <td>
+                    <h4 id="user_management_text"></h4>
+                    <form id="userManagementForm">
+                        <table>
+                            <tr>
+                                <td><label for="user_name"><span id="user_name"></span></label></td>
+                                <td><input name="userName" id="userName"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_password"><span id="user_password"></span></label></td>
+                                <td><input type="password" name="userPassword" id="userPassword"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_confirm_password"><span id="user_confirm_password"></span></label></td>
+                                <td><input type="password" name="userConfirmPassword" id="userConfirmPassword"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="group_id"><span id="group_id"></span></label></td>
+                                <td>
+                                    <select width="100%" id="groupId" name="groupId">
+                                        <option value="0">&nbsp;</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="hidden" name="ServiceName" value="UserManagement"/>
+                                    <input type="hidden" name="method" value="addUser"/>
+                                    <input id="addUser" type="submit"/></td>
+                                <td>
+                                    <div id="addUserResult">&nbsp;</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </td>
+                <td>
+                    <br />
+                </td>
+                <td>
+                    <h4 id="modify_user_text"></h4>
+                    <form id="modifyUserForm">
+                        <table>
+                            <tr>
+                                <td><label for="user_name_modify"><span id="user_name_modify"></span></label></td>
+                                <td>
+                                    <select width="100%" id="userNameModify" name="userNameModify">
+                                        <option value="0">&nbsp;</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_password_modify_actual"><span id="user_password_modify_actual"></span></label></td>
+                                <td><input type="password" name="userPasswordModifyActual" id="userPasswordModifyActual"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_confirm_password_modify"><span id="user_confirm_password_modify"></span></label></td>
+                                <td><input type="password" name="userConfirmPasswordModify" id="userConfirmPasswordModify"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_confirm_password_modify_confirm"><span id="user_confirm_password_modify_confirm"></span></label></td>
+                                <td><input type="password" name="userConfirmPasswordModifyConfirm" id="userConfirmPasswordModifyConfirm"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="group_id_2"><span id="group_id_2"></span></label></td>
+                                <td>
+                                    <select width="100%" id="groupId2" name="groupId2">
+                                        <option value="0">&nbsp;</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="hidden" name="ServiceName" value="UserManagement"/>
+                                    <input type="hidden" name="method" value="modifyUser"/>
+                                    <input id="modifyUser" type="submit"/></td>
+                                <td>
+                                    <div id="modifyUserResult">&nbsp;</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <h3><span id="channel_password_cfg"></span></h3>
