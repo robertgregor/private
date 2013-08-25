@@ -21,6 +21,8 @@ public interface ApiPersistance {
     void deleteScheduler(AbstractSchedule sch);
     HashMap<Integer, AbstractDevice> loadDevices();
     HashMap<String, AbstractSchedule> loadSchedulers();
+    UserManagement loadUserManagement();
+    void saveUserManagement(UserManagement userManagement);
     void saveProperties(Properties prop);
     Properties loadProperties();
     void saveHistoryData(AbstractHistoryData data);

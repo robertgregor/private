@@ -1,5 +1,9 @@
 package org.remoteHome;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: dr
@@ -8,6 +12,8 @@ package org.remoteHome;
  * To change this template use File | Settings | File Templates.
  */
 public class UserManagement {
+
+    List<User> users = new ArrayList<User>();
 
     class User {
         private int userId;

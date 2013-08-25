@@ -65,6 +65,23 @@ public class Db4oPersistance implements ApiPersistance {
             }
         return schedulers;
     }
+
+    public UserManagement loadUserManagement() {
+        List<UserManagement> userManagement = db.query(UserManagement.class);
+        return (userManagement.size() == 0) ? null : userManagement.get(0);
+    }
+
+    public void saveUserManagement(UserManagement userManagement) {
+        if(userManagement != null) {
+            List<UserManagement> old = db.query(UserManagement.class);
+            if(old.size() != 0) {
+                db.delete(old);
+            }
+            db.store(userManagement);
+            db.commit();
+        }
+    }
+
     public void saveProperties(Properties prop) {
             db.store(prop);
             db.commit();
