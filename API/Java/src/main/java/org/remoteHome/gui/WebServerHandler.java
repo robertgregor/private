@@ -15,6 +15,8 @@ import java.net.Socket;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.remoteHome.AbstractDevice;
 import org.remoteHome.RemoteHomeManager;
 import org.remoteHome.User;
@@ -38,6 +40,7 @@ public class WebServerHandler implements HttpHandler {
             out = t.getResponseBody();
             String getRequest = t.getRequestURI().toString();
             System.out.println(getRequest);
+            Map<String, Object> params = (Map<String, Object>)t.getAttribute("parameters");
             List<User> loggedOnUsers = remoteHomemanager.getPersistance().loadUserManagement().getLoggedOnUsers();
             boolean isUserLoggedOn = true;
 
