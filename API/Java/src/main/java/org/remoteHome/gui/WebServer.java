@@ -26,7 +26,6 @@ public class WebServer {
     public void startServer() throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(listenPort), 0);
         HttpContext context = server.createContext("/", new WebServerHandler(remoteHomeManager));
-        //context.getFilters().add(new ParameterFilter());
         server.setExecutor(null); // creates a default executor
         server.start();
     }
