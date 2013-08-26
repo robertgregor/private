@@ -367,6 +367,7 @@ public class RemoteHomeManager {
             if(userManagement == null) {
                 userManagement = new UserManagement();
                 userManagement.init();
+                getPersistance().saveUserManagement(userManagement);
             }
             for (AbstractDevice dev : devices.values()) {
                 dev.m = this;
@@ -442,13 +443,5 @@ public class RemoteHomeManager {
             webServer.startServer();
             manager.joinCommThread();            
         }
-    }
-
-    public UserManagement getUserManagement() {
-        return userManagement;
-    }
-
-    public void setUserManagement(UserManagement userManagement) {
-        this.userManagement = userManagement;
     }
 }
