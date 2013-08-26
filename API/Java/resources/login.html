@@ -20,8 +20,7 @@
                     type: "get",
                     data: values,
                     success: function (data) {
-                        var json = JSON.parse(data);
-                        if(json == 'TRUE') {
+                        if(data === 'TRUE') {
                             document.location.reload(true);
                         } else {
                             $("#addLogonResult").html(err_credentials);
