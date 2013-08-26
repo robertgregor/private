@@ -67,8 +67,22 @@ public class WebServerHandler implements HttpHandler {
                     Thread.sleep(100);
                 }
             } else {
+                //it is the request to the resource
+                if (getRequest.indexOf('?') != -1) getRequest = getRequest.substring(0, getRequest.indexOf('?'));
+                String fileNameWithDirs = getRequest.replaceAll("/", " ");
+                fileNameWithDirs = fileNameWithDirs.trim();
+                if (fileNameWithDirs.length() != 0) {
+                    if (fileNameWithDirs.indexOf(" ") != -1) {
+                        String fileNameArray[] = fileNameWithDirs.split(" ");
+                        fileNameWithDirs = fileNameArray[fileNameArray.length - 1];
+                    }
+                }
                 WebService w = (WebService)Class.forName("org.remoteHome.gui.ResourceLoaderWebService").newInstance();
-                w.setParameters(remoteHomemanager, "login.html");
+                if (fileNameWithDirs.length() == 0) {
+                    w.setParameters(remoteHomemanager, "login.html");
+                } else {
+                    w.setParameters(remoteHomemanager, fileNameWithDirs);
+                }
                 w.processRequest(out, t);
             }
         } catch (Exception e) {
