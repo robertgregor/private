@@ -41,11 +41,14 @@ public class WebServerHandler implements HttpHandler {
             out = t.getResponseBody();
             String getRequest = t.getRequestURI().toString();
             System.out.println(getRequest);
-            List<User> loggedOnUsers = remoteHomemanager.getPersistance().loadUserManagement().getLoggedOnUsers();
+            List<User> loggedOnUsers = remoteHomemanager.getPersistance().loadUserManagement().getUsers();
             boolean isUserLoggedOn = false;
             String session = null;
             Headers reqHeaders = t.getRequestHeaders();
             Headers respHeaders = t.getResponseHeaders();
+            String p = getRequest.replaceAll("/", "");
+            p = p.substring(p.indexOf('?')+1);
+            HashMap<String, String> params = parseParameters(p);
             if(!reqHeaders.containsKey("Cookie")) {
                 respHeaders.add("Set-Cookie", "session="+Long.toString(System.currentTimeMillis()));
             } else {
@@ -55,10 +58,12 @@ public class WebServerHandler implements HttpHandler {
             if(session != null && loggedOnUsers != null) {
                 for(User user : loggedOnUsers) {
                     if(user.getHttpSession() != null) {
-                        isUserLoggedOn = (user.getHttpSession().equals(session)) ? true : false;
+                        isUserLoggedOn = (user.getHttpSession().equals(session)
+                            && user.isLoggedOn()) ? true : false;
                     }
                 }
             }
+
             if(isUserLoggedOn) {
                 if ((getRequest.indexOf('?') == -1) || (getRequest.indexOf('?') > 6)) {
                     //it is the request to the resource
@@ -88,6 +93,14 @@ public class WebServerHandler implements HttpHandler {
                     w.processRequest(parsedParameters, out, t);
                     Thread.sleep(100);
                 }
+            } else if(params.size() > 0 && params.get("logon") != null && params.get("logon").equals("true")) {
+                String parameters = getRequest.replaceAll("/", "");
+                parameters = parameters.substring(parameters.indexOf('?')+1);
+                HashMap<String, String> parsedParameters = parseParameters(parameters);
+                WebService w = (WebService)Class.forName("org.remoteHome.gui."+parsedParameters.get("ServiceName")).newInstance();
+                w.setParameters(remoteHomemanager);
+                w.processRequest(parsedParameters, out, t);
+                Thread.sleep(100);
             } else {
                 //it is the request to the resource
                 if (getRequest.indexOf('?') != -1) getRequest = getRequest.substring(0, getRequest.indexOf('?'));

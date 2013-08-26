@@ -17,11 +17,13 @@ public class User {
 
     public User() {}
 
-    public User(int userId, String userName, String password, Group group) {
+    public User(int userId, String userName, String password, Group group, boolean isLoggedOn, String httpSession) {
         this.userId = userId;
         this.userName = userName;
         this.password = password;
         this.group = group;
+        this.isLoggedOn = isLoggedOn;
+        this.httpSession = httpSession;
     }
 
     public int getUserId() {

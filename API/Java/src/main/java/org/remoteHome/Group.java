@@ -11,6 +11,9 @@ public class Group {
     private int groupId;
     private String groupName;
 
+    public static final Group ADMIN_GROUP = new Group(0,"Administrators");
+    public static final Group GUEST_GROUP = new Group(1,"Guests");
+
     public Group() {}
 
     public Group(int groupId, String groupName) {

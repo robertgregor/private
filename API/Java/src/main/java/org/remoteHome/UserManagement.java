@@ -13,19 +13,18 @@ import java.util.List;
 public class UserManagement {
 
     private List<User> users = new ArrayList<User>();
-    private List<User> loggedOnUsers = new ArrayList<User>();
 
-    public final User ADMIN = new User(0, "admin", "admin", new Group(0, "Admnistrator"));
+    public static User ADMIN = new User(0, "admin", "admin", Group.ADMIN_GROUP, false, null);
 
     public void init() {
         users.add(ADMIN);
     }
 
-    public List<User> getLoggedOnUsers() {
-        return loggedOnUsers;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setLoggedOnUsers(List<User> loggedOnUsers) {
-        this.loggedOnUsers = loggedOnUsers;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

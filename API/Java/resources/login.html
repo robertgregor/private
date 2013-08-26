@@ -6,6 +6,56 @@
     <link rel="stylesheet" type="text/css" href="bootstrap.css">
     <link rel="stylesheet" type="text/css" href="login.css">
     <link rel="stylesheet" type="text/css" href="magic.css">
+
+<script>
+    $(function () {
+        $("#logonForm").submit(function (event) {
+            event.preventDefault();
+            if ($(this).valid()) {
+                $("#addLogonResult").html('');
+                var values = $(this).serialize();
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "post",
+                    data: values,
+                    success: function (data) {
+                        var json = JSON.parse(data);
+                        if(json == 'TRUE') {
+                            document.location.reload(true);
+                        } else {
+                            $("#addLogonResult").html(err_credentials);
+                        }
+                    },
+                    error: function () {
+                        $("#addLogonResult").html(err_logon);
+                    }
+                });
+            }
+        });
+        $("#recoverForm").submit(function (event) {
+            event.preventDefault();
+            if ($(this).valid()) {
+                $("#addRecoverResult").html('');
+                var values = $(this).serialize();
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: values,
+                    success: function (data) {
+                        $("#addRecoverResult").html(data);
+                    },
+                    error: function () {
+                        $("#addRecoverResult").html(err_recover_password);
+                    }
+                });
+            }
+        });
+
+    });
+
+</script>
 </head>
 <body>
 <div class="container">
@@ -14,23 +64,29 @@
     </div>
     <div class="tab-content">
         <div id="login" class="tab-pane active">
-            <form class="form-signin">
+            <form id="logonForm" class="form-signin">
                 <p class="text-muted text-center">
                     Enter your username and password
                 </p>
-                <input type="text" placeholder="Username" class="form-control">
-                <input type="password" placeholder="Password" class="form-control">
-                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                <input type="text" id="userName" name="userName" placeholder="Username" class="form-control">
+                <input type="password" id="userPassword" name="userPassword" placeholder="Password" class="form-control">
+                <input type="hidden" name="logon" value="true" />
+                <input type="hidden" name="ServiceName" value="UserManagementService" />
+                <div id="addLogonResult">&nbsp;</div>
+                <br />
+                <button class="btn btn-lg btn-primary btn-block" id="logon" type="submit">Sign in</button>
             </form>
         </div>
         <div id="forgot" class="tab-pane">
-            <form class="form-signin">
+            <form id="recoverForm" class="forgotForm">
                 <p class="text-muted text-center">
                     Enter your valid e-mail
                 </p>
-                <input type="email" placeholder="mail@domain.com" required="required" class="form-control">
+                <input type="email" id="userEmail" name="userEmail" placeholder="mail@domain.com" required="required" class="form-control">
+                <input type="hidden" name="ServiceName" value="UserManagementService" />
+                <div id="addRecoverResult">&nbsp;</div>
                 <br>
-                <button class="btn btn-lg btn-danger btn-block" type="submit">Recover Password</button>
+                <button class="btn btn-lg btn-danger btn-block" id="recover" type="submit">Recover Password</button>
             </form>
         </div>
     </div>
