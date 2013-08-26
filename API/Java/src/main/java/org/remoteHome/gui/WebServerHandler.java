@@ -40,6 +40,7 @@ public class WebServerHandler implements HttpHandler {
             System.out.println(getRequest);
             List<User> loggedOnUsers = remoteHomemanager.getPersistance().loadUserManagement().getLoggedOnUsers();
             boolean isUserLoggedOn = true;
+
             /*
             if(loggedOnUsers != null && loggedOnUsers.size() > 0) {
                 for (User user : loggedOnUsers) {
