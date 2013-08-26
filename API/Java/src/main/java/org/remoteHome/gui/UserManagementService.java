@@ -41,7 +41,7 @@ public class UserManagementService extends AbstractWebService {
             if(userName != null && !"".equals(userName)
                     && password != null && !"".equals(password)) {
                 UserManagement ums = r.getPersistance().loadUserManagement();
-                List<User> newList = ArrayList<User>();
+                List<User> newList = new ArrayList<User>();
                 if(ums != null) {
                     for(User u : ums.getUsers()) {
                         if((userName.equals(u.getUserName())
