@@ -8,6 +8,7 @@ import org.remoteHome.UserManagement;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,7 @@ public class UserManagementService extends AbstractWebService {
             if(userName != null && !"".equals(userName)
                     && password != null && !"".equals(password)) {
                 UserManagement ums = r.getPersistance().loadUserManagement();
+                List<User> newList = ArrayList<User>();
                 if(ums != null) {
                     for(User u : ums.getUsers()) {
                         if((userName.equals(u.getUserName())
@@ -47,16 +49,20 @@ public class UserManagementService extends AbstractWebService {
                             u.setLoggedOn(true);
                             u.setHttpSession(session);
                             isLoggedOn = true;
+                            newList.add(u);
                             break;
                         } else if((userName.equals(ums.ADMIN.getUserName())
                                 && password.equals(ums.ADMIN.getPassword()))) {
                             ums.ADMIN.setLoggedOn(true);
                             ums.ADMIN.setHttpSession(session);
                             isLoggedOn = true;
+                            newList.add(u);
                             break;
                         }
                     }
                     if(isLoggedOn) {
+                        ums.setUsers(newList);
+                        r.getPersistance().saveUserManagement(ums);
                         sendAjaxAnswer("TRUE");
                     } else {
                         sendAjaxAnswer("FALSE");
@@ -71,13 +77,7 @@ public class UserManagementService extends AbstractWebService {
             //Pre-load data for changing
         }
 
-        String userName = requestParameters.get("userName");
-        String password = requestParameters.get("userPassword");
-        String group = requestParameters.get("groupId");
-        String loadUsers = requestParameters.get("loadUsers");
 
     }
-
-
 
 }

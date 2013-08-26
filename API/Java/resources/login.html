@@ -17,7 +17,7 @@
                 $.ajax({
                     url: "/",
                     'cache': false,
-                    type: "post",
+                    type: "get",
                     data: values,
                     success: function (data) {
                         var json = JSON.parse(data);
