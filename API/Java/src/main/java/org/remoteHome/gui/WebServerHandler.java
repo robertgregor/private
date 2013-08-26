@@ -40,7 +40,7 @@ public class WebServerHandler implements HttpHandler {
             out = t.getResponseBody();
             String getRequest = t.getRequestURI().toString();
             System.out.println(getRequest);
-            Map<String, Object> params = (Map<String, Object>)t.getAttribute("parameters");
+            //Map<String, Object> params = (Map<String, Object>)t.getAttribute("parameters");
             List<User> loggedOnUsers = remoteHomemanager.getPersistance().loadUserManagement().getLoggedOnUsers();
             boolean isUserLoggedOn = true;
 

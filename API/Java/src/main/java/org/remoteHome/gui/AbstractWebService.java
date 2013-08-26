@@ -35,6 +35,14 @@ public abstract class AbstractWebService implements WebService {
         this.t = t;
         processRequest(o, t);
     }
+
+    protected void setCookie(String data) throws IOException {
+        Headers headers = t.getResponseHeaders();
+        headers.add ("Content-Type", "text/plain");
+        t.sendResponseHeaders(200, data.length());
+        o.write(data.getBytes());
+        o.flush();
+    }
     
     protected void sendAjaxAnswer(String data) throws IOException {
         Headers headers = t.getResponseHeaders();
