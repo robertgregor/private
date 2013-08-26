@@ -4,6 +4,7 @@
  */
 package org.remoteHome.gui;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.BufferedReader;
@@ -40,17 +41,24 @@ public class WebServerHandler implements HttpHandler {
             out = t.getResponseBody();
             String getRequest = t.getRequestURI().toString();
             System.out.println(getRequest);
-            //Map<String, Object> params = (Map<String, Object>)t.getAttribute("parameters");
             List<User> loggedOnUsers = remoteHomemanager.getPersistance().loadUserManagement().getLoggedOnUsers();
-            boolean isUserLoggedOn = true;
-
-            /*
-            if(loggedOnUsers != null && loggedOnUsers.size() > 0) {
-                for (User user : loggedOnUsers) {
-                    isUserLoggedOn = user.isLoggedOn();
+            boolean isUserLoggedOn = false;
+            String session = null;
+            Headers reqHeaders = t.getRequestHeaders();
+            Headers respHeaders = t.getResponseHeaders();
+            if(!reqHeaders.containsKey("Cookie")) {
+                respHeaders.add("Set-Cookie", "session="+Long.toString(System.currentTimeMillis()));
+            } else {
+                List<String> cookies = reqHeaders.get("Cookie");
+                session = (cookies.get(0) != null) ? cookies.get(0) : null;
+            }
+            if(session != null && loggedOnUsers != null) {
+                for(User user : loggedOnUsers) {
+                    if(user.getHttpSession() != null) {
+                        isUserLoggedOn = (user.getHttpSession().equals(session)) ? true : false;
+                    }
                 }
             }
-            */
             if(isUserLoggedOn) {
                 if ((getRequest.indexOf('?') == -1) || (getRequest.indexOf('?') > 6)) {
                     //it is the request to the resource

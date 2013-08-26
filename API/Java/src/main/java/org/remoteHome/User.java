@@ -13,7 +13,7 @@ public class User {
     private String password;
     private Group group;
     private boolean isLoggedOn = false;
-    // private HttpSession
+    private String httpSession;
 
     public User() {}
 
@@ -62,5 +62,13 @@ public class User {
 
     public void setLoggedOn(boolean loggedOn) {
         isLoggedOn = loggedOn;
+    }
+
+    public String getHttpSession() {
+        return httpSession;
+    }
+
+    public void setHttpSession(String httpSession) {
+        this.httpSession = httpSession;
     }
 }
