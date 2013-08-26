@@ -14,7 +14,7 @@ import java.util.Map;
 public class UserManagement {
 
     private List<User> users = new ArrayList<User>();
-    private boolean isLoggedOn = false;
+    private boolean isLoggedOn = true;
     private User loggedOnUser = new User();
 
     public final User ADMIN = new User(0, "admin", "admin", new Group(0, "Admnistrator"));
