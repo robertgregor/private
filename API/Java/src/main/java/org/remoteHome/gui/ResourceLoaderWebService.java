@@ -58,6 +58,9 @@ public class ResourceLoaderWebService extends AbstractWebService {
             String page = new String(result);
             page = page.replaceAll("PREFLANG", lang);
             result = page.getBytes();
+        } else if(name.equals("login.html")) {
+            String page = new String(result);
+            result = page.getBytes();
         }
         //Save the preferred language
         if (name.startsWith("Messages_") && name.endsWith(".properties")) {

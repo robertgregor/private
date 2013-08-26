@@ -25,7 +25,7 @@ import org.remoteHome.RemoteHomeManager;
 public class WebServerHandler implements HttpHandler {
     
     RemoteHomeManager remoteHomemanager = null;
-    
+
     public WebServerHandler(RemoteHomeManager remoteHomemanager) {
         this.remoteHomemanager = remoteHomemanager;
     }
@@ -37,33 +37,39 @@ public class WebServerHandler implements HttpHandler {
             out = t.getResponseBody();
             String getRequest = t.getRequestURI().toString();
             System.out.println(getRequest);
-            if ((getRequest.indexOf('?') == -1) || (getRequest.indexOf('?') > 6)) {
-                //it is the request to the resource
-                if (getRequest.indexOf('?') != -1) getRequest = getRequest.substring(0, getRequest.indexOf('?'));
-                String fileNameWithDirs = getRequest.replaceAll("/", " ");
-                fileNameWithDirs = fileNameWithDirs.trim();
-                if (fileNameWithDirs.length() != 0) {
-                    if (fileNameWithDirs.indexOf(" ") != -1) {
-                        String fileNameArray[] = fileNameWithDirs.split(" ");
-                        fileNameWithDirs = fileNameArray[fileNameArray.length - 1];
+            if(remoteHomemanager.getUserManagement().isLoggedOn()) {
+                if ((getRequest.indexOf('?') == -1) || (getRequest.indexOf('?') > 6)) {
+                    //it is the request to the resource
+                    if (getRequest.indexOf('?') != -1) getRequest = getRequest.substring(0, getRequest.indexOf('?'));
+                    String fileNameWithDirs = getRequest.replaceAll("/", " ");
+                    fileNameWithDirs = fileNameWithDirs.trim();
+                    if (fileNameWithDirs.length() != 0) {
+                        if (fileNameWithDirs.indexOf(" ") != -1) {
+                            String fileNameArray[] = fileNameWithDirs.split(" ");
+                            fileNameWithDirs = fileNameArray[fileNameArray.length - 1];
+                        }
                     }
-                }
-                WebService w = (WebService)Class.forName("org.remoteHome.gui.ResourceLoaderWebService").newInstance();
-                if (fileNameWithDirs.length() == 0) {
-                    w.setParameters(remoteHomemanager, "main.html");
+                    WebService w = (WebService)Class.forName("org.remoteHome.gui.ResourceLoaderWebService").newInstance();
+                    if (fileNameWithDirs.length() == 0) {
+                        w.setParameters(remoteHomemanager, "main.html");
+                    } else {
+                        w.setParameters(remoteHomemanager, fileNameWithDirs);
+                    }
+                    w.processRequest(out, t);
                 } else {
-                    w.setParameters(remoteHomemanager, fileNameWithDirs);
+                    //it is ajax request to do something
+                    String parameters = getRequest.replaceAll("/", "");
+                    parameters = parameters.substring(parameters.indexOf('?')+1);
+                    HashMap<String, String> parsedParameters = parseParameters(parameters);
+                    WebService w = (WebService)Class.forName("org.remoteHome.gui."+parsedParameters.get("ServiceName")).newInstance();
+                    w.setParameters(remoteHomemanager);
+                    w.processRequest(parsedParameters, out, t);
+                    Thread.sleep(100);
                 }
-                w.processRequest(out, t);
             } else {
-                //it is ajax request to do something
-                String parameters = getRequest.replaceAll("/", "");
-                parameters = parameters.substring(parameters.indexOf('?')+1);
-                HashMap<String, String> parsedParameters = parseParameters(parameters);
-                WebService w = (WebService)Class.forName("org.remoteHome.gui."+parsedParameters.get("ServiceName")).newInstance();
-                w.setParameters(remoteHomemanager);
-                w.processRequest(parsedParameters, out, t);
-                Thread.sleep(100);
+                WebService w = (WebService)Class.forName("org.remoteHome.gui.ResourceLoaderWebService").newInstance();
+                w.setParameters(remoteHomemanager, "login.html");
+                w.processRequest(out, t);
             }
         } catch (Exception e) {
             e.printStackTrace();

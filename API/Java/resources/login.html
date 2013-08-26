@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remote-home logon page</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="login.css">
+    <link rel="stylesheet" type="text/css" href="magic.css">
+</head>
+<body>
+<div class="container">
+    <div class="text-center">
+        <img src="logo.png" alt="Remote-Home Logo">
+    </div>
+    <div class="tab-content">
+        <div id="login" class="tab-pane active">
+            <form class="form-signin">
+                <p class="text-muted text-center">
+                    Enter your username and password
+                </p>
+                <input type="text" placeholder="Username" class="form-control">
+                <input type="password" placeholder="Password" class="form-control">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            </form>
+        </div>
+        <div id="forgot" class="tab-pane">
+            <form class="form-signin">
+                <p class="text-muted text-center">
+                    Enter your valid e-mail
+                </p>
+                <input type="email" placeholder="mail@domain.com" required="required" class="form-control">
+                <br>
+                <button class="btn btn-lg btn-danger btn-block" type="submit">Recover Password</button>
+            </form>
+        </div>
+    </div>
+    <div class="text-center">
+        <ul class="list-inline">
+            <li><a class="text-muted" href="#login" data-toggle="tab">Login</a></li>
+            <li><a class="text-muted" href="#forgot" data-toggle="tab">Forgot Password</a></li>
+            <li><a class="text-muted" href="#signup" data-toggle="tab">Signup</a></li>
+        </ul>
+    </div>
+</div>
+<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="bootstrap.js"></script>
+<script>
+    $('.list-inline li > a').click(function() {
+        var activeForm = $(this).attr('href') + ' > form';
+        //console.log(activeForm);
+        $(activeForm).addClass('magictime swap');
+        //set timer to 1 seconds, after that, unload the magic animation
+        setTimeout(function() {
+            $(activeForm).removeClass('magictime swap');
+        }, 1000);
+    });
+</script>
+</body>
+</html>
