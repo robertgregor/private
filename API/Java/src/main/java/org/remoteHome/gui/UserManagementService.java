@@ -26,6 +26,8 @@ public class UserManagementService extends AbstractWebService {
 
     public void processRequest(OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException {
         String logon = requestParameters.get("logon");
+        String recover = requestParameters.get("recover");
+        String logout = requestParameters.get("logout");
         boolean isLoggedOn = false;
         if(logon != null && logon.equals("true")) {
             String userName = requestParameters.get("userName");
@@ -43,21 +45,24 @@ public class UserManagementService extends AbstractWebService {
                 UserManagement ums = r.getPersistance().loadUserManagement();
                 List<User> newList = new ArrayList<User>();
                 if(ums != null) {
-                    for(User u : ums.getUsers()) {
-                        if((userName.equals(u.getUserName())
-                                && password.equals(u.getPassword()))) {
-                            u.setLoggedOn(true);
-                            u.setHttpSession(session);
-                            isLoggedOn = true;
-                            newList.add(u);
-                            break;
-                        } else if((userName.equals(ums.ADMIN.getUserName())
+                    if(ums.getUsers().size() > 0) {
+                        for(User u : ums.getUsers()) {
+                            if((userName.equals(u.getUserName())
+                                    && password.equals(u.getPassword()))) {
+                                u.setLoggedOn(true);
+                                u.setHttpSession(session);
+                                isLoggedOn = true;
+                                newList.add(u);
+                                break;
+                            }
+                        }
+                    } else {
+                        if((userName.equals(ums.ADMIN.getUserName())
                                 && password.equals(ums.ADMIN.getPassword()))) {
                             ums.ADMIN.setLoggedOn(true);
                             ums.ADMIN.setHttpSession(session);
+                            newList.add(ums.ADMIN);
                             isLoggedOn = true;
-                            newList.add(u);
-                            break;
                         }
                     }
                     if(isLoggedOn) {
@@ -73,6 +78,34 @@ public class UserManagementService extends AbstractWebService {
             } else {
                 sendAjaxAnswer("Something went wrong.");
             }
+        } else if(recover != null && recover.equals("true")) {
+            String userEmail = requestParameters.get("userEmail");
+            sendAjaxAnswer("TRUE");
+        } else if(logout != null && logout.equals("true")) {
+            UserManagement ums = r.getPersistance().loadUserManagement();
+            List<User> newList = new ArrayList<User>();
+            Headers reqHeaders = t.getRequestHeaders();
+            Headers respHeaders = t.getResponseHeaders();
+            List<String> cookies = reqHeaders.get("Cookie");
+            String session = (cookies.get(0) != null) ? cookies.get(0) : null;
+            if(reqHeaders.containsKey("Cookie")) {
+                respHeaders.remove("Cookie");
+            }
+            if(ums != null) {
+                for(User user : ums.getUsers()) {
+                    if(!user.getHttpSession().equals(session)) {
+                        newList.add(user);
+                    } else {
+                        if(user.getUserName().equals(ums.ADMIN.getUserName())) {
+                            ums.ADMIN.setLoggedOn(false);
+                            ums.ADMIN.setHttpSession(null);
+                        }
+                    }
+                }
+                ums.setUsers(newList);
+                r.getPersistance().saveUserManagement(ums);
+            }
+            sendAjaxAnswer("TRUE");
         } else {
             //Pre-load data for changing
         }

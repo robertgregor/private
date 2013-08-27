@@ -24,7 +24,7 @@
                     if(data == 'TRUE') {
                         document.location.reload(true);
                     } else {
-                        $("#addLogonResult").html(err_credentials);
+                        $("#addLogonResult").html('err_credentials');
                         $("#userName").val('');
                         $("#userPassword").val('');
                     }
@@ -49,7 +49,7 @@
                         $("#addLogonResult").html(ok_recover);
                         $("#userEmail").val('');
                     } else {
-                        $("#addLogonResult").html(err_credentials);
+                        $("#addLogonResult").html('err_credentials');
                         $("#userEmail").val('');
                     }
                 },
