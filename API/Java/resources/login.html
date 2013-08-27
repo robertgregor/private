@@ -6,8 +6,6 @@
     <link rel="stylesheet" type="text/css" href="bootstrap.css">
     <link rel="stylesheet" type="text/css" href="login.css">
     <link rel="stylesheet" type="text/css" href="magic.css">
-    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
-    <script type="text/javascript" src="bootstrap.js"></script>
 
 <script>
     $(function () {
@@ -25,10 +23,14 @@
                         document.location.reload(true);
                     } else {
                         $("#addLogonResult").html(err_credentials);
+                        $("#userName").val('');
+                        $("#userPassword").val('');
                     }
                 },
                 error: function () {
                     alert(err_free_deviceId);
+                    $("#userName").val('');
+                    $("#userPassword").val('');
                 }
             });
         });
@@ -41,10 +43,17 @@
                 type: "get",
                 data: "ServiceName=UserManagementService&recover=true&userEmail="+userEmail+"&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
-                    $("#addRecoverResult").html(data);
+                    if(data == 'TRUE') {
+                        $("#addLogonResult").html(ok_recover);
+                        $("#userEmail").val('');
+                    } else {
+                        $("#addLogonResult").html(err_credentials);
+                        $("#userEmail").val('');
+                    }
                 },
                 error: function () {
                     alert(err_recover_password);
+                    $("#userEmail").val('');
                 }
             });
         });
@@ -57,48 +66,46 @@
     <div class="text-center">
         <img src="logo.png" alt="Remote-Home Logo">
     </div>
-    <div class="tab-content">
-        <div id="login" class="tab-pane active">
+    <div class="tab-content" align="center">
+        <div id="login" class="tab-pane active" align="center">
             <table class="text-center">
-                <tr>
-                    <td>
-                        <form id="logonForm" class="form-signin">
+                <tr align="center">
+                    <td align="center">
+                        <form id="logonForm" class="form-signin" align="center">
                             <p class="text-muted text-center">
                                 Enter your username and password
                             </p>
                             <input type="text" id="userName" name="userName" placeholder="Username" class="form-control">
                             <input type="password" id="userPassword" name="userPassword" placeholder="Password" class="form-control">
-                            <div id="addLogonResult">&nbsp;</div>
-                            <br />
+                            <div id="addLogonResult"></div>
                         </form>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <div class="text-center">
+                <tr align="center">
+                    <td align="center">
+                        <div class="text-center" align="center">
                             <button class="btn btn-lg btn-primary btn-block btn-custom" id="logon">Sign in</button>
                         </div>
                     </td>
                 </tr>
             </table>
         </div>
-        <div id="forgot" class="tab-pane">
-            <table>
-                <tr>
-                    <td>
-                        <form id="recoverForm" class="forgotForm">
+        <div id="forgot" class="tab-pane" align="center">
+            <table class="text-center">
+                <tr align="center">
+                    <td align="center">
+                        <form id="recoverForm" class="forgotForm" align="center">
                             <p class="text-muted text-center">
                                 Enter your valid e-mail
                             </p>
                             <input type="email" id="userEmail" name="userEmail" placeholder="mail@domain.com" required="required" class="form-control">
-                            <div id="addRecoverResult">&nbsp;</div>
-                            <br>
+                            <div id="addRecoverResult"></div>
                         </form>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <div class="text-center">
+                <tr align="center">
+                    <td align="center">
+                        <div class="text-center" align="center">
                             <button class="btn btn-lg btn-danger btn-block btn-custom" id="recover">Recover Password</button>
                         </div>
                     </td>
@@ -113,6 +120,8 @@
         </ul>
     </div>
 </div>
+<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="bootstrap.js"></script>
 <script>
     $('.list-inline li > a').click(function() {
         var activeForm = $(this).attr('href') + ' > form';
