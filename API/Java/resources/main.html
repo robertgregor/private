@@ -43,7 +43,7 @@ $(function() {
             'cache': false,
             type: "get",
             data: "ServiceName=UserManagementService&logout=true&" + Math.floor((Math.random() * 100) + 1),
-            success: function (freeId) {
+            success: function (data) {
                 document.location.reload(true);
             },
             error: function () {
@@ -108,7 +108,7 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
-<p align="left"><input id="logout" type="submit"/>Logout</p>
+<p align="left"><input id="logout" type="submit" value="Logout" /></p>
 <p align="right"><img src="cz.png" onclick="changeLang('cz');document.location.reload(true);"/><img src="gb.png" onclick="changeLang('en');document.location.reload(true);"/></p>
 <div id="tabs">
 <ul>

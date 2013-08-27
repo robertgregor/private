@@ -6,52 +6,48 @@
     <link rel="stylesheet" type="text/css" href="bootstrap.css">
     <link rel="stylesheet" type="text/css" href="login.css">
     <link rel="stylesheet" type="text/css" href="magic.css">
+    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="bootstrap.js"></script>
 
 <script>
     $(function () {
-        $("#logonForm").submit(function (event) {
-            event.preventDefault();
-            if ($(this).valid()) {
-                $("#addLogonResult").html('');
-                var values = $(this).serialize();
-                $.ajax({
-                    url: "/",
-                    'cache': false,
-                    type: "get",
-                    data: values,
-                    success: function (data) {
-                        if(data === 'TRUE') {
-                            document.location.reload(true);
-                        } else {
-                            $("#addLogonResult").html(err_credentials);
-                        }
-                    },
-                    error: function () {
-                        $("#addLogonResult").html(err_logon);
+        $("#logon").button().click(function () {
+            $("#addLogonResult").html('');
+            var userName = $("#userName").val();
+            var userPassword = $("#userPassword").val();
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=UserManagementService&logon=true&userName="+userName+"&userPassword="+userPassword+"&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    if(data == 'TRUE') {
+                        document.location.reload(true);
+                    } else {
+                        $("#addLogonResult").html(err_credentials);
                     }
-                });
-            }
+                },
+                error: function () {
+                    alert(err_free_deviceId);
+                }
+            });
         });
-        $("#recoverForm").submit(function (event) {
-            event.preventDefault();
-            if ($(this).valid()) {
-                $("#addRecoverResult").html('');
-                var values = $(this).serialize();
-                $.ajax({
-                    url: "/",
-                    'cache': false,
-                    type: "get",
-                    data: values,
-                    success: function (data) {
-                        $("#addRecoverResult").html(data);
-                    },
-                    error: function () {
-                        $("#addRecoverResult").html(err_recover_password);
-                    }
-                });
-            }
+        $("#recover").button().click(function () {
+            $("#addRecoverResult").html('');
+            var userEmail = $("#userEmail").val();
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=UserManagementService&recover=true&userEmail="+userEmail+"&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    $("#addRecoverResult").html(data);
+                },
+                error: function () {
+                    alert(err_recover_password);
+                }
+            });
         });
-
     });
 
 </script>
@@ -69,12 +65,11 @@
                 </p>
                 <input type="text" id="userName" name="userName" placeholder="Username" class="form-control">
                 <input type="password" id="userPassword" name="userPassword" placeholder="Password" class="form-control">
-                <input type="hidden" name="logon" value="true" />
-                <input type="hidden" name="ServiceName" value="UserManagementService" />
                 <div id="addLogonResult">&nbsp;</div>
                 <br />
-                <button class="btn btn-lg btn-primary btn-block" id="logon" type="submit">Sign in</button>
             </form>
+            <!--<button class="btn btn-lg btn-primary btn-block" id="logon">Sign in</button>-->
+            <input class="btn btn-lg btn-primary btn-block" id="logon">Sign in</input>
         </div>
         <div id="forgot" class="tab-pane">
             <form id="recoverForm" class="forgotForm">
@@ -82,11 +77,11 @@
                     Enter your valid e-mail
                 </p>
                 <input type="email" id="userEmail" name="userEmail" placeholder="mail@domain.com" required="required" class="form-control">
-                <input type="hidden" name="ServiceName" value="UserManagementService" />
                 <div id="addRecoverResult">&nbsp;</div>
                 <br>
-                <button class="btn btn-lg btn-danger btn-block" id="recover" type="submit">Recover Password</button>
             </form>
+            <!--<button class="btn btn-lg btn-danger btn-block" id="recover">Recover Password</button>-->
+            <input class="btn btn-lg btn-primary btn-block" id="recover">Recover Password</input>
         </div>
     </div>
     <div class="text-center">
@@ -96,8 +91,6 @@
         </ul>
     </div>
 </div>
-<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
-<script type="text/javascript" src="bootstrap.js"></script>
 <script>
     $('.list-inline li > a').click(function() {
         var activeForm = $(this).attr('href') + ' > form';
