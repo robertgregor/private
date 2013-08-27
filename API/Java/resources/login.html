@@ -59,29 +59,51 @@
     </div>
     <div class="tab-content">
         <div id="login" class="tab-pane active">
-            <form id="logonForm" class="form-signin">
-                <p class="text-muted text-center">
-                    Enter your username and password
-                </p>
-                <input type="text" id="userName" name="userName" placeholder="Username" class="form-control">
-                <input type="password" id="userPassword" name="userPassword" placeholder="Password" class="form-control">
-                <div id="addLogonResult">&nbsp;</div>
-                <br />
-            </form>
-            <!--<button class="btn btn-lg btn-primary btn-block" id="logon">Sign in</button>-->
-            <input class="btn btn-lg btn-primary btn-block" id="logon">Sign in</input>
+            <table class="text-center">
+                <tr>
+                    <td>
+                        <form id="logonForm" class="form-signin">
+                            <p class="text-muted text-center">
+                                Enter your username and password
+                            </p>
+                            <input type="text" id="userName" name="userName" placeholder="Username" class="form-control">
+                            <input type="password" id="userPassword" name="userPassword" placeholder="Password" class="form-control">
+                            <div id="addLogonResult">&nbsp;</div>
+                            <br />
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-center">
+                            <button class="btn btn-lg btn-primary btn-block btn-custom" id="logon">Sign in</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
         <div id="forgot" class="tab-pane">
-            <form id="recoverForm" class="forgotForm">
-                <p class="text-muted text-center">
-                    Enter your valid e-mail
-                </p>
-                <input type="email" id="userEmail" name="userEmail" placeholder="mail@domain.com" required="required" class="form-control">
-                <div id="addRecoverResult">&nbsp;</div>
-                <br>
-            </form>
-            <!--<button class="btn btn-lg btn-danger btn-block" id="recover">Recover Password</button>-->
-            <input class="btn btn-lg btn-primary btn-block" id="recover">Recover Password</input>
+            <table>
+                <tr>
+                    <td>
+                        <form id="recoverForm" class="forgotForm">
+                            <p class="text-muted text-center">
+                                Enter your valid e-mail
+                            </p>
+                            <input type="email" id="userEmail" name="userEmail" placeholder="mail@domain.com" required="required" class="form-control">
+                            <div id="addRecoverResult">&nbsp;</div>
+                            <br>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-center">
+                            <button class="btn btn-lg btn-danger btn-block btn-custom" id="recover">Recover Password</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
     <div class="text-center">
