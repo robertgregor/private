@@ -108,14 +108,27 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
-<div class="text-align: right;" align="right">
+<div class="container">
+<div style="padding-bottom: 20px;" align="left">
+<img class="logo" align="left" src="logo.png" alt="Remote-Home Logo"/>
+</div>
+<div align="right">
 <table>
 <tr>
-<td align="left">
-<p align="left"><input id="logout" type="submit" value="Logout" /></p>
+<!--
+<td>
+<img align="left" src="logo.png" alt="Remote-Home Logo">
+</td>
+-->
+<td align="right">
+<div align="right">
+<p align="right"><input id="logout" type="submit" value="Logout" /></p>
+</div>
 </td>
 <td align="right">
+<div align="right">
 <p align="right"><img src="cz.png" onclick="changeLang('cz');document.location.reload(true);"/><img src="gb.png" onclick="changeLang('en');document.location.reload(true);"/></p>
+</div>
 </td>
 </tr>
 </table>
@@ -123,6 +136,7 @@ $(document).ready(function(){
 <div id="tabs">
 <ul>
 </ul>
+</div>
 </div>
 </body>
 </html>
