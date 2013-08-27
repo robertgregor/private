@@ -36,6 +36,21 @@ function setLabelBasedOnId(id, lbl) {
     document.getElementById(id).innerHTML = jQuery.i18n.prop(lbl);
 }
 $(function() {
+  $("#logout").button();
+    $("#logout").button().click(function () {
+        $.ajax({
+            url: "/",
+            'cache': false,
+            type: "get",
+            data: "ServiceName=UserManagementService&logout=true&" + Math.floor((Math.random() * 100) + 1),
+            success: function (freeId) {
+                document.location.reload(true);
+            },
+            error: function () {
+                alert(err_logout);
+            }
+        });
+    });
   var tabs = $( "#tabs" ).tabs();
   changeLang('PREFLANG');
   //$( document ).tooltip();
@@ -93,6 +108,7 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
+<p align="left"><input id="logout" type="submit"/>Logout</p>
 <p align="right"><img src="cz.png" onclick="changeLang('cz');document.location.reload(true);"/><img src="gb.png" onclick="changeLang('en');document.location.reload(true);"/></p>
 <div id="tabs">
 <ul>

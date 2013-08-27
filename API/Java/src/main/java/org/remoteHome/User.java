@@ -11,6 +11,7 @@ public class User {
     private int userId;
     private String userName;
     private String password;
+    private String email;
     private Group group;
     private boolean isLoggedOn = false;
     private String httpSession;
@@ -72,5 +73,13 @@ public class User {
 
     public void setHttpSession(String httpSession) {
         this.httpSession = httpSession;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
