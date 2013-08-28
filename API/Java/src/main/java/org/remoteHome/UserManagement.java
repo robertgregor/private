@@ -13,8 +13,8 @@ import java.util.List;
 public class UserManagement {
 
     private List<User> users = new ArrayList<User>();
-
     public static User ADMIN = new User(0, "admin", "admin", Group.ADMIN_GROUP, false, null);
+    private boolean defaultAdminPassword = true;
 
     public void init() {
         users.add(ADMIN);
@@ -26,5 +26,13 @@ public class UserManagement {
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+    public boolean isDefaultAdminPassword() {
+        return defaultAdminPassword;
+    }
+
+    public void setDefaultAdminPassword(boolean defaultAdminPassword) {
+        this.defaultAdminPassword = defaultAdminPassword;
     }
 }

@@ -50,7 +50,7 @@ public class WebServerHandler implements HttpHandler {
             p = p.substring(p.indexOf('?')+1);
             HashMap<String, String> params = parseParameters(p);
             if(!reqHeaders.containsKey("Cookie")) {
-                respHeaders.add("Set-Cookie", "session="+Long.toString(System.currentTimeMillis()));
+                respHeaders.add("Set-Cookie", "SessionId="+Long.toString(System.currentTimeMillis())+"; Max-Age=3600; Version=1");
             } else {
                 List<String> cookies = reqHeaders.get("Cookie");
                 session = (cookies.get(0) != null) ? cookies.get(0) : null;
