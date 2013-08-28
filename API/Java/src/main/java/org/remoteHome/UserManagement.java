@@ -1,5 +1,7 @@
 package org.remoteHome;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +15,17 @@ import java.util.List;
 public class UserManagement {
 
     private List<User> users = new ArrayList<User>();
-    public static User ADMIN = new User(0, "admin", "admin", Group.ADMIN_GROUP, false, null);
+    public static User ADMIN = new User(0, "admin",  "admin", Group.ADMIN_GROUP, false, null);
     private boolean defaultAdminPassword;
 
     public void init() {
-        users.add(ADMIN);
         setDefaultAdminPassword(true);
+        try {
+            ADMIN.setPassword(MessageDigest.getInstance("SHA-256").digest(ADMIN.getPassword().getBytes()).toString());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        users.add(ADMIN);
     }
 
     public List<User> getUsers() {
@@ -36,4 +43,10 @@ public class UserManagement {
     public void setDefaultAdminPassword(boolean defaultAdminPassword) {
         this.defaultAdminPassword = defaultAdminPassword;
     }
+
+    public boolean passwordsAreEqual(String password1, String password2) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        return md.digest(password1.getBytes()).equals(md.digest(password2.getBytes()));
+    }
+
 }
