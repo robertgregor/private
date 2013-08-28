@@ -91,27 +91,29 @@ public class UserManagementService extends AbstractWebService {
                     newList.add(user);
                 }
                 if (hasChanged) {
-                    ums.setUsers(newList);
-                    r.getPersistance().saveUserManagement(ums);
-                    Mail mail = new Mail();
-                    mail.setFrom("remote-home@systemmanagement.com");
-                    mail.setTo(u.getEmail());
-                    mail.setSubject("New password");
-                    mail.setMessage("Your new password is: " + newPassword);
-                    Mailer mailer = new Mailer();
-                    try {
-                        mailer.sendEmail(mail, u.getSmtpConfig());
-                    } catch (MessagingException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                        sendAjaxAnswer("FALSE");
+                    if(u.getSmtpConfig() != null) {
+                        ums.setUsers(newList);
+                        r.getPersistance().saveUserManagement(ums);
+                        Mail mail = new Mail();
+                        mail.setFrom("remote-home@systemmanagement.com");
+                        mail.setTo(u.getEmail());
+                        mail.setSubject("New password");
+                        mail.setMessage("Your new password is: " + newPassword);
+                        Mailer mailer = new Mailer();
+                        try {
+                            mailer.sendEmail(mail, u.getSmtpConfig());
+                        } catch (MessagingException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            sendAjaxAnswer("FALSE");
+                        }
+                        sendAjaxAnswer("TRUE");
+                    } else {
+                        sendAjaxAnswer("SMTP_FALSE");
                     }
-                    sendAjaxAnswer("TRUE");
                 } else {
                     sendAjaxAnswer("FALSE");
                 }
             }
-
-            sendAjaxAnswer("TRUE");
         } else if (logout != null && logout.equals("true")) {
             UserManagement ums = r.getPersistance().loadUserManagement();
             List<User> newList = new ArrayList<User>();
