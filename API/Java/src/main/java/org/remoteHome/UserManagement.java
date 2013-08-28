@@ -15,16 +15,11 @@ import java.util.List;
 public class UserManagement {
 
     private List<User> users = new ArrayList<User>();
-    public static User ADMIN = new User(0, "admin",  "admin", Group.ADMIN_GROUP, false, null);
+    public static User ADMIN = new User(0, "admin",  "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", Group.ADMIN_GROUP, false, null);
     private boolean defaultAdminPassword;
 
     public void init() {
         setDefaultAdminPassword(true);
-        try {
-            ADMIN.setPassword(MessageDigest.getInstance("SHA-256").digest(ADMIN.getPassword().getBytes()).toString());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
         users.add(ADMIN);
     }
 
