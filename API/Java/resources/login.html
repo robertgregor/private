@@ -14,6 +14,7 @@
     $(function () {
         $("#logon").button().click(function () {
             $("#addLogonResult").html('');
+            $("#addRecoverResult").html('');
             var userName = $("#userName").val();
             var userPassword = CryptoJS.SHA1($("#userPassword").val());
             $.ajax({
@@ -25,19 +26,19 @@
                     if(data == 'TRUE') {
                         document.location.reload(true);
                     } else {
-                        $("#addLogonResult").html('err_credentials');
+                        $("#addLogonResult").html(err_credentials);
                         $("#userName").val('');
                         $("#userPassword").val('');
                     }
                 },
                 error: function () {
-                    alert(err_free_deviceId);
                     $("#userName").val('');
                     $("#userPassword").val('');
                 }
             });
         });
         $("#recover").button().click(function () {
+            $("#addLogonResult").html('');
             $("#addRecoverResult").html('');
             var userEmail = $("#userEmail").val();
             $.ajax({
@@ -47,21 +48,23 @@
                 data: "ServiceName=UserManagementService&recover=true&userEmail="+userEmail+"&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
                     if(data == 'TRUE') {
-                        $("#addLogonResult").html(ok_recover);
+                        $("#addRecoverResult").html(ok_recover);
                         $("#userEmail").val('');
                     } else {
-                        $("#addLogonResult").html('err_credentials');
+                        $("#addRecoverResult").html(err_email);
                         $("#userEmail").val('');
                     }
                 },
                 error: function () {
-                    alert(err_recover_password);
                     $("#userEmail").val('');
                 }
             });
         });
     });
-
+    $(document).ready(function(){
+        $("#addLogonResult").html('');
+        $("#addRecoverResult").html('');
+    });
 </script>
 </head>
 <body>
@@ -106,6 +109,7 @@
                         </form>
                     </td>
                 </tr>
+                <p/>
                 <tr>
                     <td align="center">
                         <div class="text-center" align="center">
