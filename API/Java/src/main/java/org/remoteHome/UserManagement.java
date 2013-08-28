@@ -14,10 +14,11 @@ public class UserManagement {
 
     private List<User> users = new ArrayList<User>();
     public static User ADMIN = new User(0, "admin", "admin", Group.ADMIN_GROUP, false, null);
-    private boolean defaultAdminPassword = true;
+    private boolean defaultAdminPassword;
 
     public void init() {
         users.add(ADMIN);
+        setDefaultAdminPassword(true);
     }
 
     public List<User> getUsers() {

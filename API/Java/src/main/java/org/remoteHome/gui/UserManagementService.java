@@ -2,6 +2,7 @@ package org.remoteHome.gui;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import org.remoteHome.Group;
 import org.remoteHome.RemoteHomeManagerException;
 import org.remoteHome.User;
 import org.remoteHome.UserManagement;
@@ -43,17 +44,23 @@ public class UserManagementService extends AbstractWebService {
             if(userName != null && !"".equals(userName)
                     && password != null && !"".equals(password)) {
                 UserManagement ums = r.getPersistance().loadUserManagement();
-                List<User> newList = new ArrayList<User>();
+                List<User> newList = ums.getUsers();
                 if(ums != null) {
                     if(ums.getUsers().size() > 0) {
                         for(User u : ums.getUsers()) {
                             if((userName.equals(u.getUserName())
                                     && password.equals(u.getPassword()))) {
-                                u.setLoggedOn(true);
-                                u.setHttpSession(session);
-                                isLoggedOn = true;
-                                newList.add(u);
-                                break;
+                                if(!u.isLoggedOn()) {
+                                    isLoggedOn = true;
+                                    u.setLoggedOn(true);
+                                    u.setHttpSession(session);
+                                    break;
+                                } else {
+                                    User uu = new User(1, u.getUserName(), u.getPassword(), u.getGroup(), true, session);
+                                    isLoggedOn = true;
+                                    newList.add(uu);
+                                    break;
+                                }
                             }
                         }
                     } else {
@@ -97,11 +104,6 @@ public class UserManagementService extends AbstractWebService {
                 for(User user : ums.getUsers()) {
                     if(!user.getHttpSession().equals(session)) {
                         newList.add(user);
-                    } else {
-                        if(user.getUserName().equals(ums.ADMIN.getUserName())) {
-                            ums.ADMIN.setLoggedOn(false);
-                            ums.ADMIN.setHttpSession(null);
-                        }
                     }
                 }
                 ums.setUsers(newList);
