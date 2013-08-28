@@ -51,7 +51,7 @@
                         $("#addRecoverResult").html(ok_recover);
                         $("#userEmail").val('');
                     } else {
-                        $("#addRecoverResult").html(err_email);
+                        $("#addRecoverResult").html('err_email');
                         $("#userEmail").val('');
                     }
                 },
@@ -60,10 +60,6 @@
                 }
             });
         });
-    });
-    $(document).ready(function(){
-        $("#addLogonResult").html('');
-        $("#addRecoverResult").html('');
     });
 </script>
 </head>

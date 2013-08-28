@@ -93,7 +93,9 @@ public class WebServerHandler implements HttpHandler {
                     w.processRequest(parsedParameters, out, t);
                     Thread.sleep(100);
                 }
-            } else if(params.size() > 0 && params.get("logon") != null && params.get("logon").equals("true")) {
+            } else if(params.size() > 0 &&
+                    ((params.get("logon") != null && params.get("logon").equals("true"))
+                        || (params.get("recover") != null && params.get("recover").equals("true")))) {
                 String parameters = getRequest.replaceAll("/", "");
                 parameters = parameters.substring(parameters.indexOf('?')+1);
                 HashMap<String, String> parsedParameters = parseParameters(parameters);

@@ -26,6 +26,7 @@ public class Mailer {
         properties.put("mail.smtp.port", smtpConfig.getPort());
         if (smtpConfig.isAuthenticate()) {
             properties.put("mail.smtp.auth", "true");
+            properties.put("mail.smtp.starttls.enable", "true"); // added this line
             properties.put("mail.user", smtpConfig.getUserName());
             properties.put("mail.password", smtpConfig.getPassword());
         }
@@ -37,7 +38,11 @@ public class Mailer {
                 new InternetAddress(mail.getTo()));
         message.setSubject(mail.getSubject());
         message.setText(mail.getMessage());
-        Transport.send(message);
+        //Transport.send(message);
+        Transport transport = session.getTransport("smtp");
+        transport.connect(smtpConfig.getHost(), smtpConfig.getUserName(), smtpConfig.getPassword());
+        transport.sendMessage(message, message.getAllRecipients());
+        transport.close();
     }
 
 

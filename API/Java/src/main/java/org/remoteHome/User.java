@@ -13,7 +13,6 @@ public class User {
     private String password;
     private String email;
     private Group group;
-    private Mail mail;
     private SMTPConfig smtpConfig;
     private boolean isLoggedOn = false;
     private String httpSession;
@@ -84,14 +83,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Mail getMail() {
-        return mail;
-    }
-
-    public void setMail(Mail mail) {
-        this.mail = mail;
     }
 
     public SMTPConfig getSmtpConfig() {

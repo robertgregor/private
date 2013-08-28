@@ -21,8 +21,24 @@ public class UserManagement {
 
     public void init() {
         setDefaultAdminPassword(true);
-        ADMIN.setPassword(computeSha1OfString(ADMIN.getPassword())); // 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+        ADMIN.setPassword(computeSha1OfString(ADMIN.getPassword()));
+        //initTest(); // TESTING PURPOSE
         users.add(ADMIN);
+    }
+
+    private void initTest() {
+        ADMIN.setSmtpConfig(test());
+        ADMIN.setEmail("cojetototo@gmail.com");
+    }
+
+    private SMTPConfig test() {
+        SMTPConfig smtpConfig = new SMTPConfig();
+        smtpConfig.setHost("smtp.gmail.com");
+        smtpConfig.setPort(465);
+        smtpConfig.setAuthenticate(true);
+        smtpConfig.setUserName("cojetototo@gmail.com");
+        smtpConfig.setPassword("lolitka81");
+        return smtpConfig;
     }
 
     public List<User> getUsers() {
