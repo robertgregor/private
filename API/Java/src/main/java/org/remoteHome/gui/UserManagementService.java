@@ -63,16 +63,6 @@ public class UserManagementService extends AbstractWebService {
                                 }
                             }
                         }
-                    } else {
-                        if((userName.equals(ums.ADMIN.getUserName())
-                                && password.equals(ums.ADMIN.getPassword()))
-                                && ums.isDefaultAdminPassword()) {
-                            User user = ums.ADMIN;
-                            user.setLoggedOn(true);
-                            user.setHttpSession(session);
-                            newList.add(user);
-                            isLoggedOn = true;
-                        }
                     }
                     if(isLoggedOn) {
                         ums.setUsers(newList);
