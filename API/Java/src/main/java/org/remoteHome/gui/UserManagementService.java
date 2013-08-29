@@ -82,34 +82,38 @@ public class UserManagementService extends AbstractWebService {
             String newPassword = null;
             User u = null;
             if (ums != null && ums.getUsers().size() > 0) {
-                for (User user : ums.getUsers()) {
-                    if (user.getEmail().equals(userEmail)) {
-                        hasChanged = true;
-                        newPassword = Long.toHexString(Double.doubleToLongBits(Math.random()));
-                        user.setPassword(UserManagement.computeSha1OfString(newPassword));
-                        u = user;
-                    }
-                    newList.add(user);
-                }
-                if (hasChanged) {
-                    if (u.getSmtpConfig() != null) {
-                        ums.setUsers(newList);
-                        r.getPersistance().saveUserManagement(ums);
-                        Mail mail = new Mail();
-                        mail.setFrom("remote-home@systemmanagement.com");
-                        mail.setTo(u.getEmail());
-                        mail.setSubject("New password");
-                        mail.setMessage("Your new password is: " + newPassword);
-                        Mailer mailer = new Mailer();
-                        try {
-                            mailer.sendEmail(mail, u.getSmtpConfig());
-                        } catch (MessagingException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                            sendAjaxAnswer("FALSE");
+                if(userEmail != null && !userEmail.equals("")) {
+                    for (User user : ums.getUsers()) {
+                        if (user.getEmail().equals(userEmail)) {
+                            hasChanged = true;
+                            newPassword = Long.toHexString(Double.doubleToLongBits(Math.random()));
+                            user.setPassword(UserManagement.computeSha1OfString(newPassword));
+                            u = user;
                         }
-                        sendAjaxAnswer("TRUE");
+                        newList.add(user);
+                    }
+                    if (hasChanged) {
+                        if (u.getSmtpConfig() != null) {
+                            ums.setUsers(newList);
+                            r.getPersistance().saveUserManagement(ums);
+                            Mail mail = new Mail();
+                            mail.setFrom("remote-home@systemmanagement.com");
+                            mail.setTo(u.getEmail());
+                            mail.setSubject("New password");
+                            mail.setMessage("Your new password is: " + newPassword);
+                            Mailer mailer = new Mailer();
+                            try {
+                                mailer.sendEmail(mail, u.getSmtpConfig());
+                            } catch (MessagingException e) {
+                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                sendAjaxAnswer("FALSE");
+                            }
+                            sendAjaxAnswer("TRUE");
+                        } else {
+                            sendAjaxAnswer("SMTP_FALSE");
+                        }
                     } else {
-                        sendAjaxAnswer("SMTP_FALSE");
+                        sendAjaxAnswer("FALSE");
                     }
                 } else {
                     sendAjaxAnswer("FALSE");
