@@ -20,12 +20,12 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("currPeriodFormCOMPONENTID").value=data.expectedFrequency;
           document.getElementById("expPeriodCOMPONENTID").innerHTML=data.expectedFrequency;
           document.getElementById("temperatureCOMPONENTID").innerHTML=data.temperature / 10;
-          document.getElementById("expTemperatureCOMPONENTID").innerHTML=data.deviceExpectedTemperature / 2;
-          document.getElementById("expTemperatureFormCOMPONENTID").value=data.expectedTemperature / 2;
+          document.getElementById("expTemperatureCOMPONENTID").innerHTML=(data.expectedTemperature / 10);
+          document.getElementById("expTemperatureFormCOMPONENTID").value=(data.expectedTemperature / 10);
           document.getElementById("openAngleCOMPONENTID").innerHTML=data.openAngle;
           document.getElementById("openAngleFormCOMPONENTID").selectedIndex=(data.expectedOpenAngle / 10);
           document.getElementById("expOpenAngleCOMPONENTID").innerHTML=data.expectedOpenAngle;
-          document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery/10;
+          document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery/10 + "." + data.battery//10;
           document.getElementById("heatingControllerCOMPONENTID").innerHTML=data.heatingController;
           document.getElementById("heatingControllerFormCOMPONENTID").value=(data.heatingController);
           document.getElementById("remoteTemperatureMeterCOMPONENTID").innerHTML=data.remoteTemperatureMeter;
