@@ -362,11 +362,11 @@ public class RemoteHomeManager {
         if (getPersistance() != null) {
             devices = getPersistance().loadDevices();
             schedulers = getPersistance().loadSchedulers();
-            userManagement = getPersistance().loadUserManagement();
-            if(userManagement == null) {
-                userManagement = new UserManagement();
-                userManagement.init();
-                getPersistance().saveUserManagement(userManagement);
+            setUserManagement(getPersistance().loadUserManagement());
+            if(getUserManagement() == null) {
+                setUserManagement(new UserManagement());
+                getUserManagement().init();
+                getPersistance().saveUserManagement(getUserManagement());
             }
             for (AbstractDevice dev : devices.values()) {
                 dev.m = this;
@@ -442,5 +442,19 @@ public class RemoteHomeManager {
             webServer.startServer();
             manager.joinCommThread();            
         }
+    }
+
+    /**
+     * @return the userManagement
+     */
+    public UserManagement getUserManagement() {
+        return userManagement;
+    }
+
+    /**
+     * @param userManagement the userManagement to set
+     */
+    public void setUserManagement(UserManagement userManagement) {
+        this.userManagement = userManagement;
     }
 }
