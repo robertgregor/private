@@ -6,6 +6,69 @@
         $(function () {
             $("#accordion").accordion({heightStyle: "content"});
             $("#setChPwd").button();
+            $("#accordion1").accordion({heightStyle: "content"});
+            $("#addNewDeviceForm").button();
+            $("#deleteObjectSubmit").button();
+            $("#addDeviceForm").submit(function (event) {
+                event.preventDefault();
+                if ($(this).valid()) {
+                    $("#addDeviceResult").html('');
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            $("#addDeviceResult").html(data);
+                            $("#addDeviceForm").each(function () {
+                                this.reset();
+                            });
+                            document.location.reload(true);
+                        },
+                        error: function () {
+                            $("#addDeviceResult").html(err_add_device);
+                        }
+                    });
+                }
+            });
+            $("#deleteDeviceForm").submit(function (event) {
+                event.preventDefault();
+                if ($(this).valid()) {
+                    $("#deleteObjectResult").html('');
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            if (data == 'EMPTY') {
+                                $("#deleteObjectResult").html(err_empty_device_room);
+                            } else {
+                                document.location.reload(true);
+                            }
+                        },
+                        error: function () {
+                            $("#deleteObjectResult").html(err_delete_object);
+                        }
+                    });
+                }
+            });
+            $("#deviceIdLoader").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetFreeDeviceId&" + Math.floor((Math.random() * 100) + 1),
+                    success: function (freeId) {
+                        document.getElementById("addDeviceId").value = freeId;
+                    },
+                    error: function () {
+                        alert(err_free_deviceId);
+                    }
+                });
+            });
             $("#changeChannelPassowrd").submit(function (event) {
                 event.preventDefault();
                 if ($(this).valid()) {
@@ -68,6 +131,72 @@
 
         });
         $(document).ready(function () {
+            $("#addDeviceForm").validate({
+                rules: {
+                    addDeviceId: { required: true, range: [1, 255] },
+                    addSubDeviceId: { range: [1, 255] },
+                    addDeviceName: { required: true },
+                    type: { required: true },
+                    roomName: { required: true }
+                },
+                messages: {
+                    addDeviceId: { required: err_enter_device_id, range: err_device_id_range},
+                    addSubDeviceId: { range: err_subdevice_number},
+                    addDeviceName: { required: err_device_name },
+                    type: { required: err_device_type },
+                    roomName: { required: err_device_room }
+                }
+            });
+            $.ajax({
+                url: "/",
+                type: "get",
+                'cache': false,
+                data: "ServiceName=LoadAllRooms&" + Math.floor((Math.random() * 100) + 1),
+                success: function (roomsData) {
+                    rooms = roomsData.split("\n");
+                    $("#addDeviceLocation").autocomplete({minLength: 0, source: rooms}).
+                            focus(function () {
+                                setTimeout("if ($('#addDeviceLocation').val().length == 0) $('#addDeviceLocation').autocomplete(\"search\", \"\"); ", 1);
+                            });
+                },
+                error: function () {
+                    alert(err_no_rooms);
+                }
+            });
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=DeleteObject&loadData=true&loadRooms=false&loadDevices=true&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    var select = document.getElementById("deleteDeviceId");
+                    var json = JSON.parse(data);
+                    for (var i = 0; i < json.length; i++) {
+                        var d = json[i];
+                        select.options.add(new Option(d.name, d.id));
+                    }
+                },
+                error: function () {
+                    alert(err_get_objects);
+                }
+            });
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=DeleteObject&loadData=true&loadRooms=true&loadDevices=false&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    var select = document.getElementById("deleteRoomId");
+                    var json = JSON.parse(data);
+                    for (var i = 0; i < json.length; i++) {
+                        var d = json[i];
+                        select.options.add(new Option(d.name));
+                    }
+                },
+                error: function () {
+                    alert(err_get_objects);
+                }
+            });
             $("#changeChannelPassowrd").validate({
                 rules: {
                     channel: { required: true, range: [1, 83] },
@@ -135,12 +264,121 @@
             setLabel("user_password_modify_actual");
             setLabel("user_confirm_password_modify");
             setLabel("user_confirm_password_modify_confirm");
+            setLabel("add_new_device");
+            setLabel("add_new_device_desc");
+            setLabel("new_device_id");
+            setLabel("new_subdevice_id");
+            document.getElementById('addDeviceId').title = new_device_id_desc;
+            document.getElementById('addSubDeviceId').title = new_subdevice_id_desc;
+            document.getElementById('addDeviceName').title = new_device_name_desc;
+            document.getElementById('addDeviceLocation').title = room_name_desc;
+            document.getElementById('deviceIdLoader').value = get_device_id;
+            document.getElementById('addNewDeviceForm').value = add_new_device_form;
+            document.getElementById('deleteObjectSubmit').value = delete_object_submit;
+            setLabel("new_device_name");
+            setLabel("room_name");
+            setLabel("device_type");
+            setLabel("LightAlarmDevice");
+            setLabel("TemperatureSensor");
+            setLabel("SimpleSwitch");
+            setLabel("HeatingHeader");
+            setLabel("BlindsControllerDevice");
+            setLabel("Thermostat");
+            setLabel("ThermostatWithSwitchAndTempSensorDevice");
+            setLabel("delete_device_cfg");
+            setLabel("delete_device");
+            setLabel("delete_room");
+            setLabel("deleteObjectSubmit");
+            setLabel("user_management");
         });
 
     </script>
 </head>
 <body>
 <div id="accordion">
+
+    <h3><span id="add_new_device"></span></h3>
+    <div>
+        <p><span id="add_new_device_desc"></span></p>
+        <form id="addDeviceForm">
+            <input type="hidden" name="ServiceName" value="AddNewDevice"/>
+            <table style="text-align:left;">
+                <tr>
+                    <td><label for="addDeviceId"><span id="new_device_id"></span></label></td>
+                    <td><input name="addDeviceId" id="addDeviceId"/></td>
+                    <td><input id="deviceIdLoader"/></td>
+                </tr>
+                <tr>
+                    <td><label for="addSubDeviceId"><span id="new_subdevice_id"></span></label></td>
+                    <td><input name="addSubDeviceId" id="addSubDeviceId"/></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><label for="addDeviceName"><span id="new_device_name"></span></label></td>
+                    <td><input name="addDeviceName" id="addDeviceName"/></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><label for="addDeviceLocation"><span id="room_name"></span></label></td>
+                    <td><input name="roomName" id="addDeviceLocation"/></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><label for="device_type"><span id="device_type"></span></label></td>
+                    <td>
+                        <select name="type" id="typeOfTheDevice">
+                            <option id="LightAlarmDevice" value="1"></option>
+                            <option id="TemperatureSensor" value="2"></option>
+                            <option id="SimpleSwitch" value="3"></option>
+                            <option id="HeatingHeader" value="4"></option>
+                            <option id="BlindsControllerDevice" value="5"></option>
+                            <option id="Thermostat" value="6"></option>
+                            <option id="ThermostatWithSwitchAndTempSensorDevice" value="8"></option>
+                        </select></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><input id="addNewDeviceForm" type="submit"/></td>
+                    <td>
+                        <div id="addDeviceResult">&nbsp;</div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <h3><span id="delete_device_cfg"></span></h3>
+    <div>
+        <p><span id="delete_device_cfg_text"></span></p>
+        <form id="deleteDeviceForm">
+            <table>
+                <tr>
+                    <td><label for="deleteDeviceId"><span id="delete_device"></span></label></td>
+                    <td>
+                        <select width="100%" id="deleteDeviceId" name="deleteDeviceName">
+                            <option value="0">&nbsp;</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="deleteRoomId"><span id="delete_room"></span></label></td>
+                    <td>
+                        <select width="100%" id="deleteRoomId" name="deleteRoomName">
+                            <option value="0">&nbsp;</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="hidden" name="ServiceName" value="DeleteObject"/><input id="deleteObjectSubmit"
+                                                                                             type="submit"/></td>
+                    <td>
+                        <div id="deleteObjectResult">&nbsp;</div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
 
     <h3><span id="user_management"></span></h3>
     <div>
