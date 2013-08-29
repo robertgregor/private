@@ -27,6 +27,7 @@ public class UserManagementService extends AbstractWebService {
         String logon = requestParameters.get("logon");
         String recover = requestParameters.get("recover");
         String logout = requestParameters.get("logout");
+        String loadUsers = requestParameters.get("loadUsers");
         boolean isLoggedOn = false;
         if (logon != null && logon.equals("true")) {
             String userName = requestParameters.get("userName");
@@ -91,7 +92,7 @@ public class UserManagementService extends AbstractWebService {
                     newList.add(user);
                 }
                 if (hasChanged) {
-                    if(u.getSmtpConfig() != null) {
+                    if (u.getSmtpConfig() != null) {
                         ums.setUsers(newList);
                         r.getPersistance().saveUserManagement(ums);
                         Mail mail = new Mail();
@@ -134,11 +135,9 @@ public class UserManagementService extends AbstractWebService {
                 r.getPersistance().saveUserManagement(ums);
             }
             sendAjaxAnswer("TRUE");
-        } else {
-            //Pre-load data for changing
+        } else if (loadUsers != null && loadUsers.equals("true")) {
+            UserManagement ums = r.getPersistance().loadUserManagement();
+            sendAjaxAnswer(AbstractDevice.generateJsonData(ums.getUsers()));
         }
-
-
     }
-
 }

@@ -220,25 +220,23 @@
                     alert(err_get_channel_pwd);
                 }
             });
-            /*
             $.ajax({
                 url: "/",
                 'cache': false,
                 type: "get",
-                data: "ServiceName=UserManagement&loadUsers=true&" + Math.floor((Math.random() * 100) + 1),
+                data: "ServiceName=UserManagementService&loadUsers=true&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
                     var select = document.getElementById("userNameModify");
                     var json = JSON.parse(data);
                     for (var i = 0; i < json.length; i++) {
                         var d = json[i];
-                        select.options.add(new Option(d.name), d.id);
+                        select.options.add(new Option(d.userName));
                     }
                 },
                 error: function () {
                     alert(err_get_channel_pwd);
                 }
             });
-            */
             document.getElementById('setChPwd').value = setChPwd_form;
             document.getElementById('addUser').value = adduser_form;
             document.getElementById('modifyUser').value = modifyuser_form;
@@ -411,7 +409,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><input type="hidden" name="ServiceName" value="UserManagement"/>
+                                <td><input type="hidden" name="ServiceName" value="UserManagementService"/>
                                     <input type="hidden" name="method" value="addUser"/>
                                     <input id="addUser" type="submit"/></td>
                                 <td>
@@ -459,7 +457,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><input type="hidden" name="ServiceName" value="UserManagement"/>
+                                <td><input type="hidden" name="ServiceName" value="UserManagementService"/>
                                     <input type="hidden" name="method" value="modifyUser"/>
                                     <input id="modifyUser" type="submit"/></td>
                                 <td>
