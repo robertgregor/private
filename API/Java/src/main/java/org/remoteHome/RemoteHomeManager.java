@@ -111,7 +111,6 @@ public class RemoteHomeManager {
         if (deviceType == AbstractDevice.HeatingHeader) {
             HeatingHeaderDevice device = new HeatingHeaderDevice(this, deviceId, deviceName);
             devices.put(deviceId, device);
-            
             device.startScheduling();
             return device;
         } else if (deviceType == AbstractDevice.SimpleSwitch) {

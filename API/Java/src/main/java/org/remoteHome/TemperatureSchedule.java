@@ -174,6 +174,6 @@ public class TemperatureSchedule  extends AbstractSchedule {
         String sch = loadSchedule();
         String hourValues = sch.substring((day*24*8)+(hour*8), (day*24*8)+(hour*8)+8);
         String temperature = hourValues.substring((minRange/15)*2, ((minRange/15)*2)+2);
-        return (Integer.parseInt(temperature, 16) * 10) / 2;
+        return ((Integer.parseInt(temperature, 16) * 10) / 2);
     }
 }

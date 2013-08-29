@@ -62,11 +62,6 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     private int deviceExpectedTemperature; 
     
     /**
-     * Device Expected temperature, which has been set manually. It is value backed up, when scheduler is enabled.
-     */
-    private int deviceExpectedTemperatureBackedUp;
-
-    /**
      * Open angle
      */
     private int openAngle; 
@@ -164,10 +159,19 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     protected void manageAsynchronousCommand(String[] items) {
         if (items[0].equals("4")) {
             //This is the status
-            this.setTemperature(Integer.parseInt(items[1]));
+            if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
+                try {
+                    TemperatureSensorDevice temp = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeter());
+                    setTemperature((int)(temp.getTemperature()*10));
+                } catch (RemoteHomeManagerException e) {
+                    e.printStackTrace();
+                }
+            } else {    
+                this.setTemperature(Integer.parseInt(items[1]));
+            }   
             this.setBattery(Integer.parseInt(items[2]));
             this.setFrequency(Integer.parseInt(items[3])*10); //Frequency in seconds * 10
-            this.setDeviceExpectedTemperature(Integer.parseInt(items[4]) * 10 / 2);
+            this.setDeviceExpectedTemperature(Integer.parseInt(items[4]));
             this.setOpenAngle(Integer.parseInt(items[5]));
             setTimestamp(System.currentTimeMillis());            
         } else if (items[0].equals("l")) {
@@ -293,20 +297,6 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     }
 
     /**
-     * @return the deviceExpectedTemperatureBackedUp
-     */
-    public int getDeviceExpectedTemperatureBackedUp() {
-        return deviceExpectedTemperatureBackedUp;
-    }
-
-    /**
-     * @param deviceExpectedTemperatureBackedUp the deviceExpectedTemperatureBackedUp to set
-     */
-    public void setDeviceExpectedTemperatureBackedUp(int deviceExpectedTemperatureBackedUp) {
-        this.deviceExpectedTemperatureBackedUp = deviceExpectedTemperatureBackedUp;
-    }
-
-    /**
      * Open angle
      * @return the openAngle
      */
@@ -339,8 +329,11 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
         if ((expectedOpenAngle < 0) || (expectedOpenAngle > 100)) {
             throw new RemoteHomeManagerException("The value should be 0 - 100", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
+        setExpectedTemperature(0);
+        setManageTemperatureAuto(true);
         this.expectedOpenAngle = expectedOpenAngle;
         setManageOpenAngleAuto(true);
+        setEnabledScheduler(false);
     }
 
     /**
@@ -536,10 +529,6 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
           TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
           if (history == null) history = historyProto;
           int expected = getDeviceExpectedTemperature();
-          if (isEnabledScheduler()) {
-              Integer tmp = getTemperatureSchedule().getCurrentExpectedValue();
-              if (tmp != null) expected = tmp;
-          }
           history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()), expected);
           m.getPersistance().saveHistoryData(history);
     }    
@@ -566,7 +555,11 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
                         if (((min % 10) == 0) || (min == 0)) {
                             saveHistoryData();
                         }
-                        Thread.sleep(50000);
+                        Thread.sleep(30000);
+                        //setExpectedTemperature
+                        if (isEnabledScheduler()) {
+                            setExpectedTemperature((getTemperatureSchedule().getCurrentExpectedValue() * 2) / 10);
+                        }
                         //manage heating controller
                         if (isHeatingControllerEnabled() && getHeatingController() != 0) {
                             try {
@@ -584,26 +577,18 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
                                 e.printStackTrace();
                             }
                         }
-                        //manage the remote temperature meter and device relay
-                        if (!isEnabledScheduler()) {
-                            manageRemoteTemperatureSensorAndHeader();
-                            continue;
-                        }
-                        if (!isRemoteTemperatureMeterEnabled()) continue;
-                        c = Calendar.getInstance();
-                        min = c.get(Calendar.MINUTE);
-                        if (((min % 15) == 0) || (min == 0)) {
-                            Integer temperature = getTemperatureSchedule().processSchedule();
-                            if (temperature != null) {
-                                //something has to be done.
-                                if (!isRemoteTemperatureMeterEnabled()) {
-                                    setExpectedTemperature((temperature*2)/10);
-                                } else {
-                                    manageRemoteTemperatureSensorAndHeader();
-                                }
+                        //manage the remote temperature meter and header
+                        if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
+                            //Set the current temperature
+                            TemperatureSensorDevice temp = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeter());
+                            setTemperature((int)(temp.getTemperature()*10));
+                            c = Calendar.getInstance();
+                            min = c.get(Calendar.MINUTE);
+                            if (((min % 15) == 0) || (min == 0)) {
+                                manageRemoteTemperatureSensorAndHeader();
                             }
                         }
-                        Thread.sleep(50000);
+                        Thread.sleep(20000);
                     } catch (InterruptedException e) {
                         return;
                     } catch (RemoteHomeConnectionException e) {
@@ -618,11 +603,12 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     private void manageRemoteTemperatureSensorAndHeader() throws RemoteHomeConnectionException, RemoteHomeManagerException {
         if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
             int targetOpenAngle = 100;
+            int expected = (getExpectedTemperature() * 10) / 2;
             if (getTemperature() < 7) {
                 targetOpenAngle = 0;
             } else {
-                if (getDeviceExpectedTemperature() > getTemperature()) {
-                    int differenceTemp = getDeviceExpectedTemperature() - getTemperature();
+                if (expected > getTemperature()) {
+                    int differenceTemp = expected - getTemperature();
                     if (differenceTemp < 5) {
                         targetOpenAngle = 75;
                     } else if (differenceTemp < 10) {

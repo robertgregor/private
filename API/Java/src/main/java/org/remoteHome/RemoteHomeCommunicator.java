@@ -67,7 +67,7 @@ class RemoteHomeCommunicator extends Thread  {
                                         } else if (dev instanceof MotorControllerDevice) {
                                             manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" l|"+Integer.toString((new Random()).nextInt(100)));
                                         } else if (dev instanceof HeatingHeaderDevice) {
-                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 4|"+Integer.toString(150+(new Random()).nextInt(100))+"|31|60|42|"+(new Random()).nextInt(100));
+                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 4|"+Integer.toString(150+(new Random()).nextInt(100))+"|31|60|43|"+(new Random()).nextInt(100));
                                         } else if (dev instanceof LightAlarmDevice) {
                                             manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" ALARM");
                                         }
