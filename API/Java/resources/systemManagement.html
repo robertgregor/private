@@ -151,6 +151,26 @@
                 url: "/",
                 type: "get",
                 'cache': false,
+                data: "ServiceName=UserManagementService&authorize=true&" + Math.floor((Math.random() * 100) + 1),
+                success: function (data) {
+                    if(data != 'Administrators') {
+                        $('#setChPwd').attr("disabled", true);
+                        $('#addUser').attr("disabled", true);
+                        $('#modifyUser').attr("disabled", true);
+                        $('#deviceIdLoader').attr("disabled", true);
+                        $('#addNewDeviceForm').attr("disabled", true);
+                        $('#deleteObjectSubmit').attr("disabled", true);
+                        $('#deleteObjectSubmit').attr("disabled", true);
+                    }
+                },
+                error: function () {
+                    alert(err_no_rooms);
+                }
+            });
+            $.ajax({
+                url: "/",
+                type: "get",
+                'cache': false,
                 data: "ServiceName=LoadAllRooms&" + Math.floor((Math.random() * 100) + 1),
                 success: function (roomsData) {
                     rooms = roomsData.split("\n");

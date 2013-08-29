@@ -28,6 +28,8 @@ public class UserManagementService extends AbstractWebService {
         String recover = requestParameters.get("recover");
         String logout = requestParameters.get("logout");
         String loadUsers = requestParameters.get("loadUsers");
+        String authorize = requestParameters.get("authorize");
+
         boolean isLoggedOn = false;
         if (logon != null && logon.equals("true")) {
             String userName = requestParameters.get("userName");
@@ -142,6 +144,20 @@ public class UserManagementService extends AbstractWebService {
         } else if (loadUsers != null && loadUsers.equals("true")) {
             UserManagement ums = r.getPersistance().loadUserManagement();
             sendAjaxAnswer(AbstractDevice.generateJsonData(ums.getUsers()));
+        } else if (authorize != null && authorize.equals("true")) {
+            UserManagement ums = r.getPersistance().loadUserManagement();
+            Headers reqHeaders = t.getRequestHeaders();
+            List<String> cookies = reqHeaders.get("Cookie");
+            String session = (cookies.get(0) != null) ? cookies.get(0) : null;
+            String group = "";
+            if (ums != null && ums.getUsers().size() > 0) {
+                for (User user : ums.getUsers()) {
+                    if (user.getHttpSession().equals(session)) {
+                        group = user.getGroup().getGroupName();
+                    }
+                }
+            }
+            sendAjaxAnswer(group);
         }
     }
 }
