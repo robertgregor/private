@@ -63,15 +63,15 @@ RM2             		EQU	RAM_START + 015h
 RR1             		EQU	RAM_START + 016h
 ; C:\DOCUME~2\PICDEV~1\PBP\PBP260\PBPPIC14.RAM	00023	A00037	RR2     VAR     BYTE BANK0 SYSTEM       ' Pin 2 Register
 RR2             		EQU	RAM_START + 017h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00016	A00038	data_in var Byte[payloadLengthD] 'data received
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00016	A00038	data_in var Byte[payloadLengthD] 'data received
 _data_in         		EQU	RAM_START + 018h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00015	A00050	data_out VAR BYTE[payloadLengthD] 'data sent
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00015	A00050	data_out VAR BYTE[payloadLengthD] 'data sent
 _data_out        		EQU	RAM_START + 030h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00017	A00068	temp_data var byte[payloadLength]
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00017	A00068	temp_data var byte[payloadLength]
 _temp_data       		EQU	RAM_START + 048h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00074	A0007E	Float       VAR WORD        
 _Float           		EQU	RAM_START + 05Eh
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00014	A000A0	Pack_count VAR word 'number of packets sent
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00014	A000A0	Pack_count VAR word 'number of packets sent
 _Pack_count      		EQU	RAM_START + 080h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00071	A000A2	sleep_period var word
 _sleep_period    		EQU	RAM_START + 082h
@@ -91,7 +91,7 @@ _ci              		EQU	RAM_START + 08Eh
 _configure       		EQU	RAM_START + 08Fh
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00069	A000B0	conversionSuccess VAR BYTE
 _conversionSuccess		EQU	RAM_START + 090h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00025	A000B1	device_id var byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00025	A000B1	device_id var byte
 _device_id       		EQU	RAM_START + 091h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00072	A000B2	Dummy       VAR BYTE
 _Dummy           		EQU	RAM_START + 092h
@@ -103,11 +103,11 @@ _EEPROMPOSITION  		EQU	RAM_START + 094h
 _i               		EQU	RAM_START + 095h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00055	A000B6	j var byte
 _j               		EQU	RAM_START + 096h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00019	A000B7	k VAR byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00019	A000B7	k VAR byte
 _k               		EQU	RAM_START + 097h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00068	A000B8	l1counter var byte
 _l1counter       		EQU	RAM_START + 098h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00012	A000B9	num_byte var byte 'temp value
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00012	A000B9	num_byte var byte 'temp value
 _num_byte        		EQU	RAM_START + 099h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00001	A000BA	'@  __config _INTRC_OSC_NOCLKOUT & _WDT_ON & _MCLRE_OFF & _CP_OFF & _CPD_OFF & _FCMEN_OFF & _IESO_OFF & _BOR_ON & _PWRTE_ON
 PB01            		EQU	RAM_START + 09Ah
@@ -119,29 +119,29 @@ _seconds         		EQU	RAM_START + 09Ch
 _sleepMode       		EQU	RAM_START + 09Dh
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00060	A000BE	temp1_byte var byte
 _temp1_byte      		EQU	RAM_START + 09Eh
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00021	A000BF	temp1_byte_rfm var byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00021	A000BF	temp1_byte_rfm var byte
 _temp1_byte_rfm  		EQU	RAM_START + 09Fh
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00061	A000C0	temp2_byte var byte
 _temp2_byte      		EQU	RAM_START + 0A0h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00022	A000C1	temp2_byte_rfm var byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00022	A000C1	temp2_byte_rfm var byte
 _temp2_byte_rfm  		EQU	RAM_START + 0A1h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00062	A000C2	temp3_byte var byte
 _temp3_byte      		EQU	RAM_START + 0A2h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00023	A000C3	temp3_byte_rfm var byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00023	A000C3	temp3_byte_rfm var byte
 _temp3_byte_rfm  		EQU	RAM_START + 0A3h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00024	A000C4	temp4_byte_rfm var byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00024	A000C4	temp4_byte_rfm var byte
 _temp4_byte_rfm  		EQU	RAM_START + 0A4h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00059	A000C5	temp_byte var byte
 _temp_byte       		EQU	RAM_START + 0A5h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00058	A000C6	temp_byte_int var byte
 _temp_byte_int   		EQU	RAM_START + 0A6h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00020	A000C7	temp_byte_rfm var byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00020	A000C7	temp_byte_rfm var byte
 _temp_byte_rfm   		EQU	RAM_START + 0A7h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00067	A000C8	ticks   var     byte    ' Define pieces of seconds variable
 _ticks           		EQU	RAM_START + 0A8h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00013	A000C9	val var byte 'temp value
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00013	A000C9	val var byte 'temp value
 _val             		EQU	RAM_START + 0A9h
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00018	A000CA	w var byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00018	A000CA	w var byte
 _w               		EQU	RAM_START + 0AAh
 ; C:\DOCUME~2\PICDEV~1\PBP\PBP260\16F690.BAS	00023	PORTL   VAR     PORTA
 _PORTL           		EQU	 PORTA
@@ -313,833 +313,803 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00016	EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,0,0]
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00018	INCLUDE "RFM70.pbp"
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00010	payloadLength con 22
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00011	payloadLengthD con 24
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00028	Idle_int con $00 'Idle no interrupt pending
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00029	Max_rt con $10 'Max # of Tx retrans interrupt
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00030	Tx_inter con $30 'Tx interrupted
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00031	Rx_ds con $40 'Rx data received
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00033	Read_reg con $00 'def read command to register
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00034	Write_reg CON $20 'def write command to register
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00035	Rd_rx_pload con $61 'def Rx payload register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00036	Wr_tx_pload con $A0 'def Tx payload register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00037	Flush_tx con $E1 'def flush Tx register command
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00038	Flush_rx con $E2 'def flush Rx register command
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00039	Reuse_tx_pl con $E3 'def reuse Tx payload register command
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00040	Nop_comm con $FF 'def No operation
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00042	Config_nrf con $00 'Config register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00043	En_aa con $01 'enable auto acknowledgment register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00044	En_rxaddr con $02 'enable RX addresses register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00045	Setup_aw con $03 'setup address width register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00046	Setup_retr con $04 'setup auto retrans register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00047	Rf_ch con $05 'RF channel register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00048	Rf_setup con $06 'RF setup register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00049	Stat_us con $07 'Status register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00050	Observe_tx con $08 'Observe TX register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00051	Cd con $09 'Carrier detect register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00052	Rx_addr_p0 con $0A 'RX address pipe0 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00053	Rx_addr_p1 con $0B 'RX address pipe1 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00054	Rx_addr_p2 con $0C 'RX address pipe2 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00055	Rx_addr_p3 con $0D 'RX address pipe3 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00056	Rx_addr_p4 con $0E 'RX address pipe4 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00057	Rx_addr_p5 con $0F 'RX address pipe5 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00058	Tx_addr con $10 'TX address register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00059	Rx_pw_p0 con $11 'RX payload width pipe0 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00060	Rx_pw_p1 con $12 'RX payload width pipe1 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00061	Rx_pw_p2 con $13 'RX payload width pipe2 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00062	Rx_pw_p3 con $14 'RX payload width pipe3 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00063	Rx_pw_p4 con $15 'RX payload width pipe4 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00064	Rx_pw_p5 con $16 'RX payload width pipe5 register address
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00065	Fifo_status con $17 'FIFO status register register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00018	INCLUDE "RFM73.pbp"
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00010	payloadLength con 22
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00011	payloadLengthD con 24
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00028	Idle_int con $00 'Idle no interrupt pending
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00029	Max_rt con $10 'Max # of Tx retrans interrupt
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00030	Tx_inter con $30 'Tx interrupted
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00031	Rx_ds con $40 'Rx data received
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00033	Read_reg con $00 'def read command to register
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00034	Write_reg CON $20 'def write command to register
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00035	Rd_rx_pload con $61 'def Rx payload register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00036	Wr_tx_pload con $A0 'def Tx payload register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00037	Flush_tx con $E1 'def flush Tx register command
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00038	Flush_rx con $E2 'def flush Rx register command
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00039	Reuse_tx_pl con $E3 'def reuse Tx payload register command
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00040	Nop_comm con $FF 'def No operation
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00042	Config_nrf con $00 'Config register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00043	En_aa con $01 'enable auto acknowledgment register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00044	En_rxaddr con $02 'enable RX addresses register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00045	Setup_aw con $03 'setup address width register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00046	Setup_retr con $04 'setup auto retrans register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00047	Rf_ch con $05 'RF channel register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00048	Rf_setup con $06 'RF setup register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00049	Stat_us con $07 'Status register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00050	Observe_tx con $08 'Observe TX register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00051	Cd con $09 'Carrier detect register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00052	Rx_addr_p0 con $0A 'RX address pipe0 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00053	Rx_addr_p1 con $0B 'RX address pipe1 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00054	Rx_addr_p2 con $0C 'RX address pipe2 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00055	Rx_addr_p3 con $0D 'RX address pipe3 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00056	Rx_addr_p4 con $0E 'RX address pipe4 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00057	Rx_addr_p5 con $0F 'RX address pipe5 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00058	Tx_addr con $10 'TX address register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00059	Rx_pw_p0 con $11 'RX payload width pipe0 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00060	Rx_pw_p1 con $12 'RX payload width pipe1 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00061	Rx_pw_p2 con $13 'RX payload width pipe2 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00062	Rx_pw_p3 con $14 'RX payload width pipe3 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00063	Rx_pw_p4 con $15 'RX payload width pipe4 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00064	Rx_pw_p5 con $16 'RX payload width pipe5 register address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00065	Fifo_status con $17 'FIFO status register register address
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00067	goto endRFM70
-	GOTO?L	_endRFM70
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00067	goto endRFM73
+	GOTO?L	_endRFM73
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00068	initModule:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00068	initModule:
 
 	LABEL?L	_initModule	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00069	pause 200
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00069	pause 200
 	PAUSE?C	0C8h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00071	SSPEN = 1 'enable SPI pins
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00071	SSPEN = 1 'enable SPI pins
 	MOVE?CT	001h, _SSPEN
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00072	SSPCON.0=1 'SPI rate=OSC/16
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00072	SSPCON.0=1 'SPI rate=OSC/16
 	MOVE?CT	001h, _SSPCON??0
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00073	CKP = 0 'clock idle low
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00073	CKP = 0 'clock idle low
 	MOVE?CT	000h, _CKP
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00074	CKE = 1 'transmit on active to idle
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00074	CKE = 1 'transmit on active to idle
 	MOVE?CT	001h, _CKE
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00075	SSPIF = 0 'clear buffer full status
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00075	SSPIF = 0 'clear buffer full status
 	MOVE?CT	000h, _SSPIF
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00076	SMP = 0 'sample in middle of data
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00076	SMP = 0 'sample in middle of data
 	MOVE?CT	000h, _SMP
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00078	Ce=1 'init spi pins
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00078	Ce=1 'init spi pins
 	MOVE?CT	001h, _Ce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00079	pause 10 'wait 10 ms hardware is stable
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00079	pause 10 'wait 10 ms hardware is stable
 	PAUSE?C	00Ah
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00080	Ce=0 'set CE pin low disable Rx
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00080	Ce=0 'set CE pin low disable Rx
 	MOVE?CT	000h, _Ce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00081	CSN=0 'set CSN pin low
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00081	CSN=0 'set CSN pin low
 	MOVE?CT	000h, _CSN
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00082	Pack_count=0 'number of packets sent
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00082	Pack_count=0 'number of packets sent
 	MOVE?CW	000h, _Pack_count
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00083	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00083	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00085	commonRXTX:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00085	commonRXTX:
 
 	LABEL?L	_commonRXTX	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00086	data_out[0]=Write_reg+Rx_addr_p0 'Rx address for pipe0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00086	data_out[0]=Write_reg+Rx_addr_p0 'Rx address for pipe0
 	MOVE?CB	02Ah, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00087	gosub setRxAddressPipe
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00087	gosub setRxAddressPipe
 	GOSUB?L	_setRxAddressPipe
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00088	num_byte=5
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00088	num_byte=5
 	MOVE?CB	005h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00089	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00089	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00090	data_out[0]=Write_reg+En_aa 'enable auto ACK pipe0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00090	data_out[0]=Write_reg+En_aa 'enable auto ACK pipe0
 	MOVE?CB	021h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00091	data_out[1]=$01 '1 enable, 0 disable
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00091	data_out[1]=$01 '1 enable, 0 disable
 	MOVE?CB	001h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00092	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00092	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00093	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00093	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00094	data_out[0]=Write_reg+En_rxaddr 'enable Rx address pipe0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00094	data_out[0]=Write_reg+En_rxaddr 'enable Rx address pipe0
 	MOVE?CB	022h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00095	data_out[1]=$01
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00095	data_out[1]=$01
 	MOVE?CB	001h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00096	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00096	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00097	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00097	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00098	data_out[0]=Write_reg+Rf_ch 'Set RF channel
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00098	data_out[0]=Write_reg+Rf_ch 'Set RF channel
 	MOVE?CB	025h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00099	READ 0, data_out[1] 'number of channel used
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00099	READ 0, data_out[1] 'number of channel used
 	READADDRESS?C	000h
 	READ?B	_data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00100	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00100	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00101	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00101	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00102	data_out[0]=Write_reg+Rx_pw_p0 'Set Rx pload width pipe0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00102	data_out[0]=Write_reg+Rx_pw_p0 'Set Rx pload width pipe0
 	MOVE?CB	031h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00103	data_out[1]=payloadLength 'number of bytes used in data sent
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00103	data_out[1]=payloadLength 'number of bytes used in data sent
 	MOVE?CB	_payloadLength, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00104	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00104	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00105	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00105	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00106	data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm, 1Mbps
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00106	data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm, 1Mbps
 	MOVE?CB	026h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00107	data_out[1]=%00110111
-	MOVE?CB	037h, _data_out + 00001h
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00107	data_out[1]=%00100111 '250kbit
+	MOVE?CB	027h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00108	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00109	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00109	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00110	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00111	temp_byte_rfm = 1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00112	temp_byte_rfm = 1
 	MOVE?CB	001h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00112	gosub setBank
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00113	gosub setBank
 	GOSUB?L	_setBank
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00113	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00114	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
 	MOVE?CB	000h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00113	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00114	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
 	MOVE?CB	040h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00113	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00114	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
 	MOVE?CB	04Bh, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00113	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00114	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
 	MOVE?CB	001h, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00113	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00114	temp_byte_rfm = 0 : temp1_byte_rfm = $40 : temp2_byte_rfm = $4B : temp3_byte_rfm = $01 : temp4_byte_rfm = $E2
 	MOVE?CB	0E2h, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00114	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00115	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00115	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00116	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
 	MOVE?CB	001h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00115	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00116	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
 	MOVE?CB	0C0h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00115	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00116	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
 	MOVE?CB	04Bh, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00115	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00116	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
 	MOVE?CB	000h, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00115	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00116	temp_byte_rfm = 1 : temp1_byte_rfm = $C0 : temp2_byte_rfm = $4B : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
 	MOVE?CB	000h, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00116	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00117	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00117	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00118	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
 	MOVE?CB	002h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00117	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00118	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
 	MOVE?CB	0D0h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00117	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00118	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
 	MOVE?CB	0FCh, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00117	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00118	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
 	MOVE?CB	08Ch, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00117	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00118	temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm = $8C : temp4_byte_rfm = $02
 	MOVE?CB	002h, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00118	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00119	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00119	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00120	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 	MOVE?CB	003h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00119	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00120	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 	MOVE?CB	099h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00119	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00120	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 	MOVE?CB	000h, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00119	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00120	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 	MOVE?CB	039h, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00119	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00120	temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 	MOVE?CB	041h, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00120	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00121	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00121	temp_byte_rfm = 4 : temp1_byte_rfm = $B9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00122	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $B6 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
 	MOVE?CB	004h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00121	temp_byte_rfm = 4 : temp1_byte_rfm = $B9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
-	MOVE?CB	0B9h, _temp1_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00122	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $B6 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+	MOVE?CB	0D9h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00121	temp_byte_rfm = 4 : temp1_byte_rfm = $B9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
-	MOVE?CB	09Eh, _temp2_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00122	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $B6 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+	MOVE?CB	0B6h, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00121	temp_byte_rfm = 4 : temp1_byte_rfm = $B9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
-	MOVE?CB	086h, _temp3_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00122	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $B6 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+	MOVE?CB	082h, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00121	temp_byte_rfm = 4 : temp1_byte_rfm = $B9 : temp2_byte_rfm = $9E : temp3_byte_rfm = $86 : temp4_byte_rfm = $0B
-	MOVE?CB	00Bh, _temp4_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00122	temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $B6 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+	MOVE?CB	01Bh, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00122	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00123	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00123	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00124	temp_byte_rfm = 5 : temp1_byte_rfm = $28 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 	MOVE?CB	005h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00123	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
-	MOVE?CB	024h, _temp1_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00124	temp_byte_rfm = 5 : temp1_byte_rfm = $28 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+	MOVE?CB	028h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00123	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
-	MOVE?CB	006h, _temp2_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00124	temp_byte_rfm = 5 : temp1_byte_rfm = $28 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+	MOVE?CB	002h, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00123	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00124	temp_byte_rfm = 5 : temp1_byte_rfm = $28 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 	MOVE?CB	07Fh, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00123	temp_byte_rfm = 5 : temp1_byte_rfm = $24 : temp2_byte_rfm = $06 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00124	temp_byte_rfm = 5 : temp1_byte_rfm = $28 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 	MOVE?CB	0A6h, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00124	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00125	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00125	for k = 6 TO 11
-	MOVE?CB	006h, _k
-	LABEL?L	L00003	
-	CMPGT?BCL	_k, 00Bh, L00004
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00126	    temp_byte_rfm = k : temp1_byte_rfm = $00 : temp2_byte_rfm = $00 : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
-	MOVE?BB	_k, _temp_byte_rfm
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00126	    temp_byte_rfm = k : temp1_byte_rfm = $00 : temp2_byte_rfm = $00 : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
-	MOVE?CB	000h, _temp1_byte_rfm
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00126	    temp_byte_rfm = k : temp1_byte_rfm = $00 : temp2_byte_rfm = $00 : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
-	MOVE?CB	000h, _temp2_byte_rfm
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00126	    temp_byte_rfm = k : temp1_byte_rfm = $00 : temp2_byte_rfm = $00 : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
-	MOVE?CB	000h, _temp3_byte_rfm
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00126	    temp_byte_rfm = k : temp1_byte_rfm = $00 : temp2_byte_rfm = $00 : temp3_byte_rfm = $00 : temp4_byte_rfm = $00
-	MOVE?CB	000h, _temp4_byte_rfm
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00127	    gosub conf4bytes
-	GOSUB?L	_conf4bytes
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00128	next k
-	NEXT?BCL	_k, 001h, L00003
-	LABEL?L	L00004	
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00129	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00126	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 	MOVE?CB	00Ch, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00129	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00126	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 	MOVE?CB	000h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00129	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00126	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 	MOVE?CB	012h, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00129	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00126	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 	MOVE?CB	073h, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00129	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00126	temp_byte_rfm = 12 : temp1_byte_rfm = $00 : temp2_byte_rfm = $12 : temp3_byte_rfm = $73 : temp4_byte_rfm = $00
 	MOVE?CB	000h, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00130	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00127	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00131	temp_byte_rfm = 13 : temp1_byte_rfm = $36 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00128	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
 	MOVE?CB	00Dh, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00131	temp_byte_rfm = 13 : temp1_byte_rfm = $36 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
-	MOVE?CB	036h, _temp1_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00128	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+	MOVE?CB	046h, _temp1_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00131	temp_byte_rfm = 13 : temp1_byte_rfm = $36 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00128	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
 	MOVE?CB	0B4h, _temp2_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00131	temp_byte_rfm = 13 : temp1_byte_rfm = $36 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00128	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
 	MOVE?CB	080h, _temp3_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00131	temp_byte_rfm = 13 : temp1_byte_rfm = $36 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00128	temp_byte_rfm = 13 : temp1_byte_rfm = $46 : temp2_byte_rfm = $b4 : temp3_byte_rfm = $80 : temp4_byte_rfm = $00
 	MOVE?CB	000h, _temp4_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00132	gosub conf4bytes
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00129	gosub conf4bytes
 	GOSUB?L	_conf4bytes
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00133	data_out[0]=Write_reg+$0E
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00130	data_out[0]=Write_reg+$0E
 	MOVE?CB	02Eh, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00134	data_out[1]=$41
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00131	data_out[1]=$41
 	MOVE?CB	041h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00135	data_out[2]=$20
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00132	data_out[2]=$20
 	MOVE?CB	020h, _data_out + 00002h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00136	data_out[3]=$08
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00133	data_out[3]=$08
 	MOVE?CB	008h, _data_out + 00003h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00137	data_out[4]=$04
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00134	data_out[4]=$04
 	MOVE?CB	004h, _data_out + 00004h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00138	data_out[5]=$81
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00135	data_out[5]=$81
 	MOVE?CB	081h, _data_out + 00005h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00139	data_out[6]=$20
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00136	data_out[6]=$20
 	MOVE?CB	020h, _data_out + 00006h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00140	data_out[7]=$CF
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00137	data_out[7]=$CF
 	MOVE?CB	0CFh, _data_out + 00007h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00141	data_out[8]=$F7
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00138	data_out[8]=$F7
 	MOVE?CB	0F7h, _data_out + 00008h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00142	data_out[9]=$FE
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00139	data_out[9]=$FE
 	MOVE?CB	0FEh, _data_out + 00009h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00143	data_out[10]=$FF
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00140	data_out[10]=$FF
 	MOVE?CB	0FFh, _data_out + 0000Ah
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00144	data_out[11]=$FF
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00141	data_out[11]=$FF
 	MOVE?CB	0FFh, _data_out + 0000Bh
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00145	num_byte=11
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00142	num_byte=11
 	MOVE?CB	00Bh, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00146	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00143	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00147	temp_byte_rfm = 0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00144	temp_byte_rfm = 0
 	MOVE?CB	000h, _temp_byte_rfm
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00148	gosub setBank
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00145	gosub setBank
 	GOSUB?L	_setBank
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00149	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00146	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00151	setBank:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00148	setBank:
 
 	LABEL?L	_setBank	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00152	data_out[0]=Read_reg+$07
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00149	data_out[0]=Read_reg+$07
 	MOVE?CB	007h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00153	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00150	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00154	gosub spi_read
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00151	gosub spi_read
 	GOSUB?L	_spi_read
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00155	if (temp_byte_rfm != (data_in[0] & $80)) then
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00152	if (temp_byte_rfm != (data_in[0] & $80)) then
 	AND?BCW	_data_in, 080h, T1
-	CMPEQ?BWL	_temp_byte_rfm, T1, L00005
+	CMPEQ?BWL	_temp_byte_rfm, T1, L00003
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00157	    data_out[0]=$50
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00154	    data_out[0]=$50
 	MOVE?CB	050h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00158	    data_out[1]=$53    
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00155	    data_out[1]=$53    
 	MOVE?CB	053h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00159	    num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00156	    num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00160	    gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00157	    gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00161	endif
-	LABEL?L	L00005	
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00158	endif
+	LABEL?L	L00003	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00162	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00159	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00164	conf4bytes:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00161	conf4bytes:
 
 	LABEL?L	_conf4bytes	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00165	data_out[0]=Write_reg+temp_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00162	data_out[0]=Write_reg+temp_byte_rfm
 	ADD?CBB	_Write_reg, _temp_byte_rfm, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00166	data_out[1]=temp1_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00163	data_out[1]=temp1_byte_rfm
 	MOVE?BB	_temp1_byte_rfm, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00167	data_out[2]=temp2_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00164	data_out[2]=temp2_byte_rfm
 	MOVE?BB	_temp2_byte_rfm, _data_out + 00002h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00168	data_out[3]=temp3_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00165	data_out[3]=temp3_byte_rfm
 	MOVE?BB	_temp3_byte_rfm, _data_out + 00003h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00169	data_out[4]=temp4_byte_rfm
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00166	data_out[4]=temp4_byte_rfm
 	MOVE?BB	_temp4_byte_rfm, _data_out + 00004h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00170	num_byte=4
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00167	num_byte=4
 	MOVE?CB	004h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00171	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00168	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00172	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00169	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00174	sendData:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00171	sendData:
 
 	LABEL?L	_sendData	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00175	pause 30
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00172	pause 30
 	PAUSE?C	01Eh
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00176	GOSUB debounce
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00173	GOSUB debounce
 	GOSUB?L	_debounce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00177	data_out[0]=Flush_tx 'flush TX_fifo buffer
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00174	data_out[0]=Flush_tx 'flush TX_fifo buffer
 	MOVE?CB	_Flush_tx, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00178	num_byte=0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00175	num_byte=0
 	MOVE?CB	000h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00179	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00176	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00180	data_out[0]=Write_reg+Stat_us 'reset IRQ bits
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00177	data_out[0]=Write_reg+Stat_us 'reset IRQ bits
 	MOVE?CB	027h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00181	data_out[1]=%00110000
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00178	data_out[1]=%00110000
 	MOVE?CB	030h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00182	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00179	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00183	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00180	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00184	gosub setup_tx 'setup Tx
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00181	gosub setup_tx 'setup Tx
 	GOSUB?L	_setup_tx
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00185	data_out[0]=Wr_tx_pload 'put 10 bytes data in Tx pload buffer
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00182	data_out[0]=Wr_tx_pload 'put 10 bytes data in Tx pload buffer
 	MOVE?CB	_Wr_tx_pload, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00186	data_out[1]=device_id
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00183	data_out[1]=device_id
 	MOVE?BB	_device_id, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00187	for w = 2 to payloadLength+1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00184	for w = 2 to payloadLength+1
 	MOVE?CB	002h, _w
-	LABEL?L	L00007	
-	CMPGT?BCL	_w, 017h, L00008
+	LABEL?L	L00005	
+	CMPGT?BCL	_w, 017h, L00006
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00188	    data_out[w]=temp_data[w-2]
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00185	    data_out[w]=temp_data[w-2]
 	SUB?BCW	_w, 002h, T1
 	AOUT?BWB	_temp_data, T1, T1
 	AIN?BBB	T1, _data_out, _w
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00189	    if data_out[w] == 10 then contSendX1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00186	    if data_out[w] == 10 then contSendX1
 	AOUT?BBB	_data_out, _w, T1
 	CMPEQ?BCL	T1, 00Ah, _contSendX1
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00190	next w
-	NEXT?BCL	_w, 001h, L00007
-	LABEL?L	L00008	
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00187	next w
+	NEXT?BCL	_w, 001h, L00005
+	LABEL?L	L00006	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00191	:contSendX1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00188	:contSendX1
 
 	LABEL?L	_contSendX1	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00192	num_byte=payloadLength
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00189	num_byte=payloadLength
 	MOVE?CB	_payloadLength, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00193	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00190	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00194	pauseus 500 'pause 500 us
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00191	pauseus 500 'pause 500 us
 	PAUSEUS?C	001F4h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00195	Ce=1 'CE=1 (toggle) transmit FIFO buffer
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00192	Ce=1 'CE=1 (toggle) transmit FIFO buffer
 	MOVE?CT	001h, _Ce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00196	Pauseus 500 'pause 500 us
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00193	Pauseus 500 'pause 500 us
 	PAUSEUS?C	001F4h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00197	Ce=0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00194	Ce=0
 	MOVE?CT	000h, _Ce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00198	Pause 1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00195	Pause 1
 	PAUSE?C	001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00199	trans_irq:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00196	trans_irq:
 
 	LABEL?L	_trans_irq	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00200	If Irq !=0 then trans_irq 'wait until IRQ, active low
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00197	If Irq !=0 then trans_irq 'wait until IRQ, active low
 	CMPNE?TCL	_Irq, 000h, _trans_irq
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00201	data_out[0]=Stat_us 'read status register
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00198	data_out[0]=Stat_us 'read status register
 	MOVE?CB	_Stat_us, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00202	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00199	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00203	gosub spi_read
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00200	gosub spi_read
 	GOSUB?L	_spi_read
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00204	val=data_in[0]&%01110000 'mask the IRQ bits STATUS byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00201	val=data_in[0]&%01110000 'mask the IRQ bits STATUS byte
 	AND?BCB	_data_in, 070h, _val
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00205	if (val = Max_rt) then gosub max_retry 'maximum TX retries
-	CMPNE?BCL	_val, _Max_rt, L00009
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00202	if (val = Max_rt) then gosub max_retry 'maximum TX retries
+	CMPNE?BCL	_val, _Max_rt, L00007
 	GOSUB?L	_max_retry
+	LABEL?L	L00007	
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00203	if (val = Tx_inter) then gosub tx_int 'Tx interrupted
+	CMPNE?BCL	_val, _Tx_inter, L00009
+	GOSUB?L	_tx_int
 	LABEL?L	L00009	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00206	if (val = Tx_inter) then gosub tx_int 'Tx interrupted
-	CMPNE?BCL	_val, _Tx_inter, L00011
-	GOSUB?L	_tx_int
-	LABEL?L	L00011	
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00207	data_out[0]=Write_reg+Stat_us
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00204	data_out[0]=Write_reg+Stat_us
 	MOVE?CB	027h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00208	data_out[1]=%00100000 'clear TX_DS IRQ bit
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00205	data_out[1]=%00100000 'clear TX_DS IRQ bit
 	MOVE?CB	020h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00209	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00206	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00210	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00207	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00211	gosub debounce
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00208	gosub debounce
 	GOSUB?L	_debounce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00212	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00209	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00215	debounce:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00212	debounce:
 
 	LABEL?L	_debounce	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00216	Ce=0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00213	Ce=0
 	MOVE?CT	000h, _Ce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00217	pauseus 500
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00214	pauseus 500
 	PAUSEUS?C	001F4h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00218	Ce=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00215	Ce=1
 	MOVE?CT	001h, _Ce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00219	pauseus 500
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00216	pauseus 500
 	PAUSEUS?C	001F4h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00220	Ce=0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00217	Ce=0
 	MOVE?CT	000h, _Ce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00221	pauseus 500
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00218	pauseus 500
 	PAUSEUS?C	001F4h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00222	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00219	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00224	spi_write:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00221	spi_write:
 
 	LABEL?L	_spi_write	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00225	CSN=0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00222	CSN=0
 	MOVE?CT	000h, _CSN
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00226	For w = 0 to num_byte 'loop for # byte
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00223	For w = 0 to num_byte 'loop for # byte
+	MOVE?CB	000h, _w
+	LABEL?L	L00011	
+	CMPGT?BBL	_w, _num_byte, L00012
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00224	SSPBUF=data_out[w] 'send array variable
+	AOUT?BBB	_data_out, _w, SSPBUF
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00225	GoSub buffer_ok 'wait until buffer ready
+	GOSUB?L	_buffer_ok
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00226	Next w 'next location
+	NEXT?BCL	_w, 001h, L00011
+	LABEL?L	L00012	
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00227	CSN=1
+	MOVE?CT	001h, _CSN
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00228	return
+	RETURN?	
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00230	spi_read:
+
+	LABEL?L	_spi_read	
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00231	CSN=0
+	MOVE?CT	000h, _CSN
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00232	For w = 0 to num_byte 'loop for # byte
 	MOVE?CB	000h, _w
 	LABEL?L	L00013	
 	CMPGT?BBL	_w, _num_byte, L00014
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00227	SSPBUF=data_out[w] 'send array variable
-	AOUT?BBB	_data_out, _w, SSPBUF
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00233	    SSPBUF = data_out[0] 'write to SSPBUF to start clock
+	MOVE?BB	_data_out, SSPBUF
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00228	GoSub buffer_ok 'wait until buffer ready
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00234	    GoSub buffer_ok 'wait for receipt
 	GOSUB?L	_buffer_ok
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00229	Next w 'next location
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00235	data_in[w] = SSPBUF 'store received character in array
+	AIN?BBB	SSPBUF, _data_in, _w
+
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00236	Next w 'get next byte
 	NEXT?BCL	_w, 001h, L00013
 	LABEL?L	L00014	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00230	CSN=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00237	CSN=1
 	MOVE?CT	001h, _CSN
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00231	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00238	Return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00233	spi_read:
-
-	LABEL?L	_spi_read	
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00234	CSN=0
-	MOVE?CT	000h, _CSN
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00235	For w = 0 to num_byte 'loop for # byte
-	MOVE?CB	000h, _w
-	LABEL?L	L00015	
-	CMPGT?BBL	_w, _num_byte, L00016
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00236	    SSPBUF = data_out[0] 'write to SSPBUF to start clock
-	MOVE?BB	_data_out, SSPBUF
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00237	    GoSub buffer_ok 'wait for receipt
-	GOSUB?L	_buffer_ok
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00238	data_in[w] = SSPBUF 'store received character in array
-	AIN?BBB	SSPBUF, _data_in, _w
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00239	Next w 'get next byte
-	NEXT?BCL	_w, 001h, L00015
-	LABEL?L	L00016	
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00240	CSN=1
-	MOVE?CT	001h, _CSN
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00241	Return
-	RETURN?	
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00242	buffer_ok:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00239	buffer_ok:
 
 	LABEL?L	_buffer_ok	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00243	IF SSPIF = 0 Then buffer_ok 'wait for SPI interupt flag
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00240	IF SSPIF = 0 Then buffer_ok 'wait for SPI interupt flag
 	CMPEQ?TCL	_SSPIF, 000h, _buffer_ok
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00244	SSPIF = 0 'reset flag
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00241	SSPIF = 0 'reset flag
 	MOVE?CT	000h, _SSPIF
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00245	Return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00242	Return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00247	max_retry:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00244	max_retry:
 
 	LABEL?L	_max_retry	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00248	data_out[0]=Flush_tx 'flush TX buffer
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00245	data_out[0]=Flush_tx 'flush TX buffer
 	MOVE?CB	_Flush_tx, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00249	num_byte=0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00246	num_byte=0
 	MOVE?CB	000h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00250	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00247	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00251	data_out[0]=Write_reg+Stat_us
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00248	data_out[0]=Write_reg+Stat_us
 	MOVE?CB	027h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00252	data_out[1]=%00010000 'clear MAX_RT IRQ bit
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00249	data_out[1]=%00010000 'clear MAX_RT IRQ bit
 	MOVE?CB	010h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00253	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00250	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00254	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00251	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00255	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00252	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00257	tx_int:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00254	tx_int:
 
 	LABEL?L	_tx_int	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00258	data_out[0]=Flush_tx 'flush TX buffer
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00255	data_out[0]=Flush_tx 'flush TX buffer
 	MOVE?CB	_Flush_tx, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00259	num_byte=0
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00256	num_byte=0
 	MOVE?CB	000h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00260	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00257	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00261	data_out[0]=Write_reg+Stat_us
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00258	data_out[0]=Write_reg+Stat_us
 	MOVE?CB	027h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00262	data_out[1]=%00110000 'clear TX_DS & MAX_RT IRQ bit
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00259	data_out[1]=%00110000 'clear TX_DS & MAX_RT IRQ bit
 	MOVE?CB	030h, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00263	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00260	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00264	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00261	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00265	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00262	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00267	setup_rx:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00264	setup_rx:
 
 	LABEL?L	_setup_rx	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00268	GOSUB debounce
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00265	gosub debounce
 	GOSUB?L	_debounce
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00269	data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00266	data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
 	MOVE?CB	020h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00270	data_out[1]=$0F
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00267	data_out[1]=$0F
 	MOVE?CB	00Fh, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00271	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00268	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00272	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00269	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00273	GOSUB debounce
-	GOSUB?L	_debounce
-
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00274	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00271	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00276	setup_sleep:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00273	setup_sleep:
 
 	LABEL?L	_setup_sleep	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00277	data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=0, CRC=2, enabled
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00274	data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=0, CRC=2, enabled
 	MOVE?CB	020h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00278	data_out[1]=%00001101
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00275	data_out[1]=%00001101
 	MOVE?CB	00Dh, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00279	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00276	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00280	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00277	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00281	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00278	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00283	setup_tx:
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00280	setup_tx:
 
 	LABEL?L	_setup_tx	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00284	data_out[0]=Write_reg+Tx_addr 'Tx address
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00281	data_out[0]=Write_reg+Tx_addr 'Tx address
 	MOVE?CB	030h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00285	gosub setTxAddressPipe
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00282	gosub setTxAddressPipe
 	GOSUB?L	_setTxAddressPipe
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00286	num_byte=5
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00283	num_byte=5
 	MOVE?CB	005h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00287	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00284	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00288	data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00285	data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
 	MOVE?CB	024h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00289	data_out[1]= %00110101 '3x re-transmit (default)
-	MOVE?CB	035h, _data_out + 00001h
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00286	data_out[1]= %00011111 '15x re-transmit (default)
+	MOVE?CB	01Fh, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00290	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00287	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00291	Gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00288	Gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00292	data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00289	data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled
 	MOVE?CB	020h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00293	data_out[1]=$0E
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00290	data_out[1]=$0E
 	MOVE?CB	00Eh, _data_out + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00294	num_byte=1
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00291	num_byte=1
 	MOVE?CB	001h, _num_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00295	gosub spi_write
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00292	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00296	return
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00293	return
 	RETURN?	
 
-; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM70.PBP	00297	:endRFM70
+; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\RFM73.PBP	00294	:endRFM73
 
-	LABEL?L	_endRFM70	
+	LABEL?L	_endRFM73	
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00020	 DEFINE OSC 8
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00021	 DEFINE ADC_BITS 10
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00022	 DEFINE ADC_CLOCK 3 ' ADC clock source (Fosc/32)
@@ -1233,11 +1203,11 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00085	if (sleep_period != 0) then
 	ICALL?L	L00001
-	CMPEQ?WCL	_sleep_period, 000h, L00017
+	CMPEQ?WCL	_sleep_period, 000h, L00015
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00086	    if (device_id != 0) then
 	ICALL?L	L00001
-	CMPEQ?BCL	_device_id, 000h, L00019
+	CMPEQ?BCL	_device_id, 000h, L00017
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00087	        sleepMode = 1
 	ICALL?L	L00001
@@ -1249,11 +1219,11 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00089	    endif
 	ICALL?L	L00001
-	LABEL?L	L00019	
+	LABEL?L	L00017	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00090	endif
 	ICALL?L	L00001
-	LABEL?L	L00017	
+	LABEL?L	L00015	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00091	low HEATING_SENSOR_POWER
 	ICALL?L	L00001
@@ -1289,7 +1259,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00101	if RESET_BUTTON_FLAG == 1 then
 	ICALL?L	L00001
-	CMPNE?BCL	_RESET_BUTTON_FLAG, 001h, L00021
+	CMPNE?BCL	_RESET_BUTTON_FLAG, 001h, L00019
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00102	    RESET_BUTTON_FLAG = 0
 	ICALL?L	L00001
@@ -1359,15 +1329,15 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00119	endif
 	ICALL?L	L00001
-	LABEL?L	L00021	
+	LABEL?L	L00019	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00121	if (temp_data[0] != 0) then
 	ICALL?L	L00001
-	CMPEQ?BCL	_temp_data, 000h, L00023
+	CMPEQ?BCL	_temp_data, 000h, L00021
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00122	    if (configure == 1) then
 	ICALL?L	L00001
-	CMPNE?BCL	_configure, 001h, L00025
+	CMPNE?BCL	_configure, 001h, L00023
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00123	        gosub commonRXTX
 	ICALL?L	L00001
@@ -1379,7 +1349,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00125	    endif
 	ICALL?L	L00001
-	LABEL?L	L00025	
+	LABEL?L	L00023	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00126	    gosub sendData
 	ICALL?L	L00001
@@ -1395,11 +1365,11 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00129	endif
 	ICALL?L	L00001
-	LABEL?L	L00023	
+	LABEL?L	L00021	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00130	if (sleepMode == 1) then    
 	ICALL?L	L00001
-	CMPNE?BCL	_sleepMode, 001h, L00027
+	CMPNE?BCL	_sleepMode, 001h, L00025
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00131	      gosub setup_sleep
 	ICALL?L	L00001
@@ -1443,7 +1413,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00141	endif
 	ICALL?L	L00001
-	LABEL?L	L00027	
+	LABEL?L	L00025	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00142	If Irq !=0 then irqLoop 'wait until IRQ, active low
 	ICALL?L	L00001
@@ -1475,21 +1445,21 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00149	if (data_in[1] == device_id) then
 	ICALL?L	L00001
-	CMPNE?BBL	_data_in + 00001h, _device_id, L00029
+	CMPNE?BBL	_data_in + 00001h, _device_id, L00027
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00150	    if (data_in[2] == "c") then    
 	ICALL?L	L00001
-	CMPNE?BCL	_data_in + 00002h, 063h, L00031
+	CMPNE?BCL	_data_in + 00002h, 063h, L00029
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00151	        if (data_in[3] == "=") then
 	ICALL?L	L00001
-	CMPNE?BCL	_data_in + 00003h, 03Dh, L00033
+	CMPNE?BCL	_data_in + 00003h, 03Dh, L00031
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00153	            for i = 0 to 10
 	ICALL?L	L00001
 	MOVE?CB	000h, _i
-	LABEL?L	L00035	
-	CMPGT?BCL	_i, 00Ah, L00036
+	LABEL?L	L00033	
+	CMPGT?BCL	_i, 00Ah, L00034
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00154	                disable
 	DISABLE?	
@@ -1505,8 +1475,8 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00157	            next i
 	ICALL?L	L00001
-	NEXT?BCL	_i, 001h, L00035
-	LABEL?L	L00036	
+	NEXT?BCL	_i, 001h, L00033
+	LABEL?L	L00034	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00158	            read 10, device_id
 	ICALL?L	L00001
@@ -1523,7 +1493,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00161	            if (sleep_period == 0) then 
 	ICALL?L	L00001
-	CMPNE?WCL	_sleep_period, 000h, L00037
+	CMPNE?WCL	_sleep_period, 000h, L00035
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00162	                sleepMode = 0                
 	ICALL?L	L00001
@@ -1531,8 +1501,8 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00163	            else
 	ICALL?L	L00001
-	GOTO?L	L00038
-	LABEL?L	L00037	
+	GOTO?L	L00036
+	LABEL?L	L00035	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00164	                sleepMode = 1
 	ICALL?L	L00001
@@ -1540,7 +1510,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00165	            endif
 	ICALL?L	L00001
-	LABEL?L	L00038	
+	LABEL?L	L00036	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00166	            gosub sendDataOK
 	ICALL?L	L00001
@@ -1548,17 +1518,17 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00167	        endif
 	ICALL?L	L00001
-	LABEL?L	L00033	
+	LABEL?L	L00031	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00168	    ELSEif (data_in[2] == "m") then    
 	ICALL?L	L00001
-	GOTO?L	L00032
-	LABEL?L	L00031	
-	CMPNE?BCL	_data_in + 00002h, 06Dh, L00039
+	GOTO?L	L00030
+	LABEL?L	L00029	
+	CMPNE?BCL	_data_in + 00002h, 06Dh, L00037
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00169	        if (data_in[3] == "=") then
 	ICALL?L	L00001
-	CMPNE?BCL	_data_in + 00003h, 03Dh, L00041
+	CMPNE?BCL	_data_in + 00003h, 03Dh, L00039
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00170	            I=4
 	ICALL?L	L00001
@@ -1570,7 +1540,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00172	            if (conversionSuccess = 1) then
 	ICALL?L	L00001
-	CMPNE?BCL	_conversionSuccess, 001h, L00043
+	CMPNE?BCL	_conversionSuccess, 001h, L00041
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00173	                disable
 	DISABLE?	
@@ -1588,7 +1558,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00177	                if (sleep_period == 0) then 
 	ICALL?L	L00001
-	CMPNE?WCL	_sleep_period, 000h, L00045
+	CMPNE?WCL	_sleep_period, 000h, L00043
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00178	                    sleepMode = 0                
 	ICALL?L	L00001
@@ -1596,12 +1566,12 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00179	                else
 	ICALL?L	L00001
-	GOTO?L	L00046
-	LABEL?L	L00045	
+	GOTO?L	L00044
+	LABEL?L	L00043	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00180	                    if (device_id != 0) then
 	ICALL?L	L00001
-	CMPEQ?BCL	_device_id, 000h, L00047
+	CMPEQ?BCL	_device_id, 000h, L00045
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00181	                        sleepMode = 1
 	ICALL?L	L00001
@@ -1609,8 +1579,8 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00182	                    else
 	ICALL?L	L00001
-	GOTO?L	L00048
-	LABEL?L	L00047	
+	GOTO?L	L00046
+	LABEL?L	L00045	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00183	                        sleepMode = 0
 	ICALL?L	L00001
@@ -1618,11 +1588,11 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00184	                    endif
 	ICALL?L	L00001
-	LABEL?L	L00048	
+	LABEL?L	L00046	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00185	                endif
 	ICALL?L	L00001
-	LABEL?L	L00046	
+	LABEL?L	L00044	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00186	                gosub sendDataOK
 	ICALL?L	L00001
@@ -1630,17 +1600,17 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00187	            endif
 	ICALL?L	L00001
-	LABEL?L	L00043	
+	LABEL?L	L00041	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00188	        ENDIF
 	ICALL?L	L00001
-	LABEL?L	L00041	
+	LABEL?L	L00039	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00189	    ELSEif (data_in[2] == "s") then    
 	ICALL?L	L00001
-	GOTO?L	L00032
-	LABEL?L	L00039	
-	CMPNE?BCL	_data_in + 00002h, 073h, L00049
+	GOTO?L	L00030
+	LABEL?L	L00037	
+	CMPNE?BCL	_data_in + 00002h, 073h, L00047
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00190	            gosub sendTemperature
 	ICALL?L	L00001
@@ -1648,13 +1618,13 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00191	    elseif (data_in[2] == "p") then
 	ICALL?L	L00001
-	GOTO?L	L00032
-	LABEL?L	L00049	
-	CMPNE?BCL	_data_in + 00002h, 070h, L00051
+	GOTO?L	L00030
+	LABEL?L	L00047	
+	CMPNE?BCL	_data_in + 00002h, 070h, L00049
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00192	            if (data_in[3] == "n") then
 	ICALL?L	L00001
-	CMPNE?BCL	_data_in + 00003h, 06Eh, L00053
+	CMPNE?BCL	_data_in + 00003h, 06Eh, L00051
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00193	                gosub sendDataOK
 	ICALL?L	L00001
@@ -1662,16 +1632,16 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00194	            endif
 	ICALL?L	L00001
-	LABEL?L	L00053	
+	LABEL?L	L00051	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00195	    endif
 	ICALL?L	L00001
-	LABEL?L	L00032	
-	LABEL?L	L00051	
+	LABEL?L	L00030	
+	LABEL?L	L00049	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00196	    if (temp_data[0] == 0) then
 	ICALL?L	L00001
-	CMPNE?BCL	_temp_data, 000h, L00055
+	CMPNE?BCL	_temp_data, 000h, L00053
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00197	        temp_data[0] = "E"
 	ICALL?L	L00001
@@ -1703,11 +1673,11 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00204	    endif
 	ICALL?L	L00001
-	LABEL?L	L00055	
+	LABEL?L	L00053	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00205	endif
 	ICALL?L	L00001
-	LABEL?L	L00029	
+	LABEL?L	L00027	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00207	data_out[0]=Fifo_status 'Read FIFO status
 	ICALL?L	L00001
@@ -1765,7 +1735,7 @@ _Fifo_status     		EQU	00017h
 	LABEL?L	_intManagement	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00222	        if (INTCON.2 == 1) then
-	CMPNE?TCL	_INTCON??2, 001h, L00057
+	CMPNE?TCL	_INTCON??2, 001h, L00055
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00223	           ticks = ticks + 1      ' Count pieces of seconds
 	ADD?BCB	_ticks, 001h, _ticks
@@ -1786,19 +1756,19 @@ _Fifo_status     		EQU	00017h
 	MOVE?CB	000h, _seconds
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00229	           if (sleep_period != 0) then
-	CMPEQ?WCL	_sleep_period, 000h, L00059
+	CMPEQ?WCL	_sleep_period, 000h, L00057
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00230	               if (device_id != 0) then
-	CMPEQ?BCL	_device_id, 000h, L00061
+	CMPEQ?BCL	_device_id, 000h, L00059
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00231	                   sleepMode = 1
 	MOVE?CB	001h, _sleepMode
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00232	               endif
-	LABEL?L	L00061	
+	LABEL?L	L00059	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00233	           endif
-	LABEL?L	L00059	
+	LABEL?L	L00057	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00234	           tiexit: 
 
@@ -1808,10 +1778,10 @@ _Fifo_status     		EQU	00017h
 	MOVE?CT	000h, _INTCON??2
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00236	        endif
-	LABEL?L	L00057	
+	LABEL?L	L00055	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00237	        if (INTCON.0 == 1) then
-	CMPNE?TCL	_INTCON??0, 001h, L00063
+	CMPNE?TCL	_INTCON??0, 001h, L00061
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00238	           INTCON.0 = 0
 	MOVE?CT	000h, _INTCON??0
@@ -1820,7 +1790,7 @@ _Fifo_status     		EQU	00017h
 	MOVE?CB	001h, _RESET_BUTTON_FLAG
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00240	        endif
-	LABEL?L	L00063	
+	LABEL?L	L00061	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00241	        INTCON.7 = 1
 	MOVE?CT	001h, _INTCON??7
@@ -1870,8 +1840,8 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00255	    for ci=0 to 2    
 	ICALL?L	L00001
 	MOVE?CB	000h, _ci
-	LABEL?L	L00065	
-	CMPGT?BCL	_ci, 002h, L00066
+	LABEL?L	L00063	
+	CMPGT?BCL	_ci, 002h, L00064
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00256	        TEMP1_BYTE = "a"
 	ICALL?L	L00001
@@ -1883,9 +1853,9 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00258	        if (TEMP2_BYTE == "|") then return
 	ICALL?L	L00001
-	CMPNE?BCL	_temp2_byte, 07Ch, L00067
+	CMPNE?BCL	_temp2_byte, 07Ch, L00065
 	RETURN?	
-	LABEL?L	L00067	
+	LABEL?L	L00065	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00259	        GOSUB lookupChar
 	ICALL?L	L00001
@@ -1893,13 +1863,13 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00260	        if (TEMP1_BYTE == "a") then return 
 	ICALL?L	L00001
-	CMPNE?BCL	_temp1_byte, 061h, L00069
+	CMPNE?BCL	_temp1_byte, 061h, L00067
 	RETURN?	
-	LABEL?L	L00069	
+	LABEL?L	L00067	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00261	        if (ci==0) then 
 	ICALL?L	L00001
-	CMPNE?BCL	_ci, 000h, L00071
+	CMPNE?BCL	_ci, 000h, L00069
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00262	            TEMP_BYTE = TEMP1_BYTE
 	ICALL?L	L00001
@@ -1911,8 +1881,8 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00264	        else 
 	ICALL?L	L00001
-	GOTO?L	L00072
-	LABEL?L	L00071	
+	GOTO?L	L00070
+	LABEL?L	L00069	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00265	            TEMP_BYTE = TEMP_BYTE*10 + TEMP1_BYTE
 	ICALL?L	L00001
@@ -1925,7 +1895,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00267	        endif
 	ICALL?L	L00001
-	LABEL?L	L00072	
+	LABEL?L	L00070	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00268	        i = i + 1
 	ICALL?L	L00001
@@ -1933,8 +1903,8 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00269	    next ci
 	ICALL?L	L00001
-	NEXT?BCL	_ci, 001h, L00065
-	LABEL?L	L00066	
+	NEXT?BCL	_ci, 001h, L00063
+	LABEL?L	L00064	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00270	return
 	ICALL?L	L00001
@@ -2020,9 +1990,9 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00289	   IF Busy = 0 THEN goto Wait_Up            'Still busy..?, Wait_Up..!
 	ICALL?L	L00001
-	CMPNE?TCL	_busy, 000h, L00073
+	CMPNE?TCL	_busy, 000h, L00071
 	GOTO?L	_Wait_Up
-	LABEL?L	L00073	
+	LABEL?L	L00071	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00290	   OWOUT HEATING_SENSOR, 1, [$CC, $BE] 'Skip ROM search & read scratchpad memory
 	ICALL?L	L00001
@@ -2054,7 +2024,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00295	   if (temperature.11 = 1) then
 	ICALL?L	L00001
-	CMPNE?TCL	_temperature??11, 001h, L00075
+	CMPNE?TCL	_temperature??11, 001h, L00073
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00296	        temp_data[2] = "-"
 	ICALL?L	L00001
@@ -2100,8 +2070,8 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00306	   else
 	ICALL?L	L00001
-	GOTO?L	L00076
-	LABEL?L	L00075	
+	GOTO?L	L00074
+	LABEL?L	L00073	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00307	        temp_data[2] = "+"
 	ICALL?L	L00001
@@ -2155,7 +2125,7 @@ _Fifo_status     		EQU	00017h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00319	   endif
 	ICALL?L	L00001
-	LABEL?L	L00076	
+	LABEL?L	L00074	
 
 ; C:\RH\PRIVATE\HARDWARE\MICROCHIPSOURCES\TEMPER~1.PBP	00321	        VRCON.4 = 1 ; Turn 0.6V reference ON
 	ICALL?L	L00001

@@ -17,7 +17,7 @@
 '13 temperature - it is temperature / 2
 '14 manual control
 
-INCLUDE "RFM70.pbp"
+INCLUDE "RFM73.pbp"
 
 EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,12,44,0]
 
