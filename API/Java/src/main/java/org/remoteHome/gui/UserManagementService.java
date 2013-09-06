@@ -29,120 +29,16 @@ public class UserManagementService extends AbstractWebService {
         String logout = requestParameters.get("logout");
         String loadUsers = requestParameters.get("loadUsers");
         String authorize = requestParameters.get("authorize");
+        OutputStream oo = o;
+        HttpExchange tt = t;
 
         boolean isLoggedOn = false;
         if (logon != null && logon.equals("true")) {
-            String userName = requestParameters.get("userName");
-            String password = requestParameters.get("userPassword");
-            Headers reqHeaders = t.getRequestHeaders();
-            String session = null;
-            if (!reqHeaders.containsKey("Cookie")) {
-                sendAjaxAnswer("Something went wrong.");
-            } else {
-                List<String> cookies = reqHeaders.get("Cookie");
-                session = (cookies.get(0) != null) ? cookies.get(0) : null;
-            }
-            if (userName != null && !"".equals(userName)
-                    && password != null && !"".equals(password)) {
-                UserManagement ums = r.getPersistance().loadUserManagement();
-                List<User> newList = ums.getUsers();
-                if (ums != null && ums.getUsers().size() > 0) {
-                    for (User u : ums.getUsers()) {
-                        if ((userName.equals(u.getUserName())
-                                && password.equals(u.getPassword()))) {
-                            if (!u.isLoggedOn()) {
-                                isLoggedOn = true;
-                                u.setLoggedOn(true);
-                                u.setHttpSession(session);
-                                break;
-                            } else {
-                                User uu = new User(1, u.getUserName(), u.getPassword(), u.getGroup(), true, session);
-                                isLoggedOn = true;
-                                newList.add(uu);
-                                break;
-                            }
-                        }
-                    }
-                    if (isLoggedOn) {
-                        ums.setUsers(newList);
-                        r.getPersistance().saveUserManagement(ums);
-                        sendAjaxAnswer("TRUE");
-                    } else {
-                        sendAjaxAnswer("FALSE");
-                    }
-                } else {
-                    sendAjaxAnswer("UserManagement not correctly saved.");
-                }
-            } else {
-                sendAjaxAnswer("Something went wrong.");
-            }
+            logon(oo, tt);
         } else if (recover != null && recover.equals("true")) {
-            String userEmail = requestParameters.get("userEmail");
-            UserManagement ums = r.getPersistance().loadUserManagement();
-            List<User> newList = new ArrayList<User>();
-            boolean hasChanged = false;
-            String newPassword = null;
-            User u = null;
-            if (ums != null && ums.getUsers().size() > 0) {
-                if(userEmail != null && !userEmail.equals("")) {
-                    for (User user : ums.getUsers()) {
-                        if (user.getEmail().equals(userEmail)) {
-                            hasChanged = true;
-                            newPassword = Long.toHexString(Double.doubleToLongBits(Math.random()));
-                            user.setPassword(UserManagement.computeSha1OfString(newPassword));
-                            u = user;
-                        }
-                        newList.add(user);
-                    }
-                    if (hasChanged) {
-                        if (u.getSmtpConfig() != null) {
-                            ums.setUsers(newList);
-                            r.getPersistance().saveUserManagement(ums);
-                            Mail mail = new Mail();
-                            mail.setFrom("remote-home@systemmanagement.com");
-                            mail.setTo(u.getEmail());
-                            mail.setSubject("New password");
-                            mail.setMessage("Your new password is: " + newPassword);
-                            Mailer mailer = new Mailer();
-                            try {
-                                mailer.sendEmail(mail, u.getSmtpConfig());
-                            } catch (MessagingException e) {
-                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                sendAjaxAnswer("FALSE");
-                            }
-                            sendAjaxAnswer("TRUE");
-                        } else {
-                            sendAjaxAnswer("SMTP_FALSE");
-                        }
-                    } else {
-                        sendAjaxAnswer("FALSE");
-                    }
-                } else {
-                    sendAjaxAnswer("FALSE");
-                }
-            }
+            recover(oo, tt);
         } else if (logout != null && logout.equals("true")) {
-            UserManagement ums = r.getPersistance().loadUserManagement();
-            List<User> newList = new ArrayList<User>();
-            Headers reqHeaders = t.getRequestHeaders();
-            Headers respHeaders = t.getResponseHeaders();
-            List<String> cookies = reqHeaders.get("Cookie");
-            String session = (cookies.get(0) != null) ? cookies.get(0) : null;
-            if (reqHeaders.containsKey("Cookie")) {
-                respHeaders.remove("Cookie");
-            }
-            if (ums != null && ums.getUsers().size() > 0) {
-                for (User user : ums.getUsers()) {
-                    if (user.getHttpSession().equals(session)) {
-                        //User u = new User(1, user.getUserName(), user.getPassword(), user.getGroup(), true, "");
-                        user.setLoggedOn(false);
-                    }
-                    newList.add(user);
-                }
-                ums.setUsers(newList);
-                r.getPersistance().saveUserManagement(ums);
-            }
-            sendAjaxAnswer("TRUE");
+            logout(oo, tt);
         } else if (loadUsers != null && loadUsers.equals("true")) {
             UserManagement ums = r.getPersistance().loadUserManagement();
             sendAjaxAnswer(AbstractDevice.generateJsonData(ums.getUsers()));
@@ -160,6 +56,124 @@ public class UserManagementService extends AbstractWebService {
                 }
             }
             sendAjaxAnswer(group);
+        }
+    }
+
+    private void logon(OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException {
+        boolean isLoggedOn = false;
+        String userName = requestParameters.get("userName");
+        String password = requestParameters.get("userPassword");
+        Headers reqHeaders = t.getRequestHeaders();
+        String session = null;
+        if (!reqHeaders.containsKey("Cookie")) {
+            sendAjaxAnswer("No cookie found. Does your browser allows cookie?");
+        } else {
+            List<String> cookies = reqHeaders.get("Cookie");
+            session = (cookies.get(0) != null) ? cookies.get(0) : null;
+        }
+        if (userName != null && !"".equals(userName)
+                && password != null && !"".equals(password)) {
+            UserManagement ums = r.getPersistance().loadUserManagement();
+            List<User> newList = ums.getUsers();
+            if (ums != null && ums.getUsers().size() > 0) {
+                for (User u : ums.getUsers()) {
+                    if ((userName.equals(u.getUserName())
+                            && password.equals(u.getPassword()))) {
+                        if (!u.isLoggedOn()) {
+                            isLoggedOn = true;
+                            u.setLoggedOn(true);
+                            u.setHttpSession(session);
+                            break;
+                        } else {
+                            User uu = new User(1, u.getUserName(), u.getPassword(), u.getGroup(), true, session);
+                            isLoggedOn = true;
+                            newList.add(uu);
+                            break;
+                        }
+                    }
+                }
+                if (isLoggedOn) {
+                    ums.setUsers(newList);
+                    r.getPersistance().saveUserManagement(ums);
+                    sendAjaxAnswer("TRUE");
+                } else {
+                    sendAjaxAnswer("FALSE");
+                }
+            } else {
+                sendAjaxAnswer("UserManagement not correctly saved.");
+            }
+        } else {
+            sendAjaxAnswer("Something went wrong.");
+        }
+    }
+
+    private void logout(OutputStream oo, HttpExchange tt) throws IOException, RemoteHomeManagerException {
+        UserManagement ums = r.getPersistance().loadUserManagement();
+        List<User> newList = new ArrayList<User>();
+        Headers reqHeaders = t.getRequestHeaders();
+        Headers respHeaders = t.getResponseHeaders();
+        List<String> cookies = reqHeaders.get("Cookie");
+        String session = (cookies.get(0) != null) ? cookies.get(0) : null;
+        if (reqHeaders.containsKey("Cookie")) {
+            respHeaders.remove("Cookie");
+        }
+        if (ums != null && ums.getUsers().size() > 0) {
+            for (User user : ums.getUsers()) {
+                if (user.getHttpSession().equals(session)) {
+                    user.setLoggedOn(false);
+                }
+                newList.add(user);
+            }
+            ums.setUsers(newList);
+            r.getPersistance().saveUserManagement(ums);
+        }
+        sendAjaxAnswer("TRUE");
+    }
+
+    private void recover(OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException {
+        String userEmail = requestParameters.get("userEmail");
+        UserManagement ums = r.getPersistance().loadUserManagement();
+        List<User> newList = new ArrayList<User>();
+        boolean hasChanged = false;
+        String newPassword = null;
+        User u = null;
+        if (ums != null && ums.getUsers().size() > 0) {
+            if(userEmail != null && !userEmail.equals("")) {
+                for (User user : ums.getUsers()) {
+                    if (user.getEmail().equals(userEmail)) {
+                        hasChanged = true;
+                        newPassword = Long.toHexString(Double.doubleToLongBits(Math.random()));
+                        user.setPassword(UserManagement.computeSha1OfString(newPassword));
+                        u = user;
+                    }
+                    newList.add(user);
+                }
+                if (hasChanged) {
+                    if (u.getSmtpConfig() != null) {
+                        ums.setUsers(newList);
+                        r.getPersistance().saveUserManagement(ums);
+                        Mail mail = new Mail();
+                        mail.setFrom("remote-home@systemmanagement.com");
+                        mail.setTo(u.getEmail());
+                        mail.setSubject("New password");
+                        mail.setMessage("Your new password is: " + newPassword);
+                        Mailer mailer = new Mailer();
+                        try {
+                            mailer.sendEmail(mail, u.getSmtpConfig());
+                        } catch (MessagingException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            sendAjaxAnswer("FALSE");
+                        }
+                        sendAjaxAnswer("TRUE");
+                    } else {
+                        sendAjaxAnswer("SMTP_FALSE");
+                    }
+                } else {
+                    sendAjaxAnswer("FALSE");
+                }
+            } else {
+                sendAjaxAnswer("FALSE");
+            }
         }
     }
 }
