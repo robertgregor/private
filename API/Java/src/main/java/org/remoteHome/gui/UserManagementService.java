@@ -133,9 +133,11 @@ public class UserManagementService extends AbstractWebService {
             }
             if (ums != null && ums.getUsers().size() > 0) {
                 for (User user : ums.getUsers()) {
-                    if (!user.getHttpSession().equals(session)) {
-                        newList.add(user);
+                    if (user.getHttpSession().equals(session)) {
+                        //User u = new User(1, user.getUserName(), user.getPassword(), user.getGroup(), true, "");
+                        user.setLoggedOn(false);
                     }
+                    newList.add(user);
                 }
                 ums.setUsers(newList);
                 r.getPersistance().saveUserManagement(ums);
