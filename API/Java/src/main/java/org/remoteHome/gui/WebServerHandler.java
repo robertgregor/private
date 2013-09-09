@@ -124,6 +124,12 @@ public class WebServerHandler implements HttpHandler {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Headers headers = t.getResponseHeaders();
+            headers.add("Content-Type", "text/html");
+            headers.add("Cache-Control", "no-cache");
+            t.sendResponseHeaders(500, e.getMessage().length());
+            out.write(e.getMessage().getBytes());
+            out.flush();
         } finally {
             try {
                 out.close();

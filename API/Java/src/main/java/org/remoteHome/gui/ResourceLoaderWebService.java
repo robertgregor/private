@@ -32,6 +32,7 @@ public class ResourceLoaderWebService extends AbstractWebService {
     }
     
     public synchronized void processRequest(OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException {
+      try {
         DataInputStream br = new DataInputStream(this.getClass().getClassLoader().getResourceAsStream(name));
         ByteArrayOutputStream out = new ByteArrayOutputStream();        
         byte[] buffer = new byte[65535];
@@ -74,6 +75,9 @@ public class ResourceLoaderWebService extends AbstractWebService {
         t.sendResponseHeaders(200, result.length);
         o.write(result);
         o.flush();
+      } catch (NullPointerException e) {
+          throw new IOException("Resource cannot be loaded.");
+      }
     }
     private String getContentType(String name) throws IOException {
         if (mimeTypes == null) {
