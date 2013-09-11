@@ -139,7 +139,8 @@ if (data_in[1] == device_id) then
             configure = 1
             gosub sendDataOK
         endif
-    elseif (data_in[2] == "b") then
+    else
+     if (data_in[2] == "b") then
         if (data_in[3] == "t") then
             if (data_in[4] == "=") then
                 i = 5
@@ -152,24 +153,28 @@ if (data_in[1] == device_id) then
                      gosub sendDataOK
                 endif                                   
             endif
-        elseif (timeout_value == 0) then
+        else
+         if (timeout_value == 0) then
             'timeout not set send error
-        elseif (data_in[3] == "d") then
+         else
+          if (data_in[3] == "d") then
             counter = timeout_value
             initialcounter = counter
             gosub blindsDown
             initialPercent = currentCounter
             currentCounter = 100
             gosub sendDataOK
-        elseif (data_in[3] == "u") then
+          else
+           if (data_in[3] == "u") then
             counter = timeout_value
             initialCounter = counter
             gosub blindsup
             initialPercent = currentCounter            
             currentCounter = 0
             gosub sendDataOK
-        elseif (data_in[3] == "m") then
-            if (data_in[4] == "=") then
+           else
+            if (data_in[3] == "m") then
+             if (data_in[4] == "=") then
                 i = 5
                 gosub convertInputData
                 if (conversionSuccess == 1) then
@@ -177,7 +182,8 @@ if (data_in[1] == device_id) then
                     if (temp_byte == currentCounter) then
                         gosub sendDataOK
                         counter = 4
-                    elseif (temp_byte > currentCounter) then
+                    else
+                     if (temp_byte > currentCounter) then
                         temp2_byte = temp_byte - currentCounter
                         initialPercent = currentCounter
                         gosub computeCounter
@@ -185,7 +191,7 @@ if (data_in[1] == device_id) then
                         gosub blindsDown
                         currentCounter = temp_byte
                         gosub sendDataOK
-                    else
+                     else
                         temp2_byte = currentCounter - temp_byte
                         initialPercent = currentCounter
                         gosub computeCounter
@@ -193,12 +199,14 @@ if (data_in[1] == device_id) then
                         gosub blindsUp
                         currentCounter = temp_byte
                         gosub sendDataOK
+                     endif
                     endif
                   endif  
                 endif                                                   
-            endif
-        elseif (data_in[3] == "s") then
-            if (currentDirection != 0) then
+             endif
+            else
+             if (data_in[3] == "s") then
+              if (currentDirection != 0) then
                 temp_word = initialCounter - counter
                 disable
                 temp_word = temp_word * 100
@@ -208,21 +216,29 @@ if (data_in[1] == device_id) then
                     temp3_word = initialPercent + temp2_word
                     if (temp3_word > 100 ) then temp3_word = 100
                     currentCounter = temp3_word
-                elseif (currentDirection == 2) then
+                else
+                 if (currentDirection == 2) then
                     if (initialPercent > temp2_word) then
                         currentCounter = initialPercent - temp2_word
                     else
                         currentCounter = 0
                     endif
+                 endif
                 endif
                 gosub sendDataOK
                 counter = 4
-            else
+              else
                 gosub sendDataOK            
                 counter = 4
+              endif
+             endif
             endif
+           endif
+          endif
+         endif
         endif
-    elseif (data_in[2] == "s") then
+     else
+      if (data_in[2] == "s") then
             temp_data[0] = "5"
             temp_data[1] = "|"
             temp_data[2] = RELAY_DOWN + $30
@@ -243,19 +259,29 @@ if (data_in[1] == device_id) then
             temp_data[12] = temp1_byte
             temp_data[13] = 13    
             temp_data[14] = 10    
-    elseif (data_in[2] == "p") then
+      else
+       if (data_in[2] == "p") then
             if (data_in[3] == "n") then
                 gosub sendDataOK
             endif
-    elseif (data_in[2] == "u") then
-        gosub blindsUp
-        gosub sendDataOK        
-    elseif (data_in[2] == "d") then
-        gosub blindsDown
-        gosub sendDataOK
-    elseif (data_in[2] == "e") then
-        gosub stopBlindsSilent
-        gosub sendDataOK
+       else
+        if (data_in[2] == "u") then
+         gosub blindsUp
+         gosub sendDataOK        
+        else
+         if (data_in[2] == "d") then
+          gosub blindsDown
+          gosub sendDataOK
+         else
+          if (data_in[2] == "e") then
+           gosub stopBlindsSilent
+           gosub sendDataOK
+          endif
+         endif
+        endif
+       endif
+      endif
+     endif
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"

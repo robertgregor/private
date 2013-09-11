@@ -168,7 +168,8 @@ if (data_in[1] == device_id) then
             configure = 1
             gosub sendDataOK
         endif
-    elseif (data_in[2] == "l") then
+    else
+     if (data_in[2] == "l") then
         I = 3
         gosub convertInputData
         if (conversionSuccess == 1) then
@@ -200,7 +201,8 @@ if (data_in[1] == device_id) then
                                 endif
                             endif
                         endif                
-                    elseif (data_in[4] == "o") then
+                    else
+                     if (data_in[4] == "o") then
                         if (data_in[5] == "f") then
                             read 10+(temp4_byte*2), lcounter[temp4_byte]
                             if (lcounter[temp4_byte] == 1) then
@@ -215,15 +217,19 @@ if (data_in[1] == device_id) then
                             lcounter[temp4_byte] = 0
                             gosub sendDataOK
                         endif
-                    elseif (data_in[4] == "f") then
+                     else
+                      if (data_in[4] == "f") then
                         temp_byte = temp4_byte
                         gosub switchOffRelay
                         gosub sendDataOK
+                      endif
+                     endif
                     endif
                 endif
             endif
         endif        
-    elseif (data_in[2] == "s") then
+     else
+      if (data_in[2] == "s") then
         I = 3
         gosub convertInputData
         if (conversionSuccess == 1) then
@@ -259,10 +265,14 @@ if (data_in[1] == device_id) then
                 endif
             endif
         endif
-    elseif (data_in[2] == "p") then
+      else
+       if (data_in[2] == "p") then
         if (data_in[3] == "n") then
             gosub sendDataOK
         endif
+       endif
+      endif
+     endif
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"

@@ -167,21 +167,27 @@ if (temp_data[0] != 0) then
 endif
 if (mode == 2) then
     if (seconds > 2) then
-        'OK, if the expected temperature is set set the head
+      'OK, if the expected temperature is set set the head
       if (temperatureExp != 0) then
          if (temperature.11 != 1) then                          
              if (temperatureExp > temp3_byte) then
                 temp2_byte = temperatureExp - temp3_byte
                 if (temp3_byte < 7) then
                     temp_byte = 0
-                elseif (temp2_byte == 3) then
-                    temp_byte = 50
-                elseif (temp2_byte == 2) then
-                    temp_byte = 60
-                elseif (temp2_byte == 1) then
-                    temp_byte = 75
                 else
-                    temp_byte = 0
+                        if (temp2_byte == 3) then
+                            temp_byte = 50
+                        else
+                            if (temp2_byte == 2) then
+                                temp_byte = 60
+                            else
+                                if (temp2_byte == 1) then
+                                    temp_byte = 75
+                                else
+                                    temp_byte = 0
+                                endif
+                            endif
+                        endif
                 endif
              else
                 temp_byte = 100
@@ -220,7 +226,7 @@ if (mode == 2) then
       OPTION_REG = %00000100
       mode = 1
       goto commonSettings
-   endif
+    endif
 endif
 if (mode == 4) then
     temp_data[0] = "A"
@@ -264,8 +270,8 @@ num_byte=payloadLength
 gosub spi_read
 temp_data[0] = 0
 if (data_in[1] == device_id) then
-    if (data_in[2] == "c") then    
-        if (data_in[3] == "=") then
+    if (data_in[3] == "=") then
+        if (data_in[2] == "c") then        
             'OK it is configure
             for i = 0 to 10
                 disable
@@ -276,45 +282,55 @@ if (data_in[1] == device_id) then
             pause 250
             configure = 1
             gosub sendDataOK
+        else
+                        i = 4
+                        gosub convertInputData
+                        if (data_in[2] == "l") then
+                            if (temp_byte < 101) then 
+                                gosub setValveToPosition
+                                gosub sendDataOK
+                            endif
+                        else
+                            if (data_in[2] == "m") then
+                                disable   
+                                write 11, temp_byte
+                                enable
+                                sleep_period = temp_byte
+                                gosub setModeBasedOnSleepPeriod
+                                gosub sendDataOK
+                            else
+                                if (data_in[2] == "t") then 
+                                    disable
+                                    write 14, temp_byte
+                                    enable
+                                    temperatureExp = temp_byte
+                                    gosub sendDataOK
+                                else
+                                    if (data_in[2] == "n") then 
+                                        disable
+                                        write 15, temp_byte
+                                        enable
+                                        ANALOG_PERCENTAGE = temp_byte
+                                        gosub sendDataOK
+                                    endif
+                                endif
+                            endif
+                        endif
         endif
-    ELSEif (data_in[2] == "a") then
+    ELSE
+        if (data_in[2] == "a") then
             mode = 4
             gosub sendDataOK
-    elseif (data_in[2] == "p") then
-        if (data_in[3] == "n") then
-            gosub sendDataOK
-        endif
-    ELSEif (data_in[2] == "s") then    
-            gosub sendTemperature
-    else
-        if (data_in[3] == "=") then
-            i = 4
-            gosub convertInputData
-        endif
-        if (data_in[2] == "l") then
-            if (temp_byte < 101) then 
-                  gosub setValveToPosition
-                  gosub sendDataOK
+        else
+            if (data_in[2] == "p") then
+                if (data_in[3] == "n") then
+                    gosub sendDataOK
+                endif
+            ELSE
+                if (data_in[2] == "s") then    
+                    gosub sendTemperature
+                endif
             endif
-        elseif (data_in[2] == "m") then
-             disable   
-             write 11, temp_byte
-             enable
-             sleep_period = temp_byte
-             gosub setModeBasedOnSleepPeriod
-             gosub sendDataOK
-        elseif (data_in[2] == "t") then 
-             disable
-             write 14, temp_byte
-             enable
-             temperatureExp = temp_byte
-             gosub sendDataOK
-        elseif (data_in[2] == "n") then 
-             disable
-             write 15, temp_byte
-             enable
-             ANALOG_PERCENTAGE = temp_byte
-             gosub sendDataOK
         endif
     endif
     if (temp_data[0] == 0) then

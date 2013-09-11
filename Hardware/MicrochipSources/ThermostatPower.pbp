@@ -164,7 +164,8 @@ if (data_in[1] == device_id) then
             pause 250
             configure = 1
             gosub sendDataOK
-        elseif (confSuccess == 1) then                
+        else
+          if (confSuccess == 1) then                
             if (data_in[2] == "m") then
                 disable   
                 write 12, temp_byte
@@ -173,48 +174,65 @@ if (data_in[1] == device_id) then
                 seconds = sleep_period
                 gosub setModeBasedOnSleepPeriod
                 gosub sendDataOK
-            elseif (data_in[2] == "t") then
-                disable
-                write 13, temp_byte
-                enable
-                temperatureExp = temp_byte
-                gosub sendDataOK
-            elseif (data_in[2] == "r") then
-                if (temp_byte < 10) then
-                    disable 
-                    write 11, temp_byte
+            else
+                if (data_in[2] == "t") then
+                    disable
+                    write 13, temp_byte
                     enable
-                    threshold = temp_byte
+                    temperatureExp = temp_byte
                     gosub sendDataOK
+                else
+                    if (data_in[2] == "r") then
+                        if (temp_byte < 10) then
+                            disable 
+                            write 11, temp_byte
+                            enable
+                            threshold = temp_byte
+                            gosub sendDataOK
+                        endif
+                    endif
+                endif
+            endif
+          endif
+        endif
+    ELSE
+        if (data_in[2] == "s") then    
+            gosub sendTemperature
+        ELSE
+            if (data_in[2] == "o") then
+                GOSUB relayOn
+                manualcontrol = 1
+                GOSUB sendDataOK    
+            ELSE
+                if (data_in[2] == "f") then    
+                    GOSUB relayOff
+                    manualcontrol = 1
+                    GOSUB sendDataOK    
+                ELSE
+                    if (data_in[2] == "x") then
+                        manualcontrol = 1
+                        disable
+                        write 14, 1
+                        enable
+                        GOSUB sendDataOK    
+                    ELSE
+                        if (data_in[2] == "y") then
+                            manualcontrol = 0
+                            disable
+                            write 14, 0
+                            enable
+                            GOSUB sendDataOK    
+                        else
+                            if (data_in[2] == "p") then
+                                if (data_in[3] == "n") then
+                                    gosub sendDataOK
+                                endif
+                            endif
+                        endif   
+                    endif
                 endif
             endif
         endif
-    ELSEif (data_in[2] == "s") then    
-            gosub sendTemperature
-    ELSEif (data_in[2] == "o") then
-        GOSUB relayOn
-        manualcontrol = 1
-        GOSUB sendDataOK    
-    ELSEif (data_in[2] == "f") then    
-        GOSUB relayOff
-        manualcontrol = 1
-        GOSUB sendDataOK    
-    ELSEif (data_in[2] == "x") then
-        manualcontrol = 1
-        disable
-        write 14, 1
-        enable
-        GOSUB sendDataOK    
-    ELSEif (data_in[2] == "y") then
-        manualcontrol = 0
-        disable
-        write 14, 0
-        enable
-        GOSUB sendDataOK    
-    elseif (data_in[2] == "p") then
-            if (data_in[3] == "n") then
-                gosub sendDataOK
-            endif
     endif
     if (temp_data[0] == 0) then
         gosub sendError

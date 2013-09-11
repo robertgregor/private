@@ -131,7 +131,8 @@ if (data_in[1] == device_id) then
             configure = 1
             gosub sendDataOK
         endif
-    elseif (data_in[2] == "l") then
+    else
+     if (data_in[2] == "l") then
         if (data_in[3] == "1") then
             if (data_in[4] == "c") then
                 if (data_in[5] == "o") then
@@ -152,7 +153,8 @@ if (data_in[1] == device_id) then
                         endif
                     endif
                 endif                
-            elseif (data_in[4] == "o") then
+            else
+             if (data_in[4] == "o") then
                 if (data_in[5] == "f") then
                     seconds = 0
                     ticks = 0
@@ -164,12 +166,16 @@ if (data_in[1] == device_id) then
                     l1counter = 0
                     gosub sendDataOK
                 endif
-            elseif (data_in[4] == "f") then
+             else
+              if (data_in[4] == "f") then
                 LOW relay
                 gosub sendDataOK
+              endif
+             endif
             endif
         endif
-    elseif (data_in[2] == "s") then
+     else
+      if (data_in[2] == "s") then
             temp_data[0] = "3"
             temp_data[1] = "|"
             temp_data[2] = RELAY + $30
@@ -190,10 +196,14 @@ if (data_in[1] == device_id) then
             temp_data[12] = temp1_byte
             temp_data[13] = 13    
             temp_data[14] = 10    
-    elseif (data_in[2] == "p") then
+      else
+       if (data_in[2] == "p") then
             if (data_in[3] == "n") then
                 gosub sendDataOK
             endif
+       endif
+      endif
+     endif
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"

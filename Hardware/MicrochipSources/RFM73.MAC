@@ -1,6 +1,6 @@
 
 	NOLIST
-; PICBASIC PRO(TM) Compiler 2.60C, (c) 1998, 2011 microEngineering Labs, Inc. All Rights Reserved. 
+; PicBasic Pro Compiler 2.46, (c) 1998, 2005 microEngineering Labs, Inc. All Rights Reserved.  
 
 LABEL?L macro Label
         RST?RP
@@ -14,47 +14,56 @@ Label
     endm
 
 AIN?BBB macro Bin, Bout, Bndx
-	MOVE?BA	Bndx
+        CHK?RP  Bndx
+        movf    Bndx, W
         addlw   low (Bout)
         movwf   FSR
-    if ((Bout) > 255)
+    if (Bout > 255)
         bsf     STATUS, IRP
     endif
-        MOVE?BB Bin, INDF
-    if ((Bout) > 255)
+        CHK?RP  Bin
+        movf    Bin, W
+        movwf   INDF
+    if (Bout > 255)
         bcf     STATUS, IRP
     endif
     endm
 
 AOUT?BBB macro Bin, Bndx, Bout
-        MOVE?BA Bndx
+        CHK?RP  Bndx
+        movf    Bndx, W
         addlw   low (Bin)
         movwf   FSR
-    if ((Bin) > 255)
+    if (Bin > 255)
         bsf     STATUS, IRP
     endif
-        MOVE?BB INDF, Bout
-    if ((Bin) > 255)
+        movf    INDF, W
+        CHK?RP  Bout
+        movwf   Bout
+    if (Bin > 255)
         bcf     STATUS, IRP
     endif
     endm
 
 AOUT?BWB macro Bin, Wndx, Bout
-        MOVE?WA Wndx
+        CHK?RP  Wndx
+        movf    Wndx, W
         addlw   low (Bin)
         movwf   FSR
-    if ((Bin) > 255)
+    if (Bin > 255)
         bsf     STATUS, IRP
     endif
-        MOVE?BB INDF, Bout
-    if ((Bin) > 255)
+        CHK?RP  Bout
+        movf    INDF, W
+        movwf   Bout
+    if (Bin > 255)
         bcf     STATUS, IRP
     endif
     endm
 
 ADD?CBB macro Cin, Bin, Bout
-    if ((Bout) == (Bin))
-      if ((Cin) == 1)
+    if (Bout == Bin)
+      if (Cin == 1)
         CHK?RP  Bout
         incf    Bout, F
       else
@@ -63,7 +72,7 @@ ADD?CBB macro Cin, Bin, Bout
         addwf   Bout, F
       endif
     else
-      if ((Cin) == 1)
+      if (Cin == 1)
         CHK?RP  Bin
         incf    Bin, W
         MOVE?AB Bout
@@ -84,7 +93,7 @@ SUB?BCW macro Bin, Cin, Wout
         movlw   low ((-(Cin)) >> 8)
         btfsc   STATUS, C
         addlw   1
-        movwf   (Wout) + 1
+        movwf   Wout + 1
     endm
 
 AND?BCB macro Bin, Cin, Bout
@@ -101,14 +110,14 @@ AND?BCB macro Bin, Cin, Bout
     endm
 
 AND?BCW macro Bin, Cin, Wout
-        movlw   Cin
+        movlw   low (Cin)
         CHK?RP  Bin
         andwf   Bin, W
         MOVE?AW Wout
     endm
 
 CMPEQ?BCL macro Bin, Cin, Label
-    if (((Cin) > -100h) & ((Cin) < 100h))
+    if (Cin < 100h)
         CLRWDT?
         MOVE?BA Bin
         sublw   Cin
@@ -125,9 +134,14 @@ CMPEQ?BWL macro Bin, Win, Label
 CMPEQW_USED = 1
 
 CMPEQ?TCL macro Regin, Bitin, Cin, Label
-    if (((Cin) == 0) | ((Cin) == 1))
+    if (Cin == 0)
         CLRWDT?
-        BIT?GOTO Cin, Regin, Bitin, Label
+        BIT?GOTO 0, Regin, Bitin, Label
+    else
+      if (Cin == 1)
+        CLRWDT?
+        BIT?GOTO 1, Regin, Bitin, Label
+      endif
     endif
     endm
 
@@ -140,21 +154,17 @@ CMPGT?BBL macro Bin1, Bin2, Label
     endm
 
 CMPGT?BCL macro Bin, Cin, Label
-    if ((Cin) < 0)
-        L?GOTO  Label
-    else
-      if ((Cin) < 0ffh)
+    if (Cin < 0ffh)
         CLRWDT?
-        MOVE?CA (Cin) + 1
+        MOVE?CA Cin + 1
         CHK?RP  Bin
         subwf   Bin, W
         BIT?GOTO 1, STATUS, C, Label
-      endif
     endif
     endm
 
 CMPNE?BCL macro Bin, Cin, Label
-    if (((Cin) > -100h) & ((Cin) < 100h))
+    if (Cin < 100h)
         CLRWDT?
         MOVE?BA Bin
         sublw   Cin
@@ -165,11 +175,11 @@ CMPNE?BCL macro Bin, Cin, Label
     endm
 
 CMPNE?TCL macro Regin, Bitin, Cin, Label
-    if ((Cin) == 0)
+    if (Cin == 0)
         CLRWDT?
         BIT?GOTO 1, Regin, Bitin, Label
     else
-      if ((Cin) == 1)
+      if (Cin == 1)
         CLRWDT?
         BIT?GOTO 0, Regin, Bitin, Label
       else
@@ -190,7 +200,7 @@ GOSUB?L macro Label
         movlw   low (dlabel)
         movwf   INDF
         incf    FSR, F
-        movlw	high (dlabel)
+        movlw   (dlabel) >> 8
         movwf   INDF
       endif
         incf    DEBUG_STACK, F
@@ -204,7 +214,7 @@ GOTO?L macro Label
     endm
 
 NEXT?BCL macro Bin, Cin, Label
-    if ((Cin) == 1)
+    if (Cin == 1)
         CHK?RP  Bin
       if ((PREV_BANK == 0) & (CODE_SIZE <= 2))
         incfsz  Bin, F
@@ -214,21 +224,21 @@ NEXT?BCL macro Bin, Cin, Label
         BIT?GOTO 0, STATUS, Z, Label
       endif
     else
+      if (Cin <= 255)
         movlw   Cin
         CHK?RP  Bin
         addwf   Bin, F
-      if ((Cin) <= 255)
         BIT?GOTO 0, STATUS, C, Label
       endif
     endif
     endm
 
 PAUSE?C macro Cin
-    if (((Cin) >> 8) == 0)
+    if (high (Cin) == 0)
         MOVE?CA Cin
         L?CALL  PAUSE
     else
-        MOVE?CB (Cin) >> 8, R1 + 1
+        MOVE?CB high (Cin), R1 + 1
         MOVE?CA low (Cin)
         L?CALL  PAUSEL
     endif
@@ -236,22 +246,19 @@ PAUSE?C macro Cin
 PAUSE_USED = 1
 
 PAUSEUS?C macro Cin
-    if (((Cin) >> 8) == 0)
-        movlw   Cin
+    if (high (Cin) == 0)
+        MOVE?CA Cin
         L?CALL  PAUSEUS
     else
-        MOVE?CB (Cin) >> 8, R0 + 1
+        MOVE?CB high (Cin), R0 + 1
         MOVE?CA low (Cin)
         L?CALL  PAUSEUSL
     endif
     endm
 PAUSEUS_USED = 1
 
-READADDRESS?C macro Cin
-        MOVE?CB Cin, EEADR
-    endm
-
-READ?B macro Bout
+READ?CB macro Cin, Bout
+        MOVE?CA Cin
         L?CALL  READ
         MOVE?AB Bout
     endm

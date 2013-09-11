@@ -106,14 +106,18 @@ if (data_in[1] == device_id) then
             configure = 1
             gosub sendDataOK
         endif
-    ELSEif (data_in[2] == "s") then
+    ELSE
+        if (data_in[2] == "s") then
             temp_data[0] = "2"
             temp_data[1] = "|"            
             temp_data[2] = 10    
-    elseif (data_in[2] == "p") then
-            if (data_in[3] == "n") then
-                gosub sendDataOK
+        else
+            if (data_in[2] == "p") then
+                if (data_in[3] == "n") then
+                    gosub sendDataOK
+                endif
             endif
+        endif
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"

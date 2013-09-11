@@ -107,30 +107,38 @@ if (manageSerial==1) then
         else
             gosub printError
         endif
-    elseif ((ser_data[0] == "P" OR ser_data[0] == "p") AND ser_data[1] == "=") THEN 'password
-        GOSUB savePwd
-        GOSUB commonSettings
-    elseif ((ser_data[0] == "A" OR ser_data[0] == "a") AND ser_data[1] == "=") THEN 'add device
-        i=2
-        GOSUB convertInputData
-        if (conversionSuccessfull == 1) then
-            gosub saveCurrentConfig
-            gosub putDefaultValues
-            gosub commonRXTX
-            gosub debounce
-            gosub addNewDevice
-            flagRestoreBackedConfig = 2
-        else
-            gosub printError
-        endif
-    elseif ((ser_data[0] == "S" OR ser_data[0] == "s")) THEN 'print config
+        goto Main_rx
+    endif 
+    if ((ser_data[0] == "P" OR ser_data[0] == "p") AND ser_data[1] == "=") THEN 'password
+            GOSUB savePwd
+            GOto commonSettings
+    endif
+    if ((ser_data[0] == "A" OR ser_data[0] == "a") AND ser_data[1] == "=") THEN 'add device
+            i=2
+            GOSUB convertInputData
+            if (conversionSuccessfull == 1) then
+                gosub saveCurrentConfig
+                gosub putDefaultValues
+                gosub commonRXTX
+                gosub debounce
+                gosub addNewDevice
+                flagRestoreBackedConfig = 2
+            else
+                gosub printError
+            endif
+            goto Main_rx
+    endif
+    if ((ser_data[0] == "S" OR ser_data[0] == "s")) THEN 'print config
         GOSUB printConfig
+        goto Main_rx
     else
         i=0
         gosub convertInputData
         if (conversionSuccessfull != 1) then
             gosub printError
-        elseif (ser_data[i] != "=") then
+            goto Main_rx
+        endif
+        if (ser_data[i] != "=") then
             gosub printError
         else
             device_id = temp_byte                        

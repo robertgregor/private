@@ -171,7 +171,8 @@ if (data_in[1] == device_id) then
             configure = 1
             gosub sendDataOK
         endif
-    elseif (data_in[2] == "b") then
+    else
+     if (data_in[2] == "b") then
         I = 3
         gosub convertInputData
         if (conversionSuccess == 1) then
@@ -192,7 +193,8 @@ if (data_in[1] == device_id) then
                                 endif
                             endif                                   
                         endif
-                    elseif (data_in[4] == "d") then
+                    else
+                     if (data_in[4] == "d") then
                         counter[temp4_byte] = timeout_value[temp4_byte]
                         initialcounter[temp4_byte] = counter[temp4_byte]
                         relaysGroup = temp4_byte
@@ -200,7 +202,8 @@ if (data_in[1] == device_id) then
                         initialPercent[temp4_byte] = currentCounter[temp4_byte]
                         currentCounter[temp4_byte] = 100
                         gosub sendDataOK
-                    elseif (data_in[4] == "u") then
+                     else
+                      if (data_in[4] == "u") then
                         counter[temp4_byte] = timeout_value[temp4_byte]
                         initialCounter[temp4_byte] = counter[temp4_byte]
                         relaysGroup = temp4_byte
@@ -208,7 +211,8 @@ if (data_in[1] == device_id) then
                         initialPercent[temp4_byte] = currentCounter[temp4_byte]            
                         currentCounter[temp4_byte] = 0
                         gosub sendDataOK
-                    elseif (data_in[4] == "m") then
+                      else
+                       if (data_in[4] == "m") then
                         if (data_in[5] == "=") then
                             i = 6
                             gosub convertInputData
@@ -217,7 +221,8 @@ if (data_in[1] == device_id) then
                                 if (temp_byte == currentCounter[temp4_byte]) then
                                     gosub sendDataOK
                                     counter[temp4_byte] = 4
-                                elseif (temp_byte > currentCounter[temp4_byte]) then
+                                else
+                                 if (temp_byte > currentCounter[temp4_byte]) then
                                     temp2_byte = temp_byte - currentCounter[temp4_byte]
                                     initialPercent[temp4_byte] = currentCounter[temp4_byte]
                                     relaysGroup = temp4_byte
@@ -226,7 +231,7 @@ if (data_in[1] == device_id) then
                                     gosub blindsDown
                                     currentCounter[temp4_byte] = temp_byte
                                     gosub sendDataOK
-                                else
+                                 else
                                     temp2_byte = currentCounter[temp4_byte] - temp_byte
                                     initialPercent[temp4_byte] = currentCounter[temp4_byte]
                                     relaysGroup = temp4_byte
@@ -235,12 +240,14 @@ if (data_in[1] == device_id) then
                                     gosub blindsUp
                                     currentCounter[temp4_byte] = temp_byte
                                     gosub sendDataOK
+                                 endif
                                 endif
                               endif  
                             endif                                                   
                         endif
-                    elseif (data_in[4] == "s") then               
-                        if (currentDirection[temp4_byte] != 0) then
+                       else
+                        if (data_in[4] == "s") then               
+                         if (currentDirection[temp4_byte] != 0) then
                             temp_word = initialCounter[temp4_byte] - counter[temp4_byte]
                             disable
                             temp_word = temp_word * 100
@@ -250,24 +257,31 @@ if (data_in[1] == device_id) then
                                 temp3_word = initialPercent[temp4_byte] + temp2_word
                                 if (temp3_word > 100 ) then temp3_word = 100
                                 currentCounter[temp4_byte] = temp3_word
-                            elseif (currentDirection[temp4_byte] == 2) then
+                            else
+                             if (currentDirection[temp4_byte] == 2) then
                                 if (initialPercent[temp4_byte] > temp2_word) then
                                     currentCounter[temp4_byte] = initialPercent[temp4_byte] - temp2_word
                                 else
                                     currentCounter[temp4_byte] = 0
                                 endif
+                             endif
                             endif
                             gosub sendDataOK
                             counter[temp4_byte] = 4
-                        else
+                         else
                             gosub sendDataOK            
                             counter[temp4_byte] = 4
+                         endif
                         endif
+                       endif
+                      endif
+                     endif
                     endif
                 endif
             endif
         endif
-    elseif (data_in[2] == "s") then
+     else
+      if (data_in[2] == "s") then
         I = 3
         gosub convertInputData
         if (conversionSuccess == 1) then
@@ -280,14 +294,18 @@ if (data_in[1] == device_id) then
                         temp_data[2] = RELAY1_DOWN + $30
                         temp_data[3] = "|"
                         temp_data[4] = RELAY1_UP + $30
-                    elseif (temp4_byte == 1) then
+                    else
+                     if (temp4_byte == 1) then
                         temp_data[2] = RELAY2_DOWN + $30
                         temp_data[3] = "|"
                         temp_data[4] = RELAY2_UP + $30
-                    elseif (temp4_byte == 2) then
+                     else
+                      if (temp4_byte == 2) then
                         temp_data[2] = RELAY3_DOWN + $30
                         temp_data[3] = "|"
                         temp_data[4] = RELAY3_UP + $30
+                      endif
+                     endif
                     endif
                     temp_data[5] = "|"            
                     temp_byte = timeout_value[temp4_byte] / 30
@@ -306,14 +324,16 @@ if (data_in[1] == device_id) then
                 endif
             endif
         endif
-    elseif (data_in[2] == "p") then
+      else
+       if (data_in[2] == "p") then
             if (data_in[3] == "n") then
                 gosub sendDataOK
             endif
-    elseif (data_in[2] == "u") then
-        I = 3
-        gosub convertInputData
-        if (conversionSuccess == 1) then
+       else
+        if (data_in[2] == "u") then
+         I = 3
+         gosub convertInputData
+         if (conversionSuccess == 1) then
             if (temp_byte > 0) then
                 if (temp_byte < 4) then
                     relaysGroup = temp_byte - 1
@@ -321,11 +341,12 @@ if (data_in[1] == device_id) then
                     gosub sendDataOK
                 endif
             endif
-        endif
-    elseif (data_in[2] == "d") then
-        I = 3
-        gosub convertInputData
-        if (conversionSuccess == 1) then
+         endif
+        else
+         if (data_in[2] == "d") then
+          I = 3
+          gosub convertInputData
+          if (conversionSuccess == 1) then
             if (temp_byte > 0) then
                 if (temp_byte < 4) then
                     relaysGroup = temp_byte - 1
@@ -333,11 +354,12 @@ if (data_in[1] == device_id) then
                     gosub sendDataOK
                 endif
             endif
-        endif
-    elseif (data_in[2] == "e") then
-        I = 3
-        gosub convertInputData
-        if (conversionSuccess == 1) then
+          endif
+         else
+          if (data_in[2] == "e") then
+           I = 3
+           gosub convertInputData
+           if (conversionSuccess == 1) then
             if (temp_byte > 0) then
                 if (temp_byte < 4) then
                     relaysGroup = temp_byte - 1
@@ -345,7 +367,13 @@ if (data_in[1] == device_id) then
                     gosub sendDataOK
                 endif
             endif
+           endif
+          endif
+         endif
         endif
+       endif
+      endif
+     endif
     endif
     if (temp_data[0] == 0) then
         temp_data[0] = "E"
@@ -384,18 +412,22 @@ intManagement:
                             currentDirection[iint] = 0
                             currentPositionRelayNotifNumber = 31
                             gosub sendCurrentPosition
-                        elseif (iint == 1) then
+                        else
+                         if (iint == 1) then
                             low RELAY2_DOWN
                             low RELAY2_UP                            
                             currentDirection[iint] = 0
                             currentPositionRelayNotifNumber = 32                            
                             gosub sendCurrentPosition
-                        elseif (iint == 2) then
+                         else
+                          if (iint == 2) then
                             low RELAY3_DOWN
                             low RELAY3_UP                            
                             currentDirection[iint] = 0
                             currentPositionRelayNotifNumber = 33
                             gosub sendCurrentPosition
+                          endif
+                         endif
                         endif                        
                    endif
                endif
@@ -422,14 +454,18 @@ stopBlindsSilent:
         LOW RELAY1_DOWN
         low RELAY1_UP
         currentPositionRelayNotifNumber = 31
-    elseif (relaysGroup == 1) then
+    else
+     if (relaysGroup == 1) then
         LOW RELAY2_DOWN
         low RELAY2_UP
         currentPositionRelayNotifNumber = 32
-    elseif (relaysGroup == 2) then
+     else
+      if (relaysGroup == 2) then
         LOW RELAY3_DOWN
         low RELAY3_UP
         currentPositionRelayNotifNumber = 33
+      endif
+     endif
     endif
     currentDirection[relaysGroup] = 0
 return
@@ -440,12 +476,16 @@ blindsUp:
     if (relaysGroup == 0) then
         high RELAY1_DOWN
         low RELAY1_UP
-    elseif (relaysGroup == 1) then
+    else
+     if (relaysGroup == 1) then
         high RELAY2_DOWN
         low RELAY2_UP
-    elseif (relaysGroup == 2) then
+     else
+      if (relaysGroup == 2) then
         high RELAY3_DOWN
         low RELAY3_UP
+      endif
+     endif
     endif
     currentDirection[relaysGroup] = 2
 return
@@ -456,12 +496,16 @@ blindsDown:
     if (relaysGroup == 0) then
         LOW RELAY1_DOWN
         HIGH RELAY1_UP
-    elseif (relaysGroup == 1) then
+    else
+     if (relaysGroup == 1) then
         LOW RELAY2_DOWN
         HIGH RELAY2_UP
-    elseif (relaysGroup == 2) then
+     else
+      if (relaysGroup == 2) then
         LOW RELAY3_DOWN
         HIGH RELAY3_UP
+      endif
+     endif
     endif
     currentDirection[relaysGroup] = 1
 return
@@ -471,10 +515,14 @@ sendCurrentPosition:
     temp_data[1] = "|"
     if (currentPositionRelayNotifNumber == 31) then
         temp_byte = currentCounter[0]
-    elseif (currentPositionRelayNotifNumber == 32) then
+    else
+     if (currentPositionRelayNotifNumber == 32) then
         temp_byte = currentCounter[1]
-    elseif (currentPositionRelayNotifNumber == 33) then
+     else
+      if (currentPositionRelayNotifNumber == 33) then
         temp_byte = currentCounter[2]
+      endif
+     endif
     endif        
     gosub convertNoToStr
     temp_data[2] = temp3_byte
