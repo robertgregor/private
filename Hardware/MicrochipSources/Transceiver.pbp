@@ -12,6 +12,7 @@
 '1,2,3,4,5 bank name transmitter
 '6,7,8,9 bank name device
 
+ticks var byte
 INCLUDE "RFM73.pbp"
 
 EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,0,0,0,0]
@@ -44,7 +45,7 @@ WPUB = %11111111
 resetButton var PORTA.5
 i VAR BYTE 'loop counter
 j var byte
-
+interi var byte
 manageSerial var byte
 temp_byte_int var byte
 temp_byte var byte
@@ -59,7 +60,6 @@ conversionSuccessfull var byte
 ci var byte
 flagRestoreBackedConfig var byte
 
-ticks var byte
 seconds var byte
 minutes var byte
 resetLabel:
@@ -159,7 +159,6 @@ if (manageSerial==1) then
                 gosub saveCurrentConfig
                 gosub putDefaultValues
                 gosub commonRXTX
-                gosub debounce
                 GOSUB sendData
                 flagRestoreBackedConfig = 1
                 ticks = 0
@@ -171,28 +170,21 @@ if (manageSerial==1) then
     GOTO Main_rx
 endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
-' high led 'debug led
 Ce=0
 lop:
 data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
 num_byte=payloadLength
 gosub spi_read
-HSEROUT["+", DEC data_in[1], " "]
-for w=2 to payloadLength
-    HSEROUT[data_in[w]]
-    if (data_in[w]) == 10 then goto contInRcv
+disable
+gosub ackData
+'manage the received data
+HSEROUT["+", DEC data_received[1], " "]
+for w=2 to payloadLengthD - 1
+    HSEROUT[data_received[w]]
+    if (data_received[w]) == 10 then goto contInRcv
 next w
 contInRcv:
-data_out[0]=Fifo_status 'Read FIFO status
-num_byte=1
-gosub spi_read
-val= data_in[1] 'FIFO status register
-if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
-endRx:
-data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
-data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
-num_byte=1
-gosub spi_write
+enable
 GOTO Main_rx
 end
 
@@ -204,6 +196,11 @@ intManagement:
                 if (ticks > 10) then
                     flagRestoreBackedConfig = 2
                 endif
+           endif
+           if ticks = 5 then
+                    for interi=0 to payloadLengthD - 1
+                        data_received[interi] = 0
+                    next interi
            endif
            If ticks < 31 Then tiexit
            ticks = 0

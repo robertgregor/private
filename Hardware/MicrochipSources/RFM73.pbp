@@ -14,6 +14,7 @@ val var byte 'temp value
 Pack_count VAR word 'number of packets sent
 data_out VAR BYTE[payloadLengthD] 'data sent
 data_in var Byte[payloadLengthD] 'data received
+data_received var Byte[payloadLengthD] 'data received
 temp_data var byte[payloadLength]
 w var byte
 k VAR byte
@@ -23,6 +24,8 @@ temp2_byte_rfm var byte
 temp3_byte_rfm var byte
 temp4_byte_rfm var byte
 device_id var byte
+sameFlag VAR BYTE
+ir var byte
 
 '----------nRF24L01 interrupt flags---------------------------------------------
 Idle_int con $00 'Idle no interrupt pending
@@ -88,26 +91,22 @@ gosub setRxAddressPipe
 num_byte=5
 gosub spi_write
 data_out[0]=Write_reg+En_aa 'enable auto ACK pipe0
-data_out[1]=$01 '1 enable, 0 disable
-num_byte=1
-gosub spi_write
+data_out[1]=%00000001 '1 enable, 0 disable
+
+gosub spi_write1
 data_out[0]=Write_reg+En_rxaddr 'enable Rx address pipe0
 data_out[1]=$01
-num_byte=1
-gosub spi_write
+gosub spi_write1
 data_out[0]=Write_reg+Rf_ch 'Set RF channel
 READ 0, data_out[1] 'number of channel used
-num_byte=1
-gosub spi_write
+gosub spi_write1
 data_out[0]=Write_reg+Rx_pw_p0 'Set Rx pload width pipe0
 data_out[1]=payloadLength 'number of bytes used in data sent
-num_byte=1
-gosub spi_write
-data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm, 1Mbps
-'data_out[1]=%00100111 '250kbit
-data_out[1]=%00000111 '1mbit
-num_byte=1
-gosub spi_write
+gosub spi_write1
+data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm
+data_out[1]=%00100111 '250kbit
+'data_out[1]=%00000111 '1mbit
+gosub spi_write1
 ' configure bank 1
 temp_byte_rfm = 1
 gosub setBank
@@ -119,7 +118,7 @@ temp_byte_rfm = 2 : temp1_byte_rfm = $D0 : temp2_byte_rfm = $FC : temp3_byte_rfm
 gosub conf4bytes
 temp_byte_rfm = 3 : temp1_byte_rfm = $99 : temp2_byte_rfm = $00 : temp3_byte_rfm = $39 : temp4_byte_rfm = $41
 gosub conf4bytes
-temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $B6 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
+temp_byte_rfm = 4 : temp1_byte_rfm = $D9 : temp2_byte_rfm = $96 : temp3_byte_rfm = $82 : temp4_byte_rfm = $1B
 gosub conf4bytes
 temp_byte_rfm = 5 : temp1_byte_rfm = $28 : temp2_byte_rfm = $02 : temp3_byte_rfm = $7F : temp4_byte_rfm = $A6
 gosub conf4bytes
@@ -153,8 +152,7 @@ if (temp_byte_rfm != (data_in[0] & $80)) then
     'not good bank used switch it
     data_out[0]=$50
     data_out[1]=$53    
-    num_byte=1
-    gosub spi_write
+    gosub spi_write1
 endif
 return
 
@@ -169,6 +167,7 @@ gosub spi_write
 return
 
 sendData:
+gosub debounce
 pause 30
 GOSUB debounce
 data_out[0]=Flush_tx 'flush TX_fifo buffer
@@ -176,8 +175,7 @@ num_byte=0
 gosub spi_write
 data_out[0]=Write_reg+Stat_us 'reset IRQ bits
 data_out[1]=%00110000
-num_byte=1
-gosub spi_write
+gosub spi_write1
 gosub setup_tx 'setup Tx
 data_out[0]=Wr_tx_pload 'put 10 bytes data in Tx pload buffer
 data_out[1]=device_id
@@ -203,8 +201,7 @@ if (val = Max_rt) then gosub max_retry 'maximum TX retries
 if (val = Tx_inter) then gosub tx_int 'Tx interrupted
 data_out[0]=Write_reg+Stat_us
 data_out[1]=%00100000 'clear TX_DS IRQ bit
-num_byte=1
-gosub spi_write
+gosub spi_write1
 gosub debounce
 return
 
@@ -218,6 +215,8 @@ Ce=0
 pauseus 500
 return
 
+spi_write1:
+num_byte=1
 spi_write:
 CSN=0
 For w = 0 to num_byte 'loop for # byte
@@ -247,8 +246,7 @@ num_byte=0
 gosub spi_write
 data_out[0]=Write_reg+Stat_us
 data_out[1]=%00010000 'clear MAX_RT IRQ bit
-num_byte=1
-gosub spi_write
+gosub spi_write1
 return
 
 tx_int:
@@ -257,24 +255,21 @@ num_byte=0
 gosub spi_write
 data_out[0]=Write_reg+Stat_us
 data_out[1]=%00110000 'clear TX_DS & MAX_RT IRQ bit
-num_byte=1
-gosub spi_write
+gosub spi_write1
 return
 
 setup_rx:
 gosub debounce
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=1, CRC=2, enabled
 data_out[1]=$0F
-num_byte=1
-gosub spi_write
-'gosub debounce
+gosub spi_write1
+gosub debounce
 return
 
 setup_sleep:
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=1,PWR_UP=0, CRC=2, enabled
 data_out[1]=%00001101
-num_byte=1
-gosub spi_write
+gosub spi_write1
 return
 
 setup_tx:
@@ -283,12 +278,33 @@ gosub setTxAddressPipe
 num_byte=5
 gosub spi_write
 data_out[0]= Write_reg+Setup_retr 'Set retransmit @ ACK
-data_out[1]= %00011111 '15x re-transmit (default)
-num_byte=1
-Gosub spi_write
+data_out[1]= %11111111 '15x re-transmit (default)
+Gosub spi_write1
 data_out[0]=Write_reg+Config_nrf 'Config:PRX=0,PWR_UP=1, CRC=2, enabled
 data_out[1]=$0E
-num_byte=1
-gosub spi_write
+gosub spi_write1
 return
+
+ackData:
+'data_received = data_in
+sameFlag = 1
+for ir=0 to payloadLengthD - 1
+    if (data_received[ir] != data_in[ir]) then sameFlag = 0
+    data_received[ir] = data_in[ir]
+    if (data_received[ir] == 10) then cntAckData
+next ir
+:cntAckData
+data_out[0]=Fifo_status 'Read FIFO status
+num_byte=1
+gosub spi_read
+val= data_in[1] 'FIFO status register
+if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
+data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
+data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
+gosub spi_write1
+pause 2 'wait 2ms Rx<->Tx
+ticks = 0
+if (sameFlag == 1) then Main_rx
+return
+
 :endRFM73

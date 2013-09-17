@@ -288,6 +288,14 @@ CMPEQ?BCB macro Bin, Cin, Bout
     endm
 CMPEQB_USED = 1
 
+CMPEQ?BBL macro Bin1, Bin2, Label
+        CLRWDT?
+        MOVE?BA Bin1
+        CHK?RP  Bin2
+        subwf   Bin2, W
+        BIT?GOTO 1, STATUS, Z, Label
+    endm
+
 CMPEQ?BCL macro Bin, Cin, Label
     if (Cin < 100h)
         CLRWDT?

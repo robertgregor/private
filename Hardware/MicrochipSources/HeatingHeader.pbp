@@ -268,6 +268,8 @@ lop:
 data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
 num_byte=payloadLength
 gosub spi_read
+gosub ackData
+'manage the received data
 temp_data[0] = 0
 if (data_in[1] == device_id) then
     if (data_in[3] == "=") then
@@ -342,17 +344,6 @@ if (data_in[1] == device_id) then
         temp_data[5] = 10
     endif
 endif
-
-data_out[0]=Fifo_status 'Read FIFO status
-num_byte=1
-gosub spi_read
-val= data_in[1] 'FIFO status register
-if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
-data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
-data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
-num_byte=1
-gosub spi_write
-pause 2 'wait 2ms Rx<->Tx
 GOTO Main_rx
 end
 

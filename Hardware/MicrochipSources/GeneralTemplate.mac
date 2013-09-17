@@ -29,6 +29,21 @@ AIN?BBB macro Bin, Bout, Bndx
     endif
     endm
 
+AIN?CBB macro Cin, Bout, Bndx
+        CHK?RP  Bndx
+        movf    Bndx, W
+        addlw   low (Bout)
+        movwf   FSR
+    if (Bout > 255)
+        bsf     STATUS, IRP
+    endif
+        movlw   Cin
+        movwf   INDF
+    if (Bout > 255)
+        bcf     STATUS, IRP
+    endif
+    endm
+
 AOUT?BBB macro Bin, Bndx, Bout
         CHK?RP  Bndx
         movf    Bndx, W
@@ -188,6 +203,14 @@ AND?BCW macro Bin, Cin, Wout
         CHK?RP  Bin
         andwf   Bin, W
         MOVE?AW Wout
+    endm
+
+CMPEQ?BBL macro Bin1, Bin2, Label
+        CLRWDT?
+        MOVE?BA Bin1
+        CHK?RP  Bin2
+        subwf   Bin2, W
+        BIT?GOTO 1, STATUS, Z, Label
     endm
 
 CMPEQ?BCL macro Bin, Cin, Label

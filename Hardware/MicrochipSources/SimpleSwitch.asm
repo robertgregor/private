@@ -426,11 +426,11 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00105	gosub spi_write
 	GOSUB?L	_spi_write
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00106	data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm, 1Mbps
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00106	data_out[0]=Write_reg+Rf_setup 'Set RF: 'Set RF:5dbm
 	MOVE?CB	026h, _data_out
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00108	data_out[1]=%00000111 '1mbit
-	MOVE?CB	007h, _data_out + 00001h
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00107	data_out[1]=%00100111 '250kbit
+	MOVE?CB	027h, _data_out + 00001h
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\RFM73.PBP	00109	num_byte=1
 	MOVE?CB	001h, _num_byte

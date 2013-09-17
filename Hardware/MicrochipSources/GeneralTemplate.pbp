@@ -15,9 +15,14 @@
 
 EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,0,0,0,0]
 
+ticks   var     byte    ' Define pieces of seconds variable
 INCLUDE "RFM73.pbp"
 
  DEFINE OSC 8
+ DEFINE HSER_RCSTA 90h
+ DEFINE HSER_TXSTA 24h
+ DEFINE HSER_SPBRG 51
+ DEFINE HSER_CLROERR 1
 
  OSCCON = %01110000 ' Internal 8MHz osc
  ANSEL = 0
@@ -39,6 +44,7 @@ TRISC = %00000100 'Set IRQ input
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
+interi var byte
 configure var byte
 temp_byte_int var byte
 temp_byte var byte
@@ -49,7 +55,6 @@ temp_word var word
 EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
 seconds  var     byte    ' Define second variable
-ticks   var     byte    ' Define pieces of seconds variable
 l1counter var byte
 conversionSuccess VAR BYTE
 
@@ -91,14 +96,17 @@ lop:
 data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
 num_byte=payloadLength
 gosub spi_read
+disable
+gosub ackData
+'manage the received data
 temp_data[0] = 0
-if (data_in[1] == device_id) then
-    if (data_in[2] == "c") then    
-        if (data_in[3] == "=") then
+if (data_received[1] == device_id) then
+    if (data_received[2] == "c") then    
+        if (data_received[3] == "=") then
             'OK it is configure
             for i = 0 to 10
                 disable
-                write i, data_in[i+4]
+                write i, data_received[i+4]
                 enable
             next i
             read 10, device_id
@@ -107,13 +115,13 @@ if (data_in[1] == device_id) then
             gosub sendDataOK
         endif
     ELSE
-        if (data_in[2] == "s") then
+        if (data_received[2] == "s") then
             temp_data[0] = "2"
             temp_data[1] = "|"            
             temp_data[2] = 10    
         else
-            if (data_in[2] == "p") then
-                if (data_in[3] == "n") then
+            if (data_received[2] == "p") then
+                if (data_received[3] == "n") then
                     gosub sendDataOK
                 endif
             endif
@@ -128,17 +136,7 @@ if (data_in[1] == device_id) then
         temp_data[5] = 10
     endif
 endif
-
-data_out[0]=Fifo_status 'Read FIFO status
-num_byte=1
-gosub spi_read
-val= data_in[1] 'FIFO status register
-if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
-data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
-data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
-num_byte=1
-gosub spi_write
-pause 2 'wait 2ms Rx<->Tx
+enable
 GOTO Main_rx
 end
 
@@ -146,6 +144,11 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
+           if ticks = 5 then
+                    for interi=0 to payloadLengthD - 1
+                        data_received[interi] = 0
+                    next interi
+           endif
            If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
