@@ -64,9 +64,7 @@ temperature var word
 firstTemperature VAR WORD
 differenceManaged var byte
 difference VAR WORD
-seconds  var    word    ' Define second variable
 realseconds var byte
-ticks   var     byte    ' Define pieces of seconds variable
 dat var word 'unscaled ADC data
 normalMode VAR byte
 Dummy       VAR BYTE
@@ -145,19 +143,18 @@ endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
-data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
-num_byte=payloadLength
-gosub spi_read
+disable
+gosub ackData
 temp_data[0] = 0
-if (data_in[1] == device_id) then
-    if (data_in[3] == "=") then
+if (data_received[1] == device_id) then
+    if (data_received[3] == "=") then
         i = 4
         gosub convertInputData
-        if (data_in[2] == "c") then    
+        if (data_received[2] == "c") then    
            'OK it is configure
             for i = 0 to 10
                 disable
-                write i, data_in[i+4]
+                write i, data_received[i+4]
                 enable
             next i
             read 10, device_id
@@ -166,7 +163,7 @@ if (data_in[1] == device_id) then
             gosub sendDataOK
         else
           if (confSuccess == 1) then                
-            if (data_in[2] == "m") then
+            if (data_received[2] == "m") then
                 disable   
                 write 12, temp_byte
                 enable
@@ -175,14 +172,14 @@ if (data_in[1] == device_id) then
                 gosub setModeBasedOnSleepPeriod
                 gosub sendDataOK
             else
-                if (data_in[2] == "t") then
+                if (data_received[2] == "t") then
                     disable
                     write 13, temp_byte
                     enable
                     temperatureExp = temp_byte
                     gosub sendDataOK
                 else
-                    if (data_in[2] == "r") then
+                    if (data_received[2] == "r") then
                         if (temp_byte < 10) then
                             disable 
                             write 11, temp_byte
@@ -196,35 +193,35 @@ if (data_in[1] == device_id) then
           endif
         endif
     ELSE
-        if (data_in[2] == "s") then    
+        if (data_received[2] == "s") then    
             gosub sendTemperature
         ELSE
-            if (data_in[2] == "o") then
+            if (data_received[2] == "o") then
                 GOSUB relayOn
                 manualcontrol = 1
                 GOSUB sendDataOK    
             ELSE
-                if (data_in[2] == "f") then    
+                if (data_received[2] == "f") then    
                     GOSUB relayOff
                     manualcontrol = 1
                     GOSUB sendDataOK    
                 ELSE
-                    if (data_in[2] == "x") then
+                    if (data_received[2] == "x") then
                         manualcontrol = 1
                         disable
                         write 14, 1
                         enable
                         GOSUB sendDataOK    
                     ELSE
-                        if (data_in[2] == "y") then
+                        if (data_received[2] == "y") then
                             manualcontrol = 0
                             disable
                             write 14, 0
                             enable
                             GOSUB sendDataOK    
                         else
-                            if (data_in[2] == "p") then
-                                if (data_in[3] == "n") then
+                            if (data_received[2] == "p") then
+                                if (data_received[3] == "n") then
                                     gosub sendDataOK
                                 endif
                             endif
@@ -238,16 +235,7 @@ if (data_in[1] == device_id) then
         gosub sendError
     endif
 endif
-data_out[0]=Fifo_status 'Read FIFO status
-num_byte=1
-gosub spi_read
-val= data_in[1] 'FIFO status register
-if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
-data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
-data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
-num_byte=1
-gosub spi_write
-pause 2 'wait 2ms Rx<->Tx
+enable
 GOTO Main_rx
 end
 
@@ -255,6 +243,11 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
+           if ticks = 5 then
+                    for interi=0 to payloadLengthD - 1
+                        data_received[interi] = 0
+                    next interi
+           endif           
            If ticks < 31 Then tiexit
            ticks = 0
            realseconds = realseconds + 1
@@ -301,7 +294,7 @@ convertInputData:
     confSuccess = 0
     for ic=0 to 2    
         TEMP1_BYTE = "a"
-        TEMP2_BYTE = data_in[i]
+        TEMP2_BYTE = data_received[i]
         if (TEMP2_BYTE == "|") then return
         GOSUB lookupChar
         if (TEMP1_BYTE == "a") then return 

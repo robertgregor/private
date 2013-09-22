@@ -29,6 +29,21 @@ AIN?BBB macro Bin, Bout, Bndx
     endif
     endm
 
+AIN?CBB macro Cin, Bout, Bndx
+        CHK?RP  Bndx
+        movf    Bndx, W
+        addlw   low (Bout)
+        movwf   FSR
+    if (Bout > 255)
+        bsf     STATUS, IRP
+    endif
+        movlw   Cin
+        movwf   INDF
+    if (Bout > 255)
+        bcf     STATUS, IRP
+    endif
+    endm
+
 AOUT?BBB macro Bin, Bndx, Bout
         CHK?RP  Bndx
         movf    Bndx, W
@@ -159,48 +174,6 @@ ADD?WCB macro Win, Cin, Bout
     endif
     endm
 
-ADD?WCW macro Win, Cin, Wout
-    if (Wout == Win)
-      if (Cin == 1)
-        CHK?RP  Wout
-        incf    Wout, F
-        btfsc   STATUS, Z
-        incf    Wout + 1, F
-      else  
-        movlw   low (Cin)
-        CHK?RP  Wout
-        addwf   Wout, F
-        if (((Cin) >> 8) == 0)
-        btfsc   STATUS, C
-        incf    Wout + 1, F
-        else
-        movlw   (Cin) >> 8
-        btfsc   STATUS, C
-        addlw   1
-        addwf   Wout + 1, F
-        endif
-      endif
-    else
-        movlw   low (Cin)
-        CHK?RP  Win
-        addwf   Win, W
-        MOVE?AB Wout
-      if (((Cin) >> 8) == 0)
-        MOVE?BA Win + 1
-        btfsc   STATUS, C
-        addlw   1
-        MOVE?AB Wout + 1
-      else
-        movlw   (Cin) >> 8
-        btfsc   STATUS, C
-        addlw   1
-        CHK?RP  Win
-        addwf   Win + 1, W
-        MOVE?AB Wout + 1
-      endif
-    endif
-    endm
-
 MUL?BCW macro Bin, Cin, Wout
         MOVE?BW Bin, R3
         MOVE?CW Cin, R1
@@ -262,6 +235,14 @@ AND?BCW macro Bin, Cin, Wout
         CHK?RP  Bin
         andwf   Bin, W
         MOVE?AW Wout
+    endm
+
+CMPEQ?BBL macro Bin1, Bin2, Label
+        CLRWDT?
+        MOVE?BA Bin1
+        CHK?RP  Bin2
+        subwf   Bin2, W
+        BIT?GOTO 1, STATUS, Z, Label
     endm
 
 CMPEQ?BCL macro Bin, Cin, Label
@@ -334,15 +315,6 @@ CMPLT?BCL macro Bin, Cin, Label
         L?GOTO  Label
     endif
     endm
-
-CMPLT?WCL macro Win, Cin, Label
-        MOVE?WW Win, R0
-        MOVE?CB (Cin) >> 8, R1 + 1
-        MOVE?CA low (Cin)
-        L?CALL  CMPLT
-        BIT?GOTO 0, STATUS, Z, Label
-    endm
-CMPLT_USED = 1
 
 CMPNE?BBL macro Bin1, Bin2, Label
         CLRWDT?

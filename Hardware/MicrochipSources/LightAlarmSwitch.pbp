@@ -30,7 +30,7 @@ EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,1,0,0,0,0]
  CM1CON0 = 0
  CM2CON0 = 0
  
- 'interrupt for timer
+'interrupt for timer
 INTCON = %10100000
 PIE1 = %00000000
 OPTION_REG = %00000111
@@ -52,7 +52,6 @@ RES var PORTB.5
 RELAY VAR PORTA.4
 i VAR BYTE 'loop counter
 j var byte
-
 relay_alarm_counter var byte
 configure var byte
 temp_byte_int var byte
@@ -65,8 +64,6 @@ temp_word var word
 ALSTATUS VAR BYTE '0 disabled, 1 enabled, 2 activated, 3 leave timeout running, 4 enter timeout running
 ALEnterCounter VAR BYTE
 ALLeaveCounter VAR BYTE
-seconds  var     byte    ' Define second variable
-ticks   var     byte    ' Define pieces of seconds variable
 l1counter var byte
 l1onAlarm var byte
 conversionSuccess var byte
@@ -140,17 +137,16 @@ endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
-data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
-num_byte=payloadLength
-gosub spi_read
+disable
+gosub ackData
 temp_data[0] = 0
-if (data_in[1] == device_id) then
-    if (data_in[2] == "c") then    
-        if (data_in[3] == "=") then
+if (data_received[1] == device_id) then
+    if (data_received[2] == "c") then    
+        if (data_received[3] == "=") then
            'OK it is configure
             for i = 0 to 10
                 disable
-                write i, data_in[i+4]
+                write i, data_received[i+4]
                 enable
             next i
             read 10, device_id
@@ -159,37 +155,37 @@ if (data_in[1] == device_id) then
             gosub sendDataOK
         endif
     endif
-    if (data_in[2] == "l") then
-        if (data_in[3] == "1") then
-            if (data_in[4] == "c") then
-                if (data_in[5] == "o") then
+    if (data_received[2] == "l") then
+        if (data_received[3] == "1") then
+            if (data_received[4] == "c") then
+                if (data_received[5] == "o") then
                     disable
                     write 11, 0
                     enable
                     gosub sendDataOK
                 endif
-                if (data_in[5] == "f") then
+                if (data_received[5] == "f") then
                     disable
                     write 11, 1
                     enable
                     gosub sendDataOK
                 endif
-                if (data_in[5] == "d") then
+                if (data_received[5] == "d") then
                     disable
                     write 13, 1
                     enable
                     l1onAlarm = 1
                     gosub sendDataOK
                 endif
-                if (data_in[5] == "c") then
+                if (data_received[5] == "c") then
                     disable
                     write 13, 0
                     enable
                     l1onAlarm = 0
                     gosub sendDataOK
                 endif                
-                if (data_in[5] == "t") then
-                    if (data_in[6] == "=") then
+                if (data_received[5] == "t") then
+                    if (data_received[6] == "=") then
                         i = 7
                         gosub convertInputData
                         if (conversionSuccess == 1) then
@@ -203,8 +199,8 @@ if (data_in[1] == device_id) then
                     endif
                 endif                
             endif
-            if (data_in[4] == "o") then
-                if (data_in[5] == "f") then
+            if (data_received[4] == "o") then
+                if (data_received[5] == "f") then
                     seconds = 0
                     read 12, l1counter
                     gosub highRelay
@@ -214,15 +210,15 @@ if (data_in[1] == device_id) then
                 endif
                 gosub sendDataOK
             endif
-            if (data_in[4] == "f") then
+            if (data_received[4] == "f") then
                 gosub LOWrelay
                 gosub sendDataOK
             endif
         endif
     endif
-    if (data_in[2] == "a") then
-        if (data_in[3] == "l") then 
-            if (data_in[4] == "a") then
+    if (data_received[2] == "a") then
+        if (data_received[3] == "l") then 
+            if (data_received[4] == "a") then
                 read 15, ALLeaveCounter
                 ALEnterCounter = 0
                 if (ALLeaveCounter == 0) then
@@ -232,24 +228,24 @@ if (data_in[1] == device_id) then
                 endif
                 gosub sendDataOK
             endif
-            if (data_in[4] == "d") then
+            if (data_received[4] == "d") then
                 alstatus = 0
                 ALLeaveCounter = 0
                 ALEnterCounter = 0
                 gosub sendDataOK
             endif
-            if (data_in[4] == "c") then
-                if (data_in[6] == "=") then
+            if (data_received[4] == "c") then
+                if (data_received[6] == "=") then
                     i = 7
                     gosub convertInputData
                     if (conversionSuccess == 1) then
-                        if (data_in[5] == "e") then
+                        if (data_received[5] == "e") then
                             disable
                             write 14, temp_byte
                             enable
                             gosub sendDataOK
                         endif
-                        if (data_in[5] == "l") then
+                        if (data_received[5] == "l") then
                             disable
                             write 15, temp_byte
                             enable
@@ -260,8 +256,8 @@ if (data_in[1] == device_id) then
             endif
         endif
     endif
-    if (data_in[2] == "s") then
-        if (data_in[3] == "a") then
+    if (data_received[2] == "s") then
+        if (data_received[3] == "a") then
             temp_data[0] = "1"
             temp_data[1] = "|"
             temp_data[2] = "a"
@@ -284,7 +280,7 @@ if (data_in[1] == device_id) then
             temp_data[15] = 13            
             temp_data[16] = 10            
         endif
-        if (data_in[3] == "c") then
+        if (data_received[3] == "c") then
             temp_data[0] = "1"
             temp_data[1] = "|"
             temp_data[2] = "c"
@@ -312,8 +308,8 @@ if (data_in[1] == device_id) then
             temp_data[18] = 10    
         endif
     endif
-    if (data_in[2] == "p") then
-            if (data_in[3] == "n") then
+    if (data_received[2] == "p") then
+            if (data_received[3] == "n") then
                 gosub sendDataOK
             endif
     endif
@@ -321,17 +317,7 @@ if (data_in[1] == device_id) then
         gosub sendDataError
     endif
 endif
-
-data_out[0]=Fifo_status 'Read FIFO status
-num_byte=1
-gosub spi_read
-val= data_in[1] 'FIFO status register
-if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
-data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
-data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
-num_byte=1
-gosub spi_write
-pause 2 'wait 2ms Rx<->Tx
+enable
 GOTO Main_rx
 end
 
@@ -339,6 +325,11 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
+           if ticks = 5 then
+                    for interi=0 to payloadLengthD - 1
+                        data_received[interi] = 0
+                    next interi
+           endif
            If ticks < 31 Then tiexit
            ticks = 0
            seconds = seconds + 1
@@ -418,7 +409,7 @@ convertInputData:
     TEMP_BYTE="a"
     for k=0 to 2    
         TEMP1_BYTE = "a"
-        TEMP2_BYTE = data_in[i]
+        TEMP2_BYTE = data_received[i]
         if (TEMP2_BYTE == "|") then return
         GOSUB lookupChar
         if (TEMP1_BYTE == "a") then return 

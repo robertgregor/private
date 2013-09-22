@@ -58,8 +58,6 @@ temp2_word var word
 temp3_word var word
 EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
-seconds  var     byte    ' Define second variable
-ticks   var     byte    ' Define pieces of seconds variable
 counter var word
 initialCounter var word
 initialPercent var byte
@@ -121,17 +119,16 @@ endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
-data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
-num_byte=payloadLength
-gosub spi_read
+disable
+gosub ackData
 temp_data[0] = 0
-if (data_in[1] == device_id) then
-    if (data_in[2] == "c") then    
-        if (data_in[3] == "=") then
+if (data_received[1] == device_id) then
+    if (data_received[2] == "c") then    
+        if (data_received[3] == "=") then
            'OK it is configure
             for i = 0 to 10
                 disable
-                write i, data_in[i+4]
+                write i, data_received[i+4]
                 enable
             next i
             read 10, device_id
@@ -140,9 +137,9 @@ if (data_in[1] == device_id) then
             gosub sendDataOK
         endif
     else
-     if (data_in[2] == "b") then
-        if (data_in[3] == "t") then
-            if (data_in[4] == "=") then
+     if (data_received[2] == "b") then
+        if (data_received[3] == "t") then
+            if (data_received[4] == "=") then
                 i = 5
                 gosub convertInputData
                 if (conversionSuccess == 1) then
@@ -157,7 +154,7 @@ if (data_in[1] == device_id) then
          if (timeout_value == 0) then
             'timeout not set send error
          else
-          if (data_in[3] == "d") then
+          if (data_received[3] == "d") then
             counter = timeout_value
             initialcounter = counter
             gosub blindsDown
@@ -165,7 +162,7 @@ if (data_in[1] == device_id) then
             currentCounter = 100
             gosub sendDataOK
           else
-           if (data_in[3] == "u") then
+           if (data_received[3] == "u") then
             counter = timeout_value
             initialCounter = counter
             gosub blindsup
@@ -173,8 +170,8 @@ if (data_in[1] == device_id) then
             currentCounter = 0
             gosub sendDataOK
            else
-            if (data_in[3] == "m") then
-             if (data_in[4] == "=") then
+            if (data_received[3] == "m") then
+             if (data_received[4] == "=") then
                 i = 5
                 gosub convertInputData
                 if (conversionSuccess == 1) then
@@ -205,7 +202,7 @@ if (data_in[1] == device_id) then
                 endif                                                   
              endif
             else
-             if (data_in[3] == "s") then
+             if (data_received[3] == "s") then
               if (currentDirection != 0) then
                 temp_word = initialCounter - counter
                 disable
@@ -238,7 +235,7 @@ if (data_in[1] == device_id) then
          endif
         endif
      else
-      if (data_in[2] == "s") then
+      if (data_received[2] == "s") then
             temp_data[0] = "5"
             temp_data[1] = "|"
             temp_data[2] = RELAY_DOWN + $30
@@ -260,20 +257,20 @@ if (data_in[1] == device_id) then
             temp_data[13] = 13    
             temp_data[14] = 10    
       else
-       if (data_in[2] == "p") then
-            if (data_in[3] == "n") then
+       if (data_received[2] == "p") then
+            if (data_received[3] == "n") then
                 gosub sendDataOK
             endif
        else
-        if (data_in[2] == "u") then
+        if (data_received[2] == "u") then
          gosub blindsUp
          gosub sendDataOK        
         else
-         if (data_in[2] == "d") then
+         if (data_received[2] == "d") then
           gosub blindsDown
           gosub sendDataOK
          else
-          if (data_in[2] == "e") then
+          if (data_received[2] == "e") then
            gosub stopBlindsSilent
            gosub sendDataOK
           endif
@@ -293,17 +290,7 @@ if (data_in[1] == device_id) then
         temp_data[6] = 10
     endif
 endif
-
-data_out[0]=Fifo_status 'Read FIFO status
-num_byte=1
-gosub spi_read
-val= data_in[1] 'FIFO status register
-if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
-data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
-data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
-num_byte=1
-gosub spi_write
-pause 2 'wait 2ms Rx<->Tx
+enable
 GOTO Main_rx
 end
 
@@ -311,6 +298,11 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
+           if ticks = 5 then
+                    for interi=0 to payloadLengthD - 1
+                        data_received[interi] = 0
+                    next interi
+           endif                      
            if (counter > 0) then
                counter = counter - 1
                if (counter == 0) then
@@ -389,7 +381,7 @@ convertInputData:
     TEMP_BYTE="a"
     for ci=0 to 2    
         TEMP1_BYTE = "a"
-        TEMP2_BYTE = data_in[i]
+        TEMP2_BYTE = data_received[i]
         if (TEMP2_BYTE == "|") then return
         GOSUB lookupChar
         if (TEMP1_BYTE == "a") then return 

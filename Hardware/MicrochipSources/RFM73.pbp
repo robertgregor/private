@@ -26,6 +26,9 @@ temp4_byte_rfm var byte
 device_id var byte
 sameFlag VAR BYTE
 ir var byte
+ticks var byte
+seconds var byte
+interi var byte
 
 '----------nRF24L01 interrupt flags---------------------------------------------
 Idle_int con $00 'Idle no interrupt pending
@@ -286,6 +289,9 @@ gosub spi_write1
 return
 
 ackData:
+data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
+num_byte=payloadLength
+gosub spi_read
 'data_received = data_in
 sameFlag = 1
 for ir=0 to payloadLengthD - 1

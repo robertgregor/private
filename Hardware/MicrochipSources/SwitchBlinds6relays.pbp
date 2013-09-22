@@ -71,8 +71,6 @@ temp2_word var word
 temp3_word var word
 EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
-seconds  var     byte    ' Define second variable
-ticks   var     byte    ' Define pieces of seconds variable
 counter var word[3]
 initialCounter var word[3]
 initialPercent var byte[3]
@@ -153,17 +151,16 @@ endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
-data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
-num_byte=payloadLength
-gosub spi_read
+disable
+gosub ackData
 temp_data[0] = 0
-if (data_in[1] == device_id) then
-    if (data_in[2] == "c") then    
-        if (data_in[3] == "=") then
+if (data_received[1] == device_id) then
+    if (data_received[2] == "c") then    
+        if (data_received[3] == "=") then
            'OK it is configure
             for i = 0 to 10
                 disable
-                write i, data_in[i+4]
+                write i, data_received[i+4]
                 enable
             next i
             read 10, device_id
@@ -172,15 +169,15 @@ if (data_in[1] == device_id) then
             gosub sendDataOK
         endif
     else
-     if (data_in[2] == "b") then
+     if (data_received[2] == "b") then
         I = 3
         gosub convertInputData
         if (conversionSuccess == 1) then
             temp4_byte = temp_byte - 1 'this is relay number
             if (TEMP_BYTE > 0) then
                 if (TEMP_BYTE < 4) then
-                    if (data_in[4] == "t") then
-                        if (data_in[5] == "=") then
+                    if (data_received[4] == "t") then
+                        if (data_received[5] == "=") then
                             i = 6
                             gosub convertInputData
                             if (conversionSuccess == 1) then
@@ -194,7 +191,7 @@ if (data_in[1] == device_id) then
                             endif                                   
                         endif
                     else
-                     if (data_in[4] == "d") then
+                     if (data_received[4] == "d") then
                         counter[temp4_byte] = timeout_value[temp4_byte]
                         initialcounter[temp4_byte] = counter[temp4_byte]
                         relaysGroup = temp4_byte
@@ -203,7 +200,7 @@ if (data_in[1] == device_id) then
                         currentCounter[temp4_byte] = 100
                         gosub sendDataOK
                      else
-                      if (data_in[4] == "u") then
+                      if (data_received[4] == "u") then
                         counter[temp4_byte] = timeout_value[temp4_byte]
                         initialCounter[temp4_byte] = counter[temp4_byte]
                         relaysGroup = temp4_byte
@@ -212,8 +209,8 @@ if (data_in[1] == device_id) then
                         currentCounter[temp4_byte] = 0
                         gosub sendDataOK
                       else
-                       if (data_in[4] == "m") then
-                        if (data_in[5] == "=") then
+                       if (data_received[4] == "m") then
+                        if (data_received[5] == "=") then
                             i = 6
                             gosub convertInputData
                             if (conversionSuccess == 1) then
@@ -246,7 +243,7 @@ if (data_in[1] == device_id) then
                             endif                                                   
                         endif
                        else
-                        if (data_in[4] == "s") then               
+                        if (data_received[4] == "s") then               
                          if (currentDirection[temp4_byte] != 0) then
                             temp_word = initialCounter[temp4_byte] - counter[temp4_byte]
                             disable
@@ -281,7 +278,7 @@ if (data_in[1] == device_id) then
             endif
         endif
      else
-      if (data_in[2] == "s") then
+      if (data_received[2] == "s") then
         I = 3
         gosub convertInputData
         if (conversionSuccess == 1) then
@@ -325,12 +322,12 @@ if (data_in[1] == device_id) then
             endif
         endif
       else
-       if (data_in[2] == "p") then
-            if (data_in[3] == "n") then
+       if (data_received[2] == "p") then
+            if (data_received[3] == "n") then
                 gosub sendDataOK
             endif
        else
-        if (data_in[2] == "u") then
+        if (data_received[2] == "u") then
          I = 3
          gosub convertInputData
          if (conversionSuccess == 1) then
@@ -343,7 +340,7 @@ if (data_in[1] == device_id) then
             endif
          endif
         else
-         if (data_in[2] == "d") then
+         if (data_received[2] == "d") then
           I = 3
           gosub convertInputData
           if (conversionSuccess == 1) then
@@ -356,7 +353,7 @@ if (data_in[1] == device_id) then
             endif
           endif
          else
-          if (data_in[2] == "e") then
+          if (data_received[2] == "e") then
            I = 3
            gosub convertInputData
            if (conversionSuccess == 1) then
@@ -384,17 +381,7 @@ if (data_in[1] == device_id) then
         temp_data[5] = 10
     endif
 endif
-
-data_out[0]=Fifo_status 'Read FIFO status
-num_byte=1
-gosub spi_read
-val= data_in[1] 'FIFO status register
-if val.0=0 then lop 'test RX_EMPTY=1, RX_FIFO empty
-data_out[0]=Write_reg+Stat_us 'reset RX_DR status bit
-data_out[1]=%01000000 'write 1 tp RX_DR to reset IRQ
-num_byte=1
-gosub spi_write
-pause 2 'wait 2ms Rx<->Tx
+enable
 GOTO Main_rx
 end
 
@@ -402,6 +389,11 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
+           if ticks = 5 then
+                    for interi=0 to payloadLengthD - 1
+                        data_received[interi] = 0
+                    next interi
+           endif           
            for iint = 0 to 2
                if (counter[iint] > 0) then
                    counter[iint] = counter[iint] - 1
@@ -552,7 +544,7 @@ convertInputData:
     TEMP_BYTE="a"
     for ci=0 to 2    
         TEMP1_BYTE = "a"
-        TEMP2_BYTE = data_in[i]
+        TEMP2_BYTE = data_received[i]
         if (TEMP2_BYTE == "|") then return
         GOSUB lookupChar
         if (TEMP1_BYTE == "a") then return 

@@ -82,8 +82,6 @@ temp2_byte var byte
 temp3_byte var byte
 temp_word var word
 temp_word_int var word
-seconds  var     byte   ' Define second variable
-ticks   var     byte    ' Define pieces of seconds variable
 l1counter var byte
 conversionSuccess VAR BYTE
 Dummy       VAR BYTE
@@ -265,19 +263,17 @@ if (mode > 2) then irqLoop
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
-data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
-num_byte=payloadLength
-gosub spi_read
+disable
 gosub ackData
 'manage the received data
 temp_data[0] = 0
-if (data_in[1] == device_id) then
-    if (data_in[3] == "=") then
-        if (data_in[2] == "c") then        
+if (data_received[1] == device_id) then
+    if (data_received[3] == "=") then
+        if (data_received[2] == "c") then        
             'OK it is configure
             for i = 0 to 10
                 disable
-                write i, data_in[i+4]
+                write i, data_received[i+4]
                 enable
             next i
             read 10, device_id            
@@ -287,13 +283,13 @@ if (data_in[1] == device_id) then
         else
                         i = 4
                         gosub convertInputData
-                        if (data_in[2] == "l") then
+                        if (data_received[2] == "l") then
                             if (temp_byte < 101) then 
                                 gosub setValveToPosition
                                 gosub sendDataOK
                             endif
                         else
-                            if (data_in[2] == "m") then
+                            if (data_received[2] == "m") then
                                 disable   
                                 write 11, temp_byte
                                 enable
@@ -301,14 +297,14 @@ if (data_in[1] == device_id) then
                                 gosub setModeBasedOnSleepPeriod
                                 gosub sendDataOK
                             else
-                                if (data_in[2] == "t") then 
+                                if (data_received[2] == "t") then 
                                     disable
                                     write 14, temp_byte
                                     enable
                                     temperatureExp = temp_byte
                                     gosub sendDataOK
                                 else
-                                    if (data_in[2] == "n") then 
+                                    if (data_received[2] == "n") then 
                                         disable
                                         write 15, temp_byte
                                         enable
@@ -320,16 +316,16 @@ if (data_in[1] == device_id) then
                         endif
         endif
     ELSE
-        if (data_in[2] == "a") then
+        if (data_received[2] == "a") then
             mode = 4
             gosub sendDataOK
         else
-            if (data_in[2] == "p") then
-                if (data_in[3] == "n") then
+            if (data_received[2] == "p") then
+                if (data_received[3] == "n") then
                     gosub sendDataOK
                 endif
             ELSE
-                if (data_in[2] == "s") then    
+                if (data_received[2] == "s") then    
                     gosub sendTemperature
                 endif
             endif
@@ -351,6 +347,11 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
+           if ticks = 5 then
+                    for interi=0 to payloadLengthD - 1
+                        data_received[interi] = 0
+                    next interi
+           endif
            if (motorRunning != 0) then
                 if (MOVE_SENSOR != moveSensorPrevious) then
                     if (motorRunning == 1) then 
@@ -427,10 +428,10 @@ convertInputData:
     temp_word = 0
     conversionSuccess = 0
     labelContReadDecimals:
-        if data_in[i] > 47 then
-            if data_in[i] < 58 then
+        if data_received[i] > 47 then
+            if data_received[i] < 58 then
                 conversionSuccess = 1
-                TEMP_word = TEMP_word*10 + ((data_in[i]+2)-50)
+                TEMP_word = TEMP_word*10 + ((data_received[i]+2)-50)
                 i=i+1
                 if (TEMP_word < 256) then goto labelContReadDecimals
             endif

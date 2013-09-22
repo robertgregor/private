@@ -15,7 +15,6 @@
 
 EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,0,0,0,0]
 
-ticks   var     byte    ' Define pieces of seconds variable
 INCLUDE "RFM73.pbp"
 
  DEFINE OSC 8
@@ -44,7 +43,6 @@ TRISC = %00000100 'Set IRQ input
 i VAR BYTE 'loop counter
 j var byte
 ci var byte
-interi var byte
 configure var byte
 temp_byte_int var byte
 temp_byte var byte
@@ -54,7 +52,6 @@ temp3_byte var byte
 temp_word var word
 EEPROMBYTE      VAR BYTE
 EEPROMPOSITION  VAR BYTE
-seconds  var     byte    ' Define second variable
 l1counter var byte
 conversionSuccess VAR BYTE
 
@@ -93,9 +90,6 @@ endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
-data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
-num_byte=payloadLength
-gosub spi_read
 disable
 gosub ackData
 'manage the received data
@@ -172,7 +166,7 @@ convertInputData:
     TEMP_BYTE="a"
     for ci=0 to 2    
         TEMP1_BYTE = "a"
-        TEMP2_BYTE = data_in[i]
+        TEMP2_BYTE = data_received[i]
         if (TEMP2_BYTE == "|") then return
         GOSUB lookupChar
         if (TEMP1_BYTE == "a") then return 

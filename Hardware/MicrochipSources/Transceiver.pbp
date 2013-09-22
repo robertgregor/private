@@ -12,7 +12,6 @@
 '1,2,3,4,5 bank name transmitter
 '6,7,8,9 bank name device
 
-ticks var byte
 INCLUDE "RFM73.pbp"
 
 EEPROM  0, [40,"R","E","M","O","T","E","H","O","M",0,0,0,0,0,0]
@@ -45,7 +44,6 @@ WPUB = %11111111
 resetButton var PORTA.5
 i VAR BYTE 'loop counter
 j var byte
-interi var byte
 manageSerial var byte
 temp_byte_int var byte
 temp_byte var byte
@@ -59,8 +57,6 @@ backup_data var byte[payloadLength]
 conversionSuccessfull var byte
 ci var byte
 flagRestoreBackedConfig var byte
-
-seconds var byte
 minutes var byte
 resetLabel:
 clear
@@ -172,9 +168,6 @@ endif
 If Irq !=0 then irqLoop 'wait until IRQ, active low
 Ce=0
 lop:
-data_out[0]=rd_rx_pload 'Read 5 bytes Rx pload
-num_byte=payloadLength
-gosub spi_read
 disable
 gosub ackData
 'manage the received data
