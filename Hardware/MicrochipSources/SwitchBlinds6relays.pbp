@@ -402,21 +402,21 @@ intManagement:
                             low RELAY1_DOWN
                             low RELAY1_UP
                             currentDirection[iint] = 0
-                            currentPositionRelayNotifNumber = 31
+                            currentPositionRelayNotifNumber = 49
                             gosub sendCurrentPosition
                         else
                          if (iint == 1) then
                             low RELAY2_DOWN
                             low RELAY2_UP                            
                             currentDirection[iint] = 0
-                            currentPositionRelayNotifNumber = 32                            
+                            currentPositionRelayNotifNumber = 50                            
                             gosub sendCurrentPosition
                          else
                           if (iint == 2) then
                             low RELAY3_DOWN
                             low RELAY3_UP                            
                             currentDirection[iint] = 0
-                            currentPositionRelayNotifNumber = 33
+                            currentPositionRelayNotifNumber = 51
                             gosub sendCurrentPosition
                           endif
                          endif
@@ -445,17 +445,17 @@ stopBlindsSilent:
     if (relaysGroup == 0) then
         LOW RELAY1_DOWN
         low RELAY1_UP
-        currentPositionRelayNotifNumber = 31
+        currentPositionRelayNotifNumber = 49
     else
      if (relaysGroup == 1) then
         LOW RELAY2_DOWN
         low RELAY2_UP
-        currentPositionRelayNotifNumber = 32
+        currentPositionRelayNotifNumber = 50
      else
       if (relaysGroup == 2) then
         LOW RELAY3_DOWN
         low RELAY3_UP
-        currentPositionRelayNotifNumber = 33
+        currentPositionRelayNotifNumber = 51
       endif
      endif
     endif
@@ -505,13 +505,13 @@ return
 sendCurrentPosition:
     temp_data[0] = "l"
     temp_data[1] = "|"
-    if (currentPositionRelayNotifNumber == 31) then
+    if (currentPositionRelayNotifNumber == 49) then
         temp_byte = currentCounter[0]
     else
-     if (currentPositionRelayNotifNumber == 32) then
+     if (currentPositionRelayNotifNumber == 50) then
         temp_byte = currentCounter[1]
      else
-      if (currentPositionRelayNotifNumber == 33) then
+      if (currentPositionRelayNotifNumber == 51) then
         temp_byte = currentCounter[2]
       endif
      endif

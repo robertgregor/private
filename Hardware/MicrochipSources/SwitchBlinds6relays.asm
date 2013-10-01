@@ -2477,8 +2477,8 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00404	                            currentDirection[iint] = 0
 	AIN?CBB	000h, _currentDirection, _iint
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00405	                            currentPositionRelayNotifNumber = 31
-	MOVE?CB	01Fh, _currentPositionRelayNotifNumber
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00405	                            currentPositionRelayNotifNumber = 49
+	MOVE?CB	031h, _currentPositionRelayNotifNumber
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00406	                            gosub sendCurrentPosition
 	GOSUB?L	_sendCurrentPosition
@@ -2499,8 +2499,8 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00411	                            currentDirection[iint] = 0
 	AIN?CBB	000h, _currentDirection, _iint
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00412	                            currentPositionRelayNotifNumber = 32                            
-	MOVE?CB	020h, _currentPositionRelayNotifNumber
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00412	                            currentPositionRelayNotifNumber = 50                            
+	MOVE?CB	032h, _currentPositionRelayNotifNumber
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00413	                            gosub sendCurrentPosition
 	GOSUB?L	_sendCurrentPosition
@@ -2521,8 +2521,8 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00418	                            currentDirection[iint] = 0
 	AIN?CBB	000h, _currentDirection, _iint
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00419	                            currentPositionRelayNotifNumber = 33
-	MOVE?CB	021h, _currentPositionRelayNotifNumber
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00419	                            currentPositionRelayNotifNumber = 51
+	MOVE?CB	033h, _currentPositionRelayNotifNumber
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00420	                            gosub sendCurrentPosition
 	GOSUB?L	_sendCurrentPosition
@@ -2612,9 +2612,9 @@ _Fifo_status     		EQU	00017h
 	ICALL?L	L00001
 	LOW?T	_RELAY1_UP
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00448	        currentPositionRelayNotifNumber = 31
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00448	        currentPositionRelayNotifNumber = 49
 	ICALL?L	L00001
-	MOVE?CB	01Fh, _currentPositionRelayNotifNumber
+	MOVE?CB	031h, _currentPositionRelayNotifNumber
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00449	    else
 	ICALL?L	L00001
@@ -2633,9 +2633,9 @@ _Fifo_status     		EQU	00017h
 	ICALL?L	L00001
 	LOW?T	_RELAY2_UP
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00453	        currentPositionRelayNotifNumber = 32
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00453	        currentPositionRelayNotifNumber = 50
 	ICALL?L	L00001
-	MOVE?CB	020h, _currentPositionRelayNotifNumber
+	MOVE?CB	032h, _currentPositionRelayNotifNumber
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00454	     else
 	ICALL?L	L00001
@@ -2654,9 +2654,9 @@ _Fifo_status     		EQU	00017h
 	ICALL?L	L00001
 	LOW?T	_RELAY3_UP
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00458	        currentPositionRelayNotifNumber = 33
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00458	        currentPositionRelayNotifNumber = 51
 	ICALL?L	L00001
-	MOVE?CB	021h, _currentPositionRelayNotifNumber
+	MOVE?CB	033h, _currentPositionRelayNotifNumber
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00459	      endif
 	ICALL?L	L00001
@@ -2846,9 +2846,9 @@ _Fifo_status     		EQU	00017h
 	ICALL?L	L00001
 	MOVE?CB	07Ch, _temp_data + 00001h
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00508	    if (currentPositionRelayNotifNumber == 31) then
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00508	    if (currentPositionRelayNotifNumber == 49) then
 	ICALL?L	L00001
-	CMPNE?BCL	_currentPositionRelayNotifNumber, 01Fh, L00157
+	CMPNE?BCL	_currentPositionRelayNotifNumber, 031h, L00157
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00509	        temp_byte = currentCounter[0]
 	ICALL?L	L00001
@@ -2859,9 +2859,9 @@ _Fifo_status     		EQU	00017h
 	GOTO?L	L00158
 	LABEL?L	L00157	
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00511	     if (currentPositionRelayNotifNumber == 32) then
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00511	     if (currentPositionRelayNotifNumber == 50) then
 	ICALL?L	L00001
-	CMPNE?BCL	_currentPositionRelayNotifNumber, 020h, L00159
+	CMPNE?BCL	_currentPositionRelayNotifNumber, 032h, L00159
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00512	        temp_byte = currentCounter[1]
 	ICALL?L	L00001
@@ -2872,9 +2872,9 @@ _Fifo_status     		EQU	00017h
 	GOTO?L	L00160
 	LABEL?L	L00159	
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00514	      if (currentPositionRelayNotifNumber == 33) then
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00514	      if (currentPositionRelayNotifNumber == 51) then
 	ICALL?L	L00001
-	CMPNE?BCL	_currentPositionRelayNotifNumber, 021h, L00161
+	CMPNE?BCL	_currentPositionRelayNotifNumber, 033h, L00161
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\SWITCH~2.PBP	00515	        temp_byte = currentCounter[2]
 	ICALL?L	L00001

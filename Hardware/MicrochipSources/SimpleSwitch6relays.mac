@@ -224,6 +224,21 @@ ADD?WCB macro Win, Cin, Bout
     endif
     endm
 
+DIV?BCW macro Bin, Cin, Wout
+    if (Cin == 2)
+        bcf     STATUS, C
+        CHK?RP  Bin
+        rrf     Bin, W
+        MOVE?AW Wout
+    else
+        MOVE?BW Bin, R0
+        MOVE?CW Cin, R1
+        L?CALL  DIV
+        MOVE?AWW R0, Wout
+    endif
+    endm
+DIV_USED = 1
+
 MUL?BCW macro Bin, Cin, Wout
         MOVE?BW Bin, R3
         MOVE?CW Cin, R1
