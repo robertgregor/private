@@ -190,7 +190,7 @@ intManagement:
                     flagRestoreBackedConfig = 2
                 endif
            endif
-           if ticks = 5 then
+           if ticks = 10 then
                     for interi=0 to payloadLengthD - 1
                         data_received[interi] = 0
                     next interi

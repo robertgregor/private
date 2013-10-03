@@ -1478,8 +1478,8 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\GENERA~1.PBP	00140	           ticks = ticks + 1      ' Count pieces of seconds
 	ADD?BCB	_ticks, 001h, _ticks
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\GENERA~1.PBP	00141	           if ticks = 5 then
-	CMPNE?BCL	_ticks, 005h, L00041
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\GENERA~1.PBP	00141	           if ticks = 10 then
+	CMPNE?BCL	_ticks, 00Ah, L00041
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\GENERA~1.PBP	00142	                    for interi=0 to payloadLengthD - 1
 	MOVE?CB	000h, _interi
@@ -1572,9 +1572,9 @@ _Fifo_status     		EQU	00017h
 	ICALL?L	L00001
 	MOVE?CB	061h, _temp1_byte
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\GENERA~1.PBP	00169	        TEMP2_BYTE = data_in[i]
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\GENERA~1.PBP	00169	        TEMP2_BYTE = data_received[i]
 	ICALL?L	L00001
-	AOUT?BBB	_data_in, _i, _temp2_byte
+	AOUT?BBB	_data_received, _i, _temp2_byte
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\GENERA~1.PBP	00170	        if (TEMP2_BYTE == "|") then return
 	ICALL?L	L00001

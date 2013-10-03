@@ -1739,8 +1739,8 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\TRANSC~1.PBP	00192	           endif
 	LABEL?L	L00059	
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\TRANSC~1.PBP	00193	           if ticks = 5 then
-	CMPNE?BCL	_ticks, 005h, L00063
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\TRANSC~1.PBP	00193	           if ticks = 10 then
+	CMPNE?BCL	_ticks, 00Ah, L00063
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\TRANSC~1.PBP	00194	                    for interi=0 to payloadLengthD - 1
 	MOVE?CB	000h, _interi

@@ -369,18 +369,6 @@ CMPGT?BCL macro Bin, Cin, Label
     endif
     endm
 
-CMPLE?BCL macro Bin, Cin, Label
-    if (Cin < 0ffh)
-        CLRWDT?
-        MOVE?CA Cin + 1
-        CHK?RP  Bin
-        subwf   Bin, W
-        BIT?GOTO 0, STATUS, C, Label
-    else
-        L?GOTO  Label
-    endif
-    endm
-
 CMPLT?BCL macro Bin, Cin, Label
     if (Cin < 100h)
         CLRWDT?

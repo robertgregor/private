@@ -2153,8 +2153,8 @@ _Fifo_status     		EQU	00017h
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\LIGHTA~1.PBP	00327	           ticks = ticks + 1      ' Count pieces of seconds
 	ADD?BCB	_ticks, 001h, _ticks
 
-; C:\RH\PRIVATE\HARDWARE\MICROC~1\LIGHTA~1.PBP	00328	           if ticks = 5 then
-	CMPNE?BCL	_ticks, 005h, L00097
+; C:\RH\PRIVATE\HARDWARE\MICROC~1\LIGHTA~1.PBP	00328	           if ticks = 10 then
+	CMPNE?BCL	_ticks, 00Ah, L00097
 
 ; C:\RH\PRIVATE\HARDWARE\MICROC~1\LIGHTA~1.PBP	00329	                    for interi=0 to payloadLengthD - 1
 	MOVE?CB	000h, _interi

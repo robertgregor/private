@@ -248,8 +248,7 @@ if (data_received[1] == device_id) then
             temp_data[7] = temp2_byte
             temp_data[8] = temp1_byte
             temp_data[9] = "|"            
-            'temp_byte = currentCounter
-            temp_byte = seconds
+            temp_byte = currentCounter
             gosub convertNoToStr
             temp_data[10] = temp3_byte
             temp_data[11] = temp2_byte
@@ -298,7 +297,7 @@ disable
 intManagement:
         if (INTCON.2 == 1) then
            ticks = ticks + 1      ' Count pieces of seconds
-           if ticks = 5 then
+           if ticks = 10 then
                     for interi=0 to payloadLengthD - 1
                         data_received[interi] = 0
                     next interi
