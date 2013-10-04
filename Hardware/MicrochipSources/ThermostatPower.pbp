@@ -94,6 +94,7 @@ gosub relayOff
 gosub initModule
 commonSettings:
 gosub commonRXTX
+gosub commonRXTX
 if (device_id != 0) then
     gosub setModebasedonsleepperiod
 endif
