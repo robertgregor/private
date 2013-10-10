@@ -69,7 +69,6 @@ gosub initModule
 
 commonSettings:
 gosub commonRXTX
-gosub commonRXTX
 
 '============Main Rx============================================================
 Main_rx:
