@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 import org.remoteHome.RemoteHomeManager;
 import org.remoteHome.RemoteHomeManagerException;
+import org.remoteHome.User;
 
 /**
  *
@@ -26,8 +27,8 @@ public class ResourceLoaderWebService extends AbstractWebService {
     public void init() {
     }
 
-    public void setParameters(RemoteHomeManager r, String... name) {
-        this.r = r;
+    public void setParameters(RemoteHomeManager r, User user, String... name) {
+        super.setParameters(r, user, name);
         this.name = name[0];
     }
     
@@ -40,7 +41,7 @@ public class ResourceLoaderWebService extends AbstractWebService {
         while ((length = br.read(buffer)) != -1) out.write(buffer, 0, length);
         br.close();
         byte[] result = out.toByteArray();
-        if (name.equals("main.html")) {
+        if (name.equals("main.html") || name.equals("login.html")) {
             //OK, replace the language placeholder PREFLANG - preferred language
             org.remoteHome.Properties p = r.getPersistance().loadProperties();
             String lang = "en";
@@ -59,9 +60,6 @@ public class ResourceLoaderWebService extends AbstractWebService {
             String page = new String(result);
             page = page.replaceAll("PREFLANG", lang);
             result = page.getBytes();
-        } else if(name.equals("login.html")) {
-            String page = new String(result);
-            result = page.getBytes();
         }
         //Save the preferred language
         if (name.startsWith("Messages_") && name.endsWith(".properties")) {
@@ -69,6 +67,7 @@ public class ResourceLoaderWebService extends AbstractWebService {
             org.remoteHome.Properties p = r.getPersistance().loadProperties();
             p.language = prefLang;
             r.getPersistance().saveProperties(p);
+            WebServerHandler.setLocale(prefLang);
         }
         Headers headers = t.getResponseHeaders();
         headers.add("Content-Type", getContentType(name));

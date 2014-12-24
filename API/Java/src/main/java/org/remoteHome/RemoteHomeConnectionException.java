@@ -42,6 +42,13 @@ public class RemoteHomeConnectionException extends Exception {
      */    
     public static final int NOT_ALLOWED = 7;
 
+        
+    /**
+     * The function or operation failed.
+     */    
+    public static final int OPERATION_FAILED = 8;
+    
+    
     private int type;
     
    /**
@@ -68,21 +75,23 @@ public class RemoteHomeConnectionException extends Exception {
     public String getMessage() {
         switch (type) {
             case UNKNOWN_HOST:
-                    return "Unknown host: "+super.getMessage();
+                    return "Unknown host: "+super.getMessage()!=null?super.getMessage():"";
             case CONNECTION:
-                    return "Cannot establish connection to smart home device: "+super.getMessage();
+                    return "Cannot establish connection to smart home device: "+super.getMessage()!=null?super.getMessage():"";
             case ERROR_FROM_DEVICE:
                     return "Error received from device, invalid command.";
             case NO_RESPONSE_FROM_DEVICE:
                     return "No any response received from device.";
             case INVALID_PARAMETER:
-                    return "Invalid parameter: "+super.getMessage();
+                    return "Invalid parameter: "+super.getMessage()!=null?super.getMessage():"";
             case UNKNOWN_PORT:
-                    return "The specified serial port doesn't exist: "+super.getMessage();
+                    return "The specified serial port doesn't exist: "+super.getMessage()!=null?super.getMessage():"";
             case NOT_ALLOWED:
-                    return "This operation is forbidden: "+super.getMessage();
+                    return "This operation is forbidden: "+super.getMessage()!=null?super.getMessage():"";
+            case OPERATION_FAILED:
+                    return "Executed operation has failed: "+super.getMessage()!=null?super.getMessage():"";
             default:
-                return super.getMessage();
+                return super.getMessage()!=null?super.getMessage():"";
         }        
     }
    /**

@@ -1,0 +1,409 @@
+<div>
+<script>
+var actionSingleAllCOMPONENTID = "false";
+function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
+  $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID&"+Math.floor((Math.random()*100)+1),
+      success: function(indata) {
+          if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+          var data = JSON.parse(indata);
+          updateComponentsCOMPONENTID(data);
+      },
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
+      }   
+  });
+}
+function updateComponentsCOMPONENTID(data) {
+          document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
+          document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
+          document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
+          if (data.currentState) {
+              document.getElementById("statusCOMPONENTID").innerHTML=on;
+              document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=on+"&nbsp;/&nbsp;"+data.currentCO2concentration+"ppm&nbsp;/&nbsp;"+data.currentHumidity+"&nbsp;%";
+              document.getElementById("titleOfAccordionStartCOMPONENTID").setAttribute('class', 'ui-icon ui-icon-lightbulb');
+          } else {
+              document.getElementById("statusCOMPONENTID").innerHTML=off;
+              document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=off+"&nbsp;/&nbsp;"+data.currentCO2concentration+"ppm&nbsp;/&nbsp;"+data.currentHumidity+"&nbsp;%";
+              document.getElementById("titleOfAccordionStartCOMPONENTID").setAttribute('class', '');
+          }
+          if (data.powerLost) {
+              document.getElementById("powerLostCOMPONENTID").innerHTML=yes;
+              document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=powerLost;
+          } else {
+              document.getElementById("powerLostCOMPONENTID").innerHTML=no;
+          }
+          if (data.enableLowBattOrPowerLostReporting) {
+              document.getElementById("powerLostReportCOMPONENTID").innerHTML=yes;
+              $( "#checkboxLostPowerReportingCOMPONENTID" ).prop('checked', true);
+          } else {
+              document.getElementById("powerLostReportCOMPONENTID").innerHTML=no;
+              $( "#checkboxLostPowerReportingCOMPONENTID" ).prop('checked', false);
+          }
+          $("#checkboxLostPowerReportingCOMPONENTID").trigger("change");
+          document.getElementById("currentCO2concentrationCOMPONENTID").innerHTML=data.currentCO2concentration;
+          document.getElementById("currentHumidityCOMPONENTID").innerHTML=data.currentHumidity;
+          document.getElementById("co2PeriodCOMPONENTID").innerHTML=data.co2Counter;
+          document.getElementById("co2PeriodFormCOMPONENTID").value = data.co2Counter;
+          document.getElementById("humidityPeriodCOMPONENTID").innerHTML = data.humidityCounter;
+          document.getElementById("humidityPeriodFormCOMPONENTID").value = data.humidityCounter;
+          document.getElementById("co2maxCOMPONENTID").innerHTML=data.maxCO2concentration;
+          document.getElementById("co2maxFormCOMPONENTID").value = data.maxCO2concentration;
+          document.getElementById("humidityMaxCOMPONENTID").innerHTML = data.maxHumidity;
+          document.getElementById("humidityMaxFormCOMPONENTID").value = data.maxHumidity;
+          document.getElementById("currentPeriodCOMPONENTID").innerHTML=data.currentCounter;
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();    
+}
+$(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 3) {
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "ONOFF");
+            }
+        }
+    });
+    $( "#actionTabsCOMPONENTID").tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 0) {
+                actionSingleAllCOMPONENTID = "false";
+            } else if (ui.newTab.index() == 1) {
+                actionSingleAllCOMPONENTID = "true";
+            }
+        }
+    });
+    $( "#chartButtHourCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "ONOFF");
+    });
+    $( "#chartButtDayCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "ONOFF");
+    });
+    $( "#chartButtWeekCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "ONOFF");
+    });
+    $( "#chartButtMonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "ONOFF");
+    });
+    $( "#chartButt3MonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "ONOFF");
+    });
+    $( "#chartButtYearCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "ONOFF");
+    });
+    $( "#chartButt3YearsCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "ONOFF");
+    });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
+    $( "#chartButtClearCOMPONENTID" ).button().click(function() {
+      $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetHistoryDataJson&deviceId=COMPONENTID&clear=true",
+            success: function(indata) {
+                if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "ONOFF");
+                alert(clear_history_data_ok);
+            },
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
+            }   
+          });
+    });
+    $( "#SwitchOnSimpleSwitchCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=VentilatorControllerDeviceManager&deviceId=COMPONENTID&action=ON&all="+actionSingleAllCOMPONENTID+"&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                if (xhr.responseText == "error_no_permission") {
+                     alert(error_no_permission);
+                } else {
+                     alert(xhr.responseText);
+                }
+            }   
+          });
+    });
+    $( "#SwitchOffSimpleSwitchCOMPONENTID" ).button().click(function() {
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=VentilatorControllerDeviceManager&deviceId=COMPONENTID&action=OFF&all="+actionSingleAllCOMPONENTID+"&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                if (xhr.responseText == "error_no_permission") {
+                     alert(error_no_permission);
+                } else {
+                     alert(xhr.responseText);
+                }
+            }   
+          });
+    });
+    $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
+          updateStatusCOMPONENTID();
+    });
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+    $( "#configureCOMPONENTID" ).button().click(function() {
+          var nm = document.getElementById("nameFormCOMPONENTID").value;
+          if (nm == '') {
+                alert(error_name_cannot_be_empty);
+                return;
+          }
+          var co2period = parseInt(document.getElementById("co2PeriodFormCOMPONENTID").value);
+          if (isNaN(co2period)) {
+              alert(error_switch_off_period);
+              return;
+          }
+          if (co2period > 255) {
+              alert(error_switch_off_period_range);
+              return;
+          }
+          var humidityTimeout = parseInt(document.getElementById("humidityPeriodFormCOMPONENTID").value);
+          if (isNaN(humidityTimeout)) {
+              alert(error_switch_off_period);
+              return;
+          }
+          if (humidityTimeout > 255) {
+              alert(error_switch_off_period_range);
+              return;
+          }
+          var maxCO2concentration = parseInt(document.getElementById("co2maxFormCOMPONENTID").value);
+          if (isNaN(maxCO2concentration)) {
+              alert(error_maxCO2concentration_exist);
+              return;
+          }
+          if (maxCO2concentration > 40000) {
+              alert(error_maxCO2concentration_range);
+              return;
+          }
+          var maxHumidity = parseInt(document.getElementById("humidityMaxFormCOMPONENTID").value);
+          if (isNaN(maxHumidity)) {
+              alert(error_maxHumidity_exist);
+              return;
+          }
+          if (maxHumidity > 100) {
+              alert(error_maxHumidity_range);
+              return;
+          }
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
+          var plr = document.getElementById("checkboxLostPowerReportingCOMPONENTID").checked?"TRUE":"FALSE";
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=VentilatorControllerDeviceManager&deviceId=COMPONENTID&room="+encodeURIComponent(room)+"&maxCO2concentration="+maxCO2concentration+"&maxHumidity="+maxHumidity+"&plr="+plr+"&co2period="+co2period+"&humidityTimeout="+humidityTimeout+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+            success: function(data) {
+                if (data == "REFRESH") document.location.reload(true);
+                updateStatusCOMPONENTID();
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                if (xhr.responseText == "error_no_permission") {
+                     alert(error_no_permission);
+                } else {
+                     alert(xhr.responseText);
+                }
+            }   
+          });
+    });
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    setLabelBasedOnId("property_4COMPONENTID", "property");
+    setLabelBasedOnId("value_4COMPONENTID", "value");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("actionsCOMPONENTID", "actions");
+    setLabelBasedOnId("statusTabCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("graphsCOMPONENTID", "graphs");
+    document.getElementById('SwitchOnSimpleSwitchCOMPONENTID').value = switch_on;
+    document.getElementById('SwitchOffSimpleSwitchCOMPONENTID').value = switch_off;
+    setLabelBasedOnId("co2Period_LabelCOMPONENTID", "co2Period");
+    setLabelBasedOnId("co2PeriodForm_LabelCOMPONENTID", "co2Period");
+    setLabelBasedOnId("humidityPeriod_LabelCOMPONENTID", "humidityPeriod");
+    setLabelBasedOnId("humidityPeriodForm_LabelCOMPONENTID", "humidityPeriod");
+    setLabelBasedOnId("co2Max_LabelCOMPONENTID", "co2Max");
+    setLabelBasedOnId("co2MaxForm_LabelCOMPONENTID", "co2Max");
+    setLabelBasedOnId("humidityMax_LabelCOMPONENTID", "humidityMax");
+    setLabelBasedOnId("humidityMaxForm_LabelCOMPONENTID", "humidityMax");
+    setLabelBasedOnId("current_period_LabelCOMPONENTID", "off_current_period");
+    setLabelBasedOnId("current_CO2concentration_LabelCOMPONENTID", "co2");
+    setLabelBasedOnId("current_Humidity_LabelCOMPONENTID", "humidity");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("stateCOMPONENTID", "state");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("chartButtHourLabelCOMPONENTID", "chart_butt_hour");
+    setLabelBasedOnId("chartButtDayLabelCOMPONENTID", "chart_butt_day");
+    setLabelBasedOnId("chartButtWeekLabelCOMPONENTID", "chart_butt_week");
+    setLabelBasedOnId("chartButtMonthLabelCOMPONENTID", "chart_butt_month");
+    setLabelBasedOnId("chartButt3MonthLabelCOMPONENTID", "chart_butt_3month");
+    setLabelBasedOnId("chartButtYearLabelCOMPONENTID", "chart_butt_year");
+    setLabelBasedOnId("chartButt3YearsLabelCOMPONENTID", "chart_butt_3years");
+    setLabelBasedOnId("chartButtClearLabelCOMPONENTID", "chart_butt_clear");
+    setLabelBasedOnId("singleActionCOMPONENTID", "single_action");
+    setLabelBasedOnId("allActionCOMPONENTID", "all_action");
+    setLabelBasedOnId("powerLost_LabelCOMPONENTID", "power_lost_label");
+    setLabelBasedOnId("powerLostReport_LabelCOMPONENTID", "power_lost_report_label");
+    setLabelBasedOnId("powerLostReport_LabelFCOMPONENTID", "power_lost_report_label");
+    updateStatusCOMPONENTID();
+});
+</script>
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-1"><div id="actionsCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusTabCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-1">
+        <div id="actionTabsCOMPONENTID">
+             <ul>
+                <li><a href="#actionTabsCOMPONENTID-1"><div id="singleActionCOMPONENTID"></div></a></li>
+                <li><a href="#actionTabsCOMPONENTID-1"><div id="allActionCOMPONENTID"></div></a></li>
+             </ul>
+             <div id="actionTabsCOMPONENTID-1">
+                <br/>
+                <br/>
+                <input width="100%" type="submit" id="SwitchOnSimpleSwitchCOMPONENTID"/>
+                <input width="100%" type="submit" id="SwitchOffSimpleSwitchCOMPONENTID"/>
+             </div>
+        </div>
+    </div>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="stateCOMPONENTID"></div></td><td><span id='statusCOMPONENTID'></span></td></tr>
+                <tr><td><div id="current_CO2concentration_LabelCOMPONENTID"></div></td><td><span id='currentCO2concentrationCOMPONENTID'></span>&nbsp;ppm</td></tr>
+                <tr><td><div id="current_Humidity_LabelCOMPONENTID"></div></td><td><span id='currentHumidityCOMPONENTID'></span>&nbsp;%</td></tr>
+                <tr><td><div id="co2Period_LabelCOMPONENTID"></div></td><td><span id='co2PeriodCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="humidityPeriod_LabelCOMPONENTID"></div></td><td><span id='humidityPeriodCOMPONENTID'></span></td></tr>
+                <tr><td><div id="current_period_LabelCOMPONENTID"></div></td><td><span id='currentPeriodCOMPONENTID'></span></td></tr>
+                <tr><td><div id="co2Max_LabelCOMPONENTID"></div></td><td><span id='co2maxCOMPONENTID'></span>&nbsp;ppm</td></tr>
+                <tr><td><div id="humidityMax_LabelCOMPONENTID"></div></td><td><span id='humidityMaxCOMPONENTID'></span>&nbsp;%</td></tr>
+                <tr><td><div id="powerLost_LabelCOMPONENTID"></div></td><td><span id='powerLostCOMPONENTID'></span></td></tr>
+                <tr><td><div id="powerLostReport_LabelCOMPONENTID"></div></td><td><span id='powerLostReportCOMPONENTID'></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="co2PeriodForm_LabelCOMPONENTID"></div></td><td><input type="text" id="co2PeriodFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="humidityPeriodForm_LabelCOMPONENTID"></div></td><td><input type="text" id="humidityPeriodFormCOMPONENTID" /></td></tr>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_4COMPONENTID"></div></th>
+                <th><div id="value_4COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="co2MaxForm_LabelCOMPONENTID"></div></td><td><input type="text" id="co2maxFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="humidityMaxForm_LabelCOMPONENTID"></div></td><td><input type="text" id="humidityMaxFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="powerLostReport_LabelFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxLostPowerReportingCOMPONENTID" /><label for="checkboxLostPowerReportingCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+               </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+    <div id="componentTabsCOMPONENTID-4">
+        <button id="chartButtHourCOMPONENTID"><div id="chartButtHourLabelCOMPONENTID"></div></button>
+        <button id="chartButtDayCOMPONENTID"><div id="chartButtDayLabelCOMPONENTID"></div></button>
+        <button id="chartButtWeekCOMPONENTID"><div id="chartButtWeekLabelCOMPONENTID"></div></button>
+        <button id="chartButtMonthCOMPONENTID"><div id="chartButtMonthLabelCOMPONENTID"></div></button>
+        <button id="chartButt3MonthCOMPONENTID"><div id="chartButt3MonthLabelCOMPONENTID"></div></button>
+        <button id="chartButtYearCOMPONENTID"><div id="chartButtYearLabelCOMPONENTID"></div></button>
+        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button>
+        <button id="chartButtClearCOMPONENTID"><div id="chartButtClearLabelCOMPONENTID"></div></button><BR/><BR/>
+        <div id="chartAreaCOMPONENTID" style="width:800px;height:300px;display:inline-block">
+        </div>
+    </div>
+</div>
+<div id="schDialogCOMPONENTID">
+    <div id="schDialogInnerCOMPONENTID">
+    </div>
+</div>
+</div>

@@ -224,7 +224,7 @@ $(function() {
                 return;
           }
           var tm = parseInt(document.getElementById("offPeriodFormCOMPONENTID").value);
-          if (tm == NaN) {
+          if (isNaN(tm)) {
               alert(error_switch_off_period);
               return;
           }
@@ -238,7 +238,7 @@ $(function() {
               return;
           }
           var et = parseInt(document.getElementById("enterPeriodFormCOMPONENTID").value);
-          if (et == NaN) {
+          if (isNaN(et)) {
               alert(err_enter_number);
               return;
           }
@@ -247,7 +247,7 @@ $(function() {
               return;
           }
           var lt = parseInt(document.getElementById("leavePeriodFormCOMPONENTID").value);
-          if (lt == NaN) {
+          if (isNaN(lt)) {
               alert(err_leave_number);
               return;
           }

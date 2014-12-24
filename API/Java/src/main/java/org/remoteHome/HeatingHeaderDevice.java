@@ -1,7 +1,11 @@
 package org.remoteHome;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * 
@@ -98,11 +102,6 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      */
     private boolean manageFrequencyAuto;
 
-    /**
-     * Battery
-     */
-    private int battery;
-
     /*
      * This is true if scheduler is enabled.
      */
@@ -111,7 +110,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     /*
      * This is automatic scheduler
      */
-    private TemperatureSchedule temperatureSchedule;   
+    private TemperatureSchedule temperatureSchedule = new TemperatureSchedule();   
     /*
      * This is id of the heating controller
      */
@@ -150,7 +149,12 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     protected HeatingHeaderDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);
         temperatureSchedule = new TemperatureSchedule();
-        enabledScheduler = temperatureSchedule.isEnabled();
+    }
+    
+    /**
+     * Contains the initialization of the device.
+     */
+    protected void init() {      
     }
     /**
       * 
@@ -165,7 +169,7 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
         if (items[0].equals("4")) {
             //This is the status
             this.setTemperature(Integer.parseInt(items[1]));
-            this.setBattery(Integer.parseInt(items[2]));
+            setBattery(Float.parseFloat(items[2]));
             this.setFrequency(Integer.parseInt(items[3])*10); //Frequency in seconds * 10
             this.setDeviceExpectedTemperature(Integer.parseInt(items[4]) * 10 / 2);
             this.setOpenAngle(Integer.parseInt(items[5]));
@@ -415,22 +419,6 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
     }
 
     /**
-     * Battery
-     * @return the battery
-     */
-    public int getBattery() {
-        return battery;
-    }
-
-    /**
-     * Battery
-     * @param battery the battery to set
-     */
-    private void setBattery(int battery) {
-        this.battery = battery;
-    }
-
-    /**
      * @return the enabledScheduler
      */
     public boolean isEnabledScheduler() {
@@ -531,17 +519,11 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
      * This method will save the current state of the device to the database together with the timestamp.
      */
     protected void saveHistoryData() throws RemoteHomeManagerException {
-          TemperatureHistoryData historyProto = new TemperatureHistoryData();
-          historyProto.setDeviceId(getDeviceId());
-          TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
-          if (history == null) history = historyProto;
           int expected = getDeviceExpectedTemperature();
           if (isEnabledScheduler()) {
-              Integer tmp = getTemperatureSchedule().getCurrentExpectedValue();
+              Integer tmp = (int)getTemperatureSchedule().getCurrentExpectedValue()*10;
               if (tmp != null) expected = tmp;
           }
-          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()), expected);
-          m.getPersistance().saveHistoryData(history);
     }    
     /*
      * This method is not supported for this device and will throw always RemoteHomeManagerException - NOT_SUPPORTED.
@@ -636,5 +618,51 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
             }
             if (getOpenAngle()!=targetOpenAngle) setExpectedOpenAngle(targetOpenAngle);
         }
+    }
+    /*
+     * This method is called each second. Do not put inside blocking operations
+    */
+    protected void runEachSecond() {
+        
+    }
+    
+    /*
+     * This method is called each minute. Do not put inside blocking operations
+    */
+    protected void runEachMinute() {
+        
+    }
+
+    /*
+     * This method is called each 10 minutes. Do not put inside blocking operations
+    */
+    protected void runEach10Minutes() {
+        
+    }
+
+    /*
+     * This method is called each hour. Do not put inside blocking operations
+    */
+    protected void runEachHour() {
+        
+    }
+
+    /*
+     * This method is called each day. Do not put inside blocking operations
+    */
+    protected void runEachDay() {
+        
+    }
+    
+    public float getLowBatteryLimit() {
+        return 2.8f;
+    }
+
+    public ArrayList generateChartItems(HistoryData[] historyData, String type) {
+        ArrayList retArray = new ArrayList();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+            for (HistoryData d : historyData) {
+            }
+            return retArray;
     }
 }

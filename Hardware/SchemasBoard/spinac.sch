@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.3">
+<eagle version="6.4">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -15392,7 +15392,7 @@ nominal inductance, magnetically screened</description>
 <part name="R4" library="resistor" deviceset="R-EU_" device="M2012" value="2,05 k"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="M2012" value="1 K"/>
 <part name="C3" library="resistor" deviceset="CPOL-EU" device="SMCC" value="22uF / 16 V"/>
-<part name="L1" library="inductor-neosid" deviceset="BS" device="11" value="1mH"/>
+<part name="L1" library="inductor-neosid" deviceset="BS" device="11" value="680uH"/>
 <part name="C4" library="resistor" deviceset="CPOL-EU" device="E2.5-5" value="100uF / 6,3 V"/>
 <part name="C5" library="resistor" deviceset="C-EU" device="C2012" value="100nF"/>
 <part name="T1" library="transistor" deviceset="BC846" device=""/>
@@ -15401,7 +15401,7 @@ nominal inductance, magnetically screened</description>
 <part name="D1" library="diode" deviceset="MBRA340T3" device=""/>
 <part name="JP3" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="IC4" library="ds1820" deviceset="DS1820" device=""/>
-<part name="C6" library="resistor" deviceset="CPOL-EU" device="SMCA" value="1uF"/>
+<part name="C6" library="resistor" deviceset="CPOL-EU" device="SMCA" value="4,7uF"/>
 <part name="S1" library="switch-tact" deviceset="DTS-3" device=""/>
 <part name="U$3" library="rfm70" deviceset="PROGRAMMINGHEADER" device="" technology="DIP"/>
 <part name="X1" library="con-ptr500" deviceset="AK500/5" device=""/>

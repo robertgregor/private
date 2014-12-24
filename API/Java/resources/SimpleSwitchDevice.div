@@ -1,5 +1,6 @@
 <div>
 <script>
+var actionSingleAllCOMPONENTID = "false";
 function updateStatusCOMPONENTID() {
     updateStatusCOMPONENTID(true);
 }
@@ -10,16 +11,45 @@ function updateStatusCOMPONENTID(showError) {
       'cache' : false,
       data: "ServiceName=GetJsonObject&deviceId=COMPONENTID&"+Math.floor((Math.random()*100)+1),
       success: function(indata) {
-          var data = JSON.parse(indata);
+        if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+        var data = JSON.parse(indata);
+        updateComponentsCOMPONENTID(data);
+      },
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
+      }   
+  });
+}
+function updateComponentsCOMPONENTID(data) {
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
           document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
           document.getElementById("roomFormCOMPONENTID").value=data.roomName;
           if (data.currentState) {
               document.getElementById("statusCOMPONENTID").innerHTML=on;
+              document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=on;
+              document.getElementById("titleOfAccordionStartCOMPONENTID").setAttribute('class', 'ui-icon ui-icon-lightbulb');
           } else {
               document.getElementById("statusCOMPONENTID").innerHTML=off;
+              document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=off;
+              document.getElementById("titleOfAccordionStartCOMPONENTID").setAttribute('class', '');
           }
+          if (data.powerLost) {
+              document.getElementById("powerLostCOMPONENTID").innerHTML=yes;
+              document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=powerLost;
+          } else {
+              document.getElementById("powerLostCOMPONENTID").innerHTML=no;
+          }
+          if (data.enableLowBattOrPowerLostReporting) {
+              document.getElementById("powerLostReportCOMPONENTID").innerHTML=yes;
+              $( "#checkboxLostPowerReportingCOMPONENTID" ).prop('checked', true);
+          } else {
+              document.getElementById("powerLostReportCOMPONENTID").innerHTML=no;
+              $( "#checkboxLostPowerReportingCOMPONENTID" ).prop('checked', false);
+          }
+          $("#checkboxLostPowerReportingCOMPONENTID").trigger("change");
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
           if (data.onWhenAppliedPower) {
                 $( "#checkboxOnWhenPowerCOMPONENTID" ).prop('checked', true);
@@ -32,6 +62,9 @@ function updateStatusCOMPONENTID(showError) {
           document.getElementById("configuredPeriodCOMPONENTID").innerHTML=data.configuredPeriod;
           document.getElementById("offPeriodFormCOMPONENTID").value = data.configuredPeriod;
           document.getElementById("currentPeriodCOMPONENTID").innerHTML=data.currentCounter;
+          document.getElementById("lightIntensityCOMPONENTID").innerHTML=data.configuredLightIntensityBorderValue;
+          document.getElementById("currentLightIntensityCOMPONENTID").innerHTML=data.currentLightIntensityBorderValue;
+          document.getElementById("lightIntensityFormCOMPONENTID").value=data.configuredLightIntensityBorderValue;
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
           if (data.enabledScheduler) {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
@@ -41,48 +74,70 @@ function updateStatusCOMPONENTID(showError) {
                 document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=no;
           }
           $("#checkboxEnabledSchedulerCOMPONENTID").trigger("change");
-      },
-      error:function(xhr){
-          if (showError) {
-                alert(error_get_device_status+"\n\n"+xhr.responseText);
-          }
-      }   
-  });
 }
 $(function() {
     $( "#componentTabsCOMPONENTID" ).tabs({
         activate: function(event, ui){
             if (ui.newTab.index() == 3) {
-                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "onoff");
-                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "onoff");
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "ONOFF");
+            }
+        }
+    });
+    $( "#actionTabsCOMPONENTID").tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 0) {
+                actionSingleAllCOMPONENTID = "false";
+            } else if (ui.newTab.index() == 1) {
+                actionSingleAllCOMPONENTID = "true";
             }
         }
     });
     $( "#chartButtHourCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "onoff");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "ONOFF");
     });
     $( "#chartButtDayCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "onoff");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "ONOFF");
     });
     $( "#chartButtWeekCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "onoff");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "ONOFF");
     });
     $( "#chartButtMonthCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "onoff");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "ONOFF");
     });
     $( "#chartButt3MonthCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "onoff");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "ONOFF");
     });
     $( "#chartButtYearCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "onoff");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "ONOFF");
     });
     $( "#chartButt3YearsCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "onoff");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "ONOFF");
     });
     $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
                    focus(function() {
                    setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
               });
+    $( "#chartButtClearCOMPONENTID" ).button().click(function() {
+      $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetHistoryDataJson&deviceId=COMPONENTID&clear=true",
+            success: function(indata) {
+                if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "ONOFF");
+                alert(clear_history_data_ok);
+            },
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
+            }   
+          });
+    });
     $( "#checkboxOnWhenPowerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
     $( "#checkboxOnWhenPowerCOMPONENTID" ).change(function () {
                 if (this.checked) {
@@ -92,6 +147,15 @@ $(function() {
                 }
             });
     $( "#checkboxOnWhenPowerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).change(function () {
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
+                } else {
+                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
+                }
+            });
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#checkboxEnabledSchedulerCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
     $( "#checkboxEnabledSchedulerCOMPONENTID" ).change(function () {
                 if (this.checked) {
@@ -106,12 +170,15 @@ $(function() {
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=ON&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=ON&all="+actionSingleAllCOMPONENTID+"&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
-                updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError+"\n\n"+xhr.responseText);
+                if (xhr.responseText == "error_no_permission") {
+                     alert(error_no_permission);
+                } else {
+                     alert(xhr.responseText);
+                }
             }   
           });
     });
@@ -120,12 +187,15 @@ $(function() {
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=OFF&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=OFF&all="+actionSingleAllCOMPONENTID+"&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
-                updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError+"\n\n"+xhr.responseText);
+                if (xhr.responseText == "error_no_permission") {
+                     alert(error_no_permission);
+                } else {
+                     alert(xhr.responseText);
+                }
             }   
           });
     });
@@ -135,12 +205,15 @@ $(function() {
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=ONTIMEOUT&period="+period+"&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&action=ONTIMEOUT&all="+actionSingleAllCOMPONENTID+"&period="+period+"&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
-                updateStatusCOMPONENTID();
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError+"\n\n"+xhr.responseText);
+                if (xhr.responseText == "error_no_permission") {
+                     alert(error_no_permission);
+                } else {
+                     alert(xhr.responseText);
+                }
             }   
           });
     });
@@ -154,7 +227,7 @@ $(function() {
                 return;
           }
           var tm = parseInt(document.getElementById("offPeriodFormCOMPONENTID").value);
-          if (tm == NaN) {
+          if (isNaN(tm)) {
               alert(error_switch_off_period);
               return;
           }
@@ -167,19 +240,30 @@ $(function() {
               alert(error_room_exist);
               return;
           }
+          var lightBorder = parseInt(document.getElementById("lightIntensityFormCOMPONENTID").value);
+          if (lightBorder == isNaN(lightBorder)) {
+              lightBorder = 0;
+          }
+          if (tm > 1024) {
+              lightBorder = 1024;
+          }
           var pw = document.getElementById("checkboxOnWhenPowerCOMPONENTID").checked?"TRUE":"FALSE";
+          var plr = document.getElementById("checkboxLostPowerReportingCOMPONENTID").checked?"TRUE":"FALSE";
           var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&schenabled="+schenabled+"&pw="+pw+"&room="+encodeURIComponent(room)+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
+              data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID&schenabled="+schenabled+"&pw="+pw+"&plr="+plr+"&lightBorder="+lightBorder+"&room="+encodeURIComponent(room)+"&tm="+tm+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE&"+Math.floor((Math.random()*100)+1),
             success: function(data) {
-                if (data == "REFRESH") document.location.reload(true);
-                updateStatusCOMPONENTID();
+                if (data == "REFRESH") document.location.reload(true);               
             },
             error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError+"\n\n"+xhr.responseText);
+                if (xhr.responseText == "error_no_permission") {
+                     alert(error_no_permission);
+                } else {
+                     alert(xhr.responseText);
+                }
             }   
           });
     });
@@ -196,11 +280,15 @@ $(function() {
                         url: "/",
                         type: "get",
                         'cache' : false,
-                        data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+Math.floor((Math.random()*100)+1),
+                        data: "ServiceName=SimpleSwitchDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&all="+actionSingleAllCOMPONENTID+"&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        if (xhr.responseText == "error_no_permission") {
+                             alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
                   $( this ).dialog( "close" );
@@ -254,7 +342,11 @@ $(function() {
                         $('#onoffProgsschTableCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        if (xhr.responseText == "error_no_permission") {
+                             alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
           });
@@ -270,7 +362,11 @@ $(function() {
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        if (xhr.responseText == "error_no_permission") {
+                             alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
           });
@@ -285,7 +381,11 @@ $(function() {
                         $("#onoffProgsschTableCOMPONENTID option:selected").remove();
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        if (xhr.responseText == "error_no_permission") {
+                             alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
           });
@@ -300,7 +400,11 @@ $(function() {
                         loadSchedule(data, 'schTableCOMPONENTID');                        
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        if (xhr.responseText == "error_no_permission") {
+                             alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
           });
@@ -351,10 +455,17 @@ $(function() {
     setLabelBasedOnId("chartButt3MonthLabelCOMPONENTID", "chart_butt_3month");
     setLabelBasedOnId("chartButtYearLabelCOMPONENTID", "chart_butt_year");
     setLabelBasedOnId("chartButt3YearsLabelCOMPONENTID", "chart_butt_3years");
-    updateStatusCOMPONENTID();
-    window.setInterval(function() {
-        updateStatusCOMPONENTID(false);
-    }, 300000);
+    setLabelBasedOnId("chartButtClearLabelCOMPONENTID", "chart_butt_clear");
+    setLabelBasedOnId("singleActionCOMPONENTID", "single_action");
+    setLabelBasedOnId("allActionCOMPONENTID", "all_action");
+    setLabelBasedOnId("powerLost_LabelCOMPONENTID", "power_lost_label");
+    setLabelBasedOnId("powerLostReport_LabelCOMPONENTID", "power_lost_report_label");
+    setLabelBasedOnId("powerLostReport_LabelFCOMPONENTID", "power_lost_report_label");
+    setLabelBasedOnId("configured_lightIntensity_LabelCOMPONENTID", "configured_lightIntensity_Label");
+    setLabelBasedOnId("current_lightIntensity_LabelCOMPONENTID", "current_lightIntensity_Label");
+    setLabelBasedOnId("configured_lightIntensity_LabelFCOMPONENTID", "configured_lightIntensity_Label");
+
+    updateStatusCOMPONENTID(false);
 });
 </script>
 <div id="componentTabsCOMPONENTID">
@@ -365,17 +476,25 @@ $(function() {
         <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
     </ul>
     <div id="componentTabsCOMPONENTID-1">
-        <br/>
-        <br/>
-        <input width="100%" type="submit" id="SwitchOnSimpleSwitchCOMPONENTID"/>
-        <input width="100%" type="submit" id="SwitchOffSimpleSwitchCOMPONENTID"/>
-        &nbsp;&nbsp;
-        <select  width="100%" id="periodCOMPONENTID">
-                <option value="0">&nbsp;</option>
-        </select>
-        <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID"/>
-        &nbsp;&nbsp;
-        <button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button> 
+        <div id="actionTabsCOMPONENTID">
+             <ul>
+                <li><a href="#actionTabsCOMPONENTID-1"><div id="singleActionCOMPONENTID"></div></a></li>
+                <li><a href="#actionTabsCOMPONENTID-1"><div id="allActionCOMPONENTID"></div></a></li>
+             </ul>
+             <div id="actionTabsCOMPONENTID-1">
+                <br/>
+                <br/>
+                <input width="100%" type="submit" id="SwitchOnSimpleSwitchCOMPONENTID"/>
+                <input width="100%" type="submit" id="SwitchOffSimpleSwitchCOMPONENTID"/>
+                &nbsp;&nbsp;
+                <select  width="100%" id="periodCOMPONENTID">
+                    <option value="0">&nbsp;</option>
+                </select>
+                <input type="submit" id="SwitchOffTimeoutSimpleSwitchCOMPONENTID"/>
+                    &nbsp;&nbsp;
+                <button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button> 
+             </div>
+        </div>
     </div>
     <div id="componentTabsCOMPONENTID-2">
         <table>
@@ -393,6 +512,8 @@ $(function() {
                 <tr><td><div id="stateCOMPONENTID"></div></td><td><span id='statusCOMPONENTID'></span></td></tr>
                 <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
                 <tr><td><div id="scheduler_enabledCOMPONENTID"></div></td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="current_lightIntensity_LabelCOMPONENTID"></div></td><td><span id='currentLightIntensityCOMPONENTID'></span></td></tr>
+                <tr><td><div id="configured_lightIntensity_LabelCOMPONENTID"></div></td><td><span id='lightIntensityCOMPONENTID'></span></td></tr>
               </tbody>
             </table>
           </td><td>
@@ -407,6 +528,8 @@ $(function() {
                 <tr><td><div id="configured_period_LabelCOMPONENTID"></div></td><td><span id='configuredPeriodCOMPONENTID'></span></td></tr>
                 <tr><td><div id="current_period_LabelCOMPONENTID"></div></td><td><span id='currentPeriodCOMPONENTID'></span></td></tr>
                 <tr><td><div id="on_when_power_LabelCOMPONENTID"></div></td><td><span id='onWhenPowerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="powerLost_LabelCOMPONENTID"></div></td><td><span id='powerLostCOMPONENTID'></span></td></tr>
+                <tr><td><div id="powerLostReport_LabelCOMPONENTID"></div></td><td><span id='powerLostReportCOMPONENTID'></span></td></tr>
                 <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
                 <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
               </tbody>
@@ -429,6 +552,7 @@ $(function() {
                 <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
                 <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
                 <tr><td><div id="configured_period_LabelFCOMPONENTID"></div></td><td><input type="text" id="offPeriodFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="configured_lightIntensity_LabelFCOMPONENTID"></div></td><td><input type="text" id="lightIntensityFormCOMPONENTID" /></td></tr>
             </table>
           </td><td>
             <table class="ui-widget" style="border-collapse: collapse;" width="100%">
@@ -441,7 +565,8 @@ $(function() {
               <tbody class="ui-widget-content">
                 <tr><td><div id="scheduler_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>
                 <tr><td><div id="on_when_power_LabelFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxOnWhenPowerCOMPONENTID" /><label for="checkboxOnWhenPowerCOMPONENTID">&nbsp;</label></td></tr>
-               <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                <tr><td><div id="powerLostReport_LabelFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxLostPowerReportingCOMPONENTID" /><label for="checkboxLostPowerReportingCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
                </tbody>
             </table>
           </td></tr>
@@ -455,7 +580,8 @@ $(function() {
         <button id="chartButtMonthCOMPONENTID"><div id="chartButtMonthLabelCOMPONENTID"></div></button>
         <button id="chartButt3MonthCOMPONENTID"><div id="chartButt3MonthLabelCOMPONENTID"></div></button>
         <button id="chartButtYearCOMPONENTID"><div id="chartButtYearLabelCOMPONENTID"></div></button>
-        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button><BR/><BR/>
+        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button>
+        <button id="chartButtClearCOMPONENTID"><div id="chartButtClearLabelCOMPONENTID"></div></button><BR/><BR/>
         <div id="chartAreaCOMPONENTID" style="width:800px;height:300px;display:inline-block">
         </div>
     </div>

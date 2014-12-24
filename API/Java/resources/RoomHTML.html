@@ -34,40 +34,117 @@
                     url: "/",
                     type: "get",
                     'cache' : false,
-                    data: "ServiceName=GetHistoryDataJson&deviceId="+compId+"&range="+range+"&"+Math.floor((Math.random()*100)+1),
+                    data: "ServiceName=GetHistoryDataJson&deviceId="+compId+"&range="+range+"&type="+type+"&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
                         var items = JSON.parse(data);
-                        if (type == "onoff") {
+                        if (type == "ONOFF") {
                             divId.chart({
-                                gallery:cfx.Gallery.CurveArea,
+                                gallery: cfx.Gallery.Step,
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
                                 dataValues: items,
                                 dataSourceSettings: {
-                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value }, { name: "yDataExpected", displayName: chart_expected, usage: cfx.FieldUsage.Value },
+                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value },
                                     { name: "xData", usage: cfx.FieldUsage.XValue}]
                                 },
-                                axisX: {DataFormat:Date}
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}}
                             });                            
-                        } else if (type == "percentage") {
+                        } else if (type == "MAGNETICSENSOR") {
                             divId.chart({
-                                gallery:cfx.Gallery.CurveArea,
+                                gallery: cfx.Gallery.Step,
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yData", displayName: chart_magneticSensor, usage: cfx.FieldUsage.Value },
+                                    { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}}
+                            });                            
+                        } else if (type == "PIRSENSOR") {
+                            divId.chart({
+                                gallery: cfx.Gallery.Step,
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yData", displayName: chart_pirSensor, usage: cfx.FieldUsage.Value },
+                                    { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}}
+                            });                            
+                        } else if (type == "DOUBLELINEDATA") {
+                            divId.chart({
+                                gallery:cfx.Gallery.Lines,
                                 dataValues: items,
                                 dataSourceSettings: {
                                     fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value }, { name: "yDataExpected", displayName: chart_expected, usage: cfx.FieldUsage.Value },
                                     { name: "xData", usage: cfx.FieldUsage.XValue}]
                                 },
-                                axisX: {DataFormat:Date},
-                                axisY: {DataFormat:Number}
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}},
+                                axisY: {DataFormat:Number, AutoScale: true }
+                            });                            
+                        } else if (type == "ACCELERATION") {
+                            divId.chart({
+                                gallery:cfx.Gallery.Lines,
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yDataAccX", displayName: chart_accX, usage: cfx.FieldUsage.Value }, { name: "yDataAccY", displayName: chart_accY, usage: cfx.FieldUsage.Value }, { name: "yDataAccZ", displayName: chart_accZ, usage: cfx.FieldUsage.Value },
+                                    { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}},
+                                axisY: {DataFormat:Number, AutoScale: true }
                             });
-                        } else if (type == "temperature") {
+                        } else if (type == "ORIENTATION") {
                             divId.chart({
-                                gallery:cfx.Gallery.CurveArea,
+                                gallery:cfx.Gallery.Lines,
                                 dataValues: items,
                                 dataSourceSettings: {
-                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value }, { name: "yDataExpected", displayName: chart_expected, usage: cfx.FieldUsage.Value },
+                                    fields: [{ name: "yDataPORTRAITUP", displayName: "PORTRAITUP", usage: cfx.FieldUsage.Value }, 
+                                        { name: "yDataPORTRAITDOWN", displayName: "PORTRAITDOWN", usage: cfx.FieldUsage.Value }, 
+                                        { name: "yDataLANDSCAPERIGHT", displayName: "LANDSCAPERIGHT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataLANDSCAPELEFT", displayName: "LANDSCAPELEFT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataPORTRAITUPBACK", displayName: "PORTRAITUPBACK", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataPORTRAITDOWNBACK", displayName: "PORTRAITDOWNBACK", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataLANDSCAPERIGHTBACK", displayName: "LANDSCAPERIGHTBACK", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataLANDSCAPELEFTBACK", displayName: "LANDSCAPELEFTBACK", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataPORTRAITUPZTILT", displayName: "PORTRAITUPZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataPORTRAITDOWNZTILT", displayName: "PORTRAITDOWNZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataLANDSCAPERIGHTZTILT", displayName: "LANDSCAPERIGHTZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataLANDSCAPELEFTZTILT", displayName: "LANDSCAPELEFTZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataPORTRAITUPBACKZTILT", displayName: "PORTRAITUPBACKZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataPORTRAITDOWNBACKZTILT", displayName: "PORTRAITDOWNBACKZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataLANDSCAPERIGHTBACKZTILT", displayName: "LANDSCAPERIGHTBACKZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "yDataLANDSCAPELEFTBACKZTILT", displayName: "LANDSCAPELEFTBACKZTILT", usage: cfx.FieldUsage.Value },
+                                        { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}},
+                                axisY: {DataFormat:Number, AutoScale: true }
+                            });
+                        } else if ((type == "SINGLELINEDATA")) {
+                            divId.chart({
+                                gallery:cfx.Gallery.Lines,
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value },
                                     { name: "xData", usage: cfx.FieldUsage.XValue}]
                                 },
-                                axisX: {DataFormat:Date},
-                                axisY: {DataFormat:Number}
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}},
+                                axisY: {DataFormat:Number, AutoScale: true }
+                            });
+                        } else if ((type == "SINGLELINEDATA_2")) {
+                            divId.chart({
+                                gallery:cfx.Gallery.Lines,
+                                dataValues: items,
+                                dataSourceSettings: {
+                                    fields: [{ name: "yData", displayName: chart_current, usage: cfx.FieldUsage.Value },
+                                    { name: "xData", usage: cfx.FieldUsage.XValue}]
+                                },
+                                allSeries: {MarkerShape: cfx.MarkerShape.None},
+                                axisX: {LabelsFormat: {Format: cfx.AxisFormat.Date, CustomFormat:"HH:mm dd/MM/yy"}},
+                                axisY: {DataFormat:Number, AutoScale: true }
                             });
                         }
                     },

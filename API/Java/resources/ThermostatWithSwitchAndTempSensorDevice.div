@@ -136,7 +136,7 @@ $(function() {
                 return;
           }
           var thr = parseInt(document.getElementById("thresholdFormCOMPONENTID").value);
-          if (thr == NaN) {
+          if (isNaN(thr)) {
               alert(error_threshold_empty);
               return;
           }
@@ -145,7 +145,7 @@ $(function() {
               return;
           }
           var temp = parseFloat(document.getElementById("expTemperatureFormCOMPONENTID").value);
-          if (temp == NaN) {
+          if (isNaN(temp)) {
               alert(error_temperature_number);
               return;
           }
@@ -155,17 +155,17 @@ $(function() {
               return;
           }
           var heatingId = parseInt(document.getElementById("heatingControllerFormCOMPONENTID").value);
-          if (heatingId == NaN) {
+          if (isNaN(heatingId)) {
               alert(error_heating_id_number);
               return;
           }
           var remoteTempId = parseInt(document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value);
-          if (remoteTempId == NaN) {
+          if (isNaN(remoteTempId)) {
               alert(error_temperature_id_number);
               return;
           }
           var remoteSsId = parseInt(document.getElementById("remoteSimpleSwitchFormCOMPONENTID").value);
-          if (remoteSsId == NaN) {
+          if (isNaN(remoteSsId)) {
               alert(error_switch_id_number);
               return;
           }

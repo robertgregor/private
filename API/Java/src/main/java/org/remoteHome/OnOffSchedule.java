@@ -17,8 +17,6 @@ import java.util.Calendar;
  */
 
 public class OnOffSchedule extends AbstractSchedule {
-    
-    private transient String currentState = "0";
 
     public OnOffSchedule() {
         scheduleStreamMonday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -28,19 +26,6 @@ public class OnOffSchedule extends AbstractSchedule {
         scheduleStreamFriday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
         scheduleStreamSaturday =  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
         scheduleStreamSunday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    }
-    /**
-     * @return the currentState
-     */
-    public String getCurrentState() {
-        return currentState;
-    }
-
-    /**
-     * @param currentState the currentState to set
-     */
-    public void setCurrentState(String currentState) {
-        this.currentState = currentState;
     }
     /*
      * This method is used to receive the schedule for external source in decimal mode, so each byte
@@ -126,39 +111,28 @@ public class OnOffSchedule extends AbstractSchedule {
     }
     
     /**
-     * This method will process the realtime schedule
-     * @return True, if it changed from 0 to 1, false if it changed from 1 to 0 and null, if there was no change.
-     * It returns also null, if minute % 10 != 0, so it makes sense to call it only when minute % 10 == 0.
+     * This method will return the realtime schedule
+     * @return true, if it is 1, false if it 0
      */
-    public Boolean processSchedule() {
+    public boolean getCurrentSchedule() {
         Calendar c = Calendar.getInstance();
         int min = c.get(Calendar.MINUTE);
-        if (((min % 10) == 0) || (min == 0)) {
-            int day = 0;
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int d = c.get(Calendar.DAY_OF_WEEK);
-            if (d == Calendar.MONDAY) day = 0;
-            else if (d == Calendar.TUESDAY) day = 1;
-            else if (d == Calendar.WEDNESDAY) day = 2;
-            else if (d == Calendar.THURSDAY) day = 3;
-            else if (d == Calendar.FRIDAY) day = 4;
-            else if (d == Calendar.SATURDAY) day = 5;
-            else if (d == Calendar.SUNDAY) day = 6;
-            String sch = loadSchedule();
-            String hourBits = sch.substring((day*24*8)+(hour*8), (day*24*8)+(hour*8)+8);
-            String minute = Integer.toString(min);
-            if (minute.length()==1) minute = "0" + minute;
-            int m = Integer.parseInt(minute.substring(0,1));
-            String minBit = hourBits.substring(m+2,m+3);
-            if (minBit.equals("1") && getCurrentState().equals("0")) {
-                setCurrentState(minBit);
-                return true;
-            } else if (minBit.equals("0") && getCurrentState().equals("1")) {
-                setCurrentState(minBit);
-                return false;
-            }            
-            setCurrentState(minBit);
-        }
-        return null;
+        int day = 0;
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int d = c.get(Calendar.DAY_OF_WEEK);
+        if (d == Calendar.MONDAY) day = 0;
+        else if (d == Calendar.TUESDAY) day = 1;
+        else if (d == Calendar.WEDNESDAY) day = 2;
+        else if (d == Calendar.THURSDAY) day = 3;
+        else if (d == Calendar.FRIDAY) day = 4;
+        else if (d == Calendar.SATURDAY) day = 5;
+        else if (d == Calendar.SUNDAY) day = 6;
+        String sch = loadSchedule();
+        String hourBits = sch.substring((day*24*8)+(hour*8), (day*24*8)+(hour*8)+8);
+        String minute = Integer.toString(min);
+        if (minute.length()==1) minute = "0" + minute;
+        int m = Integer.parseInt(minute.substring(0,1));
+        String minBit = hourBits.substring(m+2,m+3);
+        return minBit.equals("1");
     }
 }

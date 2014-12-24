@@ -12,13 +12,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.remoteHome.AbstractDevice;
-import org.remoteHome.MotorControllerDevice;
-import org.remoteHome.HeatingHeaderDevice;
-import org.remoteHome.LightAlarmDevice;
-import org.remoteHome.SimpleSwitchDevice;
-import org.remoteHome.TemperatureSensorDevice;
-import org.remoteHome.ThermostatDevice;
-import org.remoteHome.ThermostatWithSwitchAndTempSensorDevice;
 
 /**
  *
@@ -37,30 +30,15 @@ public class LoadRoomPage extends AbstractWebService {
         HashSet<AbstractDevice> devices = r.getDevicesInRoom(requestParameters.get("room"));
         StringBuilder accordionBody = new StringBuilder();
         for (AbstractDevice device : devices) {
-            accordionBody.append("<h3>"+device.getDeviceName()+"</h3>\n");
-            if (device instanceof LightAlarmDevice) {
-                accordionBody.append(getDiv("LightAlarmDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof SimpleSwitchDevice) {
-                accordionBody.append(getDiv("SimpleSwitchDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof TemperatureSensorDevice) {
-                accordionBody.append(getDiv("TemperatureSensorDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof LightAlarmDevice) {
-                accordionBody.append(getDiv("LightAlarmDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof MotorControllerDevice) {
-                accordionBody.append(getDiv("MotorControllerDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof HeatingHeaderDevice) {
-                accordionBody.append(getDiv("HeatingHeaderDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof ThermostatDevice) {
-                accordionBody.append(getDiv("ThermostatDevice.div",Integer.toString(device.getDeviceId())));
-            } else if (device instanceof ThermostatWithSwitchAndTempSensorDevice) {
-                accordionBody.append(getDiv("ThermostatWithSwitchAndTempSensorDevice.div",Integer.toString(device.getDeviceId())));
-            }
+            accordionBody.append("<h3><table><tr><td><span id=\"titleOfAccordionStart"+Integer.toString(device.getDeviceId())+"\"></span></td><td>"
+                    +device.getDeviceName()+"&nbsp;&nbsp;</td><td><span id=\"titleOfAccordionEnd"+Integer.toString(device.getDeviceId())+"\"></span></td></tr></table></h3>\n");
+            String clazzName = device.getClass().getName().split("\\.")[2];
+            accordionBody.append(getDiv(clazzName+".div",Integer.toString(device.getDeviceId())));
         }
         if (accordionBody.toString().length()==0) {
             accordionBody.append("<h3><p>No device exist in the room</p></h3><div>&nbsp;</div>\n");
         }
         roomHtml = roomHtml.substring(0, roomHtml.indexOf("BBBODYYY")) + accordionBody.toString() + roomHtml.substring(roomHtml.indexOf("BBBODYYY")+8);
-        //System.out.println(roomHtml);
         sendAjaxAnswer(roomHtml);
     }
     

@@ -1,0 +1,209 @@
+<div>
+<script>
+        var myCodeMirror_COMPONENTID = CodeMirror.fromTextArea(document.getElementById("javaProgramCOMPONENTID"), {
+              mode: "text/x-java",
+              indentWithTabs: true,
+              smartIndent: true,
+              lineNumbers: true,
+              lineWrapping: true,
+              matchBrackets: true,
+              autofocus: true
+        });
+function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
+  $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID",
+      success: function(indata) {
+          if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+          var data = JSON.parse(indata);
+          document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
+          document.getElementById("nameFormCOMPONENTID").value=data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
+          document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
+          myCodeMirror_COMPONENTID.setValue(data.javaDeviceInterfaceSourceCode);
+          myCodeMirror_COMPONENTID.refresh();
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+      },
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
+      }
+  });
+}
+function updateButtonsCOMPONENTID() {
+                //OK, generate buttons here
+                $.ajax({
+                    url: "/",
+                    type: "get",
+                    'cache' : false,
+                    data: "ServiceName=JavaDeviceManager&deviceId=COMPONENTID&action=LOADBUTTON",
+                    success: function(data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        var buttondata = JSON.parse(data);
+                        for (var key in buttondata) {
+                            var buttonId = key;
+                            var buttonLabel = "";
+                            for (var lbl in buttondata[key]) {
+                                if (lbl == languageStr) {
+                                    buttonLabel = buttondata[key][lbl];
+                                }
+                            }
+                            if (buttonLabel == "") buttonLabel = buttonId;
+                            var realBid = buttonId+"_xxx_COMPONENTID";
+                            $( "#componentTabsCOMPONENTID-1" ).append('<button id="'+realBid+'">'+buttonLabel+'</button>');
+                            $( "#"+realBid ).button().click(function() {
+                                var rid = this.id.split("_xxx_");
+                                $.ajax({
+                                    url: "/",
+                                    type: "get",
+                                    'cache' : false,
+                                    data: "ServiceName=JavaDeviceManager&deviceId=COMPONENTID&action=EXECUTEBUTTON&buttonid="+rid[0],
+                                    success: function(data) {
+                                    },
+                                    error:function(xhr, ajaxOptions, thrownError){
+                                        if (xhr.responseText == "error_no_permission") {
+                                            alert(error_no_permission);
+                                        } else {
+                                            alert(xhr.responseText);
+                                        }   
+                                    }   
+                                });
+                            });
+                        }
+                    },
+                    error:function(xhr, ajaxOptions, thrownError) {
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }   
+                });
+}
+$(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs({
+        activate: function(event, ui) {
+            if ((ui.newTab.index() == 1) || (ui.newTab.index() == 2)) {
+                updateStatusCOMPONENTID();
+            } else if (ui.newTab.index() == 0) {
+                //nothing to do
+            }
+        }
+    });
+    $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
+          updateStatusCOMPONENTID();
+    });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
+    $( "#configureCOMPONENTID" ).button().click(function() {
+          var nm = document.getElementById("nameFormCOMPONENTID").value;
+          if (nm == '') {
+                alert(error_name_cannot_be_empty);
+                return;
+          }
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
+          var srcCode = myCodeMirror_COMPONENTID.getValue();
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=JavaDeviceManager&deviceId=COMPONENTID&room="+encodeURIComponent(room)+"&nm="+encodeURIComponent(nm)+"&srcCode="+encodeURIComponent(srcCode)+"&action=CONFIGURE",
+            success: function(data) {
+                if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                if (data == "REFRESH") document.location.reload(true);
+            },
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
+            }   
+          });
+    });
+});
+$(document).ready(function() {
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("statusCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("actionsCOMPONENTID", "actions");
+    updateStatusCOMPONENTID();
+    updateButtonsCOMPONENTID();
+});
+</script>
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-1"><div id="actionsCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-1"></div>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+            </table>
+          </td><td>&nbsp;
+          </td></tr>
+        </table>
+        <textarea id="javaProgramCOMPONENTID"></textarea>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+</div>
+</div>

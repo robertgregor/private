@@ -1,0 +1,38 @@
+package org.remoteHome;
+
+import java.util.*;
+
+/**
+ * @author Your name here
+ * You have to implement the JavaDeviceInterface
+ *
+ * For more info about the api and how to use it, see the javadoc
+ */
+public class TemplateJavaDeviceCOMPONENTID implements JavaDeviceInterface {
+
+   /*
+    * This is called to get the list of buttons, which this device represents. 
+    * The hashmap structure: 
+    * Key are the buuton identifiers (used in the executeButton).
+    * Value is the HashMap. The structure of this hashmap:
+    * Keys are the language abreviations such as "en", "cz", "de". Object type is String
+    * Values are the Strings, which represents the button label.
+    */
+    public HashMap getButtons() {
+        HashMap buttonLabel = new HashMap();
+        buttonLabel.put("en","Test it!");
+        buttonLabel.put("cz","Vyzkousej to!");
+        HashMap button = new HashMap();
+        button.put("testButton", buttonLabel);
+	return button;
+    }
+
+   /*
+    * This is called when the button is executed.
+    * @param button the button name, which has been pressed.
+    */
+    public void executeButton(String button, RemoteHomeManager m) throws RemoteHomeManagerException, RemoteHomeConnectionException {
+        System.out.println(button + "fired!");
+        RemoteHomeManager.log.info(button + "fired!");
+    }
+}

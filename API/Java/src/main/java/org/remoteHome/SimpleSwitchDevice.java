@@ -1,32 +1,39 @@
 package org.remoteHome;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
   * Simple switch<BR/>
   * 
-  * pn - check weather the device is up and running (ping command).<BR/>
-  * l1o - light 1 on<BR/>
-  * l1of - light 1 on and off after timeout period<BR/>
-  * l1f - light 1 off<BR/>
-  * l1co - configure light 1 to swith on when applied power<BR/>
-  * l1cf - configure light 1 to stay off when applied power<BR/>
-  * l1ct=nnn - configure light 1 timeout nnn = 0 to 255 minutes (0 means forever) minutes<BR/>
-  * s - return status 3|light|power|configuredTimeout|currentTimeout<BR/>
-  *	light 0 off, 1 on<BR/>
-  *	power 0 on when applied power, 1 stay off when applied power<BR/>
-  *	onWhenMovement 1 - on when movement detected 0 no action<BR/>
-  *	configuredTimeout - no of minutes, when l1 will go off, 0 forever<BR/>
-  *	currentTimeout - current light 1 timeout in minutes, 0 - never switch off<BR/>
+  * lxo - light 1 on
+  * lxof - light x on and off after timeout period
+  * lxot - light x on and off after 3 minutes doesnt matter the timeout period.
+  * lxf - light x off
+  * lxco - configure light x to swith on when applied power
+  * lxcf - configure light x to stay off when applied power
+  * lxcm=nnn - configure light x timeout nnn = 0 to 255 minutes (0 means forewer) minutes
+  * lxs - return status 1s|switchId|status|power|configuredTimeout|currentTimeout|configuredLightIntensity|currentLightIntensity
+  *     switchID - number of switch ( It is in fact value x )
+  * 	status - 0 off, 1 on
+  * 	power - 0 on when applied power, 1 stay off when applied power	
+  * 	configuredTimeout - no of minutes, when l1 will go off, 0 forewer
+  * 	currentTimeout - current light 1 timeout in minutes, 0 - never switch off
+  * 
   *
   *     Quick startup:<BR/>
-  *     1. Connect to the power. 110 and 220 V AC is supported<BR/>
-  *     2. Test the communication AT+0=pn<BR/>
-  *     3. Assign the device ID: AT+a=9  Id is 9.<BR/>
+  *     1. Connect to the PC, load the software to the device.<BR/>
+  *     2. Test the communication AT+1=pn<BR/>
+  *     3. Configure the device: 1. Set channel AT+c=5, set encryption password AT+p=LukiKukiBukiDuki, set device ID AT+n=9 Id is 9 ant the last configure number of relays AT+pcn=2<BR/>
   *     4. Test the device: AT+9=s Should return back the status.<BR/>
   *     5. Test the device: AT+9=l1o Should switch ON.<BR/>
   *     6. Test the device: AT+9=l1f Should switch OFF.<BR/>
+  *     7. Connect to the power line.
   * 
   * @author Robert Gregor
   */
@@ -53,16 +60,30 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      */    
     private int currentCounter;
     
+    /**
+     * Configured light intensity border value.
+     */    
+    private int configuredLightIntensityBorderValue;
+
+    /**
+     * Current light intensity border value.
+     */    
+    private int currentLightIntensityBorderValue;
+    
     /*
      * This is automatic scheduler
      */
-    private OnOffSchedule lightSchedule;
+    private OnOffSchedule lightSchedule = new OnOffSchedule();
 
     /*
      * This is true if scheduler is enabled.
      */
     private boolean enabledScheduler;
-
+    
+    /*
+     * This is true if power has been lost and the message "LP" has been received.
+     */
+    private boolean powerLost;
     /**
      * The constructor is protected. The object should be constructed using
      * SimpleSwitchDevice device = 
@@ -71,13 +92,21 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @param m remote manager reference
      * @param deviceId deviceId assigned to this device
      * @param deviceName device name
-     */
-    
+     */    
     protected SimpleSwitchDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);
         setSubDeviceNumber("1");
         lightSchedule = new OnOffSchedule();
-        enabledScheduler = lightSchedule.isEnabled();
+    }
+    /**
+     * Contains the initialization of the device.
+     */
+    protected void init() {
+        try {
+            updateDevice();
+        } catch (Exception e) {
+            RemoteHomeManager.log.error(42,e);
+        }
     }
     /**
      * For Simple switch, this method is not used.
@@ -87,7 +116,13 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
     
     @Override
     protected void manageAsynchronousCommand(String[] items) {
-        //For this device no asynchronous command exist, leave this method empty.
+        if (items[0].equals("LP")) {
+            setPowerLost(true);
+            setCurrentState(false);
+        } else {
+            setPowerLost(false);
+            parseReceivedData(items);
+        }
     }
     
     /**
@@ -98,24 +133,64 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * 
      */
     public void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        String statusResponse[] = m.sendCommandWithAnswer(parseDeviceIdForMultipleDevice(getDeviceId()), "s"+getSubDeviceNumber()).split("\\|");
-        if (!statusResponse[0].equals("3")) {
-            throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+        String statusResponse[] = null;
+        try {
+            statusResponse = m.sendCommandWithAnswer(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"s").split("\\|");
+            setPowerLost(false);
+            if (!statusResponse[0].equals("1s")) {
+                throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+            }
+        } catch (RemoteHomeConnectionException e) {
+            if (isPowerLost()) {
+                return;
+            } else {
+                throw e;
+            }
         }
-        if (statusResponse[1].equals("1")) {
+        if (!statusResponse[1].equals(getSubDeviceNumber())) {
+            throw new RemoteHomeManagerException("This response belongs to different sub device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+        }
+        parseReceivedData(statusResponse);
+    }
+    public void parseReceivedData(String statusResponse[]) {
+        setPowerLost(false);
+        if (statusResponse[2].equals("1")) {
             currentState = true;
         } else {
             currentState = false;
         }
-        if (statusResponse[2].equals("1")) {
-            onWhenAppliedPower = false;
-        } else {
+        if (statusResponse[3].equals("1")) {
             onWhenAppliedPower = true;
+        } else {
+            onWhenAppliedPower = false;
         }
-        configuredPeriod = Integer.parseInt(statusResponse[3]);
-        currentCounter = Integer.parseInt(statusResponse[4]);
+        configuredPeriod = Integer.parseInt(statusResponse[4]);
+        currentCounter = Integer.parseInt(statusResponse[5]);
+        setConfiguredLightIntensityBorderValue(Integer.parseInt(statusResponse[6]));
+        setCurrentLightIntensityBorderValue(Integer.parseInt(statusResponse[7]));
         setTimestamp(System.currentTimeMillis());
-
+        try {
+            saveHistoryData();
+        } catch (RemoteHomeManagerException e) {
+            if (e.getType() != RemoteHomeManagerException.PERSISTANCE_NOT_INITIALIZED)
+                RemoteHomeManager.log.error(241, e);
+        }
+        m.notifyDeviceChange(this);
+        RemoteHomeManager.log.info("Values set. Current values: "+toString());
+    }
+    
+    @Override
+    public String toString() {
+        HashMap h = new HashMap();
+        h.putAll(super.getFieldValues());
+        h.put("currentState", currentState);
+        h.put("currentCounter", currentCounter);    
+        h.put("onWhenAppliedPower", onWhenAppliedPower);
+        h.put("configuredPeriod", configuredPeriod);        
+        h.put("powerLost", powerLost);
+        h.put("lightSchedule", lightSchedule);
+        h.put("enabledScheduler", enabledScheduler);        
+        return h.toString();
     }
     /**
      * This method will switch on the device.
@@ -123,7 +198,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @throws RemoteHomeConnectionException if there is problem with connection
      */
     public void switchOn() throws RemoteHomeConnectionException {
-        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"o");
+        m.sendCommand(parseDeviceIdForMultipleDevice(getRealDeviceId()), "l"+getSubDeviceNumber()+"o");
         setCurrentState(true);
     }
     
@@ -133,7 +208,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @throws RemoteHomeConnectionException if there is problem with connection
      */
     public void switchOff() throws RemoteHomeConnectionException {
-        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"f");
+        m.sendCommand(parseDeviceIdForMultipleDevice(getRealDeviceId()), "l"+getSubDeviceNumber()+"f");
         setCurrentState(false);
     }
     
@@ -145,7 +220,8 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @throws RemoteHomeConnectionException if there is problem with connection
      */
     public void switchOnForConfiguredPeriod() throws RemoteHomeConnectionException {
-        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"of");
+        m.sendCommand(parseDeviceIdForMultipleDevice(getRealDeviceId()), "l"+getSubDeviceNumber()+"of");
+        setCurrentState(true);
     }
 
     /**
@@ -164,6 +240,7 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      */
     protected void setOnWhenAppliedPower(boolean onWhenAppliedPower) {
         this.onWhenAppliedPower = onWhenAppliedPower;
+        
     }
 
     /**
@@ -241,8 +318,8 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
         if ((period < 0) || (period > 255)) {
             throw new RemoteHomeManagerException("The value should be 0 - 255", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
-        m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"ct="+period);
-        setConfiguredPeriod(period);
+        m.sendCommand(parseDeviceIdForMultipleDevice(getRealDeviceId()), "l"+getSubDeviceNumber()+"cm="+period);
+        setConfiguredPeriod(period);      
     }    
     /**
      * This method will configure the behavior of the switch, when the power is applied.
@@ -251,9 +328,9 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      */
     public void switchOnWhenAppliedPower(boolean onWhenPower) throws RemoteHomeConnectionException {
         if (onWhenPower) {
-            m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"co");
+            m.sendCommand(parseDeviceIdForMultipleDevice(getRealDeviceId()), "l"+getSubDeviceNumber()+"co");
         } else {
-            m.sendCommand(parseDeviceIdForMultipleDevice(getDeviceId()), "l"+getSubDeviceNumber()+"cf");
+            m.sendCommand(parseDeviceIdForMultipleDevice(getRealDeviceId()), "l"+getSubDeviceNumber()+"cf");
         }
         setOnWhenAppliedPower(onWhenPower);
     }
@@ -262,68 +339,194 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
      * @return the enabledScheduler
      */
     public boolean isEnabledScheduler() {
-        return getLightSchedule().isEnabled();
+        return this.enabledScheduler;
     }
-
     /**
      * @param enabledScheduler the enabledScheduler to set
      */
     public void setEnabledScheduler(boolean enabledScheduler) {
-        getLightSchedule().setEnabled(enabledScheduler);
         this.enabledScheduler = enabledScheduler;
     }
     /**
      * This method will save the current state of the device to the database together with the timestamp.
+     * @throws RemoteHomeManagerException if the saving fail.
      */
     protected void saveHistoryData() throws RemoteHomeManagerException {
-          OnOffHistoryData historyProto = new OnOffHistoryData();
-          historyProto.setDeviceId(getDeviceId());
-          OnOffHistoryData history = (OnOffHistoryData)m.getPersistance().loadHistoryData(historyProto);
           int expected = (isCurrentState()) ? 1 : 0;
           if (isEnabledScheduler()) {
-              Boolean action = getLightSchedule().processSchedule();
-              if (action != null) {
-                  expected = action?1:0;
-              }
+              Boolean action = getLightSchedule().getCurrentSchedule();
+              expected = action?1:0;
           }
-          history.saveSampleData(System.currentTimeMillis(), (isCurrentState()) ? 1 : 0, expected);
-          m.getPersistance().saveHistoryData(history);
+          HistoryData history = new HistoryData();
+          history.setDeviceId(getDeviceId());
+          history.setDataName("ONOFF");
+          history.setDataValue(((isCurrentState())?1:0)+"|"+expected);
+          history.setDataTimestamp();
+          m.getPersistance().addHistoryData(history);
+          RemoteHomeManager.log.debug("Saved history data: "+history.toString());
     }  
-    /**
-     * This method will start the scheduler thread to process the schedule.
-     */
-    public void startScheduling() {
-        getLightSchedule().setCurrentState("0");
-        new Thread(new Runnable() {
-            public void run() {
-                while(true) {
-                    try {
-                        Thread.sleep(30000);                        
-                        if (!isEnabledScheduler()) continue;
-                        Calendar c = Calendar.getInstance();
-                        int min = c.get(Calendar.MINUTE);
-                        if (((min % 10) == 0) || (min == 0)) {
-                            Boolean action = getLightSchedule().processSchedule();
-                            if (action != null) {
-                                //something has to be done.
-                                if (action) {
-                                    switchOn();
-                                } else {
-                                    switchOff();
-                                }
-                            }
-                            saveHistoryData();
-                        }
-                        Thread.sleep(30000);
-                    } catch (InterruptedException e) {
-                        return;
-                    } catch (RemoteHomeConnectionException e) {
-                        e.printStackTrace();
-                    } catch (RemoteHomeManagerException e) {
-                        e.printStackTrace();
-                    }
+    /*
+     * This method is called each second. Do not put inside blocking operations
+    */
+    protected void runEachSecond() {
+        
+    }
+    
+    /*
+     * This method is called each minute. Do not put inside blocking operations
+    */
+    protected void runEachMinute() {
+        
+    }
+
+    /*
+     * This method is called each 10 minutes. Do not put inside blocking operations
+    */
+    protected void runEach10Minutes() {
+        try {
+            saveHistoryData();
+            if (isEnabledScheduler()) {
+                boolean action = getLightSchedule().getCurrentSchedule();
+                if (action) {
+                    if (!currentState) switchOn();
+                } else {
+                     if (currentState) switchOff();
                 }
             }
-        }).start();        
+        } catch (RemoteHomeManagerException e) {
+            RemoteHomeManager.log.error(44,e);
+        } catch (RemoteHomeConnectionException e) {
+            RemoteHomeManager.log.error(45,e);
+        }
+    }
+
+    /*
+     * This method is called each hour. Do not put inside blocking operations
+    */
+    protected void runEachHour() {
+        
+    }
+
+    /*
+     * This method is called each day. Do not put inside blocking operations
+    */
+    protected void runEachDay() {
+        
+    }
+
+    public float getLowBatteryLimit() {
+        return 0f;
+    }
+
+    /**
+     * @return the powerLost
+     */
+    public boolean isPowerLost() {
+        return powerLost;
+    }
+
+    /**
+     * @param powerLost the powerLost to set
+     */
+    protected void setPowerLost(boolean powerLost) {
+        this.powerLost = powerLost;
+    }
+
+    /**
+     * @return the configuredLightIntensityBorderValue
+     */
+    public int getConfiguredLightIntensityBorderValue() {
+        return configuredLightIntensityBorderValue;
+    }
+
+    /**
+     * @param configuredLightIntensityBorderValue the configuredLightIntensityBorderValue to set
+     */
+    private void setConfiguredLightIntensityBorderValue(int configuredLightIntensityBorderValue) {
+        this.configuredLightIntensityBorderValue = configuredLightIntensityBorderValue;
+    }
+
+    /**
+     * @return the currentLightIntensityBorderValue
+     */
+    public int getCurrentLightIntensityBorderValue() {
+        return currentLightIntensityBorderValue;
+    }
+
+    /**
+     * @param currentLightIntensityBorderValue the currentLightIntensityBorderValue to set
+     */
+    private void setCurrentLightIntensityBorderValue(int currentLightIntensityBorderValue) {
+        this.currentLightIntensityBorderValue = currentLightIntensityBorderValue;
+    }
+
+    /**
+     * @param currentLightIntensityBorderValue the currentLightIntensityBorderValue to set to the hardware device
+     */
+    public void configureLightIntensityBorderValue(int currentLightIntensityBorderValue) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        if ((currentLightIntensityBorderValue <= 0) || (currentLightIntensityBorderValue >= 1024)) {
+            throw new RemoteHomeManagerException("The value should be 0 - 1024", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        }
+        m.sendCommand(parseDeviceIdForMultipleDevice(getRealDeviceId()), "l"+getSubDeviceNumber()+"cb="+Integer.toString(currentLightIntensityBorderValue));
+    }
+    
+    public class SimpleSwitchChartItem {
+        private String xData;
+        private int yData;
+        private int yDataExpected;
+
+        /**
+         * @return the xData
+         */
+        public String getxData() {
+            return xData;
+        }
+
+        /**
+         * @param xData the xData to set
+         */
+        public void setxData(String xData) {
+            this.xData = xData;
+        }
+
+        /**
+         * @return the yData
+         */
+        public int getyData() {
+            return yData;
+        }
+
+        /**
+         * @param yData the yData to set
+         */
+        public void setyData(int yData) {
+            this.yData = yData;
+        }
+
+        /**
+         * @return the yDataExpected
+         */
+        public int getyDataExpected() {
+            return yDataExpected;
+        }
+
+        /**
+         * @param yDataExpected the yDataExpected to set
+         */
+        public void setyDataExpected(int yDataExpected) {
+            this.yDataExpected = yDataExpected;
+        }
+    }
+    public ArrayList generateChartItems(HistoryData[] historyData, String type) {
+        ArrayList<SimpleSwitchDevice.SimpleSwitchChartItem> retArray = new ArrayList<SimpleSwitchDevice.SimpleSwitchChartItem>();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+            for (HistoryData d : historyData) {
+                SimpleSwitchDevice.SimpleSwitchChartItem item = new SimpleSwitchDevice.SimpleSwitchChartItem();            
+                item.setxData(df.format(d.getDataTimestamp()));
+                item.setyData(Integer.parseInt(d.getDataValue().split("\\|")[0]));
+                item.setyDataExpected(Integer.parseInt(d.getDataValue().split("\\|")[1]));
+                retArray.add(item);
+            }
+            return retArray;
     }
 }

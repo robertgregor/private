@@ -1,49 +1,39 @@
 package org.remoteHome;
 
 import java.io.Serializable;
-import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 /**
   * Motor controller<br/>
   * <br/>
-  * pn - check weather the device is up and runing (ping command)<br/>
-  * s - return status 5|down|up|timeout value|current opening<br/>
-  * 	&nbsp;&nbsp;&nbsp;down - 1 if currently moving down<br/>
-  * 	&nbsp;&nbsp;&nbsp;up - 1 if currently moving up<br/>
-  * 	&nbsp;&nbsp;&nbsp;timeout value - number of configured timeout in sec. This value is the 100 % time to open the blinds<br/>
-  * 	&nbsp;&nbsp;&nbsp;current opening - Blinds opening in %. 0 means fully open, 100 means fully closed. In manual mode always 0.<br/>
-  * <br/>
-  * Position managed mode:<br/>
-  * <br/>
-  * bt=nnn - configure number of seconds, when the blind is moving fully from open position to closed position.<br/>
-  * bu - blinds up moving to fully open position<br/>
-  * bd - blinds down moving to fully closed position<br/>
-  * bs - blinds stop stop movements<br/>
-  * bm=nnn - Move to the nnn position. nnn is the percentage between open and close. 0 - fully open, 100 - fully closed<br/>
-  * <br/>
-  * Asynchronous messages: l|nnn percentage of opening.<br/>
-  * <br/>
-  * Manual mode:<br/>
-  * <br/>
-  * u - start to move up<br/>
-  * d - start to move down<br/>
-  * e - stop to move<br/>
-  *<br/><br/> 
-  *     Quick startup:<BR/>
-  *     1. Connect wires<BR/>
-  *     2. Test the communication AT+0=pn<BR/>
-  *     3. Assign the device ID: AT+a=9  Id is 9.<BR/>
-  *     4. Measure the number of seconds from fully open position to fully closed position.<BR/>
-  *     5. Set this value to device: AT+9=bm=123<BR/>
+  * bxt=nnn - configure number of seconds, when the blind is moving fully from the open position to closed position.
+  * bxu - blinds up moving to fully open position it means 0 %
+  * bxd - blinds down moving to fully closed position it means 100 %
+  * bxp - blinds stop stop movements
+  * bxc=nnn - Move to the nnn position. nnn is the percentage between open and close. 0 - fully open, 100 - fully closed
+  * bxm=nnn - Timeout value - number of configured timeout in 100 msec. This value is the 100 % time to open the blinds
+  * bxs - return status 1b|blindId|down|up|timeout value|current timeout value|expected opening|current opening
+  *     blindID - number of blind ( It is in fact value x )
+  * 	down - 1 if currently moving down
+  * 	up - 1 if currently moving up
+  * 	timeout value - number of configured timeout in 100 msec. This value is the 100 % time to open the blinds
+  * 	current timeout value - number of configured timeout in 100 msec. This value is the 100 % time to open the blinds
+  *     expected opening - Blinds opening in %. This is expected value. When the blind reach that value, it will stop and will send the asynchronous command.
+  * 	current opening - Blinds opening in %. 0 means fully open, 100 means fully closed. If the blinds moving, it display current position. If it is not moving, this value should match the value of the expected temperature.
+  * 
+  * x - pair of the relays number. In this mode, always 2 relays form 1 controller. So to use this mode, 2 relay board or 8 relay board should be used. So e.g. b2u command means, that blind's motor is connected to relays 3 and 4.
+  * Asynchronous messages (It is changed, when the status of the device change):
+  * 1b|blindId|down|up|timeout value|current timeout value|expected opening|current opening
+  * 
+  * <br/><br/> 
   * 
   * @author Robert Gregor
   */
 public class MotorControllerDevice extends AbstractDevice implements Serializable {
-   /**
-     * This listenner listen for the event, when the blind is moved to required position. The user of this API should implement this interface
-     * and register it for that event.
-     */    
-    private MotorControllerListener blindsControllerListener;
     
     /**
      * When the blinds are moving already, this is true.
@@ -73,14 +63,18 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
     /*
      * This is automatic scheduler
      */
-    private PercentageSchedule positionSchedule;
+    private PercentageSchedule positionSchedule = new PercentageSchedule();
 
     /*
      * This is true if scheduler is enabled.
      */
     private boolean enabledScheduler;
     
-    
+    /*
+     * This is true if power has been lost and the message "LP" has been received.
+     */
+    private boolean powerLost;    
+
    /**
      * The constructor is protected. The object should be constructed using
      * BlindsControllerDevice device = 
@@ -92,25 +86,34 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      */    
     protected MotorControllerDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);
-        setSubDeviceNumber("");
+        setSubDeviceNumber("1");
         positionSchedule = new PercentageSchedule();
     }
     /**
-     * Receive asynchronous command - blinds positioned
+     * Contains the initialization of the device.
+     */
+    protected void init() {
+        try {
+            updateDevice();
+        } catch (Exception e) {
+            RemoteHomeManager.log.error(42,e);
+        }
+    }
+    /**
+     * Receive asynchronous command
      * 
-     * @param items items returned back
+     * @param statusResponse items returned back
      */    
     @Override
-    protected void manageAsynchronousCommand(String[] items) {
-        if (items[0].equals("l")) {
-            this.setCurrentOpening(Integer.parseInt(items[1]));
-            this.setMoving(false);
-            this.setMovingUp(false);
-            this.setMovingDown(false);
-            if (blindsControllerListener != null) {
-                blindsControllerListener.blindsPositioned();
-            }
-            setTimestamp(System.currentTimeMillis());
+    protected void manageAsynchronousCommand(String[] statusResponse) {
+        if (statusResponse[0].equals("LP")) {
+            setPowerLost(true);
+            movingDown = false;
+            movingUp = false;
+            moving = false;
+        } else {
+            setPowerLost(false);
+            parseReceivedData(statusResponse);
         }
     }    
    /**
@@ -121,61 +124,100 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * 
      */
     public void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        String statusResponse[] = m.sendCommandWithAnswer(getDeviceId(), "s"+getSubDeviceNumber()).split("\\|");
-        if (!statusResponse[0].equals("5")) {
-            throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
-        }        
-        if (statusResponse[1].equals("1")) {
+        String statusResponse[] = null;
+        try {
+            statusResponse = m.sendCommandWithAnswer(parseDeviceIdForMultipleDevice(getDeviceId()), "b"+getSubDeviceNumber()+"s").split("\\|");
+            setPowerLost(false);
+            if (!statusResponse[0].equals("1b")) {
+                throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+            }
+        } catch (RemoteHomeConnectionException e) {
+            if (isPowerLost()) {
+                return;
+            } else {
+                throw e;
+            }
+        }
+        if (!statusResponse[1].equals(getSubDeviceNumber())) {
+            throw new RemoteHomeManagerException("This response belongs to different sub device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+        }
+        parseReceivedData(statusResponse);
+    }
+    
+    public void parseReceivedData(String statusResponse[]) {
+        if (statusResponse[2].equals("1")) {
             movingDown = true;
         } else {
             movingDown = false;
         }
-        if (statusResponse[2].equals("1")) {
+        if (statusResponse[3].equals("1")) {
             movingUp = true;
         } else {
             movingUp = false;
         }
-        if (statusResponse[1].equals("1") || statusResponse[2].equals("1")) {
+        if (statusResponse[2].equals("1") || statusResponse[3].equals("1")) {
             moving = true;
         } else {
             moving = false;
         }
-        fullRangeTimeout = Integer.parseInt(statusResponse[3]);
-        currentOpening = Integer.parseInt(statusResponse[4]);
+        fullRangeTimeout = Integer.parseInt(statusResponse[4]);
+        currentOpening = Integer.parseInt(statusResponse[7]);
         setTimestamp(System.currentTimeMillis());
+        try {
+            saveHistoryData();
+        } catch (RemoteHomeManagerException e) {
+            if (e.getType() != RemoteHomeManagerException.PERSISTANCE_NOT_INITIALIZED)
+                RemoteHomeManager.log.error(241, e);
+        }        
+        m.notifyDeviceChange(this);
+        RemoteHomeManager.log.info("Values set. Current values: "+toString());
     }
     
+    @Override
+    public String toString() {
+        HashMap h = new HashMap();
+        h.putAll(super.getFieldValues());
+        h.put("movingDown", movingDown);
+        h.put("movingUp", movingUp);    
+        h.put("moving", moving);
+        h.put("fullRangeTimeout", fullRangeTimeout);
+        h.put("currentOpening", currentOpening);
+        h.put("powerLost", powerLost);
+        h.put("positionSchedule", positionSchedule);
+        h.put("enabledScheduler", enabledScheduler);        
+        return h.toString();
+    }
     /**
      * 
-     * @param fullRangeTimeout timeout in seconds to move from fully open position to fully closed position
+     * @param fullRangeTimeout timeout in seconds to move from fully open position to fully closed position. It is multiple 100ms, so e.g. for 5 seconds, put 50.
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      * @throws RemoteHomeManagerException if the range is outside 0 - 255 seconds
      */
     public void configureFullRangeTimeout(int fullRangeTimeout) throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        if ((fullRangeTimeout < 0) || (fullRangeTimeout > 255)) {
-            throw new RemoteHomeManagerException("The value should be 0 - 255", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        if ((fullRangeTimeout < 0) || (fullRangeTimeout > 65535)) {
+            throw new RemoteHomeManagerException("The value should be 0 - 65535", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
-        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"t="+fullRangeTimeout);
+        m.sendCommand(getRealDeviceId(), "b"+getSubDeviceNumber()+"m="+fullRangeTimeout);
         setFullRangeTimeout(fullRangeTimeout);
     }
 
     /**
-     * This method will move the blinds to fully opened position
+     * This method will move the motor to fully opened position
      * @throws RemoteHomeConnectionException if there is a problem with the connection 
      */
-    public void blindsUp() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"u"); 
+    public void motorUp() throws RemoteHomeConnectionException {
+        m.sendCommand(getRealDeviceId(), "b"+getSubDeviceNumber()+"u"); 
         moving = true;
         movingUp = true;
-        movingDown = false;        
+        movingDown = false;
     }
     
     /**
      * This method will move the blinds to fully closed position
      * @throws RemoteHomeConnectionException if there is a problem with the connection 
      */
-    public void blindsDown() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"d");        
+    public void motorDown() throws RemoteHomeConnectionException {
+        m.sendCommand(getRealDeviceId(), "b"+getSubDeviceNumber()+"d");        
         moving = true;
         movingUp = false;
         movingDown = true;
@@ -187,11 +229,11 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * @throws RemoteHomeConnectionException if there is a problem with the connection 
      * @throws RemoteHomeManagerException if the value is not in range 0 - 100
      */
-    public void moveBlindsToPosition(int position) throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        if ((fullRangeTimeout < 0) || (fullRangeTimeout > 100)) {
+    public void moveMotorToPosition(int position) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        if ((position < 0) || (position > 100)) {
             throw new RemoteHomeManagerException("The value should be 0 - 100", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
-        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"m="+position);        
+        m.sendCommand(getRealDeviceId(), "b"+getSubDeviceNumber()+"c="+position);        
         moving = true;
         movingUp = false;
         movingDown = false;
@@ -201,75 +243,18 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * This method will stop the movement of the blinds
      * @throws RemoteHomeConnectionException if there is a problem with the connection
      */
-    public void stopBlindsMovement() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "b"+getSubDeviceNumber()+"s");
+    public void stopMotorMovement() throws RemoteHomeConnectionException {
+        m.sendCommand(getRealDeviceId(), "b"+getSubDeviceNumber()+"p");
         moving = false;
         movingUp = false;
         movingDown = false;
     }
     
-    /**
-     * Don't use this method!!! Only for your own risk!!!
-     * Use rather blindsUp(). It is only for someone, who want to implement it's own logic. In this manual mode, the device will lost control about the 
-     * position!!!!. Also the device will not stop the blinds!!!! So it is your responsibility to call manualStop!!!!
-     * @throws RemoteHomeConnectionException if there is a problem with the connection
-     */
-    public void manualMoveUp() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "u"+getSubDeviceNumber());        
-        moving = true;
-        movingUp = true;
-        movingDown = false;
-    }
-
-    /**
-     * Don't use this method!!! Only for your own risk!!!
-     * Use rather blindsDown(). It is only for someone, who want to implement it's own logic. In this manual mode, the device will lost control about the 
-     * position!!!!. Also the device will not stop the blinds!!!! So it is your responsibility to call manualStop!!!!
-     * @throws RemoteHomeConnectionException if there is a problem with the connection
-     */
-    public void manualMoveDown() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "d"+getSubDeviceNumber());        
-        moving = true;
-        movingUp = false;
-        movingDown = true;
-    }
-    
-    /**
-     * Don't use this method!!! Only for your own risk!!!
-     * Use rather stopBlindsMovement(). It is only for someone, who want to implement it's own logic. In this manual mode, the device will lost control about the 
-     * position!!!!. Also the device will not stop the blinds!!!! So it is your responsibility to call manualMoveStop!!!!
-     * @throws RemoteHomeConnectionException if there is a problem with the connection
-     */
-    public void manualStop() throws RemoteHomeConnectionException {
-        m.sendCommand(getDeviceId(), "e"+getSubDeviceNumber());
-        moving = false;
-        movingUp = false;
-        movingDown = false;
-    }
-
-    /**
-     * This listenner listen for the event, when the blind is moved to required position. The user of this API could implement this interface
-     * and register it for that event.
-     * @return the blindsControllerListener
-     */
-    public MotorControllerListener getBlindsControllerListener() {
-        return blindsControllerListener;
-    }
-
-    /**
-     * This listenner listen for the event, when the blind is moved to required position. The user of this API should implement this interface
-     * and register it for that event.
-     * @param blindsControllerListener the blindsControllerListener to set
-     */
-    public void setBlindsControllerListener(MotorControllerListener blindsControllerListener) {
-        this.blindsControllerListener = blindsControllerListener;
-    }
-
     /**
      * When the blinds are moving already, this is true.
      * @return the moving
      */
-    protected boolean isMoving() {
+    public boolean isMoving() {
         return moving;
     }
 
@@ -277,7 +262,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * Current opening is the value in percent of the position. Fully opened is 0, fully closed is 100.
      * @return the currentOpening
      */
-    protected int getCurrentOpening() {
+    public int getCurrentOpening() {
         return currentOpening;
     }
 
@@ -301,7 +286,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * When the blinds are moving up, this is true.
      * @return the movingUp
      */
-    protected boolean isMovingUp() {
+    public boolean isMovingUp() {
         return movingUp;
     }
 
@@ -317,7 +302,7 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      * When the blinds are moving down, this is true.
      * @return the movingDown
      */
-    protected boolean isMovingDown() {
+    public boolean isMovingDown() {
         return movingDown;
     }
 
@@ -346,52 +331,18 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
     }
     /**
      * This method will save the current state of the device to the database together with the timestamp.
+     * @throws RemoteHomeManagerException if the saving fails.
      */
     protected void saveHistoryData() throws RemoteHomeManagerException {
-          PercentageHistoryData historyProto = new PercentageHistoryData();
-          historyProto.setDeviceId(getDeviceId());
-          PercentageHistoryData history = (PercentageHistoryData)m.getPersistance().loadHistoryData(historyProto);
           int expected = getCurrentOpening();
-          if (isEnabledScheduler()) expected = (getPositionSchedule().processSchedule()!=null)?getPositionSchedule().processSchedule():getCurrentOpening();
-          history.saveSampleData(System.currentTimeMillis(), getCurrentOpening(), expected);
-          m.getPersistance().saveHistoryData(history);
-    }
-   /**
-     * This method will start the scheduler thread to process the schedule.
-     */
-    public void startScheduling() {
-        getPositionSchedule().setCurrentState("00");
-        new Thread(new Runnable() {
-            public void run() {
-                while(true) {
-                    try {
-                        Calendar c = Calendar.getInstance();
-                        int min = c.get(Calendar.MINUTE);
-                        if (((min % 10) == 0) || (min == 0)) {
-                            saveHistoryData();
-                        }
-                        Thread.sleep(30000);                        
-                        if (!isEnabledScheduler()) continue;
-                        c = Calendar.getInstance();
-                        min = c.get(Calendar.MINUTE);
-                        if (((min % 10) == 0) || (min == 0)) {
-                            Integer action = getPositionSchedule().processSchedule();
-                            if (action != null) {
-                                //something has to be done.
-                                moveBlindsToPosition(action);
-                            }
-                        }
-                        Thread.sleep(20000);
-                    } catch (InterruptedException e) {
-                        return;
-                    } catch (RemoteHomeConnectionException e) {
-                        e.printStackTrace();
-                    } catch (RemoteHomeManagerException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
+          if (isEnabledScheduler()) expected = getPositionSchedule().processSchedule();          
+          HistoryData history = new HistoryData();
+          history.setDeviceId(getDeviceId());
+          history.setDataName("DOUBLELINEDATA");
+          history.setDataValue(getCurrentOpening()+"|"+expected);
+          history.setDataTimestamp();
+          m.getPersistance().addHistoryData(history);
+          RemoteHomeManager.log.debug("Saved history data: "+history.toString());          
     }
 
     /**
@@ -420,5 +371,135 @@ public class MotorControllerDevice extends AbstractDevice implements Serializabl
      */
     public void setEnabledScheduler(boolean enabledScheduler) {
         this.enabledScheduler = enabledScheduler;
+    }
+    /*
+     * This method is called each second. Do not put inside blocking operations
+    */
+    protected void runEachSecond() {
+        
+    }
+    
+    /*
+     * This method is called each minute. Do not put inside blocking operations
+     */
+    protected void runEachMinute() {
+        
+    }
+
+    /*
+     * This method is called each 10 minutes. Do not put inside blocking operations
+     */
+    protected void runEach10Minutes() {
+        try {
+            saveHistoryData();
+            if (isEnabledScheduler()) {
+                int schPosition = getPositionSchedule().processSchedule();
+                if (schPosition != getCurrentOpening()) {
+                    this.moveMotorToPosition(schPosition);
+                }    
+            }
+        } catch (RemoteHomeManagerException e) {
+            RemoteHomeManager.log.error(44,e);
+        } catch (RemoteHomeConnectionException e) {
+            RemoteHomeManager.log.error(45,e);
+        }
+    }        
+
+    /*
+     * This method is called each hour. Do not put inside blocking operations
+     */
+    protected void runEachHour() {
+        
+    }
+
+    /*
+     * This method is called each day. Do not put inside blocking operations
+     */
+    protected void runEachDay() {
+        
+    }
+    
+    public float getLowBatteryLimit() {
+        return 0f;
+    }
+
+    /**
+     * @return the powerLost
+     */
+    public boolean isPowerLost() {
+        return powerLost;
+    }
+
+    /**
+     * @param powerLost the powerLost to set
+     */
+    public void setPowerLost(boolean powerLost) {
+        this.powerLost = powerLost;
+    }
+
+    public class MotorChartItem {
+        private String xData;
+        private int yData;
+        private int yDataExpected;
+        
+        @Override
+        public String toString() {
+            return "xData:"+getxData()+",yData:"+getyData()+",yDataExpected:"+getyDataExpected();
+        }
+
+        /**
+         * @return the xData
+         */
+        public String getxData() {
+            return xData;
+        }
+
+        /**
+         * @param xData the xData to set
+         */
+        public void setxData(String xData) {
+            this.xData = xData;
+        }
+
+        /**
+         * @return the yData
+         */
+        public int getyData() {
+            return yData;
+        }
+
+        /**
+         * @param yData the yData to set
+         */
+        public void setyData(int yData) {
+            this.yData = yData;
+        }
+
+        /**
+         * @return the yDataExpected
+         */
+        public int getyDataExpected() {
+            return yDataExpected;
+        }
+
+        /**
+         * @param yDataExpected the yDataExpected to set
+         */
+        public void setyDataExpected(int yDataExpected) {
+            this.yDataExpected = yDataExpected;
+        }
+    }
+    
+    public ArrayList generateChartItems(HistoryData[] historyData, String type) {
+        ArrayList<MotorControllerDevice.MotorChartItem> retArray = new ArrayList<MotorControllerDevice.MotorChartItem>();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+            for (HistoryData d : historyData) {
+                MotorControllerDevice.MotorChartItem item = new MotorControllerDevice.MotorChartItem();            
+                item.setxData(df.format(d.getDataTimestamp()));
+                item.setyData(Integer.parseInt(d.getDataValue().split("\\|")[0]));
+                item.setyDataExpected(Integer.parseInt(d.getDataValue().split("\\|")[1]));
+                retArray.add(item);
+            }
+            return retArray;
     }
 }

@@ -24,14 +24,9 @@ public class WebServer {
     }
 
     public void startServer() throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(listenPort), 0);
-        HttpContext context = server.createContext("/", new WebServerHandler(remoteHomeManager));
-        server.setExecutor(null); // creates a default executor
+        HttpServer server = HttpServer.create(new InetSocketAddress(listenPort), 100);
+        server.createContext("/", new WebServerHandler(remoteHomeManager));
+        server.setExecutor(java.util.concurrent.Executors.newFixedThreadPool(100)); // creates a default executor
         server.start();
-    }
-
-    public static void main(String... args) throws Exception {
-        WebServer w = new WebServer("8080", new RemoteHomeManager("127.0.0.1", "8081", "C:/test.ser"));
-        w.startServer();
     }
 }

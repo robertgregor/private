@@ -1,0 +1,61 @@
+package org.remoteHome;
+
+import java.util.Collection;
+
+/**
+ * @author Your name here
+ * You can use these methods from AbstractSketch:
+ * AbstractDevice getDevice(int deviceId) throws RemoteHomeManagerException
+ * Collection<AbstractDevice> getAllDevices() throws RemoteHomeManagerException
+ * The reference to RemoteHomeManager is remoteHomeManager
+ *
+ * For more info about the api and how to use it, see the javadoc
+ */
+public class TemplateSketch extends AbstractSketch {
+
+   /*
+    * This is called after the class is constructed.
+    */
+
+    public void init() {
+    }
+
+   /*
+    * This is called, when any device change its status. 
+    * @param device is the device which was changed.
+    */
+    public void manageDeviceChange(AbstractDevice device) {
+    }
+    
+   /*
+    * This method is called each second. Do not put inside blocking operations
+    */
+    public void runEachSecond() {}
+    
+   /*
+    * This method is called each minute. Do not put inside blocking operations
+    */
+    public void runEachMinute() {}
+
+   /*
+    * This method is called each 10 minutes. Do not put inside blocking operations
+    */
+    public void runEach10Minutes() {}
+
+   /*
+    * This method is called each hour. Do not put inside blocking operations
+    */
+    public void runEachHour() {}
+
+   /*
+    * This method is called each day. Do not put inside blocking operations
+    */
+    public void runEachDay() {}
+    
+    public AbstractDevice getDevice(int deviceId) throws RemoteHomeManagerException {
+        return remoteHomeManager.getDevice(deviceId);
+    }
+    public Collection<AbstractDevice> getAllDevices() throws RemoteHomeManagerException {
+        return remoteHomeManager.getDevices();
+    }
+}

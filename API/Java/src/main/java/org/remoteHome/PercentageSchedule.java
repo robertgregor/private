@@ -17,7 +17,6 @@ import java.util.Calendar;
 
 
 public class PercentageSchedule extends AbstractSchedule {
-        private transient String currentState = "";
 
     public PercentageSchedule() {
         scheduleStreamMonday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -28,19 +27,7 @@ public class PercentageSchedule extends AbstractSchedule {
         scheduleStreamSaturday =  "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
         scheduleStreamSunday =    "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     }
-    /**
-     * @return the currentState
-     */
-    public String getCurrentState() {
-        return currentState;
-    }
 
-    /**
-     * @param currentState the currentState to set
-     */
-    public void setCurrentState(String currentState) {
-        this.currentState = currentState;
-    }
     /*
      * This method is used to receive the schedule hex format.
      * @param value is the schedule string, represents 24 * 6 hexa digits number
@@ -115,33 +102,24 @@ public class PercentageSchedule extends AbstractSchedule {
     
     /**
      * This method will process the realtime schedule
-     * @return decimal value of the expected temperature or null, if the value has not been changed.
-     * It also returns null, if the min % 15 != 0
+     * @return decimal value of the expected position between 0 and 100.
      */
-    public Integer processSchedule() {
+    public int processSchedule() {
         Calendar c = Calendar.getInstance();
         int min = c.get(Calendar.MINUTE);
-        if (((min % 10) == 0) || (min == 0)) {
-            int day = 0;
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int d = c.get(Calendar.DAY_OF_WEEK);
-            if (d == Calendar.MONDAY) day = 0;
-            else if (d == Calendar.TUESDAY) day = 1;
-            else if (d == Calendar.WEDNESDAY) day = 2;
-            else if (d == Calendar.THURSDAY) day = 3;
-            else if (d == Calendar.FRIDAY) day = 4;
-            else if (d == Calendar.SATURDAY) day = 5;
-            else if (d == Calendar.SUNDAY) day = 6;
-            String sch = loadSchedule();
-            String hourValues = sch.substring((day*24*12)+(hour*12), (day*24*12)+(hour*12)+12);
-            String percent = hourValues.substring((min/10)*2, ((min/10)*2)+2);
-            if (!percent.equalsIgnoreCase(getCurrentState())) {
-                setCurrentState(percent);
-                return Integer.parseInt(percent, 16);
-            } else {
-                return null;
-            }            
-        }
-        return null;
+        int day = 0;
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int d = c.get(Calendar.DAY_OF_WEEK);
+        if (d == Calendar.MONDAY) day = 0;
+        else if (d == Calendar.TUESDAY) day = 1;
+        else if (d == Calendar.WEDNESDAY) day = 2;
+        else if (d == Calendar.THURSDAY) day = 3;
+        else if (d == Calendar.FRIDAY) day = 4;
+        else if (d == Calendar.SATURDAY) day = 5;
+        else if (d == Calendar.SUNDAY) day = 6;
+        String sch = loadSchedule();
+        String hourValues = sch.substring((day*24*12)+(hour*12), (day*24*12)+(hour*12)+12);
+        String percent = hourValues.substring((min/10)*2, ((min/10)*2)+2);
+        return Integer.parseInt(percent, 16);
     }
 }

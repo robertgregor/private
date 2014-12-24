@@ -3,14 +3,350 @@
 <head>
     <meta charset="utf-8"/>
     <script>
+        var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("sketchTextArea"), {
+              mode: "text/x-java",
+              indentWithTabs: true,
+              smartIndent: true,
+              lineNumbers: true,
+              lineWrapping: true,
+              matchBrackets: true,
+              autofocus: true
+        });
+        function populateProperties(json) {
+              document.getElementById("lang").value = json.language;
+              document.getElementById("programmingPort").value = json.programmingPort;
+              document.getElementById("useLogFile").value = json.useTextLogging;
+              document.getElementById("logFileName").value = json.logFileName;
+              document.getElementById("logLevel").value = json.logLevel;
+              document.getElementById("emailUsername").value = json.smtpUserName;
+              document.getElementById("emailPassword").value = json.smtpPassword;
+              document.getElementById("emailFrom").value = json.smtpFrom;
+              document.getElementById("emailSmtpHost").value = json.smtpHost;
+              document.getElementById("emailSmtpPort").value = json.smtpPort;
+              document.getElementById("emailauthenticate").value = json.smtpAuthenticate;
+              document.getElementById("emailtls").value = json.useMailTls;
+              document.getElementById("tempDir").value = json.tempDir;
+              document.getElementById("lowBatteryMessage").value = json.lowBatteryMessage;
+              document.getElementById("powerLostMessage").value = json.powerLostMessage;
+              document.getElementById("notificationMessageSubject").value = json.notificationMessageSubject;
+              document.getElementById("notificationMessageTo").value = json.notificationMessageTo;
+              
+              
+        } 
+        function manageTransceiver(action) {
+            var result=false;
+                                      $.ajax({
+                                            url: "/",
+                                            'cache': false,
+                                            async: false,
+                                            type: "get",
+                                            data: "ServiceName=ConnectionManager&action="+action,
+                                                success: function (data) {
+                                                    if (data.indexOf("<!--LOGIN-->") > 0) { 
+                                                        location.replace("/");
+                                                    }
+                                                    result=true;
+                                                },
+                                                error: function (xhr, ajaxOptions, thrownError) {
+                                                    if (xhr.responseText == "error_no_permission") {
+                                                        alert(error_no_permission);
+                                                    } else {
+                                                        alert(xhr.responseText);
+                                                    }
+                                                }
+                                        });
+            return result;
+        }
         $(function () {
-            $("#accordion").accordion({heightStyle: "content"});
+            $("#downloadSketch").dialog({
+                modal: true,
+                autoOpen: false,
+                buttons: {}
+            });
+            $("#downloadSketchProgressBar").progressbar();
+            $("#accordion").accordion({heightStyle: "content", activate: function (event, ui) {
+                    var active = $("#accordion").accordion("option", "active");
+                    if (active == "3") {
+                        myCodeMirror.refresh();
+                        $.ajax({
+                            url: "/",
+                            type: "get",
+                            'cache' : false,
+                            data: "ServiceName=SketchesManager&action=LOAD&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        var sketches = data.split("\n");
+                        var select = document.getElementById("savedSketchesList");
+                        for (var i = 0; i < sketches.length; i++) {
+                            select.options.add(new Option(sketches[i]));
+                        }
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                            alert(xhr.responseText);
+                    }   
+                  });
+                    }
+                }
+            });
+            $("#tabsUserMngmt").tabs({
+                    activate: function (event, ui) {
+                        var active = $("#tabsUserMngmt").tabs("option", "active");
+                        if (active == "1") {
+                                        $.ajax({
+                                            url: "/",
+                                            'cache': false,
+                                            type: "get",
+                                            data: "ServiceName=UserManager&action=loadAllUsers",
+                                                success: function (data) {
+                                                    if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                                                    var select = document.getElementById("userNameModify");
+                                                    var json = JSON.parse(data);
+                                                    select.innerHTML="";
+                                                    for (var i = 0; i < json.length; i++) {
+                                                        select.options.add(new Option(json[i].userName));
+                                                    }
+                                                },
+                                                error: function (xhr, ajaxOptions, thrownError) {
+                                                    alert(xhr.responseText+"\n"+thrownError);
+                                                }
+                                        });
+                        } else if (active == "2") {
+                                        $.ajax({
+                                            url: "/",
+                                            'cache': false,
+                                            type: "get",
+                                            data: "ServiceName=UserManager&action=loadAllUsers",
+                                                success: function (data) {
+                                                    if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                                                    var select = document.getElementById("userNameDelete");
+                                                    var json = JSON.parse(data);
+                                                    select.innerHTML="";
+                                                    for (var i = 0; i < json.length; i++) {
+                                                        select.options.add(new Option(json[i].userName));
+                                                    }
+                                                },
+                                                error: function (xhr, ajaxOptions, thrownError) {
+                                                    alert(xhr.responseText+"\n"+thrownError);
+                                                }
+                                        });                            
+                        }
+                    }    
+            });
+            $("#tabsDevMngmt").tabs();
             $("#setChPwd").button();
-            $("#accordion1").accordion({heightStyle: "content"});
             $("#addNewDeviceForm").button();
             $("#deleteObjectSubmit").button();
-            $("#addDeviceForm").submit(function (event) {
+            $("#updateSw").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetLastHexFiles",
+                    success: function (data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        alert(get_hexfiles_ok+"\n"+data);
+                        $.ajax({
+                            url: "/",
+                            'cache': false,
+                            type: "get",
+                            data: "ServiceName=LoadHexSoftwareList",
+                            success: function (data) {
+                                if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                                var select = document.getElementById("deviceHexFiles");
+                                var json = JSON.parse(data);
+                                $("#deviceHexFiles").empty();
+                                for (var i = 0; i < json.length; i++) {
+                                    select.options.add(new Option(json[i].deviceSoftwareHexName));
+                                }
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert(xhr.responseText+"\n"+thrownError);
+                            }
+                        });
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                alert(error_no_permission);
+                            } else {
+                                alert(xhr.responseText);
+                            }
+                    }
+                });
+            });
+            $("#loadSw").button();
+            $("#btnLogClean").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetLog&action=Clean",
+                    success: function (data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        document.getElementById("LogArea").innerHTML = data;
+                        $("#logfileTable").dataTable({"bJQueryUI": true,"sPaginationType": "full_numbers", "iDisplayLength": 25}).fnSort( [ [0,'desc'] ] );
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                alert(error_no_permission);
+                            } else {
+                                alert(err_getLog+":\n"+xhr.responseText+"\n"+thrownError);
+                            }
+                    }
+                });
+            });
+            $("#btnLogDebug").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetLog&action=All",
+                    success: function (data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        document.getElementById("LogArea").innerHTML = data;
+                        $("#logfileTable").dataTable({"bJQueryUI": true,"sPaginationType": "full_numbers", "iDisplayLength": 25}).fnSort( [ [0,'desc'] ] );
+                    },
+                    error: function () {
+                        alert(err_getLog);
+                    }
+                });
+            });
+            $("#btnLogInfo").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetLog&action=Info",
+                    success: function (data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        document.getElementById("LogArea").innerHTML = data;
+                        $("#logfileTable").dataTable({"bJQueryUI": true,"sPaginationType": "full_numbers", "iDisplayLength": 25}).fnSort( [ [0,'desc'] ] );
+                    },
+                    error: function () {
+                        alert(err_getLog);
+                    }
+                });
+            });
+            $("#btnLogWarning").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetLog&action=Warning",
+                    success: function (data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        document.getElementById("LogArea").innerHTML = data;
+                        $("#logfileTable").dataTable({"bJQueryUI": true,"sPaginationType": "full_numbers", "iDisplayLength": 25}).fnSort( [ [0,'desc'] ] );
+                    },
+                    error: function () {
+                        alert(err_getLog);
+                    }
+                });
+            });
+            $("#btnLogError").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetLog&action=Error",
+                    success: function (data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        document.getElementById("LogArea").innerHTML = data;
+                        $("#logfileTable").dataTable({"bJQueryUI": true,"sPaginationType": "full_numbers", "iDisplayLength": 25}).fnSort( [ [0,'desc'] ] );
+                    },
+                    error: function () {
+                        alert(err_getLog);
+                    }
+                });
+            });
+            $("#btnLogFatal").button().click(function () {
+                $.ajax({
+                    url: "/",
+                    'cache': false,
+                    type: "get",
+                    data: "ServiceName=GetLog&action=Fatal",
+                    success: function (data) {
+                        if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                        document.getElementById("LogArea").innerHTML = data;
+                        $("#logfileTable").dataTable({"bJQueryUI": true,"sPaginationType": "full_numbers", "iDisplayLength": 25}).fnSort( [ [0,'desc'] ] );
+                    },
+                    error: function () {
+                        alert(err_getLog);
+                    }
+                });
+            });
+            $("#loadSwForm").submit(function (event) {                
                 event.preventDefault();
+                if (!manageTransceiver("DISCONNECT")) return;
+                if (!confirm(load_sw_to_device_alert)) {
+                    alert(connect_transceiver);
+                    manageTransceiver("CONNECT");
+                    return;
+                }
+                if ($(this).valid()) {                    
+                    $("#loadSwResult").html('');
+                    $("#downloadSketch").dialog( "open" );                    
+                    var timerVar=setInterval(function(){
+                        $.ajax({
+                        url: "/",
+                        'cache': false,
+                        data: "ServiceName=LoadSwToDevice&getProgress=true",
+                        type: "get",                        
+                        success: function (data) {
+                            var percent = parseInt(data.split(" ")[1]);
+                            if (isNaN(percent)) percent = 0;
+                            $("#downloadSketchProgressText").html('<br/><br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;'+data);
+                            $("#downloadSketchProgressBar").progressbar( 'value', percent );
+                        }});
+                    },1000);
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            manageTransceiver("DISCONNECT");
+                            alert(connect_transceiver);
+                            manageTransceiver("CONNECT");
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                            $("#loadSwResult").html(load_sw_to_device_result);
+                            $("#loadSwForm").each(function () {
+                                this.reset();
+                            });
+                            $("#downloadSketch").dialog( "close" );
+                            window.clearTimeout(timerVar);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            manageTransceiver("DISCONNECT");
+                            alert(connect_transceiver);
+                            manageTransceiver("CONNECT");
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#loadSwResult").html(error_no_permission);
+                            } else {
+                                $("#loadSwResult").html(err_add_device+":<BR>"+xhr.responseText+"<BR>"+thrownError);
+                            }
+                            $("#downloadSketch").dialog( "close" );
+                            window.clearTimeout(timerVar);
+                        }
+                    });
+                } else {
+                    manageTransceiver("DISCONNECT");
+                    alert(connect_transceiver);
+                    manageTransceiver("CONNECT");                    
+                }
+            });
+            $("#addDeviceForm").submit(function (event) {
+                //first disconnect transceiver
+                event.preventDefault();
+                var doNotAddChecked = document.getElementById("donotadd").checked;
+                if (!doNotAddChecked) {
+                    if (!manageTransceiver("DISCONNECT")) return;
+                    if (!confirm(add_new_device_alert)) {
+                        alert(connect_transceiver);
+                        manageTransceiver("CONNECT");
+                        return;
+                    }
+                }
                 if ($(this).valid()) {
                     $("#addDeviceResult").html('');
                     var values = $(this).serialize();
@@ -20,16 +356,37 @@
                         type: "get",
                         data: values,
                         success: function (data) {
+                            if (!doNotAddChecked) {
+                                manageTransceiver("DISCONNECT");
+                                alert(connect_transceiver);
+                                manageTransceiver("CONNECT");
+                            }
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
                             $("#addDeviceResult").html(data);
                             $("#addDeviceForm").each(function () {
                                 this.reset();
                             });
                             document.location.reload(true);
                         },
-                        error: function () {
-                            $("#addDeviceResult").html(err_add_device);
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (!doNotAddChecked) {
+                                manageTransceiver("DISCONNECT");
+                                alert(connect_transceiver);
+                                manageTransceiver("CONNECT");
+                            }
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#addDeviceResult").html(error_no_permission);
+                            } else {
+                                $("#addDeviceResult").html(err_add_device+":<BR>"+xhr.responseText+"<BR>"+thrownError);
+                            }
                         }
                     });
+                } else {
+                    if (!doNotAddChecked) {
+                        manageTransceiver("DISCONNECT");
+                        alert(connect_transceiver);
+                        manageTransceiver("CONNECT");
+                    }
                 }
             });
             $("#deleteDeviceForm").submit(function (event) {
@@ -43,14 +400,19 @@
                         type: "get",
                         data: values,
                         success: function (data) {
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
                             if (data == 'EMPTY') {
                                 $("#deleteObjectResult").html(err_empty_device_room);
                             } else {
                                 document.location.reload(true);
                             }
                         },
-                        error: function () {
-                            $("#deleteObjectResult").html(err_delete_object);
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#deleteObjectResult").html(error_no_permission);
+                            } else {
+                                $("#deleteObjectResult").html(err_delete_object+":<BR>"+xhr.responseText+"<BR>"+thrownError);
+                            }
                         }
                     });
                 }
@@ -62,10 +424,15 @@
                     type: "get",
                     data: "ServiceName=GetFreeDeviceId&" + Math.floor((Math.random() * 100) + 1),
                     success: function (freeId) {
+                        if (freeId.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
                         document.getElementById("addDeviceId").value = freeId;
                     },
-                    error: function () {
-                        alert(err_free_deviceId);
+                    error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                alert(error_no_permission);
+                            } else {
+                                alert(err_free_deviceId+":\n"+xhr.responseText+"\n"+thrownError);
+                            }
                     }
                 });
             });
@@ -80,16 +447,21 @@
                         type: "get",
                         data: values,
                         success: function (data) {
-                            $("#changeChannelPassowrdResult").html(data);
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                            $("#changeChannelPassowrdResult").html(channel_pwd_configured);
                         },
-                        error: function () {
-                            $("#changeChannelPassowrdResult").html(err_change_channelPwd);
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#changeChannelPassowrdResult").html(error_no_permission);
+                            } else {
+                                $("#changeChannelPassowrdResult").html(err_change_channelPwd+":<BR>"+xhr.responseText+"<BR>"+thrownError);
+                            }
                         }
                     });
                 }
             });
             $("#addUser").button();
-            $("#userManagementForm").submit(function (event) {
+            $("#addUserForm").submit(function (event) {
                 event.preventDefault();
                 if ($(this).valid()) {
                     $("#addUserResult").html('');
@@ -100,10 +472,15 @@
                         type: "get",
                         data: values,
                         success: function (data) {
-                            $("#addUserResult").html(data);
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                            $("#addUserResult").html(operation_ok);
                         },
-                        error: function () {
-                            $("#addUserResult").html(err_add_user);
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#addUserResult").html(error_no_permission);
+                            } else {
+                                $("#addUserResult").html(xhr.responseText+"<BR>"+thrownError);
+                            }
                         }
                     });
                 }
@@ -111,6 +488,7 @@
             $("#modifyUser").button();
             $("#modifyUserForm").submit(function (event) {
                 event.preventDefault();
+                if (!confirm(user_operation_confirm)) return;
                 if ($(this).valid()) {
                     $("#modifyUserResult").html('');
                     var values = $(this).serialize();
@@ -120,21 +498,160 @@
                         type: "get",
                         data: values,
                         success: function (data) {
-                            $("#modifyUserResult").html(data);
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                            $("#modifyUserResult").html(operation_ok);
+                            location.replace("/");
                         },
-                        error: function () {
-                            $("#modifyUserResult").html(err_change_user);
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#modifyUserResult").html(error_no_permission);
+                            } else {
+                                $("#modifyUserResult").html(xhr.responseText+"<BR>"+thrownError);
+                            }
                         }
                     });
                 }
             });
-
+            $("#deleteUser").button();
+            $("#deleteUserForm").submit(function (event) {
+                event.preventDefault();
+                if (!confirm(user_operation_confirm)) return;
+                if ($(this).valid()) {
+                    $("#deleteUserResult").html('');
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                            $("#deleteUserResult").html(operation_ok);
+                            location.replace("/");
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#deleteUserResult").html(error_no_permission);
+                            } else {
+                                $("#deleteUserResult").html(xhr.responseText+"<BR>"+thrownError);
+                            }
+                        }
+                    });
+                }
+            });
+            $("#systemPropertiesModify").button();
+            $("#systemPropertiesForm").submit(function (event) {
+                event.preventDefault();
+                if ($(this).valid()) {
+                    $("#systemPropertiesResult").html('');
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                            $("#systemPropertiesResult").html(operation_ok);
+                            populateProperties(JSON.parse(data));
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                $("#systemPropertiesResult").html(error_no_permission);
+                            } else {
+                                $("#systemPropertiesResult").html(xhr.responseText+"<BR>"+thrownError);
+                            }
+                        }
+                    });
+                }
+            });
+            $( "#sketchLoad" ).button({ icons: { primary: "ui-icon-arrowthick-1-n" }, text: false }).unbind('click').click(function() {
+                var name = $("#savedSketchesList option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SketchesManager&name="+encodeURIComponent(name)+"&action=GET&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        myCodeMirror.setValue(data);
+                        myCodeMirror.refresh();
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+                  });
+            });
+            $( "#sketchUpdate" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
+                  var name = $("#savedSketchesList option:selected").val();
+                  var sketchData=encodeURIComponent(myCodeMirror.getValue());
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SketchesManager&data="+sketchData+"&name="+encodeURIComponent(name)+"&action=UPDATE&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }   
+                  });
+            });            
+            $( "#sketchDelete" ).button({ icons: { primary: "ui-icon-closethick" }, text: false }).unbind('click').click(function() {
+                  var name = $("#savedSketchesList option:selected").val();
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SketchesManager&name="+encodeURIComponent(name)+"&action=DELETE&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $("#savedSketchesList option:selected").remove();
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }   
+                  });
+            });
+            $( "#sketchSave" ).button({ icons: { primary: "ui-icon-disk" }, text: false }).unbind('click').click(function() {
+                  var name = document.getElementById("newSketchName").value;
+                  if (name == '') {
+                        alert(error_name_sketch_empty);
+                        return;
+                  }
+                  var sketchData=encodeURIComponent(myCodeMirror.getValue());
+                  $.ajax({
+                        url: "/",
+                        type: "get",
+                        'cache' : false,
+                        data: "ServiceName=SketchesManager&name="+encodeURIComponent(name)+"&action=SAVE&data="+sketchData+"&"+Math.floor((Math.random()*100)+1),
+                    success: function(data) {
+                        $('#savedSketchesList').append('<option value="'+name+'">'+name+'</option>');
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
+                    }   
+                  });
+            });            
         });
         $(document).ready(function () {
             $("#addDeviceForm").validate({
                 rules: {
-                    addDeviceId: { required: true, range: [1, 255] },
-                    addSubDeviceId: { range: [1, 255] },
+                    addDeviceId: { required: true, range: [1, 254] },
+                    addSubDeviceId: { range: [1, 8] },
                     addDeviceName: { required: true },
                     type: { required: true },
                     roomName: { required: true }
@@ -148,83 +665,87 @@
                 }
             });
             $.ajax({
-                url: "/",
-                type: "get",
-                'cache': false,
-                data: "ServiceName=UserManagementService&authorize=true&" + Math.floor((Math.random() * 100) + 1),
-                success: function (data) {
-                    if(data != 'Administrators') {
-                        $('#setChPwd').attr("disabled", true);
-                        $('#addUser').attr("disabled", true);
-                        $('#modifyUser').attr("disabled", true);
-                        $('#deviceIdLoader').attr("disabled", true);
-                        $('#addNewDeviceForm').attr("disabled", true);
-                        $('#deleteObjectSubmit').attr("disabled", true);
-                        $('#deleteObjectSubmit').attr("disabled", true);
-                    }
-                },
-                error: function () {
-                    alert(err_no_rooms);
-                }
-            });
+                    url: "/TemplateSketch.txt",
+                    type: "get",
+                    success: function(data) {
+                        myCodeMirror.setValue(data);
+                        myCodeMirror.refresh();
+                    },
+                    error:function(xhr, ajaxOptions, thrownError){
+                        alert(thrownError+"\n\n"+xhr.responseText);
+                    }   
+            });            
             $.ajax({
                 url: "/",
                 type: "get",
                 'cache': false,
-                data: "ServiceName=LoadAllRooms&" + Math.floor((Math.random() * 100) + 1),
+                data: "ServiceName=LoadAllRooms",
                 success: function (roomsData) {
-                    rooms = roomsData.split("\n");
+                    if (roomsData.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                    var rooms = roomsData.split("\n");
                     $("#addDeviceLocation").autocomplete({minLength: 0, source: rooms}).
                             focus(function () {
                                 setTimeout("if ($('#addDeviceLocation').val().length == 0) $('#addDeviceLocation').autocomplete(\"search\", \"\"); ", 1);
-                            });
+                    });
+                    var select = document.getElementById("deleteRoomId");
+                    select.options.add(new Option(''));
+                    for (var i = 0; i < rooms.length; i++) {
+                        select.options.add(new Option(rooms[i]));
+                    }
                 },
-                error: function () {
-                    alert(err_no_rooms);
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(err_no_rooms+"\n"+xhr.responseText+"\n"+thrownError);
                 }
             });
             $.ajax({
                 url: "/",
                 'cache': false,
                 type: "get",
-                data: "ServiceName=DeleteObject&loadData=true&loadRooms=false&loadDevices=true&" + Math.floor((Math.random() * 100) + 1),
+                data: "ServiceName=LoadAllDevices",
                 success: function (data) {
+                    if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
                     var select = document.getElementById("deleteDeviceId");
                     var json = JSON.parse(data);
                     for (var i = 0; i < json.length; i++) {
-                        var d = json[i];
-                        select.options.add(new Option(d.name, d.id));
+                        select.options.add(new Option(json[i].deviceName, json[i].deviceId));
                     }
                 },
-                error: function () {
-                    alert(err_get_objects);
-                }
-            });
-            $.ajax({
-                url: "/",
-                'cache': false,
-                type: "get",
-                data: "ServiceName=DeleteObject&loadData=true&loadRooms=true&loadDevices=false&" + Math.floor((Math.random() * 100) + 1),
-                success: function (data) {
-                    var select = document.getElementById("deleteRoomId");
-                    var json = JSON.parse(data);
-                    for (var i = 0; i < json.length; i++) {
-                        var d = json[i];
-                        select.options.add(new Option(d.name));
-                    }
-                },
-                error: function () {
-                    alert(err_get_objects);
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(err_get_objects+"\n"+xhr.responseText+"\n"+thrownError);
                 }
             });
             $("#changeChannelPassowrd").validate({
                 rules: {
-                    channel: { required: true, range: [1, 83] },
-                    password: { required: true, exactlength: 9 }
+                    channel: { required: true, range: [1, 255] },
+                    password: { required: true, exactlength: 16 }
                 },
                 messages: {
                     channel: { required: err_channel_empty, range: err_channel_range },
                     password: { required: err_pwd_empty, exactlength: err_pwd_range }
+                }
+            });
+            $("#addUserForm").validate({
+                rules: {
+                    userName: { required: true },
+                    userPassword: { required: true, minlength : 5 },
+                    userConfirmPassword: { required: true, minlength : 5, equalTo : "#userPassword" },
+                    
+                },
+                messages: {
+                    userName: { required: err_user_empty },
+                    userPassword: { required: err_user_pwd_empty, minlength: err_pwd_range },
+                    userConfirmPassword: { required: err_user_cpwd_empty, minlength: err_user_cpwd_range, equalTo: err_user_pwdnotequal }
+                }
+            });
+            $("#modifyUserForm").validate({
+                rules: {
+                    userPasswordModify: { required: true, minlength : 5 },
+                    userPasswordModifyConfirm: { required: true, minlength : 5, equalTo : "#userPasswordModify" },
+                    
+                },
+                messages: {
+                    userPasswordModify: { required: err_user_pwd_empty, minlength: err_pwd_range },
+                    userPasswordModifyConfirm: { required: err_user_cpwd_empty, minlength: err_user_cpwd_range, equalTo: err_user_pwdnotequal }
                 }
             });
             $.ajax({
@@ -233,90 +754,179 @@
                 type: "get",
                 data: "ServiceName=LoadChannelPassword&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
+                    if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
                     document.getElementById("channel").value = data.split("\n")[0];
                     document.getElementById("password").value = data.split("\n")[1];
                 },
-                error: function () {
-                    alert(err_get_channel_pwd);
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(err_get_channel_pwd+"\n"+xhr.responseText+"\n"+thrownError);
                 }
             });
             $.ajax({
                 url: "/",
                 'cache': false,
                 type: "get",
-                data: "ServiceName=UserManagementService&loadUsers=true&" + Math.floor((Math.random() * 100) + 1),
+                data: "ServiceName=GetLog&action=Info",
                 success: function (data) {
-                    var select = document.getElementById("userNameModify");
+                    if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                    document.getElementById("LogArea").innerHTML = data;
+                    $("#logfileTable").dataTable({"bJQueryUI": true,"sPaginationType": "full_numbers", "iDisplayLength": 25}).fnSort( [ [0,'desc'] ] );
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(err_getLog+"\n"+xhr.responseText+"\n"+thrownError);
+                }
+            });
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=LoadHexSoftwareList",
+                success: function (data) {
+                    if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                    var select = document.getElementById("deviceHexFiles");
                     var json = JSON.parse(data);
                     for (var i = 0; i < json.length; i++) {
-                        var d = json[i];
-                        select.options.add(new Option(d.userName));
+                        select.options.add(new Option(json[i].deviceSoftwareHexName));
                     }
                 },
-                error: function () {
-                    alert(err_get_channel_pwd);
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText+"\n"+thrownError);
+                }
+            });
+            $.ajax({
+                url: "/",
+                'cache': false,
+                type: "get",
+                data: "ServiceName=PropertiesManager&action=loadAllProperties",
+                success: function (data) {                    
+                    if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                    var json = JSON.parse(data);
+                    populateProperties(JSON.parse(data));
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText+"\n"+thrownError);
                 }
             });
             document.getElementById('setChPwd').value = setChPwd_form;
             document.getElementById('addUser').value = adduser_form;
+            document.getElementById('systemPropertiesModify').value = systemPropertiesModify_form;
             document.getElementById('modifyUser').value = modifyuser_form;
+            document.getElementById('deleteUser').value = delete_form;
             setLabel("channel_password_cfg");
             setLabel("channel_device");
             setLabel("password_device");
             document.getElementById('channel').title = channel_device_desc;
             document.getElementById('password').title = password_device_desc;
-            setLabel("wifi_configuration");
+            setLabel("log_file");
+            setLabel("system_parameters");
             setLabel("user_management");
             setLabel("user_management_text");
             setLabel("user_name");
             setLabel("user_password");
             setLabel("user_confirm_password");
             setLabel("group_id");
-            var selectGROUP = document.getElementById("groupId");
-            selectGROUP.options[1].text = admin_label;
-            selectGROUP.options[2].text = reader_label;
+            var selectGROUP = document.getElementById("userGroupId");
+            selectGROUP.options[0].text = admin_label;
+            selectGROUP.options[1].text = operator_label;
+            selectGROUP.options[2].text = guest_label;
             setLabel("modify_user_text");
-            setLabel("groupId2");
+            setLabel("delete_user_text");
             setLabel("group_id_2");
+            var selectGROUP2 = document.getElementById("userGroupId2");
+            selectGROUP2.options[0].text = admin_label;
+            selectGROUP2.options[1].text = operator_label;
+            selectGROUP2.options[2].text = guest_label;
             setLabel("user_name_modify");
-            setLabel("user_password_modify_actual");
+            setLabel("user_name_delete");
             setLabel("user_confirm_password_modify");
             setLabel("user_confirm_password_modify_confirm");
             setLabel("add_new_device");
+            setLabel("devices_management");
             setLabel("add_new_device_desc");
+            setLabel("program_device");
+            setLabel("program_device_desc");
             setLabel("new_device_id");
             setLabel("new_subdevice_id");
             document.getElementById('addDeviceId').title = new_device_id_desc;
+            document.getElementById('donotadd').title = donotsendadd_desc;
             document.getElementById('addSubDeviceId').title = new_subdevice_id_desc;
             document.getElementById('addDeviceName').title = new_device_name_desc;
             document.getElementById('addDeviceLocation').title = room_name_desc;
             document.getElementById('deviceIdLoader').value = get_device_id;
             document.getElementById('addNewDeviceForm').value = add_new_device_form;
             document.getElementById('deleteObjectSubmit').value = delete_object_submit;
+            document.getElementById('updateSw').value = update_hex_files;
+            document.getElementById('loadSw').value = load_sw_to_device;
             setLabel("new_device_name");
             setLabel("room_name");
             setLabel("device_type");
-            setLabel("LightAlarmDevice");
+            setLabel("donotsendadd");
+            //setLabel("LightAlarmDevice");
             setLabel("TemperatureSensor");
             setLabel("SimpleSwitch");
-            setLabel("HeatingHeader");
+            //setLabel("HeatingHeader");
             setLabel("BlindsControllerDevice");
             setLabel("Thermostat");
-            setLabel("ThermostatWithSwitchAndTempSensorDevice");
+            setLabel("PirSensor");
+            setLabel("MagneticSensor");
+            setLabel("LightSensor");
+            setLabel("AccelerometerSensor");
+            setLabel("Java");
+            setLabel("TemperatureHumiditySensor");
+            setLabel("CO2SensorDevice");
+            setLabel("VentilatorControllerDevice");
             setLabel("delete_device_cfg");
             setLabel("delete_device");
             setLabel("delete_room");
-            setLabel("deleteObjectSubmit");
-            setLabel("user_management");
+            setLabel("parameterName");
+            setLabel("parameterValue");
+            setLabel("parameterLang");
+            setLabel("programming_cfg");
+            setLabel("savedSketchesLabel");
+            setLabel("newSketchLabel");
+            document.getElementById('sketchLoad').title = sketchLoad;
+            document.getElementById('sketchUpdate').title = sketchUpdate;
+            document.getElementById('sketchDelete').title = sketchDelete;
+            document.getElementById('sketchSave').title = sketchSave;
+            setLabel("smtp_user_label");
+            setLabel("smtp_password_label");
+            setLabel("smtp_email_from_label");
+            setLabel("smtp_host_label");
+            setLabel("smtp_port_label");
+            setLabel("smtp_authenicate");
+            setLabel("smtp_useTLS");
+            setLabel("programmingPortLabel");
+            setLabel("tempDirLabel");
+            setLabel("lowBatteryMessageL");
+            setLabel("powerLostMessageL");
+            setLabel("notificationMessageSubjectL");
+            setLabel("notificationMessageToL");
+            setLabel("useLogFileLabel");
+            setLabel("logFileNameLabel");
+            setLabel("logLevelLabel");
         });
-
     </script>
 </head>
 <body>
 <div id="accordion">
-
-    <h3><span id="add_new_device"></span></h3>
-    <div>
+    <h3><span id="devices_management"></span></h3>
+    <div id="tabsDevMngmt">
+        <ul>
+           <li><a href="#tabsDevMngmt-1"><span id="program_device"></span></a></li>
+           <li><a href="#tabsDevMngmt-2"><span id="add_new_device"></span></a></li>
+           <li><a href="#tabsDevMngmt-3"><span id="delete_device_cfg"></span></a></li>
+           <li><a href="#tabsDevMngmt-4"><span id="channel_password_cfg"></span></a></li>
+       </ul>    
+       <div id="tabsDevMngmt-1">
+           <p><span id="program_device_desc"></span></p>
+           <table style="text-align:left;"><tr><td><input id="updateSw"/></td><td>
+                       <form id="loadSwForm">
+                         <input type="hidden" name="ServiceName" value="LoadSwToDevice"/>
+                         <table><tr><td><select name="type" id="deviceHexFiles"></select></td><td><input type="submit" id="loadSw"/></td><td><div id="loadSwResult"></div></td></tr></table>
+                       </form>
+           </td></tr></table>
+       </div>
+       <div id="tabsDevMngmt-2">
         <p><span id="add_new_device_desc"></span></p>
         <form id="addDeviceForm">
             <input type="hidden" name="ServiceName" value="AddNewDevice"/>
@@ -345,16 +955,28 @@
                     <td><label for="device_type"><span id="device_type"></span></label></td>
                     <td>
                         <select name="type" id="typeOfTheDevice">
-                            <option id="LightAlarmDevice" value="1"></option>
                             <option id="TemperatureSensor" value="2"></option>
-                            <option id="SimpleSwitch" value="3"></option>
-                            <option id="HeatingHeader" value="4"></option>
-                            <option id="BlindsControllerDevice" value="5"></option>
-                            <option id="Thermostat" value="6"></option>
-                            <option id="ThermostatWithSwitchAndTempSensorDevice" value="8"></option>
+                            <option id="SimpleSwitch" value="1"></option>
+                            <option id="BlindsControllerDevice" value="3"></option>
+                            <option id="Thermostat" value="4"></option>
+                            <option id="PirSensor" value="5"></option>
+                            <option id="MagneticSensor" value="6"></option>
+                            <option id="LightSensor" value="7"></option>
+                            <option id="AccelerometerSensor" value="8"></option>
+                            <option id="Java" value="9"></option>
+                            <option id="TemperatureHumiditySensor" value="10"></option>
+                            <option id="CO2SensorDevice" value="11"></option>
+                            <option id="VentilatorControllerDevice" value="12"></option>
                         </select></td>
                     <td>&nbsp;</td>
                 </tr>
+                <tr>
+                    <td><label for="donotadd"><span id="donotsendadd"></span></label></td>
+                    <td>
+                        <input type="checkbox" name="donotadd" id="donotadd"/>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>                
                 <tr>
                     <td>&nbsp;</td>
                     <td><input id="addNewDeviceForm" type="submit"/></td>
@@ -364,17 +986,15 @@
                 </tr>
             </table>
         </form>
-    </div>
-
-    <h3><span id="delete_device_cfg"></span></h3>
-    <div>
+       </div>
+       <div id="tabsDevMngmt-3">
         <p><span id="delete_device_cfg_text"></span></p>
         <form id="deleteDeviceForm">
             <table>
                 <tr>
                     <td><label for="deleteDeviceId"><span id="delete_device"></span></label></td>
                     <td>
-                        <select width="100%" id="deleteDeviceId" name="deleteDeviceName">
+                        <select id="deleteDeviceId" name="deleteDeviceName">
                             <option value="0">&nbsp;</option>
                         </select>
                     </td>
@@ -382,7 +1002,7 @@
                 <tr>
                     <td><label for="deleteRoomId"><span id="delete_room"></span></label></td>
                     <td>
-                        <select width="100%" id="deleteRoomId" name="deleteRoomName">
+                        <select id="deleteRoomId" name="deleteRoomName">
                             <option value="0">&nbsp;</option>
                         </select>
                     </td>
@@ -396,103 +1016,8 @@
                 </tr>
             </table>
         </form>
-    </div>
-
-    <h3><span id="user_management"></span></h3>
-    <div>
-        <table>
-            <tr>
-                <td>
-                    <h4 id="user_management_text"></h4>
-                    <form id="userManagementForm">
-                        <table>
-                            <tr>
-                                <td><label for="user_name"><span id="user_name"></span></label></td>
-                                <td><input name="userName" id="userName"/></td>
-                            </tr>
-                            <tr>
-                                <td><label for="user_password"><span id="user_password"></span></label></td>
-                                <td><input type="password" name="userPassword" id="userPassword"/></td>
-                            </tr>
-                            <tr>
-                                <td><label for="user_confirm_password"><span id="user_confirm_password"></span></label></td>
-                                <td><input type="password" name="userConfirmPassword" id="userConfirmPassword"/></td>
-                            </tr>
-                            <tr>
-                                <td><label for="group_id"><span id="group_id"></span></label></td>
-                                <td>
-                                    <select width="100%" id="groupId" name="groupId">
-                                        <option value="0">&nbsp;</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="hidden" name="ServiceName" value="UserManagementService"/>
-                                    <input type="hidden" name="method" value="addUser"/>
-                                    <input id="addUser" type="submit"/></td>
-                                <td>
-                                    <div id="addUserResult">&nbsp;</div>
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
-                </td>
-                <td>
-                    <br />
-                </td>
-                <td>
-                    <h4 id="modify_user_text"></h4>
-                    <form id="modifyUserForm">
-                        <table>
-                            <tr>
-                                <td><label for="user_name_modify"><span id="user_name_modify"></span></label></td>
-                                <td>
-                                    <select width="100%" id="userNameModify" name="userNameModify">
-                                        <option value="0">&nbsp;</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label for="user_password_modify_actual"><span id="user_password_modify_actual"></span></label></td>
-                                <td><input type="password" name="userPasswordModifyActual" id="userPasswordModifyActual"/></td>
-                            </tr>
-                            <tr>
-                                <td><label for="user_confirm_password_modify"><span id="user_confirm_password_modify"></span></label></td>
-                                <td><input type="password" name="userConfirmPasswordModify" id="userConfirmPasswordModify"/></td>
-                            </tr>
-                            <tr>
-                                <td><label for="user_confirm_password_modify_confirm"><span id="user_confirm_password_modify_confirm"></span></label></td>
-                                <td><input type="password" name="userConfirmPasswordModifyConfirm" id="userConfirmPasswordModifyConfirm"/></td>
-                            </tr>
-                            <tr>
-                                <td><label for="group_id_2"><span id="group_id_2"></span></label></td>
-                                <td>
-                                    <select width="100%" id="groupId2" name="groupId2">
-                                        <option value="0">&nbsp;</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="hidden" name="ServiceName" value="UserManagementService"/>
-                                    <input type="hidden" name="method" value="modifyUser"/>
-                                    <input id="modifyUser" type="submit"/></td>
-                                <td>
-                                    <div id="modifyUserResult">&nbsp;</div>
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <h3><span id="channel_password_cfg"></span></h3>
-    <div>
+       </div>
+       <div id="tabsDevMngmt-4">
         <p><span id="channel_password_cfg_text"></span></p>
         <form id="changeChannelPassowrd">
             <table>
@@ -512,13 +1037,168 @@
                     </td>
                 </tr>
             </table>
-        </form>
+        </form>            
+       </div>
     </div>
-
-    <h3><span id="wifi_configuration"></span></h3>
+    
+    <h3><span id="user_management"></span></h3>
+    <div id="tabsUserMngmt">
+     <ul>
+        <li><a href="#tabsUserMngmt-1"><span id="user_management_text"></span></a></li>
+        <li><a href="#tabsUserMngmt-2"><span id="modify_user_text"></span></a></li>
+        <li><a href="#tabsUserMngmt-3"><span id="delete_user_text"></span></a></li>
+    </ul>
+        <div id="tabsUserMngmt-1">
+                    <form id="addUserForm">
+                        <table>
+                            <tr>
+                                <td><label for="user_name"><span id="user_name"></span></label></td>
+                                <td><input name="userName" id="userName"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_password"><span id="user_password"></span></label></td>
+                                <td><input type="password" name="userPassword" id="userPassword"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_confirm_password"><span id="user_confirm_password"></span></label></td>
+                                <td><input type="password" name="userConfirmPassword" id="userConfirmPassword"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="group_id"><span id="group_id"></span></label></td>
+                                <td>
+                                    <select id="userGroupId" name="userGroupId">
+                                        <option value="1"></option>
+                                        <option value="2"></option>
+                                        <option value="3"></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="hidden" name="ServiceName" value="UserManager"/>
+                                    <input type="hidden" name="action" value="addUser"/>
+                                    <input id="addUser" type="submit"/></td>
+                                <td>
+                                    <div id="addUserResult">&nbsp;</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+        </div>
+        <div id="tabsUserMngmt-2">                    
+                    <form id="modifyUserForm">
+                        <table>
+                            <tr>
+                                <td><label for="user_name_modify"><span id="user_name_modify"></span></label></td>
+                                <td>
+                                    <select id="userNameModify" name="userNameModify">
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_confirm_password_modify"><span id="user_confirm_password_modify"></span></label></td>
+                                <td><input type="password" name="userPasswordModify" id="userPasswordModify"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="user_confirm_password_modify_confirm"><span id="user_confirm_password_modify_confirm"></span></label></td>
+                                <td><input type="password" name="userPasswordModifyConfirm" id="userPasswordModifyConfirm"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="group_id_2"><span id="group_id_2"></span></label></td>
+                                <td>
+                                    <select id="userGroupId2" name="userGroupId2">
+                                        <option value="1"></option>
+                                        <option value="2"></option>
+                                        <option value="3"></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="hidden" name="ServiceName" value="UserManager"/>
+                                    <input type="hidden" name="action" value="modifyUser"/>
+                                    <input id="modifyUser" type="submit"/></td>
+                                <td>
+                                    <div id="modifyUserResult">&nbsp;</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+        </div>
+        <div id="tabsUserMngmt-3">
+                    <form id="deleteUserForm">
+                        <table>
+                            <tr>
+                                <td><label for="user_name_delete"><span id="user_name_delete"></span></label></td>
+                                <td>
+                                    <select id="userNameDelete" name="userNameDelete">
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="hidden" name="ServiceName" value="UserManager"/>
+                                    <input type="hidden" name="action" value="deleteUser"/>
+                                    <input id="deleteUser" type="submit"/></td>
+                                <td>
+                                    <div id="deleteUserResult">&nbsp;</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+            
+        </div>
+    </div>
+    <h3><span id="system_parameters"></span></h3>
     <div>
+        <form id="systemPropertiesForm">
+            
+            <table id="systemPropertiesTable" class="ui-widget" style="border-collapse: collapse;">
+                <thead class="ui-widget-header"><tr><th id="parameterName"></th><th id="parameterValue"></th></tr></thead>
+                <tbody class="ui-widget-content">
+                    <tr><td><span id="parameterLang"></span></td><td><input type="text" name="lang" id="lang"/></td></tr>
+                    <tr><td><span id="logLevelLabel"></span></td><td><input type="text" name="logLevel" id="logLevel"/></td></tr>
+                    <tr><td><span id="useLogFileLabel"></td><td><input type="text" name="useLogFile" id="useLogFile"/></td></tr>
+                    <tr><td><span id="logFileNameLabel"></td><td><input type="text" name="logFileName" id="logFileName"/></td></tr>
+                    <tr><td><span id="programmingPortLabel"></td><td><input type="text" name="programmingPort" id="programmingPort"/></td></tr>
+                    <tr><td><span id="tempDirLabel"></td><td><input type="text" name="tempDir" id="tempDir"/></td></tr>
+                    <tr><td><span id="smtp_user_label"></td><td><input type="text" name="emailUsername" id="emailUsername"/></td></tr>
+                    <tr><td><span id="smtp_password_label"></td><td><input type="text" name="emailPassword" id="emailPassword"/></td></tr>
+                    <tr><td><span id="smtp_email_from_label"></td><td><input type="text" name="emailFrom" id="emailFrom"/></td></tr>
+                    <tr><td><span id="smtp_host_label"></td><td><input type="text" name="emailSmtpHost" id="emailSmtpHost"/></td></tr>
+                    <tr><td><span id="smtp_port_label"></td><td><input type="text" name="emailSmtpPort" id="emailSmtpPort"/></td></tr>
+                    <tr><td><span id="smtp_authenicate"></td><td><input type="text" name="emailauthenticate" id="emailauthenticate"/></td></tr>
+                    <tr><td><span id="smtp_useTLS"></td><td><input type="text" name="emailtls" id="emailtls"/></td></tr>                    
+                    <tr><td><span id="lowBatteryMessageL"></td><td><input type="text" name="lowBatteryMessage" id="lowBatteryMessage"/></td></tr>
+                    <tr><td><span id="powerLostMessageL"></td><td><input type="text" name="powerLostMessage" id="powerLostMessage"/></td></tr>
+                    <tr><td><span id="notificationMessageSubjectL"></td><td><input type="text" name="notificationMessageSubject" id="notificationMessageSubject"/></td></tr>
+                    <tr><td><span id="notificationMessageToL"></td><td><input type="text" name="notificationMessageTo" id="notificationMessageTo"/></td></tr>
+                </tbody>
+            </table>
+            <input type="hidden" name="ServiceName" value="PropertiesManager"/>
+            <input type="hidden" name="action" value="modifyProperties"/>
+            <input id="systemPropertiesModify" type="submit"/>
+            <div id="systemPropertiesResult">&nbsp;</div>
+        </form>
+    </div>    
+    <h3><span id="programming_cfg"></span></h3>
+    <div>
+        <span id="savedSketchesLabel"></span><SELECT id="savedSketchesList"></select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <BUTTON id="sketchLoad">&nbsp;</BUTTON><BUTTON id="sketchUpdate">&nbsp;</BUTTON><BUTTON id="sketchDelete">&nbsp;</BUTTON>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id="newSketchLabel"></span><INPUT id="newSketchName" type="text"/><BUTTON id="sketchSave">&nbsp;</BUTTON><br/><br/>
+        <textarea id="sketchTextArea"></textarea>
+    </div>    
+    <h3><span id="log_file"></span></h3>
+    <div>
+        <button id="btnLogDebug">Debug</button>
+        <button id="btnLogInfo">Info</button>
+        <button id="btnLogWarning">Warning</button>
+        <button id="btnLogError">Error</button>
+        <button id="btnLogFatal">Fatal</button>
+        <button id="btnLogClean">Clean</button>        
+        <div id="LogArea"></div>
     </div>
-
 </div>
+    <div id="downloadSketch">
+        <BR/><BR/>&nbsp;&nbsp;&nbsp;&nbsp;<span id="downloadSketchProgressText"></span><BR/><BR/>
+        <div id="downloadSketchProgressBar"></div>
+    </div>
 </body>
 </html>

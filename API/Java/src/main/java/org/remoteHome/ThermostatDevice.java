@@ -1,26 +1,25 @@
 package org.remoteHome;
-
-import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
   *Thermostat<br/>
   *<br/><br/>
-  *pn - check weather the device is up and runing (ping command)<br/>
-  *o - Switch on the relay<br/>
-  *f - Switch off the relay<br/>
-  *s - return status 6|temperature|frequency|expected temperature|relay|treshold<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;temperature format - 3 decimals degree celsius, e.g 233 = 23.3 or -23 = -23 or 022 = 2.2<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;frequency - frequency in seconds to send status. Longer value, longer battery life<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected temperature - the value set with command t: 23.5 celsius = 47, or 17 celsius = 34<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;relay - Current state of the relay 0 - off, 1 on<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;treshold - Current treshold 0 - 9<br/>
-  *m=nnn - set the frequency of the notifications and relay changes. 1 means 10 seconds, 255 means 2550 seconds.<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If not set, or set to 0, then no relay changes - Manual mode<br/>
-  *t=nnn - Expected temperature - if set, the header is running in self managed mode - each frequency period checks the current temperature, and if it is lower, switch on the<br/>
-  *    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;relay. The value is temperature * 2, it means, that 23.5 celsius = 47, or 17 celsius = 34.<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If it is set to 0, then relay is operated manually.<br/>
-  *r=n  -  Treshhold 0 - 9. For the self managed mode, the treshhold could be set. It means that relay will go off when currentTemperature + treshold / 10 > expected temperature and will<br/>
-  *	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;go on, when currentTemperature - treshold / 10 < expected temperature<br/>
+  * txcu=nn.nn - receive current temperature from temperature sensor nn.nn is the float
+  * txcte=nnn - configure expected temperature. Should be in form float, decimal character is ".", e.g. 21.5
+  * txctt=nnn - configure threshold. Should be 0 < nnn < 9. If the expected temperature is e.g. 21 and threshold is 2, then the switch is on, when the current temperature is bellow 20.8 and will switch off, when it is higher than 21.2
+  * txch=nnn - configure heating device Id. If there is a device, which needs to be switched on ( e.g. heating unit ), then configure it. This value is common for all the switches on the same board. nnn = 1 to 254
+  * txcs=nnn - configure heating sub device Id. If there is a device, which needs to be switched on ( e.g. heating unit ), then configure it. If there is a subdevice board to control more outputs configure subdevice Id. nnn = 1 to 8
+  * txs - return status 1t|thermostatID|status|currentTemperature|ExpectedTemperature|Threshold|HeatingDeviceId|HeatingDeviceSubdeviceId
+  *         thermostatID - number of thermostat ( It is in fact value x )
+  *         status - 0 off, 1 on
+  *         currentTemperature - current temperature send by the temperature sensor
+  *         ExpectedTemperature - expected temperature
+  *         Threshold - Threshold. Should be 0 < nnn < 9. If the expected temperature is e.g. 21 and threshold is 2, then the switch is on, when the current temperature is bellow 20.8 and will switch off, when it is higher than 21.2
+  *         HeatingDeviceId - heating device Id. If there is a device, which needs to be switched on ( e.g. heating unit ), then configure it. This value is common for all the switches on the same board. nnn = 1 to 254
+  *         HeatingDeviceSubdeviceId - heating sub device Id. If there is a device, which needs to be switched on ( e.g. heating unit ), then configure it. If there is a subdevice board to control more outputs configure subdevice Id. nnn = 1 to 8
   *<br/><br/>
   * @author Robert Gregor<br/>
   */
@@ -29,17 +28,12 @@ public class ThermostatDevice extends AbstractDevice {
     /**
      * Current temperature
      */
-    private int temperature; 
+    private float temperature; 
         
     /**
      * Device Expected temperature already configured in the device
      */
-    private int deviceExpectedTemperature;
-    
-    /**
-     * Device Expected temperature, which has been set manually. It is value backed up, when scheduler is enabled.
-     */
-    private int deviceExpectedTemperatureBackedUp;
+    private float deviceExpectedTemperature;
     
     /**
      * State of the relay, true if the relay is ON
@@ -47,51 +41,40 @@ public class ThermostatDevice extends AbstractDevice {
     private boolean relayOn;
     
     /**
-     * State of the manual control mode, true if the manual control is ON (Relay is not controlled using the expected temperature.)
-     */
-    private boolean manualControl;
-
-    /**
-     * Frequency in seconds
-     */
-    private int frequency; 
-
-    /**
      * Threshold 0 - 9. For the self managed mode, the threshold could be set. It means that relay will go off when currentTemperature + threshold / 10 > expected temperature and will<br/>
      * go on, when currentTemperature - threshold / 10 < expected temperature<br/>
      */
     private int threshold;
         
-    /*
+    /**
      * This is true if scheduler is enabled.
      */
     private boolean enabledScheduler;
 
-    /*
+    /**
      * This is automatic scheduler
      */
-    private TemperatureSchedule temperatureSchedule;   
+    private TemperatureSchedule temperatureSchedule = new TemperatureSchedule();   
     
-    /*
+    /**
      * This is id of the heating controller
      */
-    private int heatingController;   
+    private int heatingControllerDeviceId;   
+
+    /**
+     * This is subdevice id of the heating controller
+     */
+    private int heatingControllerSubDeviceId;   
 
     /*
-     * This is id of the remote temperature meter
+     * Holds the hour counter for the manual temperature setup
      */
-    private boolean heatingControllerEnabled = false;   
+    private int manualSetupHourCounter;
 
     /*
-     * This is id of the remote temperature meter
+     * This is true if power has been lost and the message "LP" has been received.
      */
-    private int remoteTemperatureMeter;   
-
-    /*
-     * This is id of the remote temperature meter
-     */
-    private boolean remoteTemperatureMeterEnabled = false;   
-
+    private boolean powerLost;
     /**
      * The constructor is protected. The object should be constructed using
      * ThermostatDevice device = 
@@ -105,7 +88,22 @@ public class ThermostatDevice extends AbstractDevice {
     protected ThermostatDevice(RemoteHomeManager m, int deviceId, String deviceName) {
         super (m, deviceId, deviceName);
         temperatureSchedule = new TemperatureSchedule();
-        enabledScheduler = temperatureSchedule.isEnabled();
+    }
+    
+    /**
+     * Contains the initialization of the device. Here the correct expected temperature is set.
+     */
+    protected void init() {
+        try {
+            if (enabledScheduler) {
+                if (getDeviceExpectedTemperature() != getTemperatureSchedule().getCurrentExpectedValue()) {
+                    setDeviceExpectedTemperature(getTemperatureSchedule().getCurrentExpectedValue());
+                    enabledScheduler = true;
+                }
+            }
+        } catch (Exception e) {
+            RemoteHomeManager.log.error(31,e);
+        }
     }
     
     /**
@@ -115,32 +113,12 @@ public class ThermostatDevice extends AbstractDevice {
       */
     @Override
     protected void manageAsynchronousCommand(String[] items) {
-         if (items[0].equals("6")) {
-            //This is the status
-            if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
-                try {
-                    TemperatureSensorDevice tsd = (TemperatureSensorDevice)m.getDevice(getRemoteTemperatureMeter());
-                    this.temperature = (int)Math.round(tsd.getTemperature()*10);
-                } catch (RemoteHomeManagerException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                this.temperature = (Integer.parseInt(items[1]));
-            }
-            this.frequency = (Integer.parseInt(items[2])*10); //Frequency in seconds * 10
-            this.deviceExpectedTemperature = ((Integer.parseInt(items[3])*10)/2); //0.5 is one degree celsius
-            if (items[4].equals("1")) {
-                relayOn = true;
-            } else {
-                relayOn = false;                
-            }
-            this.threshold = (Integer.parseInt(items[5]));
-            if (items[6].equals("1")) {
-                manualControl = true;
-            } else {
-                manualControl = false;                
-            }
-            setTimestamp(System.currentTimeMillis());
+        if (items[0].equals("LP")) {
+            setPowerLost(true);
+            relayOn = false;
+        } else {
+            setPowerLost(false);
+            parseReceivedData(items);
         }
     }
     
@@ -152,18 +130,52 @@ public class ThermostatDevice extends AbstractDevice {
      * 
      */
     public void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        String statusResponse[] = m.sendCommandWithAnswer(getDeviceId(), "s").split("\\|");
-        if (!statusResponse[0].equals("6")) {
-            throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+        String statusResponse[] = null;
+        try {
+            statusResponse = m.sendCommandWithAnswer(parseDeviceIdForMultipleDevice(getDeviceId()), "t"+getSubDeviceNumber()+"s").split("\\|");
+            setPowerLost(false);
+            if (!statusResponse[0].equals("1t")) {
+                throw new RemoteHomeManagerException("This response belongs to different device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+            }
+        } catch (RemoteHomeConnectionException e) {
+            if (isPowerLost()) {
+                return;
+            } else {
+                throw e;
+            }
         }
-        manageAsynchronousCommand(statusResponse);
+        if (!statusResponse[1].equals(getSubDeviceNumber())) {
+            throw new RemoteHomeManagerException("This response belongs to different sub device type.", RemoteHomeManagerException.WRONG_DEVICE_TYPE);
+        }
+        parseReceivedData(statusResponse);        
     }
-
+    public void parseReceivedData(String statusResponse[]) {
+            setPowerLost(false);
+            if (statusResponse[2].equals("1")) {
+                relayOn = true;
+            } else {
+                relayOn = false;                
+            }
+            temperature = Float.parseFloat(statusResponse[3]);
+            deviceExpectedTemperature = Float.parseFloat(statusResponse[4]);
+            threshold = (int)(Float.parseFloat(statusResponse[5])*10);  
+            heatingControllerDeviceId = Integer.parseInt(statusResponse[6]);
+            heatingControllerSubDeviceId = Integer.parseInt(statusResponse[7]);
+            setTimestamp(System.currentTimeMillis());
+            try {
+                saveHistoryData();
+            } catch (RemoteHomeManagerException e) {
+                if (e.getType() != RemoteHomeManagerException.PERSISTANCE_NOT_INITIALIZED)
+                    RemoteHomeManager.log.error(241, e);
+            }
+            m.notifyDeviceChange(this);
+            RemoteHomeManager.log.info("Values set. Current values: "+toString());
+    }
     /**
      * Current temperature
      * @return the temperature
      */
-    public int getTemperature() {
+    public float getTemperature() {
         return temperature;
     }
 
@@ -171,7 +183,7 @@ public class ThermostatDevice extends AbstractDevice {
      * Current temperature
      * @param temperature the temperature to set
      */
-    protected void setTemperature(int temperature) {
+    protected void setTemperature(float temperature) {
         this.temperature = temperature;
     }
 
@@ -179,36 +191,19 @@ public class ThermostatDevice extends AbstractDevice {
      * Device Expected temperature already configured in the device
      * @return the deviceExpectedTemperature
      */
-    public int getDeviceExpectedTemperature() {
+    public float getDeviceExpectedTemperature() {
         return deviceExpectedTemperature;
     }
 
     /**
      * Device Expected temperature already configured in the device
-     * @param deviceExpectedTemperature the deviceExpectedTemperature to set
+     * @param deviceExpectedTemperature the deviceExpectedTemperature to set. Should be in form float, decimal character is ".", e.g. 21.5
      * @throws RemoteHomeConnectionException if there is a problem with communication
-     * @throws RemoteHomeManagerException if the value is not in range 0 - 400
      */
-    public void setDeviceExpectedTemperature(int deviceExpectedTemperature) throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        if ((deviceExpectedTemperature < 0) || (deviceExpectedTemperature > 400)) {
-            throw new RemoteHomeManagerException("The value should be 0 - 400", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
-        }        
-        m.sendCommand(getDeviceId(), "t="+(deviceExpectedTemperature*2)/10);
+    public void setDeviceExpectedTemperature(float deviceExpectedTemperature) throws RemoteHomeConnectionException {        
+        m.sendCommand(getRealDeviceId(), "t"+this.getSubDeviceNumber()+"cte="+(Float.toString(deviceExpectedTemperature)));
         this.deviceExpectedTemperature = deviceExpectedTemperature;
-    }
-
-    /**
-     * @return the deviceExpectedTemperatureBackedUp
-     */
-    public int getDeviceExpectedTemperatureBackedUp() {
-        return deviceExpectedTemperatureBackedUp;
-    }
-
-    /**
-     * @param deviceExpectedTemperatureBackedUp the deviceExpectedTemperatureBackedUp to set
-     */
-    public void setDeviceExpectedTemperatureBackedUp(int deviceExpectedTemperatureBackedUp) {
-        this.deviceExpectedTemperatureBackedUp = deviceExpectedTemperatureBackedUp;
+        enabledScheduler = false;
     }
 
     /**
@@ -218,43 +213,6 @@ public class ThermostatDevice extends AbstractDevice {
     public boolean isRelayOn() {
         return relayOn;
     }
-
-    /**
-     * Set state of the relay, true if the relay should go ON
-     * @param relayOn the relayState to set
-     * @throws RemoteHomeConnectionException if there is a problem with communication
-     */
-    public void setRelayOn(boolean relayOn) throws RemoteHomeConnectionException {
-        if (relayOn) {
-            m.sendCommand(getDeviceId(), "o");
-        } else {
-            m.sendCommand(getDeviceId(), "f");
-        }
-        this.relayOn = relayOn;
-    }
-
-    /**
-     * Frequency in seconds
-     * @return the frequency
-     */
-    public int getFrequency() {
-        return frequency;
-    }
-
-    /**
-     * Frequency in seconds
-     * @param frequency the frequency to set
-     * @throws RemoteHomeConnectionException if there is a problem with communication
-     * @throws RemoteHomeManagerException if the value is not in range 0 - 2550
-     */
-    public void setFrequency(int frequency) throws RemoteHomeConnectionException, RemoteHomeManagerException {
-        if ((frequency < 0) || (frequency > 2550)) {
-            throw new RemoteHomeManagerException("The value should be 0 - 2550", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
-        }
-        m.sendCommand(getDeviceId(), "m="+(frequency)/10);
-        this.frequency = frequency;
-    }
-
 
     /**
      * Threshold 0 - 9. For the self managed mode, the threshold could be set. It means that relay will go off when currentTemperature + threshold / 10 > expected temperature and will<br/>
@@ -276,47 +234,30 @@ public class ThermostatDevice extends AbstractDevice {
         if ((threshold < 0) || (threshold > 9)) {
             throw new RemoteHomeManagerException("The value should be 0 - 9", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
-        m.sendCommand(getDeviceId(), "r="+threshold);
+        m.sendCommand(getRealDeviceId(), "t"+this.getSubDeviceNumber()+"ctt="+(threshold));
         this.threshold = threshold;
-    }
 
-    /**
-     * @return the manualControl
-     */
-    public boolean isManualControl() {
-        return manualControl;
-    }
-
-    /**
-     * @param manualControl the manualControl to set
-     */
-    public void setManualControl(boolean manualControl) throws RemoteHomeConnectionException {
-        if (manualControl) {
-            m.sendCommand(getDeviceId(), "x");
-        } else {
-            if (!isRemoteTemperatureMeterEnabled()) {
-                m.sendCommand(getDeviceId(), "y");
-            } else {
-                throw new RemoteHomeConnectionException("The remote temperature meter is enabled. "
-                        + "Disable remote temperature meter first.", RemoteHomeConnectionException.NOT_ALLOWED);
-            }
-        }
-        this.manualControl = manualControl;
     }
 
     /**
      * @return the enabledScheduler
      */
     public boolean isEnabledScheduler() {
-        return getTemperatureSchedule().isEnabled();
+        return enabledScheduler;
     }
 
     /**
      * @param enabledScheduler the enabledScheduler to set
+     * @throws RemoteHomeConnectionException if there is a problem with communication
      */
-    public void setEnabledScheduler(boolean enabledScheduler) {
+    public void setEnabledScheduler(boolean enabledScheduler) throws RemoteHomeConnectionException {
+        //set the correct expected temperature
+        if (enabledScheduler) {
+            if (getDeviceExpectedTemperature() != getTemperatureSchedule().getCurrentExpectedValue()) {
+                setDeviceExpectedTemperature(getTemperatureSchedule().getCurrentExpectedValue());
+            }
+        }
         this.enabledScheduler = enabledScheduler;
-        getTemperatureSchedule().setEnabled(enabledScheduler);
     }
 
     /**
@@ -336,159 +277,230 @@ public class ThermostatDevice extends AbstractDevice {
     /**
      * @return the heatingController
      */
-    public int getHeatingController() {
-        return heatingController;
+    public int getHeatingControllerDeviceId() {
+        return heatingControllerDeviceId;
     }
 
     /**
-     * @param heatingController the heatingController to set
+     * @param heatingControllerDeviceId the heatingController device id to set
+     * @throws RemoteHomeConnectionException if there is a problem with communication
+     * @throws RemoteHomeManagerException if the value is not in range 1 - 254
      */
-    public void setHeatingController(int heatingController) {
-        this.heatingController = heatingController;
-    }
-
-    /**
-     * @return the remoteTemperatureMeter
-     */
-    public int getRemoteTemperatureMeter() {
-        return remoteTemperatureMeter;
-    }
-
-    /**
-     * @param remoteTemperatureMeter the remoteTemperatureMeter to set
-     */
-    public void setRemoteTemperatureMeter(int remoteTemperatureMeter) {
-        this.remoteTemperatureMeter = remoteTemperatureMeter;
-    }
-
-    /**
-     * @return the remoteTemperatureMeterEnabled
-     */
-    public boolean isRemoteTemperatureMeterEnabled() {
-        return remoteTemperatureMeterEnabled;
-    }
-
-    /**
-     * @param remoteTemperatureMeterEnabled the remoteTemperatureMeterEnabled to set
-     */
-    public void setRemoteTemperatureMeterEnabled(boolean remoteTemperatureMeterEnabled) throws RemoteHomeConnectionException {
-        this.remoteTemperatureMeterEnabled = remoteTemperatureMeterEnabled;
-        if (!this.isManualControl()) {
-            this.setManualControl(true);
+    public void setHeatingControllerDeviceId(int heatingControllerDeviceId) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        if ((heatingControllerDeviceId < 0) || (heatingControllerDeviceId > 254)) {
+            throw new RemoteHomeManagerException("The value should be 1 - 254", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
         }
+        m.sendCommand(getRealDeviceId(), "t"+this.getSubDeviceNumber()+"ch="+(heatingControllerDeviceId));
+        this.heatingControllerDeviceId = heatingControllerDeviceId;
     }
 
     /**
-     * @return the heatingControllerEnabled
-     */
-    public boolean isHeatingControllerEnabled() {
-        return heatingControllerEnabled;
-    }
-
-    /**
-     * @param heatingControllerEnabled the heatingControllerEnabled to set
-     */
-    public void setHeatingControllerEnabled(boolean heatingControllerEnabled) {
-        this.heatingControllerEnabled = heatingControllerEnabled;
-    }
-    /**
-     * This method will save the current state of the device to the database together with the timestamp.
+     * This method will save the current state of the device (current and expected temperature) to the database together with the timestamp.
+     * @throws RemoteHomeManagerException if the saving fails.
      */
     protected void saveHistoryData() throws RemoteHomeManagerException {
-          TemperatureHistoryData historyProto = new TemperatureHistoryData();
-          historyProto.setDeviceId(getDeviceId());
-          TemperatureHistoryData history = (TemperatureHistoryData)m.getPersistance().loadHistoryData(historyProto);
-          int expected = getDeviceExpectedTemperature();
-          if (isEnabledScheduler()) {
-              Integer tmp = getTemperatureSchedule().getCurrentExpectedValue();
-              if (tmp != null) expected = tmp;
-          }
-          history.saveSampleData(System.currentTimeMillis(), (int)Math.round(getTemperature()), expected);
-          m.getPersistance().saveHistoryData(history);
+        HistoryData history = new HistoryData();
+        history.setDeviceId(getDeviceId());
+        history.setDataName("DOUBLELINEDATA");
+        history.setDataValue(Float.toString(getTemperature())+"|"+Float.toString(getDeviceExpectedTemperature()));
+        history.setDataTimestamp();
+        m.getPersistance().addHistoryData(history);
+        RemoteHomeManager.log.debug("Saved history data: "+history.toString());        
     }
+
     /**
-     * This method will start the scheduler thread to process the schedule.
+     * @return the heatingControllerSubDeviceId
      */
-    public void startScheduling() {
-        String deviceTemp = Integer.toString((getDeviceExpectedTemperature()*2)/10,16).toUpperCase();
-        while (deviceTemp.length() < 2) deviceTemp = "0" + deviceTemp;
-        getTemperatureSchedule().setCurrentState(deviceTemp);
-        new Thread(new Runnable() {
-            public void run() {
-                while(true) {
-                    try {
-                        Calendar c = Calendar.getInstance();
-                        int min = c.get(Calendar.MINUTE);
-                        if (((min % 10) == 0) || (min == 0)) {
-                            saveHistoryData();
-                        }
-                        Thread.sleep(50000);
-                        //manage heating controller
-                        if (isHeatingControllerEnabled() && getHeatingController() != 0) {
-                            try {
-                                //ok heating controller enabled check the status of the relay
-                                updateDevice();
-                                if (isRelayOn()) {
-                                    //ok, get the device and check if it is on
-                                    SimpleSwitchDevice ssd = (SimpleSwitchDevice)m.getDevice(getHeatingController());
-                                    if (ssd.updatedBefore(1)) ssd.updateDevice();
-                                    if (!ssd.isCurrentState() || ssd.getCurrentCounter() < 2) {
-                                        if (ssd.getConfiguredPeriod() != 3) {
-                                            ssd.configurePeriod(3);
-                                        }
-                                        ssd.switchOnForConfiguredPeriod();
-                                    }
-                                }
-                            } catch (RemoteHomeConnectionException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        //manage the remote temperature meter and device relay
-                        if (!isEnabledScheduler()) {
-                            manageRemoteTemperatureSensorAndDeviceRelay();
-                            continue;
-                        }
-                        if (isManualControl() && !isRemoteTemperatureMeterEnabled()) continue;
-                        c = Calendar.getInstance();
-                        min = c.get(Calendar.MINUTE);
-                        if (((min % 15) == 0) || (min == 0)) {
-                            Integer temperature = getTemperatureSchedule().processSchedule();
-                            if (temperature != null) {
-                                //something has to be done.
-                                if (!isRemoteTemperatureMeterEnabled()) {
-                                    setDeviceExpectedTemperature(temperature);
-                                } else {
-                                    manageRemoteTemperatureSensorAndDeviceRelay();
-                                }
-                            }
-                        }
-                        Thread.sleep(50000);
-                    } catch (InterruptedException e) {
-                        return;
-                    } catch (RemoteHomeConnectionException e) {
-                        e.printStackTrace();
-                    } catch (RemoteHomeManagerException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();                
+    public int getHeatingControllerSubDeviceId() {
+        return heatingControllerSubDeviceId;
+    }
+
+    /**
+     * @param heatingControllerSubDeviceId the heatingControllerSubDeviceId to set
+     * @throws RemoteHomeConnectionException if there is a problem with communication
+     * @throws RemoteHomeManagerException if the value is not in range 1 - 8
+     */
+    public void setHeatingControllerSubDeviceId(int heatingControllerSubDeviceId) throws RemoteHomeConnectionException, RemoteHomeManagerException {
+        if ((heatingControllerSubDeviceId < 0) || (heatingControllerSubDeviceId > 8)) {
+            throw new RemoteHomeManagerException("The value should be 1 - 8", RemoteHomeManagerException.WRONG_PARAMETER_VALUE);
+        }
+        m.sendCommand(getRealDeviceId(), "t"+this.getSubDeviceNumber()+"cs="+(heatingControllerSubDeviceId));        
+        this.heatingControllerSubDeviceId = heatingControllerSubDeviceId;
     }
     
-    private void manageRemoteTemperatureSensorAndDeviceRelay() throws RemoteHomeConnectionException {
-        if (isRemoteTemperatureMeterEnabled() && getRemoteTemperatureMeter() != 0) {
-            if (!isManualControl()) {
-               setManualControl(true);
-            }
-            int finalTemp = getTemperature() + getThreshold();
-            if (finalTemp > getDeviceExpectedTemperature()) {
-               if (isRelayOn()) setRelayOn(false);
+    @Override
+    public String toString() {
+        HashMap h = new HashMap();
+        h.putAll(super.getFieldValues());
+        h.put("temperature", temperature);
+        h.put("deviceExpectedTemperature", deviceExpectedTemperature);
+        h.put("relayOn", relayOn);
+        h.put("threshold", threshold);
+        h.put("enabledScheduler", enabledScheduler);
+        h.put("heatingControllerDeviceId", heatingControllerDeviceId);
+        h.put("heatingControllerSubDeviceId", heatingControllerSubDeviceId);
+        h.put("powerLost", powerLost);
+        return h.toString();
+    }
+    
+    /**
+     * This method is called each second. Do not put inside blocking operations
+     */
+    protected void runEachSecond() {        
+    }
+    
+    /**
+     * This method is called each minute. Do not put inside blocking operations
+     */
+    protected void runEachMinute() {
+        if (manualSetupHourCounter > 0) {
+            if (--manualSetupHourCounter == 0) {
+                //OK set the schedulerEnabled and set the scheduler temperature
+                RemoteHomeManager.log.debug("Temporary manual setup period is over. Setting to the enabled scheduler mode.");
+                enabledScheduler = true;
+                if (getDeviceExpectedTemperature() != getTemperatureSchedule().getCurrentExpectedValue()) {
+                    try {
+                        setDeviceExpectedTemperature(getTemperatureSchedule().getCurrentExpectedValue());
+                        enabledScheduler = true;
+                        RemoteHomeManager.log.debug("Scheduler enabled. Set the new expected temperature: "+getDeviceExpectedTemperature());
+                    } catch (RemoteHomeConnectionException e) {
+                        RemoteHomeManager.log.error(33,e);
+                    }            
+                }                
             } else {
-               finalTemp = getTemperature() - getThreshold();
-               if (finalTemp < getDeviceExpectedTemperature()) {
-                    if (!isRelayOn()) setRelayOn(true);
-               }
+                RemoteHomeManager.log.debug("Temporary manual setup counter decressed by 1. New value: "+manualSetupHourCounter);
             }
         }
+    }
+
+    /**
+     * This method is called each 10 minutes. Do not put inside blocking operations
+     */
+    protected void runEach10Minutes() {
+        try {            
+            if (enabledScheduler) {
+                if (getDeviceExpectedTemperature() != getTemperatureSchedule().getCurrentExpectedValue()) {
+                    setDeviceExpectedTemperature(getTemperatureSchedule().getCurrentExpectedValue());
+                    enabledScheduler = true;
+                    RemoteHomeManager.log.debug("Scheduler enabled. Set the new expected temperature: "+getDeviceExpectedTemperature());
+                }
+            }
+            saveHistoryData();
+        } catch (RemoteHomeConnectionException e) {
+            RemoteHomeManager.log.error(33,e);
+        } catch (RemoteHomeManagerException e) {
+            RemoteHomeManager.log.error(34,e);
+        }            
+    }
+
+    /**
+     * This method is called each hour. Do not put inside blocking operations
+     */
+    protected void runEachHour() {
+    }
+
+    /**
+     * This method is called each day. Do not put inside blocking operations
+     */
+    protected void runEachDay() {
+    }
+
+    /**
+     * @return the manualSetupHourCounter
+     */
+    public int getManualSetupHourCounter() {
+        return manualSetupHourCounter;
+    }
+
+    /**
+     * This method will set for the temporary hour period the defined temperature. After this period, the device will be set automatically to the scheduler enabled mode and the
+     * temperature from the assigned scheduler is used.
+     * 
+     * @param manualSetupHourCounter the number of hours, for which the device should stay on the temperature.
+     * @param temperature the temporary temperature
+     * @throws RemoteHomeConnectionException if there is a problem with communication
+     */
+    public void setManualSetupHourCounterAndTemperature(int manualSetupHourCounter, float temperature) throws RemoteHomeConnectionException {
+        this.manualSetupHourCounter = manualSetupHourCounter*60;
+        setDeviceExpectedTemperature(temperature);
+        RemoteHomeManager.log.debug("Temporary manual setup enabled. Hour(s): "+manualSetupHourCounter+" Temperature: "+temperature);
+    }
+
+    public float getLowBatteryLimit() {
+        return 0f;
+    }
+
+    /**
+     * @return the powerLost
+     */
+    public boolean isPowerLost() {
+        return powerLost;
+    }
+
+    /**
+     * @param powerLost the powerLost to set
+     */
+    protected void setPowerLost(boolean powerLost) {
+        this.powerLost = powerLost;
+    }
+    
+    public class ThermostatChartItem {
+        private String xData;
+        private float yData;
+        private float yDataExpected;
+
+        /**
+         * @return the xData
+         */
+        public String getxData() {
+            return xData;
+        }
+
+        /**
+         * @param xData the xData to set
+         */
+        public void setxData(String xData) {
+            this.xData = xData;
+        }
+
+        /**
+         * @return the yData
+         */
+        public float getyData() {
+            return yData;
+        }
+
+        /**
+         * @param yData the yData to set
+         */
+        public void setyData(float yData) {
+            this.yData = yData;
+        }
+
+        /**
+         * @return the yDataExpected
+         */
+        public float getyDataExpected() {
+            return yDataExpected;
+        }
+
+        /**
+         * @param yDataExpected the yDataExpected to set
+         */
+        public void setyDataExpected(float yDataExpected) {
+            this.yDataExpected = yDataExpected;
+        }
+    }
+    public ArrayList generateChartItems(HistoryData[] historyData, String type) {
+        ArrayList<ThermostatDevice.ThermostatChartItem> retArray = new ArrayList<ThermostatDevice.ThermostatChartItem>();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000Z'");
+            for (HistoryData d : historyData) {
+                ThermostatDevice.ThermostatChartItem item = new ThermostatDevice.ThermostatChartItem();            
+                item.setxData(df.format(d.getDataTimestamp()));
+                item.setyData(Float.parseFloat(d.getDataValue().split("\\|")[0]));
+                item.setyDataExpected(Float.parseFloat(d.getDataValue().split("\\|")[1]));
+                retArray.add(item);
+            }
+            return retArray;
     }
 }

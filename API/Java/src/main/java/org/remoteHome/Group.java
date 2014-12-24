@@ -8,25 +8,16 @@ package org.remoteHome;
  * To change this template use File | Settings | File Templates.
  */
 public class Group {
-    private int groupId;
     private String groupName;
 
-    public static final Group ADMIN_GROUP = new Group(0,"Administrators");
-    public static final Group GUEST_GROUP = new Group(1,"Guests");
+    public static final Group ADMIN_GROUP = new Group("Administrators");
+    public static final Group OPERATOR_GROUP = new Group("Operators");
+    public static final Group GUEST_GROUP = new Group("Guests");
 
     public Group() {}
 
-    public Group(int groupId, String groupName) {
-        this.groupId = groupId;
+    public Group(String groupName) {
         this.groupName = groupName;
-    }
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
     }
 
     public String getGroupName() {
@@ -35,5 +26,16 @@ public class Group {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Group)) return false;
+        return ((Group)o).getGroupName().equals(groupName);
+    }
+    
+    @Override
+    public int hashCode() {
+        if (getGroupName().isEmpty()) return 0;
+        else return getGroupName().charAt(0);
     }
 }

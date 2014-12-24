@@ -146,9 +146,9 @@ public class TemperatureSchedule  extends AbstractSchedule {
     }
     /**
      * This method will return current expected temperature value 
-     * @return decimal value of the expected temperature ( e.g. 41 means 205 (20.5) degree celsius - (41 * 10) / 2)
+     * @return float value of the expected temperature (e.g. 20.5 degree celsius is equivalent to 41 saved decimal value.)
      */
-    public Integer getCurrentExpectedValue() {
+    public float getCurrentExpectedValue() {
         Calendar c = Calendar.getInstance();
         int min = c.get(Calendar.MINUTE);
         int minRange = 0;
@@ -174,6 +174,6 @@ public class TemperatureSchedule  extends AbstractSchedule {
         String sch = loadSchedule();
         String hourValues = sch.substring((day*24*8)+(hour*8), (day*24*8)+(hour*8)+8);
         String temperature = hourValues.substring((minRange/15)*2, ((minRange/15)*2)+2);
-        return ((Integer.parseInt(temperature, 16) * 10) / 2);
+        return ((float)((Integer.parseInt(temperature, 16) * 10) / 2))/10;
     }
 }

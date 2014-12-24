@@ -1,0 +1,359 @@
+<div>
+<script>
+function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
+  $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID",
+      success: function(indata) {
+          if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+          var data = JSON.parse(indata);
+          document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
+          document.getElementById("nameFormCOMPONENTID").value=data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
+          document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
+          document.getElementById("currPeriodCOMPONENTID").innerHTML=data.frequency;
+          document.getElementById("currPeriodFormCOMPONENTID").value=data.frequency;
+          document.getElementById("thermostatDeviceIdFormCOMPONENTID").value=data.thermostatDeviceId;
+          document.getElementById("thermostatSubDeviceIdFormCOMPONENTID").value=data.thermostatSubDeviceId;
+          document.getElementById("humidityDeviceIdFormCOMPONENTID").value=data.humidityDeviceId;
+          document.getElementById("humiditySubDeviceIdFormCOMPONENTID").value=data.humiditySubDeviceId;
+          document.getElementById("temperatureCOMPONENTID").innerHTML=data.temperature;
+          document.getElementById("humidityCOMPONENTID").innerHTML=data.humidity;
+          document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=data.temperature+"&nbsp;"+deg_celsius+"&nbsp;/&nbsp;"+data.humidity+"&nbsp;%";
+          document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery;
+          if (data.manageFrequencyAuto) {
+            document.getElementById("expPeriodCOMPONENTID").innerHTML=data.expectedFrequency;
+            setLabelBasedOnId("secondsL1COMPONENTID", "seconds");
+          } else {
+            document.getElementById("expPeriodCOMPONENTID").innerHTML="";
+          }
+          document.getElementById("thermo_deviceIdCOMPONENTID").innerHTML=data.thermostatDeviceId;
+          if (data.manageThermostatDeviceIdAuto) {
+              document.getElementById("thermo_deviceIdExpectedCOMPONENTID").innerHTML=data.expectedThermostatDeviceId;
+          } else {
+              document.getElementById("thermo_deviceIdExpectedCOMPONENTID").innerHTML="";
+          }
+          document.getElementById("thermo_subdeviceIdCOMPONENTID").innerHTML=data.thermostatSubDeviceId;
+          if (data.manageThermostatSubDeviceIdAuto) {
+              document.getElementById("thermo_subdeviceIdExpectedCOMPONENTID").innerHTML=data.expectedThermostatSubDeviceId;
+          } else {
+              document.getElementById("thermo_subdeviceIdExpectedCOMPONENTID").innerHTML="";
+          }
+          document.getElementById("humid_deviceIdCOMPONENTID").innerHTML=data.humidityDeviceId;
+          if (data.manageHumidityDeviceIdAuto) {
+              document.getElementById("humid_deviceIdExpectedCOMPONENTID").innerHTML=data.expectedHumidityDeviceId;
+          } else {
+              document.getElementById("humid_deviceIdExpectedCOMPONENTID").innerHTML="";
+          }
+          document.getElementById("humid_subdeviceIdCOMPONENTID").innerHTML=data.humiditySubDeviceId;
+          if (data.manageHumiditySubDeviceIdAuto) {
+              document.getElementById("humid_subdeviceIdExpectedCOMPONENTID").innerHTML=data.expectedHumiditySubDeviceId;
+          } else {
+              document.getElementById("humid_subdeviceIdExpectedCOMPONENTID").innerHTML="";
+          }
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+      },
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
+      }
+  });
+}
+$(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 2) {
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA");
+                drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA_2");
+            } else if ((ui.newTab.index() == 0) || (ui.newTab.index() == 1)) {
+                updateStatusCOMPONENTID();
+            }
+        }
+    });
+    $( "#chartButtHourCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA");
+        drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA_2");
+    });
+    $( "#chartButtDayCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "SINGLELINEDATA");
+        drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "day", "SINGLELINEDATA_2");
+    });
+    $( "#chartButtWeekCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "SINGLELINEDATA");
+        drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "week", "SINGLELINEDATA_2");
+    });
+    $( "#chartButtMonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "SINGLELINEDATA");
+        drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "month", "SINGLELINEDATA_2");
+    });
+    $( "#chartButt3MonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "SINGLELINEDATA");
+        drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "threemonth", "SINGLELINEDATA_2");
+    });
+    $( "#chartButtYearCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "SINGLELINEDATA");
+        drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "year", "SINGLELINEDATA_2");
+    });
+    $( "#chartButt3YearsCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "SINGLELINEDATA");
+        drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "threeyears", "SINGLELINEDATA_2");
+    });
+    $( "#chartButtClearCOMPONENTID" ).button().click(function() {
+      $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetHistoryDataJson&deviceId=COMPONENTID&clear=true",
+            success: function(indata) {
+                if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA");
+                drawChart($( "#chartArea2_COMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA_2");
+                alert(clear_history_data_ok);
+            },
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
+            }   
+          });
+  
+    });
+    $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
+          updateStatusCOMPONENTID();
+    });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
+    $( "#configureCOMPONENTID" ).button().click(function() {
+          var nm = document.getElementById("nameFormCOMPONENTID").value;
+          if (nm == '') {
+                alert(error_name_cannot_be_empty);
+                return;
+          }
+          var tm = parseInt(document.getElementById("currPeriodFormCOMPONENTID").value);
+          if (isNaN(tm)) {
+              alert(error_period_exist);
+              return;
+          }
+          if ((tm > 2550) || (tm < 10)) {
+              alert(error_period_range);
+              return;
+          }
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
+          var sendingDeviceId = parseInt(document.getElementById("thermostatDeviceIdFormCOMPONENTID").value);
+          if (isNaN(sendingDeviceId)) {
+              alert(error_sendingDeviceId_exist);
+              return;
+          }
+          if ((sendingDeviceId < 0) || (sendingDeviceId > 254)) {
+              alert(error_sendingDeviceId_range);
+              return;
+          }
+          var sendingSubDeviceId = parseInt(document.getElementById("thermostatSubDeviceIdFormCOMPONENTID").value);
+          if (isNaN(sendingSubDeviceId)) {
+              alert(error_sendingSubDeviceId_exist);
+              return;
+          }
+          if ((sendingSubDeviceId > 8) || (sendingSubDeviceId < 1)) {
+              alert(error_sendingSubDeviceId_range);
+              return;
+          }
+
+          var humidDeviceId = parseInt(document.getElementById("humidityDeviceIdFormCOMPONENTID").value);
+          if (isNaN(humidDeviceId)) {
+              alert(error_humidityDeviceId_exist);
+              return;
+          }
+          if ((humidDeviceId < 0) || (humidDeviceId > 254)) {
+              alert(error_sendingDeviceId_range);
+              return;
+          }
+          var humidSubDeviceId = parseInt(document.getElementById("humiditySubDeviceIdFormCOMPONENTID").value);
+          if (isNaN(humidSubDeviceId)) {
+              alert(error_sendingSubDeviceId_exist);
+              return;
+          }
+          if ((humidSubDeviceId > 8) || (humidSubDeviceId < 1)) {
+              alert(error_sendingSubDeviceId_range);
+              return;
+          }
+
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=TemperatureHumiditySensorDeviceManager&deviceId=COMPONENTID&tm="+tm+"&room="+encodeURIComponent(room)+"&sendingDeviceId="+encodeURIComponent(sendingDeviceId)+"&sendingSubDeviceId="+encodeURIComponent(sendingSubDeviceId)+"&humidDeviceId="+encodeURIComponent(humidDeviceId)+"&humidSubDeviceId="+encodeURIComponent(humidSubDeviceId)+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+            success: function(data) {
+                if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                if (data == "REFRESH") document.location.reload(true);
+                alert(status_configuration_prepared);
+            },
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
+            }   
+          });
+          updateStatusCOMPONENTID();
+    });
+});
+$(document).ready(function() {
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("statusCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("graphsCOMPONENTID", "graphs");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("battVoltageLabelCOMPONENTID", "batt_voltage");
+    setLabelBasedOnId("temperatureLCOMPONENTID", "temperature");
+    setLabelBasedOnId("humidityLCOMPONENTID", "humidity");
+    setLabelBasedOnId("degCelsius1COMPONENTID", "deg_celsius");
+    setLabelBasedOnId("secondsL2COMPONENTID", "seconds");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("sending_periodCOMPONENTID", "sending_period");
+    setLabelBasedOnId("sending_periodExpectedCOMPONENTID", "sending_period_expected");
+    setLabelBasedOnId("sending_periodFCOMPONENTID", "sending_period");
+    setLabelBasedOnId("thermostat_deviceIdFCOMPONENTID", "thermostat_deviceId");
+    setLabelBasedOnId("thermostat_subdeviceIdFCOMPONENTID", "thermostat_subdeviceId");
+    setLabelBasedOnId("thermostat_deviceIdCOMPONENTID", "thermostat_deviceId");
+    setLabelBasedOnId("thermostat_deviceIdExpectedCOMPONENTID", "thermostat_deviceIdExpected");
+    setLabelBasedOnId("thermostat_subdeviceIdCOMPONENTID", "thermostat_subdeviceId");
+    setLabelBasedOnId("thermostat_subdeviceIdExpectedCOMPONENTID", "thermostat_subdeviceIdExpected");
+    setLabelBasedOnId("humidity_deviceIdFCOMPONENTID", "humidity_deviceId");
+    setLabelBasedOnId("humidity_subdeviceIdFCOMPONENTID", "humidity_subdeviceId");
+    setLabelBasedOnId("humidity_deviceIdCOMPONENTID", "humidity_deviceId");
+    setLabelBasedOnId("humidity_deviceIdExpectedCOMPONENTID", "humidity_deviceIdExpected");
+    setLabelBasedOnId("humidity_subdeviceIdCOMPONENTID", "humidity_subdeviceId");
+    setLabelBasedOnId("humidity_subdeviceIdExpectedCOMPONENTID", "humidity_subdeviceIdExpected");
+    setLabelBasedOnId("chartButtHourLabelCOMPONENTID", "chart_butt_hour");
+    setLabelBasedOnId("chartButtDayLabelCOMPONENTID", "chart_butt_day");
+    setLabelBasedOnId("chartButtWeekLabelCOMPONENTID", "chart_butt_week");
+    setLabelBasedOnId("chartButtMonthLabelCOMPONENTID", "chart_butt_month");
+    setLabelBasedOnId("chartButt3MonthLabelCOMPONENTID", "chart_butt_3month");
+    setLabelBasedOnId("chartButtYearLabelCOMPONENTID", "chart_butt_year");
+    setLabelBasedOnId("chartButt3YearsLabelCOMPONENTID", "chart_butt_3years");
+    setLabelBasedOnId("chartButtClearLabelCOMPONENTID", "chart_butt_clear");
+    updateStatusCOMPONENTID();
+    window.setInterval(function() {
+        updateStatusCOMPONENTID(false);
+    }, 300000);
+});
+</script>
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="thermostat_deviceIdCOMPONENTID"></div></td><td><span id='thermo_deviceIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="thermostat_deviceIdExpectedCOMPONENTID"></div></td><td><span id='thermo_deviceIdExpectedCOMPONENTID'></span></td></tr>
+                <tr><td><div id="humidity_deviceIdCOMPONENTID"></div></td><td><span id='humid_deviceIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="humidity_deviceIdExpectedCOMPONENTID"></div></td><td><span id='humid_deviceIdExpectedCOMPONENTID'></span></td></tr>
+                <tr><td><div id="battVoltageLabelCOMPONENTID"></div></td><td><span id='battVoltageCOMPONENTID'></span></td></tr>
+                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="temperatureLCOMPONENTID"></div></td><td><span id='temperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius1COMPONENTID"></span></td></tr>
+                <tr><td><div id="humidityLCOMPONENTID"></div></td><td><span id='humidityCOMPONENTID'></span>&nbsp;%</td></tr>
+                <tr><td><div id="sending_periodCOMPONENTID"></div></td><td><span id='currPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL2COMPONENTID"></span></td></tr>
+                <tr><td><div id="sending_periodExpectedCOMPONENTID"></div></td><td><span id='expPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL1COMPONENTID"></span></td></tr>
+                <tr><td><div id="thermostat_subdeviceIdCOMPONENTID"></div></td><td><span id='thermo_subdeviceIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="thermostat_subdeviceIdExpectedCOMPONENTID"></div></td><td><span id='thermo_subdeviceIdExpectedCOMPONENTID'></span></td></tr>
+                <tr><td><div id="humidity_subdeviceIdCOMPONENTID"></div></td><td><span id='humid_subdeviceIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="humidity_subdeviceIdExpectedCOMPONENTID"></div></td><td><span id='humid_subdeviceIdExpectedCOMPONENTID'></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="currPeriodFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="thermostat_deviceIdFCOMPONENTID"></div></td><td><input type="text" id="thermostatDeviceIdFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="thermostat_subdeviceIdFCOMPONENTID"></div></td><td><input type="text" id="thermostatSubDeviceIdFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="humidity_deviceIdFCOMPONENTID"></div></td><td><input type="text" id="humidityDeviceIdFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="humidity_subdeviceIdFCOMPONENTID"></div></td><td><input type="text" id="humiditySubDeviceIdFormCOMPONENTID"/></td></tr>
+            </table>
+          </td><td>&nbsp;
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+    <div id="componentTabsCOMPONENTID-4">
+        <button id="chartButtHourCOMPONENTID"><div id="chartButtHourLabelCOMPONENTID"></div></button>
+        <button id="chartButtDayCOMPONENTID"><div id="chartButtDayLabelCOMPONENTID"></div></button>
+        <button id="chartButtWeekCOMPONENTID"><div id="chartButtWeekLabelCOMPONENTID"></div></button>
+        <button id="chartButtMonthCOMPONENTID"><div id="chartButtMonthLabelCOMPONENTID"></div></button>
+        <button id="chartButt3MonthCOMPONENTID"><div id="chartButt3MonthLabelCOMPONENTID"></div></button>
+        <button id="chartButtYearCOMPONENTID"><div id="chartButtYearLabelCOMPONENTID"></div></button>
+        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button>
+        <button id="chartButtClearCOMPONENTID"><div id="chartButtClearLabelCOMPONENTID"></div></button><BR/><BR/>
+        <div id="chartAreaCOMPONENTID" style="width:800px;height:300px;display:inline-block"></div>
+        <div id="chartArea2_COMPONENTID" style="width:800px;height:300px;display:inline-block"></div>
+    </div>
+</div>
+</div>

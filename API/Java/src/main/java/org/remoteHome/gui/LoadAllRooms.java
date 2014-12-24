@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.String;
 import java.util.TreeSet;
+import org.remoteHome.AbstractDevice;
 
 /**
  *

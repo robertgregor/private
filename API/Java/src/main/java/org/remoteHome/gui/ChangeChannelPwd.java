@@ -7,6 +7,7 @@ package org.remoteHome.gui;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
+import org.remoteHome.Group;
 import org.remoteHome.RemoteHomeConnectionException;
 
 /**
@@ -21,9 +22,13 @@ public class ChangeChannelPwd extends AbstractWebService {
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
         try {
-            r.setChannel(Integer.parseInt(requestParameters.get("channel")));
-            r.setPassword(requestParameters.get("password"));
-            sendAjaxAnswer("Channel and / or password configured. Please reset all your devices and add them again.");
+            if (user.getGroup().equals(Group.ADMIN_GROUP)) {
+                r.setChannel(Integer.parseInt(requestParameters.get("channel")));
+                r.setPassword(requestParameters.get("password"));
+                sendAjaxAnswer("OK");
+            } else {
+                sendAjaxError("error_no_permission");
+            }
         } catch (RemoteHomeConnectionException e) {
             sendAjaxAnswer(e.getMessage());
         }

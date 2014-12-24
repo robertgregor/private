@@ -4,24 +4,18 @@
  */
 package org.remoteHome.gui;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.remoteHome.AbstractDevice;
-import org.remoteHome.AbstractHistoryData;
-import org.remoteHome.BatteryThermostatDevice;
-import org.remoteHome.HeatingHeaderDevice;
-import org.remoteHome.MotorControllerDevice;
-import org.remoteHome.OnOffHistoryData;
-import org.remoteHome.PercentageHistoryData;
-import org.remoteHome.SimpleSwitchDevice;
-import org.remoteHome.TemperatureHistoryData;
-import org.remoteHome.TemperatureSensorDevice;
-import org.remoteHome.ThermostatDevice;
-import org.remoteHome.ThermostatWithSwitchAndTempSensorDevice;
+import org.remoteHome.Group;
+import org.remoteHome.HistoryData;
+import org.remoteHome.RemoteHomeManager;
 
 /**
  *
@@ -33,38 +27,44 @@ public class GetHistoryDataJson extends AbstractWebService{
     
     @Override
     public void processRequest(OutputStream o, HttpExchange t) throws IOException {
-        try {
+        try {            
             StringBuilder sb = new StringBuilder();
             int deviceId = Integer.parseInt(requestParameters.get("deviceId"));
             AbstractDevice d = r.getDevice(deviceId);
-            AbstractHistoryData data = null;
-            if (d instanceof SimpleSwitchDevice) data = new OnOffHistoryData();
-            if ((d instanceof ThermostatDevice) 
-                    || (d instanceof BatteryThermostatDevice)
-                    || (d instanceof ThermostatWithSwitchAndTempSensorDevice)                
-                    || (d instanceof HeatingHeaderDevice)             
-                    || (d instanceof TemperatureSensorDevice)) data = new TemperatureHistoryData();
-            if (d instanceof MotorControllerDevice) data = new PercentageHistoryData();
-            data.setDeviceId(deviceId);
-            AbstractHistoryData jsonData = r.getPersistance().loadHistoryData(data);
-            String range = requestParameters.get("range");
-            SortedMap<Long, AbstractHistoryData.HistoryItems> map = null;
-            if (jsonData != data) {
-                if (range.equalsIgnoreCase("hour")) map = jsonData.getLastHourSamples();
-                else if (range.equalsIgnoreCase("day")) map = jsonData.getLastDaySamples();
-                else if (range.equalsIgnoreCase("week")) map = jsonData.getLastWeekSamples();
-                else if (range.equalsIgnoreCase("month")) map = jsonData.getLastMonthSamples();
-                else if (range.equalsIgnoreCase("threemonth")) map = jsonData.getLastThreeMonthSamples();
-                else if (range.equalsIgnoreCase("year")) map = jsonData.getLastYearSamples();
-                else if (range.equalsIgnoreCase("threeyears")) map = jsonData.getLastThreeYearsSamples();
-            } else {
-                map = new TreeMap<Long, AbstractHistoryData.HistoryItems>();
+            if (requestParameters.get("clear") != null) {
+                    if (user.getGroup().equals(Group.ADMIN_GROUP)) {                   
+                        r.getPersistance().deleteHistoryData(deviceId);
+                        sendAjaxAnswer("OK");
+                        return;
+                    } else {
+                        RemoteHomeManager.log.warning("User "+user+" doesnt have permission to modify parameters.");
+                        sendAjaxError("error_no_permission");
+                        return;
+                    }
             }
-            Gson gson = new Gson();
-            sb.append(gson.toJson(jsonData.createItems(map)));
+            HistoryData[] historyData;
+            String range = requestParameters.get("range");
+            HistoryData prototype = new HistoryData();
+            prototype.setDeviceId(deviceId);
+            prototype.setDataName(requestParameters.get("type"));
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(System.currentTimeMillis()));
+            if (range.equalsIgnoreCase("hour")) {cal.add(Calendar.HOUR, -1);prototype.setDataTimestamp(cal.getTime());}
+            else if (range.equalsIgnoreCase("day")) {cal.add(Calendar.DAY_OF_MONTH, -1);prototype.setDataTimestamp(cal.getTime());}
+            else if (range.equalsIgnoreCase("week")) {cal.add(Calendar.WEEK_OF_MONTH, -1);prototype.setDataTimestamp(cal.getTime());}
+            else if (range.equalsIgnoreCase("month")) {cal.add(Calendar.MONTH, -1);prototype.setDataTimestamp(cal.getTime());}
+            else if (range.equalsIgnoreCase("threemonth")) {cal.add(Calendar.MONTH, -3);prototype.setDataTimestamp(cal.getTime());}
+            else if (range.equalsIgnoreCase("year")) {cal.add(Calendar.YEAR, -1);prototype.setDataTimestamp(cal.getTime());}
+            else if (range.equalsIgnoreCase("threeyears")) {cal.add(Calendar.YEAR, -3);prototype.setDataTimestamp(cal.getTime());}
+            historyData = r.getPersistance().getHistoryData(prototype);                
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            sb.append(mapper.writeValueAsString(d.generateChartItems(historyData, requestParameters.get("type"))));                
+            RemoteHomeManager.log.debug("Data to chart: "+sb.toString());
             sendAjaxAnswer(sb.toString());
+            return;
         } catch (Exception e) {
-            e.printStackTrace();
+            RemoteHomeManager.log.error(8,e);
             sendAjaxError(e.getMessage());
         }
     }   

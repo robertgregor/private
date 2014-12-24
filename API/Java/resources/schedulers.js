@@ -259,6 +259,20 @@
             statusData += "<option style=\"background-color: orangered; color:black;\">30 "+deg_celsius+"</option>";
             return statusData;
         }
+        function populateHourOptions() {
+            var statusData = "";
+            statusData += "<option style=\"background-color:black; color:white;\" selected=\"selected\" value=\"1\">1 "+hour+"</option>";
+            statusData += "<option style=\"background-color: white; color:black;\" value=\"2\">2 "+hours+"</option>";
+            statusData += "<option style=\"background-color: lightblue; color:black;\" value=\"4\">4 "+hours+"</option>";
+            statusData += "<option style=\"background-color: blue; color:white;\" value=\"8\">8 "+hours2+"</option>";
+            statusData += "<option style=\"background-color: darkblue; color:white;\" value=\"24\">1 "+day+"</option>";
+            statusData += "<option style=\"background-color: lightgreen; color:black;\" value=\"48\">2 "+days+"</option>";
+            statusData += "<option style=\"background-color: green; color:white;\" value=\"72\">3 "+days+"</option>";
+            statusData += "<option style=\"background-color: darkgreen; color:white;\" value=\"120\">5 "+days2+"</option>";
+            statusData += "<option style=\"background-color: lightgoldenrodyellow; color:black;\" value=\"168\">7 "+days2+"</option>";
+            statusData += "<option style=\"background-color: yellow; color:black;\" value=\"336\">14 "+days2+"</option>";
+            return statusData;
+        }
         function schedulePercentProgramsManager(id) {
             var html = "";
             html += sch_percentage_selection+"<SELECT style=\"background-color: green; color:white;\" onChange=\"this.style.backgroundColor = this.options[this.selectedIndex].style.backgroundColor; this.style.color = this.options[this.selectedIndex].style.color;\" id=\"percentSelect"+id+"\">"+populatePercentOptions()+"</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";

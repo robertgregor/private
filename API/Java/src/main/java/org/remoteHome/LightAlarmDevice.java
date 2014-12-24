@@ -78,42 +78,42 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
    /**
      * Current smtp server host
      */
-    private String smtpHost;
+    private String smtpHost = "";
 
    /**
      * Current smtp server user
      */
-    private String smtpUser;
+    private String smtpUser = "";
 
    /**
      * Current smtp server password
      */
-    private String smtpPassword;
+    private String smtpPassword = "";
 
    /**
      * Current smtp email address to
      */
-    private String smtpEmailTo;
+    private String smtpEmailTo = "";
 
    /**
      * Current smtp email address to
      */
-    private String smtpEmailFrom;
+    private String smtpEmailFrom = "";
 
     /**
      * Current smtp email subject
      */
-    private String smtpSubject;
+    private String smtpSubject = "";
 
    /**
      * Current smtp email message
      */
-    private String smtpMessage;
+    private String smtpMessage = "";
 
     /*
      * This is the schedule allows to set the light on when movement is detected.
      */
-    private OnOffSchedule lightOnWhenMovementDetectedSchedule;
+    private OnOffSchedule lightOnWhenMovementDetectedSchedule = new OnOffSchedule();
     
     /*
      * This is true if movement scheduler is enabled.
@@ -590,8 +590,6 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
      * This method will start the scheduler thread to process the schedule.
      */
     public void startScheduling() {
-        getLightOnWhenMovementDetectedSchedule().setCurrentState("0");
-        getLightSchedule().setCurrentState("0");
         new Thread(new Runnable() {
             public void run() {
                 while(true) {
@@ -600,24 +598,18 @@ public class LightAlarmDevice  extends SimpleSwitchDevice implements Serializabl
                         Calendar c = Calendar.getInstance();
                         int min = c.get(Calendar.MINUTE);
                         if (((min % 10) == 0) || (min == 0)) {
-                            Boolean action = getLightOnWhenMovementDetectedSchedule().processSchedule();
-                            if (action != null) {
-                                //something has to be done.
+                            boolean action = getLightOnWhenMovementDetectedSchedule().getCurrentSchedule();
                                 if (action) {
                                     configureSwitchOnWhenMovement(true);
                                 } else {
                                     configureSwitchOnWhenMovement(false);
                                 }
-                            }
-                            action = getLightSchedule().processSchedule();
-                            if (action != null) {
-                                //something has to be done.
+                            action = getLightSchedule().getCurrentSchedule();
                                 if (action) {
                                     switchOn();
                                 } else {
                                     switchOff();
                                 }
-                            }
                             saveHistoryData();
                         }
                         Thread.sleep(30000);

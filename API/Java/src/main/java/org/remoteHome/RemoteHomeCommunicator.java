@@ -6,10 +6,16 @@ import gnu.io.NRSerialPort;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.remoteHome.stk500_v1.Logger;
+import org.remoteHome.stk500_v1.STK500v1;
 
 /**
  *
@@ -26,90 +32,85 @@ class RemoteHomeCommunicator extends Thread  {
     private NRSerialPort serialPort = null; 
     private BufferedReader dataInputStream = null;
     private DataOutputStream dataOutputStream = null;
-    private String dataReceived = "";
-    private boolean cmdWithResponse = false;
-    private int cmdWithResponseId = 0;
-    private final Object semaphore = new Object();
+    private List<String> dataReceived;
     private boolean simulate = false;
+    private boolean programming = false;
+    private String programDeviceProgress = "";
 
     protected RemoteHomeCommunicator(String host, String port, RemoteHomeManager manager) throws RemoteHomeConnectionException {
+        dataReceived = Collections.synchronizedList(new <String>ArrayList());
+        processAsynchronousCommands();
         this.host = host;
         this.port = port;
         this.manager = manager;
         connect();
-        getUserNamePassword();
         this.start();
+        getUserNamePassword();
     }
         
     protected void connect() throws RemoteHomeConnectionException {
+            programming = false;
             disconnect();
             try {
-                socket = new Socket( getHost(), Integer.parseInt(getPort()));
-                dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                dataInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                Integer.parseInt(getPort());
+                connectTcp();
+                RemoteHomeManager.log.info("TCP connection established to: "+getHost()+":"+getPort());
             } catch (NumberFormatException e) {
                 //OK, the port is COM port.
                 if (!getPort().equalsIgnoreCase("SIMULATE")) {
                     connectComPort();
+                    RemoteHomeManager.log.info("COMM port connection established: "+getPort());
                 } else {
                     simulate = true;
-                    System.out.println("!!!!!!!!!!!    Simulation mode     !!!!!!!!!!!!!");
+                    RemoteHomeManager.log.info("!!!!!!!!!!!    Simulation mode     !!!!!!!!!!!!!");
                     new Thread(new Runnable(){
                         public void run() {
                             while (true) {
                                 try {
-                                    Thread.sleep(150000);
-                                    for (AbstractDevice dev : manager.getDevices()) {
-                                        if (dev instanceof TemperatureSensorDevice) {
-                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 2|+"+Integer.toString(15+(new Random()).nextInt(10))+"."+Integer.toString((new Random()).nextInt(99))+"|3.2|10");
-                                        } else if (dev instanceof ThermostatDevice) {
-                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 6|"+Integer.toString(150+(new Random()).nextInt(100))+"|10|47|0|5|0");
-                                        } else if (dev instanceof MotorControllerDevice) {
-                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" l|"+Integer.toString((new Random()).nextInt(100)));
-                                        } else if (dev instanceof HeatingHeaderDevice) {
-                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" 4|"+Integer.toString(150+(new Random()).nextInt(100))+"|31|60|43|"+(new Random()).nextInt(100));
-                                        } else if (dev instanceof LightAlarmDevice) {
-                                            manager.manageAsynchronousCommand("+"+dev.getDeviceId()+" ALARM");
-                                        }
-                                    }
+                                    Thread.sleep(60000);
                                     Thread.sleep(150000);
                                 } catch (InterruptedException e) {
                                     return;
                                 } catch (Exception e) {
-                                    e.printStackTrace();
+                                    RemoteHomeManager.log.error(107, e);
                                 }
                             }
                         }
                     }).start();
                 }
-            } catch (UnknownHostException e) {
-                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);
-            } catch (IOException e) {
-                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
-                
             }
     }
     private void getUserNamePassword() throws RemoteHomeConnectionException {
-        try {
             if (isSimulate()) {
-                if (channel==0) channel = 40;
-                if (password==null) password = "REMOTEHOM";
+                if (channel==0) channel = 1;
+                if (password==null) password = "thisIsEncryptKey";
                 return;
             }
-            dataOutputStream.write("AT+s\n".getBytes());
-            dataOutputStream.flush();
-            Thread.sleep(50);
-            if (dataInputStream.ready()) {
-                channel = (Integer.parseInt(dataInputStream.readLine().split(":")[1]));
-                password = (dataInputStream.readLine().split(":")[1]);
-            } else {
+            RemoteHomeManager.log.debug("Going to get username and password from the transceiver.");
+            try {
+                String answer = sendCommandWithAnswer(-1, "s");
+                String[] data = answer.split("\t");
+                channel = (Integer.parseInt(data[1].split(":")[1]));
+                password = (data[2].split(":")[1]);
+            } catch (Exception ee) {
+                RemoteHomeManager.log.error(100, ee);
                 throw new RemoteHomeConnectionException("Cannot read username and password.", RemoteHomeConnectionException.CONNECTION);                
             }
-        } catch (IOException e) {
-            throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
-        } catch (InterruptedException e) {
-            return;
-        }
+    }
+    protected void connectTcp() throws RemoteHomeConnectionException {
+            if (isSimulate()) return;
+            disconnect();
+            try {
+                socket = new Socket( getHost(), Integer.parseInt(getPort()));
+                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                dataInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            } catch (UnknownHostException e) {
+                RemoteHomeManager.log.error(104, e);
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);
+            } catch (IOException e) {
+                RemoteHomeManager.log.error(105, e);
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);                
+            }
     }
     protected void connectComPort() throws RemoteHomeConnectionException {
             if (isSimulate()) return;
@@ -117,11 +118,12 @@ class RemoteHomeCommunicator extends Thread  {
             try {
 		NativeResource nr = new NativeResource();
 		nr.load("libNRJavaSerial");
-                serialPort = new NRSerialPort(getPort(), 9600);
+                serialPort = new NRSerialPort(getPort(), 115200);
                 serialPort.connect();
                 dataInputStream = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
                 dataOutputStream = new DataOutputStream(serialPort.getOutputStream());                 
             } catch (Exception e) {
+                RemoteHomeManager.log.error(103, e);
                 throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_PORT);                
             }
     }
@@ -131,132 +133,243 @@ class RemoteHomeCommunicator extends Thread  {
         try { dataOutputStream.close(); } catch (Throwable e) {}
         try { dataInputStream.close(); } catch (Throwable e) {}
         try { if (socket != null) socket.close(); } catch (Throwable e) {}
-        try { if (serialPort != null) serialPort.disconnect(); } catch (Throwable e) {}
+        try { if (serialPort != null) { if (serialPort.isConnected()) serialPort.disconnect(); }} catch (Throwable e) {}
+        RemoteHomeManager.log.info("Disconnected.");
     }
     
-    protected synchronized String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
-        if (isSimulate()) return null;
-        cmdWithResponse = true;
-        cmdWithResponseId = deviceId;
+    protected synchronized void programDevice(byte[] hexDataToLoad) throws RemoteHomeConnectionException {
+      disconnect();
+      dataOutputStream = null;
+      dataInputStream = null;
+      programming = true;
+      OutputStream out = null;
+      InputStream in = null;
+      try {
+        RemoteHomeManager.log.info("Going to program device.");
         try {
-            sendCommand(deviceId, command);
-            return dataReceived.split(" ")[1];
-        } finally {
-            cmdWithResponse = false;
-            cmdWithResponseId = 0;
-        }
-    }
-    
-    protected synchronized void addDevice(int deviceId) throws RemoteHomeConnectionException {
-        if (isSimulate()) return;
-        cmdWithResponse = true;
-        cmdWithResponseId = deviceId;
-        try {
-            dataReceived = "";
-            String cmd = "AT+a="+deviceId+"\n";
-            dataOutputStream.write(cmd.getBytes());
-            dataOutputStream.flush();
-                try {
-                    synchronized(semaphore) {
-                        semaphore.wait(2000);
-                    }
-                } catch (InterruptedException e) {
-                    return;
-                }            
-                if (dataReceived.indexOf("OK") > 0) return;
-                if (dataReceived.indexOf("ERROR") > 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.ERROR_FROM_DEVICE);
-                if (dataReceived.length() == 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.NO_RESPONSE_FROM_DEVICE);
-        } catch (IOException e) {
-            //OK, try to reconnect
-            disconnect();
+            Integer.parseInt(getPort());
+            RemoteHomeManager.log.debug("TCP connection is used.");
             try {
-                connect();
-            } catch (Exception ee) {
-                //OK, so now throw the exception
+                socket = new Socket( getHost(), Integer.parseInt(getPort()));
+                out = socket.getOutputStream();
+                in = socket.getInputStream();
+                RemoteHomeManager.log.info("TCP connection is established.");
+            } catch (UnknownHostException e) {
+                RemoteHomeManager.log.error(115, e);
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.UNKNOWN_HOST);
+            } catch (IOException e) {
+                RemoteHomeManager.log.error(116, e);
+                throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);                
+            }    
+        } catch (NumberFormatException e) {
+            //Ok it is comport connection or simulate
+            if (!getPort().equalsIgnoreCase("SIMULATE")) {
+                RemoteHomeManager.log.debug("COMM port direct connection is used.");
+                try {
+                    NativeResource nr = new NativeResource();
+                    nr.load("libNRJavaSerial");
+                    serialPort = new NRSerialPort(getPort(), 115200);
+                    serialPort.connect();
+                    in = serialPort.getInputStream();
+                    out = serialPort.getOutputStream();
+                    RemoteHomeManager.log.info("COM port connection is established.");
+                } catch (Exception ee) {
+                    RemoteHomeManager.log.error(117, ee);
+                    throw new RemoteHomeConnectionException(ee.getMessage(), RemoteHomeConnectionException.UNKNOWN_PORT);                
+                }
+            } else {
+                RemoteHomeManager.log.info("Simulate mode is used. Nothing will happen.");
+                //Simulate nothing should be done.
+                return;
+            }
+        }
+        STK500v1 stk = new STK500v1(out, in, new RemoteHomeCommunicator.StkLoggerImpl(), hexDataToLoad);
+        if (stk.programUsingOptiboot(true, 128)) {
+            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            RemoteHomeManager.log.info("Programming successfull.");
+            programDeviceProgress = "";
+        } else {
+            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            RemoteHomeManager.log.warning("Programming failed.");
+            programDeviceProgress = "";
+            throw new RemoteHomeConnectionException(RemoteHomeConnectionException.OPERATION_FAILED);
+        }
+      } finally {
+        if (isSimulate()) return;
+        try { in.close(); } catch (Throwable e) {}
+        try { out.close(); } catch (Throwable e) {}
+        try { socket.close(); } catch (Throwable e) {}
+        try { serialPort.disconnect(); } catch (Throwable e) {}
+        programming = false;
+        //connect();
+      }
+    }
+    
+    protected String getProgramDeviceProgress() {
+        return programDeviceProgress;
+    }
+    protected void addDevice(int deviceId) throws RemoteHomeConnectionException {
+        if ((deviceId < 1) || (deviceId > 254)) throw new RemoteHomeConnectionException("Invalid device ID. Should be 0 < deviceId < 255", 
+                                RemoteHomeConnectionException.INVALID_PARAMETER);
+        if (isSimulate()) return;
+        sendCommandWithAnswer(-1, "p="+getPassword());
+        sendCommandWithAnswer(-1, "c="+getChannel());
+        sendCommandWithAnswer(-1, "n="+deviceId);
+    }
+
+    protected synchronized String sendCommandWithAnswer(int deviceId, String command) throws RemoteHomeConnectionException {
+            cleanupDataReceived();
+            if (isSimulate()) return "";
+            try {
+                String cmd = null;
+                if (deviceId != -1) {
+                    cmd = "at+"+deviceId+"="+command;
+                } else {
+                    cmd = "at+"+command;
+                }
+                RemoteHomeManager.log.info("Sending command: "+cmd);
+                dataOutputStream.write(cmd.getBytes());
+                dataOutputStream.write((byte)10);
+                dataOutputStream.flush();
+                for (int i=0; i<350;i++) {
+                    for (String received : dataReceived) {
+                        String tokens[] = received.split(" ",2);
+                        if (tokens.length > 1) {
+                            try {
+                                if (Integer.parseInt(tokens[0].substring(1)) == deviceId) {
+                                    dataReceived.remove(received);
+                                    return tokens[1];                                    
+                                }
+                            } catch (NumberFormatException e) {
+                                if (received.startsWith("+Device")) {
+                                    //OK, it is answer to at+s command
+                                    dataReceived.remove(received);
+                                    return received;                                    
+                                }
+                            }
+                        } else {
+                            dataReceived.remove(received);
+                            return received;                                    
+                        }
+                    }
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        return "";
+                    }
+                }
+                throw new RemoteHomeConnectionException(RemoteHomeConnectionException.NO_RESPONSE_FROM_DEVICE);
+            } catch (IOException e) {
+                //OK, try to reconnect
+                try {
+                    connect();
+                } catch (Exception ee) {}
+                RemoteHomeManager.log.error(102, e);
                 throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
             }
-            addDevice(deviceId);
-        } finally {
-            cmdWithResponse = false;
-            cmdWithResponseId = 0;
-        }
+    }
+    
+    private synchronized void cleanupDataReceived() {
+        while (dataReceived.remove(""));
+        while (dataReceived.remove("OK"));
+        while (dataReceived.remove("ERROR [Not reachable]"));
+        while (dataReceived.remove("ERROR"));
+        while (dataReceived.remove("Started"));      
     }
 
     protected synchronized void sendCommand(int deviceId, String command) throws RemoteHomeConnectionException {
-        if (isSimulate()) return;
-        try {
-            dataReceived = "";
-            String cmd = null;
-            if (deviceId != -1) {
-                cmd = "AT+"+deviceId+"="+command+"\n";
-            } else {
-                cmd = "AT+"+command;
-            }
-            System.out.println("S: "+cmd);
-            dataOutputStream.write(cmd.getBytes());
-            dataOutputStream.flush();
-                try {
-                    synchronized(semaphore) {
-                        semaphore.wait(3000);
-                    }
-                } catch (InterruptedException e) {
-                    return;
-                }            
-                if (dataReceived.indexOf("OK") > 0) return;
-                if (dataReceived.indexOf("ERROR") > 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.ERROR_FROM_DEVICE);
-                if (dataReceived.length() == 0) throw new RemoteHomeConnectionException(RemoteHomeConnectionException.NO_RESPONSE_FROM_DEVICE);
-        } catch (IOException e) {
-            //OK, try to reconnect
-            disconnect();
+            cleanupDataReceived();
+            if (isSimulate()) return;
             try {
-                connect();
-            } catch (Exception ee) {
-                //OK, so now throw the exception
+                String cmd = null;
+                if (deviceId != -1) {
+                    cmd = "at+"+deviceId+"="+command;
+                } else {
+                    cmd = "at+"+command;
+                }
+                RemoteHomeManager.log.info("Sending command: "+cmd);
+                dataOutputStream.write(cmd.getBytes());
+                dataOutputStream.write((byte)10);
+                dataOutputStream.flush();
+                for (int i=0; i<350;i++) {
+                    for (String received : dataReceived) {
+                        if (received.indexOf("OK") >= 0) {
+                            dataReceived.remove(received);
+                            Thread.sleep(10);
+                            return;
+                        }
+                        if (received.indexOf("ERROR [Not reachable]") >= 0) {
+                            dataReceived.remove(received);
+                            Thread.sleep(10); 
+                            throw new RemoteHomeConnectionException(RemoteHomeConnectionException.NO_RESPONSE_FROM_DEVICE);
+                        }
+                        if (received.indexOf("ERROR") >= 0) {
+                            dataReceived.remove(received);
+                            Thread.sleep(10); 
+                            throw new RemoteHomeConnectionException(RemoteHomeConnectionException.ERROR_FROM_DEVICE);
+                        }
+                    }
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+                throw new RemoteHomeConnectionException(RemoteHomeConnectionException.NO_RESPONSE_FROM_DEVICE);
+            } catch (IOException e) {
+                try {
+                    connect();
+                } catch (Exception ee) {}                
+                RemoteHomeManager.log.error(101, e);
                 throw new RemoteHomeConnectionException(e.getMessage(), RemoteHomeConnectionException.CONNECTION);
-            }
-            sendCommand(deviceId, command);
-        }
+            } catch (InterruptedException e) {}            
     }
+    
+    protected synchronized void processAsynchronousCommand() {
+        for (String received : dataReceived) {
+                            String tokens[] = received.split(" ");
+                            if (tokens.length < 2) dataReceived.remove(received);
+                            else {
+                                dataReceived.remove(received);
+                                manager.manageAsynchronousCommand(received);
+                                return;
+                            }
+                        }
+    }
+    protected void processAsynchronousCommands() {
+        new Thread(new Runnable() {
+            public void run() {
+                while (true) {                    
+                    try {
+                        processAsynchronousCommand();
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        return;
+                    } catch (Exception e) {
+                        RemoteHomeManager.log.error(1101, e);
+                    }
+                }
+            }
+        }).start();
+        //});
+    }
+    
     @Override
     public void run() {
         while (true) {
             try {            
-                Thread.sleep(50);
+                Thread.sleep(10);
                 if (isSimulate()) continue;
+                if (programming) continue;
+                if ((serialPort != null) && !serialPort.isConnected()) continue;
+                if ((socket != null) && !socket.isClosed()) continue;
                 while (dataInputStream.ready()) {
-                    dataReceived = dataInputStream.readLine();
-                    System.out.println("R:"+dataReceived);
-                    if ((dataReceived.indexOf("OK") > -1) || (dataReceived.indexOf("ERROR") > -1)) {
-                        //response to regular command
-                        synchronized(semaphore) {
-                            semaphore.notify();
-                        }
-                    } else {
-                        //asynchronous command? yes or not? get id first
-                        String tokens[] = dataReceived.split(" ");
-                        //device Id, skip + sign
-                        int devId = Integer.parseInt(tokens[0].substring(1));
-                        if (!cmdWithResponse) {
-                            //Oki, asynchronous command
-                            manager.manageAsynchronousCommand(dataReceived);
-                        } else {
-                            if (devId == cmdWithResponseId) {
-                                //OK, it is response for the "command with response"
-                                synchronized(semaphore) {
-                                    semaphore.notify();
-                                }
-                            } else {
-                                //Asynchronous command
-                                manager.manageAsynchronousCommand(dataReceived);
-                                dataReceived="";
-                            }
-                        }
-                    }
+                    String d = dataInputStream.readLine();
+                    dataReceived.add(d);
+                    RemoteHomeManager.log.info("Received: "+d);
                 }
-            } catch (InterruptedException e) {
-                return;
             } catch (Exception e) {
-                //ignore the error, thus it is communication problem. 
+                RemoteHomeManager.log.error(100, e);
             }
         }
     }
@@ -305,10 +418,19 @@ class RemoteHomeCommunicator extends Thread  {
      * @param password the password to set
      */
     public void setPassword(String password) throws RemoteHomeConnectionException {
-        if (password.length() != 9) throw new RemoteHomeConnectionException("Invalid password length. Should be exactly 9 characters.", 
+        if (password.length() != 16) throw new RemoteHomeConnectionException("Invalid password length. Should be exactly 16 characters.", 
                                 RemoteHomeConnectionException.INVALID_PARAMETER);
-        sendCommand(-1, "p="+password+(char)10);
+        sendCommandWithAnswer(-1, "p="+password);
         this.password = password;
+    }
+
+    /**
+     * @param deviceID the device id to read.
+     */
+    public int readRSSI(int deviceId) throws RemoteHomeConnectionException {
+        if (!((deviceId > 0) && (deviceId < 255))) throw new RemoteHomeConnectionException("Invalid deviceId. Should be 0 < deviceId < 255.", 
+                                RemoteHomeConnectionException.INVALID_PARAMETER);
+        return Integer.parseInt(sendCommandWithAnswer(-1, "r="+deviceId));
     }
 
     /**
@@ -322,7 +444,9 @@ class RemoteHomeCommunicator extends Thread  {
      * @param channel the channel to set
      */
     public void setChannel(int channel) throws RemoteHomeConnectionException {
-        sendCommand(-1, "c="+Integer.toString(channel)+(char)10);
+        if ((channel < 1) || (channel > 255)) throw new RemoteHomeConnectionException("Invalid channel. Should be 0 < channel < 256", 
+                                RemoteHomeConnectionException.INVALID_PARAMETER);
+        sendCommandWithAnswer(-1, "c="+Integer.toString(channel));
         this.channel = channel;
         
     }
@@ -332,5 +456,30 @@ class RemoteHomeCommunicator extends Thread  {
      */
     public boolean isSimulate() {
         return simulate;
+    }
+    
+    class StkLoggerImpl implements Logger {        
+        public void makeToast(String msg){
+            //System.out.println("Toast "+System.currentTimeMillis()+": "+msg);
+            RemoteHomeManager.log.debug(msg);
+        }        
+        public void printToConsole(String msg) {
+            RemoteHomeManager.log.info(msg);
+        }
+        public void logcat(String msg, String level) {
+                    //System.out.println("Logcat "+System.currentTimeMillis()+" "+level+": "+msg);
+                    if (msg.indexOf("%") > 0) {
+                        programDeviceProgress = msg;
+                    }
+                    if (level.equals("i")) {
+                        RemoteHomeManager.log.info(msg);
+                    } else if (level.equals("w")) {
+                        RemoteHomeManager.log.warning(msg);
+                    } else if (level.equals("e")) {
+                        RemoteHomeManager.log.error(300, msg);
+                    } else {
+                        RemoteHomeManager.log.debug(msg);
+                    }                    
+        }
     }
 }

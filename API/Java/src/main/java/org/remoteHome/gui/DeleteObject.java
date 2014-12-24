@@ -6,6 +6,8 @@ import org.remoteHome.AbstractDevice;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import org.remoteHome.Group;
+import org.remoteHome.RemoteHomeManager;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,28 +39,50 @@ public class DeleteObject extends AbstractWebService {
                         Room r = new Room(roomName);
                         rooms.add(r);
                     }
-                    //System.out.println(AbstractDevice.generateJsonData(rooms));
                     sendAjaxAnswer(AbstractDevice.generateJsonData(rooms));
                 } else if(loadDevices != null && loadDevices.equals("true")
                             && loadRooms != null && loadRooms.equals("false")) {
                     List<Device> devices = new ArrayList<Device>();
                     for (AbstractDevice dev : r.getDevices()) {
-                    //for(AbstractDevice dev : devs ) {
                         Device device = new Device(dev.getDeviceName(), dev.getDeviceId());
                         devices.add(device);
                     }
-                    //System.out.println(AbstractDevice.generateJsonData(devices));
                     sendAjaxAnswer(AbstractDevice.generateJsonData(devices));
                 } else {
+                    RemoteHomeManager.log.warning("Something went wrong.");
                     sendAjaxAnswer("Something went wrong.");
                 }
             } else {
                 if(deleteDevice != null && !deleteDevice.equals("0")
                     && deleteRoom != null && deleteRoom.equals("0")) {
-                    try {
+                      if (user.getGroup().equals(Group.ADMIN_GROUP)) {
+                        try {
+                            List<AbstractDevice> deleteDevices = new ArrayList<AbstractDevice>();
+                            for (AbstractDevice dev : r.getDevices()) {
+                                if(dev.getDeviceId() == Integer.valueOf(deleteDevice)) {
+                                    deleteDevices.add(dev);
+                                }
+                            }
+                            for(AbstractDevice dev : deleteDevices) {
+                                r.removeDevice(dev.getDeviceId());
+                            }
+                            r.getPersistance().deleteObjects(deleteDevices);
+                            RemoteHomeManager.log.info("Deleted device: " + deleteDevice);
+                            sendAjaxAnswer("Deleted device: " + deleteDevice);
+                        } catch (NumberFormatException e) {
+                            RemoteHomeManager.log.warning("Not a valid DeviceId: "+deleteDevice);
+                            sendAjaxAnswer("Not a valid DeviceId");
+                        }
+                      } else {
+                        RemoteHomeManager.log.warning("No permission to perform this operation.");                        
+                        sendAjaxError("error_no_permission");
+                      }
+                } else if(deleteDevice != null && deleteDevice.equals("0")
+                            && deleteRoom != null && !deleteRoom.equals("0")) {
+                    if (user.getGroup().equals(Group.ADMIN_GROUP)) {
                         List<AbstractDevice> deleteDevices = new ArrayList<AbstractDevice>();
                         for (AbstractDevice dev : r.getDevices()) {
-                            if(dev.getDeviceId() == Integer.valueOf(deleteDevice)) {
+                            if(dev.getRoomName().equals(deleteRoom)) {
                                 deleteDevices.add(dev);
                             }
                         }
@@ -66,26 +90,16 @@ public class DeleteObject extends AbstractWebService {
                             r.removeDevice(dev.getDeviceId());
                         }
                         r.getPersistance().deleteObjects(deleteDevices);
-                    } catch (NumberFormatException e) {
-                        sendAjaxAnswer("Not a valid DeviceId");
-                    }
-                    sendAjaxAnswer("Deleted device: " + deleteDevice);
-                } else if(deleteDevice != null && deleteDevice.equals("0")
-                            && deleteRoom != null && !deleteRoom.equals("0")) {
-                    List<AbstractDevice> deleteDevices = new ArrayList<AbstractDevice>();
-                    for (AbstractDevice dev : r.getDevices()) {
-                        if(dev.getRoomName().equals(deleteRoom)) {
-                            deleteDevices.add(dev);
-                        }
-                    }
-                    for(AbstractDevice dev : deleteDevices) {
-                        r.removeDevice(dev.getDeviceId());
-                    }
-                    r.getPersistance().deleteObjects(deleteDevices);
-                    sendAjaxAnswer("Deleted room: " + deleteRoom);
+                        RemoteHomeManager.log.info("Deleted room: " + deleteRoom);
+                        sendAjaxAnswer("Deleted room: " + deleteRoom);
+                    } else {
+                        RemoteHomeManager.log.warning("No permission to perform this operation.");                        
+                        sendAjaxError("error_no_permission");
+                    }                    
                 } else if(deleteDevice != null && !deleteDevice.equals("0")
                         && deleteRoom != null && !deleteRoom.equals("0")) {
-                    try {
+                    if (user.getGroup().equals(Group.ADMIN_GROUP)) {
+                      try {
                         List<AbstractDevice> deleteDevices = new ArrayList<AbstractDevice>();
                         for (AbstractDevice dev : r.getDevices()) {
                             if(dev.getDeviceId() == Integer.valueOf(deleteDevice)
@@ -97,23 +111,28 @@ public class DeleteObject extends AbstractWebService {
                             r.removeDevice(dev.getDeviceId());
                         }
                         r.getPersistance().deleteObjects(deleteDevices);
-
-                    } catch (NumberFormatException e) {
+                      } catch (NumberFormatException e) {
+                        RemoteHomeManager.log.warning("Not a valid DeviceId: "+deleteDevice);
                         sendAjaxAnswer("Not a valid DeviceId");
+                      }
+                      RemoteHomeManager.log.info("Deleted device: " + deleteDevice + " and room: " + deleteRoom);
+                      sendAjaxAnswer("Deleted device: " + deleteDevice + " and room: " + deleteRoom);
+                    } else {
+                        RemoteHomeManager.log.warning("No permission to perform this operation.");
+                        sendAjaxError("error_no_permission");
                     }
-                    sendAjaxAnswer("Deleted device: " + deleteDevice + " and room: " + deleteRoom);
                 } else if(deleteDevice != null && deleteDevice.equals("0")
                         && deleteRoom != null && deleteRoom.equals("0")) {
+                    RemoteHomeManager.log.info("Empty");
                     sendAjaxAnswer("EMPTY");
                 } else {
+                    RemoteHomeManager.log.warning("Something went wrong.");
                     sendAjaxAnswer("Something went wrong.");
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            //sendAjaxAnswer(e.getMessage());
+            RemoteHomeManager.log.error(11, e);
         }
-
     }
 
     class Room {

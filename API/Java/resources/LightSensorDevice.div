@@ -1,0 +1,304 @@
+<div>
+<script>
+function updateStatusCOMPONENTID() {
+    updateStatusCOMPONENTID(true);
+}
+function updateStatusCOMPONENTID(showError) {
+  $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetJsonObject&deviceId=COMPONENTID",
+      success: function(indata) {
+          if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+          var data = JSON.parse(indata);
+          updateComponentsCOMPONENTID(data);
+      },
+      error:function(xhr){
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
+      }
+  });
+}
+function updateComponentsCOMPONENTID(data) {
+          document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
+          document.getElementById("nameFormCOMPONENTID").value=data.deviceName;
+          document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
+          document.getElementById("roomFormCOMPONENTID").value=data.roomName;
+          document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
+          document.getElementById("currPeriodCOMPONENTID").innerHTML=data.frequency;
+          document.getElementById("currPeriodFormCOMPONENTID").value=data.frequency;
+          document.getElementById("lightCOMPONENTID").innerHTML=data.light;
+          document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=data.light;
+          document.getElementById("battVoltageCOMPONENTID").innerHTML=data.battery;
+          if (data.manageFrequencyAuto) {
+            document.getElementById("expPeriodCOMPONENTID").innerHTML=data.expectedFrequency;
+            setLabelBasedOnId("secondsL1COMPONENTID", "seconds");
+          } else {
+            document.getElementById("expPeriodCOMPONENTID").innerHTML="";
+          }
+          document.getElementById("switch_deviceIdCOMPONENTID").innerHTML=data.switchDeviceId;
+          document.getElementById("switch_subDeviceIdCOMPONENTID").innerHTML=data.switchSubDeviceId;
+          document.getElementById("switch_deviceIdFormCOMPONENTID").value=data.switchDeviceId;
+          document.getElementById("switch_subDeviceIdFormCOMPONENTID").value=data.switchSubDeviceId;
+          if (data.manageSwitchDeviceIdAuto) {
+            document.getElementById("switch_deviceIdExpectedCOMPONENTID").innerHTML=data.switchDeviceIdExpected;
+          } else {
+            document.getElementById("switch_deviceIdExpectedCOMPONENTID").innerHTML="";
+          }
+          if (data.manageSwitchSubDeviceIdAuto) {
+            document.getElementById("switch_subDeviceIdExpectedCOMPONENTID").innerHTML=data.switchSubDeviceIdExpected;
+          } else {
+            document.getElementById("switch_subDeviceIdExpectedCOMPONENTID").innerHTML="";
+          }
+          document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
+}
+$(function() {
+    $( "#componentTabsCOMPONENTID" ).tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 2) {
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA");
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA");
+            } else if ((ui.newTab.index() == 0) || (ui.newTab.index() == 1)) {
+                updateStatusCOMPONENTID();
+            }
+        }
+    });
+    $( "#chartButtHourCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA");
+    });
+    $( "#chartButtDayCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "SINGLELINEDATA");
+    });
+    $( "#chartButtWeekCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "SINGLELINEDATA");
+    });
+    $( "#chartButtMonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "SINGLELINEDATA");
+    });
+    $( "#chartButt3MonthCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "SINGLELINEDATA");
+    });
+    $( "#chartButtYearCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "SINGLELINEDATA");
+    });
+    $( "#chartButt3YearsCOMPONENTID" ).button().click(function() {
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "SINGLELINEDATA");
+    });
+    $( "#chartButtClearCOMPONENTID" ).button().click(function() {
+      $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetHistoryDataJson&deviceId=COMPONENTID&clear=true",
+            success: function(indata) {
+                if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "SINGLELINEDATA");
+                alert(clear_history_data_ok);
+            },
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
+            }   
+          });
+  
+    });
+    $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
+          updateStatusCOMPONENTID();
+    });
+    $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
+                   focus(function() {
+                   setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
+              });
+    $( "#configureCOMPONENTID" ).button().click(function() {
+          var nm = document.getElementById("nameFormCOMPONENTID").value;
+          if (nm == '') {
+                alert(error_name_cannot_be_empty);
+                return;
+          }
+          var tm = parseInt(document.getElementById("currPeriodFormCOMPONENTID").value);
+          if (isNaN(tm)) {
+              alert(error_period_exist);
+              return;
+          }
+          if ((tm > 2550) || (tm < 10)) {
+              alert(error_period_range);
+              return;
+          }
+          var room = document.getElementById("roomFormCOMPONENTID").value;
+          if (room == '') {
+              alert(error_room_exist);
+              return;
+          }
+          var switchDeviceId = document.getElementById("switch_deviceIdFormCOMPONENTID").value;
+          if (isNaN(switchDeviceId)) {
+              alert(error_sendingDeviceId_exist);
+              return;
+          }
+          if ((switchDeviceId < 0) || (switchDeviceId > 254)) {
+              alert(error_sendingDeviceId_range);
+              return;
+          }
+          var switchSubDeviceId = document.getElementById("switch_subDeviceIdFormCOMPONENTID").value;
+          if (isNaN(switchSubDeviceId)) {
+              alert(error_sendingDeviceId_exist);
+              return;
+          }
+          if ((switchSubDeviceId < 0) || (switchSubDeviceId > 254)) {
+              alert(error_sendingDeviceId_range);
+              return;
+          }
+          $.ajax({
+              url: "/",
+              type: "get",
+              'cache' : false,
+              data: "ServiceName=LightSensorDeviceManager&deviceId=COMPONENTID&tm="+tm+"&switchDeviceId="+switchDeviceId+"&switchSubDeviceId="+switchSubDeviceId+"&room="+encodeURIComponent(room)+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+            success: function(data) {
+                if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                if (data == "REFRESH") document.location.reload(true);
+                alert(status_configuration_prepared);
+            },
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
+            }   
+          });
+          updateStatusCOMPONENTID();
+    });
+});
+$(document).ready(function() {
+    setLabelBasedOnId("property_1COMPONENTID", "property");
+    setLabelBasedOnId("value_1COMPONENTID", "value");
+    setLabelBasedOnId("property_2COMPONENTID", "property");
+    setLabelBasedOnId("value_2COMPONENTID", "value");
+    setLabelBasedOnId("property_3COMPONENTID", "property");
+    setLabelBasedOnId("value_3COMPONENTID", "value");
+    document.getElementById('configureCOMPONENTID').value = change_config_p;
+    document.getElementById('RefreshStatusCOMPONENTID').value = refresh_p;
+    setLabelBasedOnId("statusCOMPONENTID", "status");
+    setLabelBasedOnId("configurationCOMPONENTID", "configuration");
+    setLabelBasedOnId("graphsCOMPONENTID", "graphs");
+    setLabelBasedOnId("nameLabelCOMPONENTID", "name");
+    setLabelBasedOnId("nameFCOMPONENTID", "name");
+    setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
+    setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
+    setLabelBasedOnId("component_idCOMPONENTID", "component_id");
+    setLabelBasedOnId("battVoltageLabelCOMPONENTID", "batt_voltage");
+    setLabelBasedOnId("lightLCOMPONENTID", "light");
+    setLabelBasedOnId("secondsL2COMPONENTID", "seconds");
+    setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
+    setLabelBasedOnId("sending_periodCOMPONENTID", "sending_period");
+    setLabelBasedOnId("sending_periodExpectedCOMPONENTID", "sending_period_expected");
+    setLabelBasedOnId("sending_periodFCOMPONENTID", "sending_period");
+    setLabelBasedOnId("switch_deviceIdLCOMPONENTID", "device_id_lght_sensor");
+    setLabelBasedOnId("switch_deviceIdExpectedLCOMPONENTID", "device_id_lght_s_exp");
+    setLabelBasedOnId("switch_subDeviceIdLCOMPONENTID", "subdevice_id_lght_sensor");
+    setLabelBasedOnId("switch_subDeviceIdExpectedLCOMPONENTID", "subdevice_id_lght_s_exp");
+    setLabelBasedOnId("switch_deviceIdLFCOMPONENTID", "device_id_lght_sensor");
+    setLabelBasedOnId("switch_subDeviceIdLFCOMPONENTID", "subdevice_id_lght_sensor");
+
+
+    setLabelBasedOnId("chartButtHourLabelCOMPONENTID", "chart_butt_hour");
+    setLabelBasedOnId("chartButtDayLabelCOMPONENTID", "chart_butt_day");
+    setLabelBasedOnId("chartButtWeekLabelCOMPONENTID", "chart_butt_week");
+    setLabelBasedOnId("chartButtMonthLabelCOMPONENTID", "chart_butt_month");
+    setLabelBasedOnId("chartButt3MonthLabelCOMPONENTID", "chart_butt_3month");
+    setLabelBasedOnId("chartButtYearLabelCOMPONENTID", "chart_butt_year");
+    setLabelBasedOnId("chartButt3YearsLabelCOMPONENTID", "chart_butt_3years");
+    setLabelBasedOnId("chartButtClearLabelCOMPONENTID", "chart_butt_clear");
+    updateStatusCOMPONENTID();
+    window.setInterval(function() {
+        updateStatusCOMPONENTID(false);
+    }, 300000);
+});
+</script>
+<div id="componentTabsCOMPONENTID">
+     <ul>
+        <li><a href="#componentTabsCOMPONENTID-2"><div id="statusCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-3"><div id="configurationCOMPONENTID"></div></a></li>
+        <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
+    </ul>
+    <div id="componentTabsCOMPONENTID-2">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_1COMPONENTID"></div></th>
+                <th><div id="value_1COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="battVoltageLabelCOMPONENTID"></div></td><td><span id='battVoltageCOMPONENTID'></span></td></tr>
+                <tr><td><div id="switch_deviceIdLCOMPONENTID"></div></td><td><span id='switch_deviceIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="switch_deviceIdExpectedLCOMPONENTID"></div></td><td><span id='switch_deviceIdExpectedCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_2COMPONENTID"></div></th>
+                <th><div id="value_2COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="lightLCOMPONENTID"></div></td><td><span id='lightCOMPONENTID'></span></td></tr>
+                <tr><td><div id="sending_periodCOMPONENTID"></div></td><td><span id='currPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL2COMPONENTID"></span></td></tr>
+                <tr><td><div id="sending_periodExpectedCOMPONENTID"></div></td><td><span id='expPeriodCOMPONENTID'></span>&nbsp;<span id="secondsL1COMPONENTID"></span></td></tr>
+                <tr><td><div id="switch_subDeviceIdLCOMPONENTID"></div></td><td><span id='switch_subDeviceIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="switch_subDeviceIdExpectedLCOMPONENTID"></div></td><td><span id='switch_subDeviceIdExpectedCOMPONENTID'></span></td></tr>
+                <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
+              </tbody>
+            </table>
+          </td></tr>
+        </table>
+        <input type="submit" id="RefreshStatusCOMPONENTID"/>
+    </div>
+    <div id="componentTabsCOMPONENTID-3">
+        <table>
+          <tr><td>
+            <table class="ui-widget" style="border-collapse: collapse;" width="100%">
+              <thead class="ui-widget-header">
+                <tr>
+                <th><div id="property_3COMPONENTID"></div></th>
+                <th><div id="value_3COMPONENTID"></div></th>
+                </tr>
+              </thead>
+              <tbody class="ui-widget-content">
+                <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
+                <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="currPeriodFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="switch_deviceIdLFCOMPONENTID"></div></td><td><input type="text" id="switch_deviceIdFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="switch_subDeviceIdLFCOMPONENTID"></div></td><td><input type="text" id="switch_subDeviceIdFormCOMPONENTID" /></td></tr>
+            </table>
+          </td><td>&nbsp;
+          </td></tr>
+        </table>
+        <input type="submit" id="configureCOMPONENTID" />        
+    </div>
+    <div id="componentTabsCOMPONENTID-4">
+        <button id="chartButtHourCOMPONENTID"><div id="chartButtHourLabelCOMPONENTID"></div></button>
+        <button id="chartButtDayCOMPONENTID"><div id="chartButtDayLabelCOMPONENTID"></div></button>
+        <button id="chartButtWeekCOMPONENTID"><div id="chartButtWeekLabelCOMPONENTID"></div></button>
+        <button id="chartButtMonthCOMPONENTID"><div id="chartButtMonthLabelCOMPONENTID"></div></button>
+        <button id="chartButt3MonthCOMPONENTID"><div id="chartButt3MonthLabelCOMPONENTID"></div></button>
+        <button id="chartButtYearCOMPONENTID"><div id="chartButtYearLabelCOMPONENTID"></div></button>
+        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button>
+        <button id="chartButtClearCOMPONENTID"><div id="chartButtClearLabelCOMPONENTID"></div></button><BR/><BR/>
+        <div id="chartAreaCOMPONENTID" style="width:800px;height:300px;display:inline-block"></div>
+    </div>
+</div>
+</div>

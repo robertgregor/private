@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import org.remoteHome.RemoteHomeManager;
 import org.remoteHome.RemoteHomeManagerException;
+import org.remoteHome.User;
 
 /**
  *
@@ -20,5 +21,5 @@ public interface WebService {
     void init();
     void processRequest(OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException;
     void processRequest(HashMap<String, String> requestParameters, OutputStream o, HttpExchange t) throws IOException, RemoteHomeManagerException;
-    void setParameters(RemoteHomeManager r, String... requestAttributes);
+    void setParameters(RemoteHomeManager r, User user, String... requestAttributes);
 }

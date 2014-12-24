@@ -1,8 +1,10 @@
 package org.remoteHome;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This is the implementation class for all hardware devices. All the devices should extend this class.
@@ -12,14 +14,9 @@ import java.util.ArrayList;
 public abstract class AbstractDevice implements Serializable, Comparable<AbstractDevice> {
     
     /**
-     * This device type is heating header.
-     */
-    public static int HeatingHeader = 4;
-
-    /**
      * This device type is simple switch
      */
-    public static int SimpleSwitch = 3;
+    public static int SimpleSwitch = 1;
     
     /**
      * This device type is simple switch
@@ -27,56 +24,93 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     public static int TemperatureSensor = 2;
 
     /**
-     * This device type is simple switch
-     */
-    public static int LightAlarmDevice = 1;
-
-    /**
      * This device type is blinds controller
      */
-    public static int BlindsControllerDevice = 5;
+    public static int BlindsController = 3;
 
     /**
      * This device type is thermostat, connected to power line
      */
-    public static int Thermostat = 6;
-    
+    public static int Thermostat = 4;
+  
     /**
-     * This device type is thermostat with Simple switch and TemperatureSensor
+     * This device type is battery Pir sensor device
      */
-    public static int ThermostatWithSwitchAndTempSensor = 8;
-
-    /**
-     * This device type is battery thermostat, connected to power line
-     */
-    public static int BatteryThermostat = 7;
+    public static int PirSensor = 5;
    
     /**
-     * This is subdevice number e.g. for 6 relay board switch it is 1..6
+     * This device type is battery magnetic sensor device
+     */
+    public static int MagneticSensor = 6;
+    /**
+     * This device type is light sensor device
+     */
+    public static int LightSensor = 7;
+    /**
+     * This device type is accelerometer sensor, which measure movements
+     */
+    public static int AccelerometerSensor = 8;
+    /**
+     * This device type is the artifical java device. You can define its functionality via the java code
+     */
+    public static int Java = 9;
+    /**
+     * This device type is the Temperature humidity device based on the AM2302 sensor.
+     */
+    public static int TemperatureHumiditySensorDevice = 10;
+    /**
+     * This device type is the CO2 sensor based on the MG811 sensor.
+     */
+    public static int CO2SensorDevice = 11;
+    /**
+     * This device type is the ventilator / recuperation unit controller device.
+     */
+    public static int VentilatorController = 12;
+    /**
+     * This is subdevice number e.g. for 8 relay board switch it is 1..8
      */
     private String subDeviceNumber = "1";
 
     /**
-     * This is device id of the hardware device assigned with AT+a=id command
+     * This is device id known in the api. Please note, that if this is multiple device,
+     * the value should be realDeviceId*1000 + sub device id, if it is single device, then this is real device id.
      */
     private int deviceId = 0;    
+
+    /**
+     * This is real device id of the hardware device assigned with AT+n=id command
+     */
+    private int realDeviceId = 0;    
 
     /**
      * This is device name of the hardware device. Free text
      */
     private String deviceName = "";
-    
+
+    /**
+     * This is the current device battery voltage
+     */
+    private float battery;
+    /**
+     * If true, the email reporting of low battery or power lost event is enabled.
+     */
+    private boolean enableLowBattOrPowerLostReporting = false;
+    /**
+     * If true, the email reported about low battery has been already sent.
+     */
+    private boolean lowBatteryReported = false;
+
     /**
      * This is reference to the RemoteHomeManager
      */
     protected transient RemoteHomeManager m;
     
-    private String roomName;
+    private String roomName = "";
     /**
      * This is timestamp, when the values has been last updated
      */
-    private long timestamp = 0;
-    
+    protected transient long timestamp = 0;
+
     protected AbstractDevice (RemoteHomeManager m, int deviceId, String deviceName) {
         this.m = m;
         this.deviceId = deviceId;
@@ -151,49 +185,16 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
         return getDeviceName().compareTo(device.getDeviceName());
     }
     public static String generateJsonData(Object o) {
-         Gson gson = new Gson();
-         return gson.toJson(o);
-    }
-    /*
-    public static String generateJsonData(Object o) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\n");
-        ArrayList<Field> fields = new <Field>ArrayList();
-        fields.addAll(Arrays.asList(o.getClass().getDeclaredFields()));
-        Class c = o.getClass().getSuperclass();
-        while (!c.getName().equals("java.lang.Object")) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
-            c = c.getSuperclass();
+        try {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            RemoteHomeManager.log.error(124, e);
+            return "";
         }
-        for (Field field : fields) {
-          if (field == null) continue;
-          if (field.getName() == null) continue;          
-          boolean tempAccessible = field.isAccessible();
-          field.setAccessible(true);
-          try {
-            if (sb.length() > 3) sb.append(" , \n");
-            if (field.get(o) == null) {
-                sb.append("\""+field.getName()+"\" : null");
-                continue;
-            }
-            if (field.getType().isAssignableFrom(Integer.TYPE) || 
-                    field.getType().isAssignableFrom(Byte.TYPE) || 
-                    field.getType().isAssignableFrom(Long.TYPE)) {
-                    sb.append("\""+field.getName()+"\" : "+field.get(o).toString());
-            } else if (field.getType().isAssignableFrom(Boolean.TYPE)) {
-               sb.append("\""+field.getName()+"\" : "+field.get(o).toString());
-            } else {
-               sb.append("\""+field.getName()+"\" : \""+field.get(o).toString()+"\"");
-            }
-          } catch (IllegalAccessException e) {
-          } finally {
-              field.setAccessible(tempAccessible);
-          } //No access, no output
-        }
-        sb.append("\n}");
-        return sb.toString();
+        //Gson gson = new Gson();
+        //return gson.toJson(o);
     }
-    */
     
     /**
      * This is timestamp, when the values has been last updated
@@ -237,7 +238,7 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     public void setRoomName(String roomName) {
         this.roomName = roomName;
     }
-    
+  
     protected int parseDeviceIdForMultipleDevice(int deviceId) {
         if (deviceId < 256) {            
             return deviceId;
@@ -247,10 +248,35 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
         }
     }
     /*
-     * This method is called once, when the class is instantiated or deserialized.
-     */
-    protected abstract void startScheduling();
+     * This method is called first time, when the device is either created or loaded from the persistent class. Be carefull, when loaded from persistance class,
+     * constructor is not called.
+    */
+    protected abstract void init();
+    /*
+     * This method is called each second. Do not put inside blocking operations
+    */
+    protected abstract void runEachSecond();
     
+    /*
+     * This method is called each minute. Do not put inside blocking operations
+    */
+    protected abstract void runEachMinute();
+
+    /*
+     * This method is called each 10 minutes. Do not put inside blocking operations
+    */
+    protected abstract void runEach10Minutes();
+
+    /*
+     * This method is called each hour. Do not put inside blocking operations
+    */
+    protected abstract void runEachHour();
+
+    /*
+     * This method is called each day. Do not put inside blocking operations
+    */
+    protected abstract void runEachDay();
+
     /*
      * This method will return true, if the device data are older then defined
      * @param minute is the defined period, after which the device has been updated
@@ -260,5 +286,90 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
         long currentTimestamp = System.currentTimeMillis();
         if ((timestamp + minute*60000) < currentTimestamp) return true;
         return false;
+    }
+    
+    protected HashMap getFieldValues() {
+        HashMap h = new HashMap();
+        h.put("deviceId", deviceId);
+        h.put("subDeviceNumber", subDeviceNumber);
+        h.put("deviceName", deviceName);
+        h.put("roomName", roomName);
+        h.put("battery", battery);
+        h.put("enableLowBattOrPowerLostReporting", enableLowBattOrPowerLostReporting);
+        h.put("lowBatteryReported", lowBatteryReported);
+        h.put("timestamp", timestamp);
+        return h;
+    }
+
+    /**
+     * @return the realDeviceId
+     */
+    protected int getRealDeviceId() {
+        return realDeviceId;
+    }
+
+    /**
+     * @param realDeviceId the realDeviceId to set
+     */
+    protected void setRealDeviceId(int realDeviceId) {
+        this.realDeviceId = realDeviceId;
+    }
+    
+    /**
+     * If you will use your own implementation of the history data presentation just return here the empty ArrayList()
+     * The purpose of this method is to prepare the list of java objects, ready for tranformation to e.g. xml or json. These java objects can be instanced from the inner class of
+     * the device e.g.
+     * @param historyData is the array of the history data read e.g. from the DB
+     * @param type is the history data type - i.e. if the device should store more independent values - like humidity and temperature e.g.
+     * @return the Array list with the java objects, ready for the transformation
+     */
+    public abstract ArrayList generateChartItems(HistoryData[] historyData, String type);
+    
+    /**
+     * This method should return the limit of the low battery. If the battery value received is lower, the API will send notification email - if set and configured.
+     * @return the low battery limit e.g. 2.8
+     */
+    public abstract float getLowBatteryLimit();
+
+    /**
+     * @return the enableLowBattOrPowerLostReporting
+     */
+    public boolean isEnableLowBattOrPowerLostReporting() {
+        return enableLowBattOrPowerLostReporting;
+    }
+
+    /**
+     * @param enableLowBattOrPowerLostReporting the enableLowBattOrPowerLostReporting to set
+     */
+    public void setEnableLowBattOrPowerLostReporting(boolean enableLowBattOrPowerLostReporting) {
+        this.enableLowBattOrPowerLostReporting = enableLowBattOrPowerLostReporting;
+    }
+
+    /**
+     * @return the battery
+     */
+    public float getBattery() {
+        return battery;
+    }
+
+    /**
+     * @param battery the battery to set
+     */
+    protected void setBattery(float battery) {
+        this.battery = battery;
+    }
+
+    /**
+     * @return the lowBatteryReported
+     */
+    protected boolean isLowBatteryReported() {
+        return lowBatteryReported;
+    }
+
+    /**
+     * @param lowBatteryReported the lowBatteryReported to set
+     */
+    protected void setLowBatteryReported(boolean lowBatteryReported) {
+        this.lowBatteryReported = lowBatteryReported;
     }
 }

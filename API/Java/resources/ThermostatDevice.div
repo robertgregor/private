@@ -10,36 +10,57 @@ function updateStatusCOMPONENTID(showError) {
       'cache' : false,
       data: "ServiceName=GetJsonObject&deviceId=COMPONENTID",
       success: function(indata) {
+          if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
           var data = JSON.parse(indata);
+          updateComponentsCOMPONENTID(data);
+      },
+      error:function(xhr) {
+          if (showError) {
+                alert(error_get_device_status+"\n\n"+xhr.responseText);
+          }
+      }
+  });
+}
+function updateComponentsCOMPONENTID(data) {
           document.getElementById("nameCOMPONENTID").innerHTML=data.deviceName;
           document.getElementById("nameFormCOMPONENTID").value = data.deviceName;
           document.getElementById("roomCOMPONENTID").innerHTML=data.roomName;
           document.getElementById("roomFormCOMPONENTID").value=data.roomName;
           document.getElementById("compIdCOMPONENTID").innerHTML=data.deviceId;
-          document.getElementById("periodCOMPONENTID").innerHTML=data.frequency;          
-          document.getElementById("currPeriodFormCOMPONENTID").value=data.frequency;
           if (data.relayOn) {
                document.getElementById("stateCOMPONENTID").innerHTML=on;
+               document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=on;
+               document.getElementById("titleOfAccordionStartCOMPONENTID").setAttribute('class', 'ui-icon ui-icon-power');
           } else {
                document.getElementById("stateCOMPONENTID").innerHTML=off;
+               document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=off;
+               document.getElementById("titleOfAccordionStartCOMPONENTID").setAttribute('class', '');
           }
-          if (data.manualControl) {
-               $( "#checkboxManualModeCOMPONENTID" ).prop('checked', true);
-               document.getElementById("manualModeCOMPONENTID").innerHTML=manual_mode;
+          if (data.powerLost) {
+              document.getElementById("powerLostCOMPONENTID").innerHTML=yes;
+              document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=powerLost;
           } else {
-               $( "#checkboxManualModeCOMPONENTID" ).prop('checked', false);
-               document.getElementById("manualModeCOMPONENTID").innerHTML=automatic_mode;
+              document.getElementById("powerLostCOMPONENTID").innerHTML=no;
           }
-          $("#checkboxManualModeCOMPONENTID").trigger("change");
-          document.getElementById("expTemperatureCOMPONENTID").innerHTML=data.deviceExpectedTemperature / 10;
-          document.getElementById("expTemperatureFormCOMPONENTID").value=(data.deviceExpectedTemperature / 10);
-          document.getElementById("temperatureCOMPONENTID").innerHTML=((data.temperature < 0) ? data.temperature : data.temperature / 10);
+          if (data.enableLowBattOrPowerLostReporting) {
+              document.getElementById("powerLostReportCOMPONENTID").innerHTML=yes;
+              $( "#checkboxLostPowerReportingCOMPONENTID" ).prop('checked', true);
+          } else {
+              document.getElementById("powerLostReportCOMPONENTID").innerHTML=no;
+              $( "#checkboxLostPowerReportingCOMPONENTID" ).prop('checked', false);
+          }
+          $("#checkboxLostPowerReportingCOMPONENTID").trigger("change");
+          document.getElementById("expTemperatureCOMPONENTID").innerHTML=data.deviceExpectedTemperature;
+          document.getElementById("expTemperatureFormCOMPONENTID").value=data.deviceExpectedTemperature;
+          document.getElementById("temperatureCOMPONENTID").innerHTML=data.temperature;
+          document.getElementById("titleOfAccordionEndCOMPONENTID").innerHTML=data.temperature+"&nbsp;"+deg_celsius;
           document.getElementById("thresholdCOMPONENTID").innerHTML=data.threshold;
-          document.getElementById("thresholdFormCOMPONENTID").value=(data.threshold);
-          document.getElementById("heatingControllerCOMPONENTID").innerHTML=data.heatingController;
-          document.getElementById("heatingControllerFormCOMPONENTID").value=(data.heatingController);
-          document.getElementById("remoteTemperatureMeterCOMPONENTID").innerHTML=data.remoteTemperatureMeter;
-          document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value=(data.remoteTemperatureMeter);
+          document.getElementById("thresholdFormCOMPONENTID").value=data.threshold;
+          document.getElementById("heatingControllerCOMPONENTID").innerHTML=data.heatingControllerDeviceId;
+          document.getElementById("heatingControllerFormCOMPONENTID").value=data.heatingControllerDeviceId;
+          document.getElementById("heatingControllerSubCOMPONENTID").innerHTML=data.heatingControllerSubDeviceId;
+          document.getElementById("heatingControllerSubFormCOMPONENTID").value=data.heatingControllerSubDeviceId;
+          document.getElementById("manualSetupHourCounterCOMPONENTID").innerHTML=data.manualSetupHourCounter;
           document.getElementById("timestampCOMPONENTID").innerHTML=new Date(data.timestamp).europeDate();
           if (data.enabledScheduler) {
                 $( "#checkboxEnabledSchedulerCOMPONENTID" ).prop('checked', true);
@@ -49,92 +70,96 @@ function updateStatusCOMPONENTID(showError) {
                 document.getElementById("enabledSchedulerCOMPONENTID").innerHTML=no;
           }
           $("#checkboxEnabledSchedulerCOMPONENTID").trigger("change");
-          if (data.heatingControllerEnabled) {
-                $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).prop('checked', true);
-                document.getElementById("heatingControllerEnabledCOMPONENTID").innerHTML=yes;
-          } else {
-                $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).prop('checked', false);
-                document.getElementById("heatingControllerEnabledCOMPONENTID").innerHTML=no;
-          }
-          $("#checkboxHeatingControllerEnabledCOMPONENTID").trigger("change");
-          if (data.remoteTemperatureMeterEnabled) {
-                $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).prop('checked', true);
-                document.getElementById("remoteTemperatureMeterEnabledCOMPONENTID").innerHTML=yes;
-          } else {
-                $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).prop('checked', false);
-                document.getElementById("remoteTemperatureMeterEnabledCOMPONENTID").innerHTML=no;
-          }
-          $("#checkboxRemoteTemperatureMeterEnabledCOMPONENTID").trigger("change");
-      },
-      error:function(xhr) {
-          if (showError) {
-                alert(error_get_device_status+"\n\n"+xhr.responseText);
-          }
-      }
-  });
 }
 $(function() {
+    $("#manualSetupFormCOMPONENTID").submit(function (event) {
+                event.preventDefault();
+                    var values = $(this).serialize();
+                    $.ajax({
+                        url: "/",
+                        'cache': false,
+                        type: "get",
+                        data: values,
+                        success: function (data) {
+                            if (data.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); }
+                            alert(operation_ok);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.responseText == "error_no_permission") {
+                                alert(error_no_permission);
+                            } else {
+                                alert(xhr.responseText);
+                            }
+                        }
+                    });
+    });
+    $( "#manualSetupButtCOMPONENTID" ).button();
     $( "#componentTabsCOMPONENTID" ).tabs({
         activate: function(event, ui){
             if (ui.newTab.index() == 3) {
-                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
-                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "DOUBLELINEDATA");
+            }
+        }
+    });
+    $( "#actionTabsCOMPONENTID").tabs({
+        activate: function(event, ui){
+            if (ui.newTab.index() == 0) {
+                document.getElementById('manSetupTemperatureCOMPONENTID').innerHTML = populateTempOptions();
+                document.getElementById('manSetupHourDurationCOMPONENTID').innerHTML = populateHourOptions();
+                document.getElementById("allCOMPONENTID").value = "false";
+            } else if (ui.newTab.index() == 1) {
+                document.getElementById('manSetupTemperatureCOMPONENTID').innerHTML = populateTempOptions();
+                document.getElementById('manSetupHourDurationCOMPONENTID').innerHTML = populateHourOptions();
+                document.getElementById("allCOMPONENTID").value = "true";
             }
         }
     });
     $( "#chartButtHourCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "temperature");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "DOUBLELINEDATA");
     });
     $( "#chartButtDayCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "temperature");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "day", "DOUBLELINEDATA");
     });
     $( "#chartButtWeekCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "temperature");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "week", "DOUBLELINEDATA");
     });
     $( "#chartButtMonthCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "temperature");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "month", "DOUBLELINEDATA");
     });
     $( "#chartButt3MonthCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "temperature");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threemonth", "DOUBLELINEDATA");
     });
     $( "#chartButtYearCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "temperature");
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "year", "DOUBLELINEDATA");
     });
     $( "#chartButt3YearsCOMPONENTID" ).button().click(function() {
-        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "temperature");
-    });
-    $( "#onThermostatCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&action=ON&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
-            },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError+"\n\n"+xhr.responseText);
-            }   
-          });
+        drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "threeyears", "DOUBLELINEDATA");
     });
     $( "#roomFormCOMPONENTID" ).autocomplete({minLength: 0,source: rooms}).
                    focus(function() {
                    setTimeout( "if ($('#roomFormCOMPONENTID').val().length == 0) $('#roomFormCOMPONENTID').autocomplete(\"search\", \"\"); ",1);
               });
-    $( "#offThermostatCOMPONENTID" ).button().click(function() {
-          $.ajax({
-              url: "/",
-              type: "get",
-              'cache' : false,
-              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&action=OFF&"+Math.floor((Math.random()*100)+1),
-            success: function(data) {
-                updateStatusCOMPONENTID();
+    $( "#chartButtClearCOMPONENTID" ).button().click(function() {
+      $.ajax({
+      url: "/",
+      type: "get",
+      'cache' : false,
+      data: "ServiceName=GetHistoryDataJson&deviceId=COMPONENTID&clear=true",
+            success: function(indata) {
+                if (indata.indexOf("<!--LOGIN-->") > 0) { location.replace("/"); return; }
+                drawChart($( "#chartAreaCOMPONENTID" ), COMPONENTID, "hour", "DOUBLELINEDATA");
+                alert(clear_history_data_ok);
             },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError+"\n\n"+xhr.responseText);
+            error:function(xhr, ajaxOptions, thrownError) {
+                var d = xhr.responseText;
+                if (d == "error_no_permission") {
+                   alert(error_no_permission);
+                } else {
+                    alert(xhr.responseText);
+                }
             }   
           });
-    });
+    });    
     $( "#RefreshStatusCOMPONENTID" ).button().click(function() {
           updateStatusCOMPONENTID();
     });
@@ -148,50 +173,23 @@ $(function() {
                 }
             });
     $( "#checkboxEnabledSchedulerCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
-    $( "#checkboxManualModeCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
-    $( "#checkboxManualModeCOMPONENTID" ).change(function () {
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).change(function () {
                 if (this.checked) {
                     $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
                 } else {
                     $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
                 }
             });
-    $( "#checkboxManualModeCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
-    $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
-    $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).change(function () {
-                if (this.checked) {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
-                } else {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
-                }
-            });
-    $( "#checkboxHeatingControllerEnabledCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
-    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).button({icons: {primary: "ui-icon-circle-close"}});
-    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).change(function () {
-                if (this.checked) {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-check"})
-                } else {
-                    $(this).button("option", "icons", {primary: "ui-icon-circle-close"})
-                }
-            });
-    $( "#checkboxRemoteTemperatureMeterEnabledCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
+    $( "#checkboxLostPowerReportingCOMPONENTID" ).filter(":checked").button({icons: {primary: "ui-icon-circle-check"} });
     $( "#configureCOMPONENTID" ).button().click(function() {
           var nm = document.getElementById("nameFormCOMPONENTID").value;
           if (nm == '') {
                 alert(error_name_cannot_be_empty);
                 return;
           }
-          var tm = parseInt(document.getElementById("currPeriodFormCOMPONENTID").value);
-          if (tm == NaN) {
-              alert(error_period_exist);
-              return;
-          }
-          if ((tm > 2550) || (tm < 10)) {
-              alert(error_period_range);
-              return;
-          }
           var thr = parseInt(document.getElementById("thresholdFormCOMPONENTID").value);
-          if (thr == NaN) {
+          if (isNaN(thr)) {
               alert(error_threshold_empty);
               return;
           }
@@ -200,7 +198,7 @@ $(function() {
               return;
           }
           var temp = parseFloat(document.getElementById("expTemperatureFormCOMPONENTID").value);
-          if (temp == NaN) {
+          if (isNaN(temp)) {
               alert(error_temperature_number);
               return;
           }
@@ -210,13 +208,13 @@ $(function() {
               return;
           }
           var heatingId = parseInt(document.getElementById("heatingControllerFormCOMPONENTID").value);
-          if (heatingId == NaN) {
+          if (isNaN(heatingId)) {
               alert(error_heating_id_number);
               return;
           }
-          var remoteTempId = parseInt(document.getElementById("remoteTemperatureMeterFormCOMPONENTID").value);
-          if (remoteTempId == NaN) {
-              alert(error_temperature_id_number);
+          var heatingSubId = parseInt(document.getElementById("heatingControllerSubFormCOMPONENTID").value);
+          if (isNaN(heatingSubId)) {
+              alert(error_heating_id_number);
               return;
           }
           var room = document.getElementById("roomFormCOMPONENTID").value;
@@ -224,54 +222,58 @@ $(function() {
               alert(error_room_exist);
               return;
           }
+          var plr = document.getElementById("checkboxLostPowerReportingCOMPONENTID").checked?"TRUE":"FALSE";
           var schenabled = document.getElementById("checkboxEnabledSchedulerCOMPONENTID").checked?"TRUE":"FALSE";
-          var manual = document.getElementById("checkboxManualModeCOMPONENTID").checked?"TRUE":"FALSE";
-          var heatingEnabled = document.getElementById("checkboxHeatingControllerEnabledCOMPONENTID").checked?"TRUE":"FALSE";
-          var tempEnabled = document.getElementById("checkboxRemoteTemperatureMeterEnabledCOMPONENTID").checked?"TRUE":"FALSE";
-          if ((tempEnabled == "TRUE") && (manual = "FALSE")) {
-                alert(error_remoteId_manual);
-                return;
-          }
           $.ajax({
               url: "/",
               type: "get",
               'cache' : false,
-              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&tm="+tm+"&thr="+thr+"&room="+encodeURIComponent(room)+"&heatingId="+heatingId+"&remoteTempId="+remoteTempId+"&schenabled="+schenabled+"&manual="+manual+"&heatingEnabled="+heatingEnabled+"&tempEnabled="+tempEnabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
+              data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID&thr="+thr+"&room="+encodeURIComponent(room)+"&heatingId="+heatingId+"&plr="+plr+"&heatingSubId="+heatingSubId+"&schenabled="+schenabled+"&temp="+temp+"&nm="+encodeURIComponent(nm)+"&action=CONFIGURE",
             success: function(data) {
                 if (data == "REFRESH") document.location.reload(true);
                 updateStatusCOMPONENTID();
             },
-            error:function(xhr, ajaxOptions, thrownError){
-                alert(thrownError+"\n\n"+xhr.responseText);
+            error:function(xhr, ajaxOptions, thrownError) {
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
             }   
           });
-          updateStatusCOMPONENTID();
     });
     $( "#schDialogCOMPONENTID" ).dialog({      
             autoOpen: false,
             height: 420,
             width: 940,
             modal: true,
-            buttons: {
-                "Assign schedule": function() {
+            buttons: [
+                { text: sch_button_assign_schedule, click: function() {
                   var schData="&0="+saveTempSchedule("schTempTableCOMPONENTID", 0)+"&1="+saveTempSchedule("schTempTableCOMPONENTID", 1)+"&2="+saveTempSchedule("schTempTableCOMPONENTID", 2)+"&3="+saveTempSchedule("schTempTableCOMPONENTID", 3)+"&4="+saveTempSchedule("schTempTableCOMPONENTID", 4)+"&5="+saveTempSchedule("schTempTableCOMPONENTID", 5)+"&6="+saveTempSchedule("schTempTableCOMPONENTID", 6)+"&7="+saveTempSchedule("schTempTableCOMPONENTID", 7)+"&8="+saveTempSchedule("schTempTableCOMPONENTID", 8)+"&9="+saveTempSchedule("schTempTableCOMPONENTID", 9)+"&10="+saveTempSchedule("schTempTableCOMPONENTID", 10)+"&11="+saveTempSchedule("schTempTableCOMPONENTID", 11)+"&12="+saveTempSchedule("schTempTableCOMPONENTID", 12)+"&13="+saveTempSchedule("schTempTableCOMPONENTID", 13);
-                  $.ajax({
+                  var all=document.getElementById("allCOMPONENTID").value;
+                    $.ajax({
                         url: "/",
                         type: "get",
                         'cache' : false,
-                        data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+Math.floor((Math.random()*100)+1),
+                        data: "ServiceName=ThermostatDeviceManager&deviceId=COMPONENTID"+schData+"&action=SAVESCH&"+"&all="+all+"&"+Math.floor((Math.random()*100)+1),
                     success: function(data) {
                     },
-                    error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                    error:function(xhr, ajaxOptions, thrownError) {
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
                   $( this ).dialog( "close" );
-                },
-                Cancel: function() {
+                }},
+                { text: sch_button_cancel, click: function() {
                       $( this ).dialog( "close" );        
-                }
-          }
+                }}
+          ]
     });
     $( "#scheduleButtCOMPONENTID" ).button().click(function() {
           $( "#schDialogInnerCOMPONENTID" ).replaceWith(createTempSchTable('schTempTableCOMPONENTID'));        
@@ -317,7 +319,12 @@ $(function() {
                         $('#temperatureProgsschTempTableCOMPONENTID').append('<option value="'+name+'">'+name+'</option>');
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
           });
@@ -333,7 +340,12 @@ $(function() {
                     success: function(data) {
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
           });
@@ -348,7 +360,12 @@ $(function() {
                         $("#temperatureProgsschTempTableCOMPONENTID option:selected").remove();
                     },
                     error:function(xhr, ajaxOptions, thrownError){
-                        alert(thrownError+"\n\n"+xhr.responseText);
+                        var d = xhr.responseText;
+                        if (d == "error_no_permission") {
+                            alert(error_no_permission);
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }   
                   });
           });
@@ -368,9 +385,12 @@ $(function() {
                   });
           });
     });
+});
+$(document).ready(function () {
+    document.getElementById('manSetupTemperatureCOMPONENTID').innerHTML = populateTempOptions();
+    document.getElementById('manSetupHourDurationCOMPONENTID').innerHTML = populateHourOptions();
     document.getElementById('configureCOMPONENTID').value = change_config_p;
-    document.getElementById('onThermostatCOMPONENTID').value = on_thermostat;
-    document.getElementById('offThermostatCOMPONENTID').value = off_thermostat;
+    document.getElementById('manualSetupButtCOMPONENTID').value = change_config_p;
     setLabelBasedOnId("actionsCOMPONENTID", "actions");
     setLabelBasedOnId("statusCOMPONENTID", "status");
     setLabelBasedOnId("configurationCOMPONENTID", "configuration");
@@ -391,16 +411,8 @@ $(function() {
     setLabelBasedOnId("degCelsius2COMPONENTID", "deg_celsius");
     setLabelBasedOnId("degCelsius3COMPONENTID", "deg_celsius");
     setLabelBasedOnId("stateLCOMPONENTID", "state");
-    setLabelBasedOnId("heating_ctrl_enabledCOMPONENTID", "heating_ctrl_enabled");
     setLabelBasedOnId("scheduler_enabledCOMPONENTID", "scheduler_enabled");
-    setLabelBasedOnId("heating_ctrl_enabledFCOMPONENTID", "heating_ctrl_enabled");
-    setLabelBasedOnId("manual_mode_enabledFCOMPONENTID", "manual_mode_enabled");
-    setLabelBasedOnId("manual_mode_enabledCOMPONENTID", "mode_operation");
     setLabelBasedOnId("scheduler_enabledFCOMPONENTID", "scheduler_enabled");
-    setLabelBasedOnId("temperature_ctrl_enabledCOMPONENTID", "remote_temp_meter_enabled");
-    setLabelBasedOnId("temperature_ctrl_enabledFCOMPONENTID", "remote_temp_meter_enabled");
-    setLabelBasedOnId("temp_meter_idCOMPONENTID", "temp_meter_id");
-    setLabelBasedOnId("temp_meter_idFCOMPONENTID", "temp_meter_id");
     setLabelBasedOnId("component_idCOMPONENTID", "component_id");
     setLabelBasedOnId("expected_temperatureLCOMPONENTID", "expected_temperature");
     setLabelBasedOnId("expected_temperatureFCOMPONENTID", "expected_temperature");
@@ -408,12 +420,11 @@ $(function() {
     setLabelBasedOnId("thresholdFCOMPONENTID", "threshold");
     setLabelBasedOnId("heating_controller_idCOMPONENTID", "heating_controller_id");
     setLabelBasedOnId("heating_controller_idFCOMPONENTID", "heating_controller_id");
+    setLabelBasedOnId("heating_controllerSub_idCOMPONENTID", "heating_controllerSub_id");
+    setLabelBasedOnId("heating_controllerSub_idFCOMPONENTID", "heating_controllerSub_id");
     setLabelBasedOnId("room_nameCOMPONENTID", "room_name");
     setLabelBasedOnId("room_nameFCOMPONENTID", "room_name");
     setLabelBasedOnId("last_update_timestampCOMPONENTID", "last_update_timestamp");
-    setLabelBasedOnId("sending_periodCOMPONENTID", "sending_period");
-    setLabelBasedOnId("sending_periodFCOMPONENTID", "sending_period");
-    setLabelBasedOnId("secondsLCOMPONENTID", "seconds");
     setLabelBasedOnId("chartButtHourLabelCOMPONENTID", "chart_butt_hour");
     setLabelBasedOnId("chartButtDayLabelCOMPONENTID", "chart_butt_day");
     setLabelBasedOnId("chartButtWeekLabelCOMPONENTID", "chart_butt_week");
@@ -421,10 +432,17 @@ $(function() {
     setLabelBasedOnId("chartButt3MonthLabelCOMPONENTID", "chart_butt_3month");
     setLabelBasedOnId("chartButtYearLabelCOMPONENTID", "chart_butt_year");
     setLabelBasedOnId("chartButt3YearsLabelCOMPONENTID", "chart_butt_3years");
-    updateStatusCOMPONENTID();
-    window.setInterval(function() {
-        updateStatusCOMPONENTID(false);
-    }, 300000);
+    setLabelBasedOnId("chartButtClearLabelCOMPONENTID", "chart_butt_clear");
+    setLabelBasedOnId("singleActionCOMPONENTID", "single_action");
+    setLabelBasedOnId("allActionCOMPONENTID", "all_action");
+    setLabelBasedOnId("manSetupDurationLblCOMPONENTID", "man_setup_duration");
+    setLabelBasedOnId("temperatureManualLblCOMPONENTID", "temperature");
+    setLabelBasedOnId("manSetuplblCOMPONENTID", "manual_setup_lbl");
+    setLabelBasedOnId("manualSetupHourCounterLCOMPONENTID", "manual_setup_hour_counter_lbl");
+    setLabelBasedOnId("powerLost_LabelCOMPONENTID", "power_lost_label");
+    setLabelBasedOnId("powerLostReport_LabelCOMPONENTID", "power_lost_report_label");
+    setLabelBasedOnId("powerLostReport_LabelFCOMPONENTID", "power_lost_report_label");
+    updateStatusCOMPONENTID(false);
 });
 </script>
   <div id="componentTabsCOMPONENTID">
@@ -435,13 +453,31 @@ $(function() {
         <li><a href="#componentTabsCOMPONENTID-4"><div id="graphsCOMPONENTID"></div></a></li>
     </ul>
     <div id="componentTabsCOMPONENTID-1">
-        <br/>
-        <br/>
-        <table><tr>
-        <td><button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button></td>
-        <td><input type="submit" id="onThermostatCOMPONENTID" /></td>
-        <td><input type="submit" id="offThermostatCOMPONENTID" /></td>
-        </tr></table>
+        <div id="actionTabsCOMPONENTID">
+             <ul>
+                <li><a href="#actionTabsCOMPONENTID-1"><div id="singleActionCOMPONENTID"></div></a></li>
+                <li><a href="#actionTabsCOMPONENTID-1"><div id="allActionCOMPONENTID"></div></a></li>
+             </ul>
+             <div id="actionTabsCOMPONENTID-1">
+                <button id="scheduleButtCOMPONENTID"><div id="schedulerCOMPONENTID"></div></button>
+                <br/>
+                <br/>
+                <form id="manualSetupFormCOMPONENTID">
+                <table><caption class="ui-widget-header"><span id="manSetuplblCOMPONENTID"></span></caption><tr class="ui-widget-content">
+                    <td><span id="temperatureManualLblCOMPONENTID"></span></td>
+                    <td><select id="manSetupTemperatureCOMPONENTID" name="manSetupTemperature"></select></td>
+                    <td>&nbsp;&nbsp;</td>
+                    <td><span id="manSetupDurationLblCOMPONENTID"></span></td>
+                    <td><select id="manSetupHourDurationCOMPONENTID" name="manSetupHourDuration"></select></td>
+                    <td><input type="submit" id="manualSetupButtCOMPONENTID"/></td>
+                </tr></table>
+                <input type="hidden" name="ServiceName" value="ThermostatDeviceManager"/>
+                <input type="hidden" name="deviceId" value="COMPONENTID"/>
+                <input type="hidden" name="action" value="setmanduration"/>
+                <input type="hidden" id="allCOMPONENTID" name="all" value="false"/>
+                </form>
+             </div>
+        </div>
     </div>
     <div id="componentTabsCOMPONENTID-2">
         <table>
@@ -455,13 +491,12 @@ $(function() {
               </thead>
               <tbody class="ui-widget-content">
                 <tr><td><div id="nameLabelCOMPONENTID"></div></td><td><span id='nameCOMPONENTID'></span></td></tr>
-                <tr><td><div id="temperatureLCOMPONENTID"></div></td><td><span id='temperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius1COMPONENTID"></span></td></tr>
+                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
                 <tr><td><div id="stateLCOMPONENTID"></div></td><td><span id='stateCOMPONENTID'></span></td></tr>
-                <tr><td><div id="temp_meter_idCOMPONENTID"></div></td><td><span id='remoteTemperatureMeterCOMPONENTID'></span></td></tr>
-                <tr><td><div id="temperature_ctrl_enabledCOMPONENTID"></div></td><td><span id='remoteTemperatureMeterEnabledCOMPONENTID'></span></td></tr>
-                <tr><td><div id="heating_ctrl_enabledCOMPONENTID"></div></td><td><span id='heatingControllerEnabledCOMPONENTID'></span></td></tr>
+                <tr><td><div id="heating_controller_idCOMPONENTID"></div></td><td><span id='heatingControllerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="heating_controllerSub_idCOMPONENTID"></div></td><td><span id='heatingControllerSubCOMPONENTID'></span></td></tr>
                 <tr><td><div id="scheduler_enabledCOMPONENTID"></div></td><td><span id='enabledSchedulerCOMPONENTID'></span></td></tr>
-                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
               </tbody>
             </table>
           </td><td>
@@ -473,14 +508,13 @@ $(function() {
                 </tr>
               </thead>
               <tbody class="ui-widget-content">
-                <tr><td><div id="component_idCOMPONENTID"></div></td><td><span id='compIdCOMPONENTID'></span></td></tr>
+                <tr><td><div id="temperatureLCOMPONENTID"></div></td><td><span id='temperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius1COMPONENTID"></span></td></tr>
                 <tr><td><div id="expected_temperatureLCOMPONENTID"></div></td><td><span id='expTemperatureCOMPONENTID'></span>&nbsp;<span id="degCelsius2COMPONENTID"></span></td></tr>
                 <tr><td><div id="thresholdLCOMPONENTID"></div></td><td>0.<span id='thresholdCOMPONENTID'></span>&nbsp;<span id="degCelsius3COMPONENTID"></span></td></tr>
-                <tr><td><div id="manual_mode_enabledCOMPONENTID"></div></td><td><span id='manualModeCOMPONENTID'></span></span></td></tr>
-                <tr><td><div id="heating_controller_idCOMPONENTID"></div></td><td><span id='heatingControllerCOMPONENTID'></span></td></tr>
+                <tr><td><div id="manualSetupHourCounterLCOMPONENTID"></div></td><td><span id='manualSetupHourCounterCOMPONENTID'></span>&nbsp;min.</td></tr>
+                <tr><td><div id="powerLost_LabelCOMPONENTID"></div></td><td><span id='powerLostCOMPONENTID'></span></td></tr>
+                <tr><td><div id="powerLostReport_LabelCOMPONENTID"></div></td><td><span id='powerLostReportCOMPONENTID'></span></td></tr>
                 <tr><td><div id="last_update_timestampCOMPONENTID"></div></td><td><span id='timestampCOMPONENTID'></span></td></tr>
-                <tr><td><div id="room_nameCOMPONENTID"></div></td><td><span id='roomCOMPONENTID'></span></td></tr>
-                <tr><td><div id="sending_periodCOMPONENTID"></div></td><td><span id='periodCOMPONENTID'></span>&nbsp;<span id="secondsLCOMPONENTID"></span></td></tr>
               </tbody>
             </table>
           </td></tr>
@@ -499,11 +533,9 @@ $(function() {
               </thead>
               <tbody class="ui-widget-content">
                 <tr><td><div id="nameFCOMPONENTID"></div></td><td><input type="text" id="nameFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
                 <tr><td><div id="expected_temperatureFCOMPONENTID"></div></td><td><input type="text" id="expTemperatureFormCOMPONENTID" /></td></tr>
                 <tr><td><div id="thresholdFCOMPONENTID"></div></td><td><input type="text" id="thresholdFormCOMPONENTID" /></td></tr>
-                <tr><td><div id="scheduler_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>
-                <tr><td><div id="manual_mode_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxManualModeCOMPONENTID" /><label for="checkboxManualModeCOMPONENTID">&nbsp;</label></td></tr>
-                <tr><td><div id="heating_ctrl_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxHeatingControllerEnabledCOMPONENTID" /><label for="checkboxHeatingControllerEnabledCOMPONENTID">&nbsp;</label></td></tr>
               </tbody>
             </table>
           </td><td>
@@ -515,13 +547,10 @@ $(function() {
                 </tr>
               </thead>
               <tbody class="ui-widget-content">
-                <tr><td><div id="sending_periodFCOMPONENTID"></div></td><td><input type="text" id="currPeriodFormCOMPONENTID" /></td></tr>
-                <tr><td><div id="temp_meter_idFCOMPONENTID"></div></td><td><input type="text" id="remoteTemperatureMeterFormCOMPONENTID" /></td></tr>
                 <tr><td><div id="heating_controller_idFCOMPONENTID"></div></td><td><input type="text" id="heatingControllerFormCOMPONENTID" /></td></tr>
-                <tr><td><div id="room_nameFCOMPONENTID"></div></td><td><input type="text" id="roomFormCOMPONENTID"/></td></tr>
-                <tr><td><div id="temperature_ctrl_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxRemoteTemperatureMeterEnabledCOMPONENTID" /><label for="checkboxRemoteTemperatureMeterEnabledCOMPONENTID">&nbsp;</label></td></tr>
-                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+                <tr><td><div id="heating_controllerSub_idFCOMPONENTID"></div></td><td><input type="text" id="heatingControllerSubFormCOMPONENTID" /></td></tr>
+                <tr><td><div id="powerLostReport_LabelFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxLostPowerReportingCOMPONENTID" /><label for="checkboxLostPowerReportingCOMPONENTID">&nbsp;</label></td></tr>
+                <tr><td><div id="scheduler_enabledFCOMPONENTID"></div></td><td><input type="checkbox" id="checkboxEnabledSchedulerCOMPONENTID" /><label for="checkboxEnabledSchedulerCOMPONENTID">&nbsp;</label></td></tr>                
               </tbody>
             </table>
           </td></tr>
@@ -535,7 +564,8 @@ $(function() {
         <button id="chartButtMonthCOMPONENTID"><div id="chartButtMonthLabelCOMPONENTID"></div></button>
         <button id="chartButt3MonthCOMPONENTID"><div id="chartButt3MonthLabelCOMPONENTID"></div></button>
         <button id="chartButtYearCOMPONENTID"><div id="chartButtYearLabelCOMPONENTID"></div></button>
-        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button><BR/><BR/>
+        <button id="chartButt3YearsCOMPONENTID"><div id="chartButt3YearsLabelCOMPONENTID"></div></button>
+        <button id="chartButtClearCOMPONENTID"><div id="chartButtClearLabelCOMPONENTID"></div></button><BR/><BR/>
         <div id="chartAreaCOMPONENTID" style="width:800px;height:300px;display:inline-block">
         </div>
     </div>

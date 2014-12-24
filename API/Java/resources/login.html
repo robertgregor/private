@@ -1,17 +1,36 @@
 <!DOCTYPE html>
 <html>
+<!--LOGIN-->
 <head>
-    <title>Remote-home logon page</title>
+    <title>Remote-home</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="bootstrap.css">
     <link rel="stylesheet" type="text/css" href="login.css">
     <link rel="stylesheet" type="text/css" href="magic.css">
-    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.10.2.custom.js"></script>
     <script type="text/javascript" src="bootstrap.js"></script>
     <script type="text/javascript" src="sha1.js"></script>
-
+    <script type="text/javascript" src="jquery.i18n.properties-1.0.9.js"></script>
 <script>
+    function changeLang(lang) {
+        jQuery.i18n.properties({
+            name: 'Messages', 
+            path: '', 
+            mode: 'both',
+            language: lang, 
+            callback: function() {
+            }
+        });
+    }
+    function setLabel(lbl) {
+        document.getElementById(lbl).innerHTML = jQuery.i18n.prop(lbl);
+    }
+    function setLabelBasedOnId(id, lbl) {
+        document.getElementById(id).innerHTML = jQuery.i18n.prop(lbl);
+    }
     $(function () {
+        changeLang('PREFLANG');
         $("#logon").button().click(function () {
             $("#addLogonResult").html('');
             $("#addRecoverResult").html('');
@@ -21,7 +40,7 @@
                 url: "/",
                 'cache': false,
                 type: "get",
-                data: "ServiceName=UserManagementService&logon=true&userName="+userName+"&userPassword="+userPassword+"&" + Math.floor((Math.random() * 100) + 1),
+                data: "logon=true&userName="+userName+"&userPassword="+userPassword+"&" + Math.floor((Math.random() * 100) + 1),
                 success: function (data) {
                     if(data == 'TRUE') {
                         document.location.reload(true);
@@ -37,29 +56,12 @@
                 }
             });
         });
-        $("#recover").button().click(function () {
-            $("#addLogonResult").html('');
-            $("#addRecoverResult").html('');
-            var userEmail = $("#userEmail").val();
-            $.ajax({
-                url: "/",
-                'cache': false,
-                type: "get",
-                data: "ServiceName=UserManagementService&recover=true&userEmail="+userEmail+"&" + Math.floor((Math.random() * 100) + 1),
-                success: function (data) {
-                    if(data == 'TRUE') {
-                        $("#addRecoverResult").html(ok_recover);
-                        $("#userEmail").val('');
-                    } else {
-                        $("#addRecoverResult").html('err_email');
-                        $("#userEmail").val('');
-                    }
-                },
-                error: function () {
-                    $("#userEmail").val('');
-                }
-            });
-        });
+    });
+    $(document).ready(function () {
+       setLabel("enter_name_password");
+       document.getElementById("userName").placeholder = user_name;
+       document.getElementById("userPassword").placeholder = user_password;
+       setLabelBasedOnId("logonLabel","logon_btn");
     });
 </script>
 </head>
@@ -73,66 +75,26 @@
             <table class="text-center">
                 <tr>
                     <td align="center">
-                        <form id="logonForm" class="form-signin" align="center">
+                        <form id="logonForm" class="form-signin">
                             <p class="text-muted text-center">
-                                Enter your username and password
+                                <span id="enter_name_password"></span>
                             </p>
                             <input type="text" id="userName" name="userName" placeholder="Username" class="form-control">
                             <input type="password" id="userPassword" name="userPassword" placeholder="Password" class="form-control">
-                            <div id="addLogonResult"></div>
+                            <div class="text-muted text-center" id="addLogonResult"></div>
                         </form>
                     </td>
                 </tr>
                 <tr>
                     <td align="center">
                         <div class="text-center" align="center">
-                            <button class="btn btn-lg btn-primary btn-block btn-custom" id="logon">Sign in</button>
+                            <button class="btn btn-lg btn-primary btn-block btn-custom" id="logon"><span id="logonLabel"></span></button>
                         </div>
                     </td>
                 </tr>
             </table>
         </div>
-        <div id="forgot" class="tab-pane" align="center">
-            <table class="text-center">
-                <tr>
-                    <td align="center">
-                        <form id="recoverForm" class="forgotForm" align="center">
-                            <p class="text-muted text-center">
-                                Enter your valid e-mail
-                            </p>
-                            <input type="email" id="userEmail" name="userEmail" placeholder="mail@domain.com" required="required" class="form-control">
-                            <div id="addRecoverResult"></div>
-                        </form>
-                    </td>
-                </tr>
-                <p/>
-                <tr>
-                    <td align="center">
-                        <div class="text-center" align="center">
-                            <button class="btn btn-lg btn-danger btn-block btn-custom" id="recover">Recover Password</button>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <div class="text-center">
-        <ul class="list-inline">
-            <li><a class="text-muted" href="#login" data-toggle="tab">Login</a></li>
-            <li><a class="text-muted" href="#forgot" data-toggle="tab">Forgot Password</a></li>
-        </ul>
     </div>
 </div>
-<script>
-    $('.list-inline li > a').click(function() {
-        var activeForm = $(this).attr('href') + ' > form';
-        //console.log(activeForm);
-        $(activeForm).addClass('magictime swap');
-        //set timer to 1 seconds, after that, unload the magic animation
-        setTimeout(function() {
-            $(activeForm).removeClass('magictime swap');
-        }, 1000);
-    });
-</script>
 </body>
 </html>
