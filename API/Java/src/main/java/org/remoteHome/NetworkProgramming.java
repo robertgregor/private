@@ -75,13 +75,14 @@ public class NetworkProgramming extends Thread {
     byte hexFile[];
     
     public NetworkProgramming(int port, String tempDirectory) throws IOException {
+        this.tempDirectory = tempDirectory;
         listenPort = port;        
         socket = new ServerSocket(listenPort);
-        scn = this.new HexfileScanner(tempDirectory, this);
+        scn = this.new HexfileScanner(this);
     } 
     public NetworkProgramming() throws IOException {
         socket = new ServerSocket(listenPort);
-        scn = this.new HexfileScanner(tempDirectory, this);
+        scn = this.new HexfileScanner(this);
     }     
     public void run() {
         while(!terminate) {
@@ -186,15 +187,10 @@ public class NetworkProgramming extends Thread {
         }
     }
     class HexfileScanner extends Thread {
-        File dir = null;
         NetworkProgramming p = null;
-        public HexfileScanner(String dir, NetworkProgramming p) {
-            this.dir = new File(dir);
+        public HexfileScanner(NetworkProgramming p) {
             this.p = p;
             this.start();
-        }
-        public void setDirectory(String dir) {
-            this.dir = new File(dir);
         }
         File getLastModifHexFile(File dir) {
             File findedHexFile = null;
@@ -246,10 +242,10 @@ public class NetworkProgramming extends Thread {
             while (true) {                
                     try {
                         Thread.sleep(1000);
-                        if (dir != null) {
-                            File f = getLastModifHexFile(dir);
+                        if (p.tempDirectory != null) {
+                            File f = getLastModifHexFile(new File(p.tempDirectory));
                             noFileSelectedReported = false;
-                            if ((f != null) && ((currentFile == null) || f.lastModified() > currentFile.lastModified() || (dir.getAbsolutePath().endsWith(".hex") && dir != currentFile))) {
+                            if ((f != null) && ((currentFile == null) || f.lastModified() > currentFile.lastModified() || (new File(p.tempDirectory).getAbsolutePath().endsWith(".hex") && new File(p.tempDirectory) != currentFile))) {
                                 byte b[] = new byte[(int) f.length()];
                                 DataInputStream dis = new DataInputStream(new FileInputStream(f));
                                 dis.readFully(b);
@@ -353,7 +349,7 @@ public class NetworkProgramming extends Thread {
                 if(returnVal == JFileChooser.APPROVE_OPTION) {                
                     directoryField.setText(chooser.getSelectedFile().getAbsolutePath());
                     hexField.setText("");
-                    prg.scn.dir = new File(chooser.getSelectedFile().getAbsolutePath());
+                    prg.tempDirectory = chooser.getSelectedFile().getAbsolutePath();
                 }
           } else if (e.getActionCommand().equals("findHex")) {
                 JFileChooser chooser = new JFileChooser();
@@ -364,7 +360,7 @@ public class NetworkProgramming extends Thread {
                 if(returnVal == JFileChooser.APPROVE_OPTION) {                
                     hexField.setText(chooser.getSelectedFile().getAbsolutePath());
                     directoryField.setText("");
-                    prg.scn.dir = new File(chooser.getSelectedFile().getAbsolutePath());
+                    prg.tempDirectory = chooser.getSelectedFile().getAbsolutePath();
                 }              
           } else if (e.getActionCommand().equals("cleanLog")) {
               statusWindow.setText("");
