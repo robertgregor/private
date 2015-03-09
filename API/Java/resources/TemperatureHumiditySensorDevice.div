@@ -146,7 +146,7 @@ $(function() {
               alert(error_period_exist);
               return;
           }
-          if ((tm > 2550) || (tm < 10)) {
+          if ((tm > 65535) || (tm < 10)) {
               alert(error_period_range);
               return;
           }
@@ -155,44 +155,10 @@ $(function() {
               alert(error_room_exist);
               return;
           }
-          var sendingDeviceId = parseInt(document.getElementById("thermostatDeviceIdFormCOMPONENTID").value);
-          if (isNaN(sendingDeviceId)) {
-              alert(error_sendingDeviceId_exist);
-              return;
-          }
-          if ((sendingDeviceId < 0) || (sendingDeviceId > 254)) {
-              alert(error_sendingDeviceId_range);
-              return;
-          }
-          var sendingSubDeviceId = parseInt(document.getElementById("thermostatSubDeviceIdFormCOMPONENTID").value);
-          if (isNaN(sendingSubDeviceId)) {
-              alert(error_sendingSubDeviceId_exist);
-              return;
-          }
-          if ((sendingSubDeviceId > 8) || (sendingSubDeviceId < 1)) {
-              alert(error_sendingSubDeviceId_range);
-              return;
-          }
-
-          var humidDeviceId = parseInt(document.getElementById("humidityDeviceIdFormCOMPONENTID").value);
-          if (isNaN(humidDeviceId)) {
-              alert(error_humidityDeviceId_exist);
-              return;
-          }
-          if ((humidDeviceId < 0) || (humidDeviceId > 254)) {
-              alert(error_sendingDeviceId_range);
-              return;
-          }
-          var humidSubDeviceId = parseInt(document.getElementById("humiditySubDeviceIdFormCOMPONENTID").value);
-          if (isNaN(humidSubDeviceId)) {
-              alert(error_sendingSubDeviceId_exist);
-              return;
-          }
-          if ((humidSubDeviceId > 8) || (humidSubDeviceId < 1)) {
-              alert(error_sendingSubDeviceId_range);
-              return;
-          }
-
+          var sendingDeviceId = document.getElementById("thermostatDeviceIdFormCOMPONENTID").value;
+          var sendingSubDeviceId = document.getElementById("thermostatSubDeviceIdFormCOMPONENTID").value;
+          var humidDeviceId = document.getElementById("humidityDeviceIdFormCOMPONENTID").value;
+          var humidSubDeviceId = document.getElementById("humiditySubDeviceIdFormCOMPONENTID").value;
           $.ajax({
               url: "/",
               type: "get",

@@ -1,5 +1,7 @@
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
@@ -336,7 +338,7 @@ public class RemoteHomeManager extends Thread {
      * manageAsynchronousCommand method. If unknown data are received, just
      * ignore it.
      */
-    protected void manageAsynchronousCommand(String data) {
+    public void manageAsynchronousCommand(String data) {
         String tokens[] = data.split(" ", 2);
         //device Id, skip + sign
         Integer deviceId = Integer.parseInt(tokens[0].substring(1));
@@ -374,7 +376,25 @@ public class RemoteHomeManager extends Thread {
             }
         }
     }
-
+    /**
+     * This method is called by the webserver, when the asynchronous command
+     * is received. It will parse the device Id and call the device object
+     * manageAsynchronousCommand method. If unknown data are received, just
+     * ignore it.
+     */
+    public void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {
+          //check all the devices and match the deviceId
+          int deviceId = Integer.parseInt(requestParameters.get("n"));
+          RemoteHomeManager.log.debug("Received asynchronous command for device Id: " + deviceId);
+          for (AbstractDevice d : getDevices()) {
+              if (d.getDeviceId() == deviceId) {
+                  RemoteHomeManager.log.debug("Command send to the device class: " + d.getClass().getName());
+                  d.manageAsynchronousCommand(o,t,requestParameters);
+                  return;
+              }
+          }
+          log.warning("The device Id "+deviceId+" cannot be matched with any stored device.");
+    }
     /**
      * This method should be called in the Device class, in case of change of
      * the device.

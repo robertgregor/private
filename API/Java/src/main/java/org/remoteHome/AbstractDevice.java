@@ -2,6 +2,8 @@ package org.remoteHome;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,6 +83,11 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
      * This is real device id of the hardware device assigned with AT+n=id command
      */
     private int realDeviceId = 0;    
+
+    /**
+     * This is real device ip address - only in case of network device.
+     */
+    private String deviceIPaddress = "";    
 
     /**
      * This is device name of the hardware device. Free text
@@ -164,9 +171,17 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     * 
     */
     protected abstract void manageAsynchronousCommand(String[] items);
+
+  /**
+    * This method is called by the NetworkDevice service. It is called, when the new GET request is received by the device
+    * @param o the outputStream. This has to be send back to the device.
+    * @param t the HttpExchange object, used for the device request.
+    * @param requestParameters is the hasmap of the GET parameters
+    * 
+    */
+    protected abstract void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters);
     
   /**
-    * 
     * This method will update the device 
     */
     public abstract void updateDevice() throws RemoteHomeConnectionException, RemoteHomeManagerException;
@@ -291,6 +306,8 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     protected HashMap getFieldValues() {
         HashMap h = new HashMap();
         h.put("deviceId", deviceId);
+        h.put("realDeviceId", realDeviceId);
+        h.put("deviceIPaddress", deviceIPaddress);
         h.put("subDeviceNumber", subDeviceNumber);
         h.put("deviceName", deviceName);
         h.put("roomName", roomName);
@@ -304,14 +321,14 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
     /**
      * @return the realDeviceId
      */
-    protected int getRealDeviceId() {
+    public int getRealDeviceId() {
         return realDeviceId;
     }
 
     /**
      * @param realDeviceId the realDeviceId to set
      */
-    protected void setRealDeviceId(int realDeviceId) {
+    public void setRealDeviceId(int realDeviceId) {
         this.realDeviceId = realDeviceId;
     }
     
@@ -371,5 +388,23 @@ public abstract class AbstractDevice implements Serializable, Comparable<Abstrac
      */
     protected void setLowBatteryReported(boolean lowBatteryReported) {
         this.lowBatteryReported = lowBatteryReported;
+    }
+
+    /**
+     * @return the deviceIPaddress
+     */
+    public String getDeviceIPaddress() {
+        return deviceIPaddress;
+    }
+
+    /**
+     * @param deviceIPaddress the deviceIPaddress to set
+     */
+    public void setDeviceIPaddress(String deviceIPaddress) {
+        this.deviceIPaddress = deviceIPaddress;
+    }
+    public boolean isNetworkDevice() {
+        if (deviceIPaddress == null) return false;
+        return !(deviceIPaddress.equals(""));
     }
 }

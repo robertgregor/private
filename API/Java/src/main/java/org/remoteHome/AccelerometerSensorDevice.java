@@ -61,6 +61,8 @@ EEPROM_ENABLE_MOTION 20 //Enable motion detection mode eeprom position
 
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -403,6 +405,12 @@ public class AccelerometerSensorDevice extends AbstractDevice implements Seriali
             }
             m.notifyDeviceChange(this);
         }
+    }
+    
+    /**
+      * Not used
+      */
+    protected void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {       
     }
     
     /**

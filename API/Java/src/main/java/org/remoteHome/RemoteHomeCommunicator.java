@@ -38,6 +38,7 @@ class RemoteHomeCommunicator extends Thread  {
     private String programDeviceProgress = "";
 
     protected RemoteHomeCommunicator(String host, String port, RemoteHomeManager manager) throws RemoteHomeConnectionException {
+        if (port.equalsIgnoreCase("NULL")) return;
         dataReceived = Collections.synchronizedList(new <String>ArrayList());
         processAsynchronousCommands();
         this.host = host;

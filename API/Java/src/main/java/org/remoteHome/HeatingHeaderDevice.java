@@ -1,11 +1,14 @@
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * 
@@ -223,6 +226,11 @@ public class HeatingHeaderDevice extends AbstractDevice implements Serializable 
                      }
                 }).start();                                                        
             }
+    }
+    /**
+      * Not used
+      */
+    protected void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {       
     }
 
     /**

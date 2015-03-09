@@ -1,5 +1,7 @@
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -123,6 +125,13 @@ public class SimpleSwitchDevice extends AbstractDevice implements Serializable {
             setPowerLost(false);
             parseReceivedData(items);
         }
+    }
+
+    /**
+      * Not used
+      */
+    @Override
+    protected void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {       
     }
     
     /**

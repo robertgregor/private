@@ -42,6 +42,8 @@ EEPROM_SENSOR_ENABLED_FLAG 19 //Enabled / disabled
 
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -321,6 +323,13 @@ public class MagneticSensorDevice extends AbstractDevice implements Serializable
                 RemoteHomeManager.log.error(241, e);
             }            
         }
+    }
+    
+    /**
+      * Not used
+      */
+    @Override
+    protected void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {       
     }
     
     /**

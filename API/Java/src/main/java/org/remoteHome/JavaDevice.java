@@ -1,9 +1,12 @@
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
 * Java device
@@ -58,6 +61,12 @@ public class JavaDevice extends AbstractDevice implements Serializable {
     
     @Override
     protected void manageAsynchronousCommand(String[] items) {
+    }
+    /**
+      * Not used
+      */
+    @Override
+    protected void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {       
     }
     
     

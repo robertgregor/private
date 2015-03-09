@@ -4,7 +4,6 @@
  */
 package org.remoteHome.gui;
 
-import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.remoteHome.RemoteHomeManager;
 

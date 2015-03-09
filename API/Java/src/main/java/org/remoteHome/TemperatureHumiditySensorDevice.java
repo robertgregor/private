@@ -6,11 +6,14 @@
 
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -75,7 +78,7 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
      * Expected frequency in seconds value should be set by external system in order to trigger the value change
      * Also the manageOpenAngleAuto method should be set to true.
      */
-    private int expectedFrequency; 
+    private int expectedFrequency = 0; 
 
     /**
      * Set this to true, if you want to set the expected frequency
@@ -85,13 +88,13 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
     /**
      * Thermostat device Id, where to send the temperature.
      */
-    private int thermostatDeviceId; 
+    private String thermostatDeviceId; 
     
     /**
      * Expected thermostat device Id is the value, which should be set by external system in order to trigger the value change.
      * Also the manageThermostatDeviceIdAuto method should be set to true.
      */
-    private int expectedThermostatDeviceId; 
+    private String expectedThermostatDeviceId; 
 
     /**
      * Set this to true, if you want to set the thermostat device id
@@ -117,13 +120,13 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
     /**
      * humidity device Id, where to send the humidity.
      */
-    private int humidityDeviceId; 
+    private String humidityDeviceId; 
     
     /**
      * Expected humidity device Id is the value, which should be set by external system in order to trigger the value change.
      * Also the manageHumidityDeviceIdAuto method should be set to true.
      */
-    private int expectedHumidityDeviceId; 
+    private String expectedHumidityDeviceId; 
 
     /**
      * Set this to true, if you want to set the humidity device id
@@ -177,10 +180,10 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
             humidity = Float.parseFloat(items[2]);
             setBattery(Float.parseFloat(items[3]));
             frequency = Integer.parseInt(items[4]);
-            thermostatDeviceId = Integer.parseInt(items[5]);
+            thermostatDeviceId = items[5];
             thermostatSubDeviceId = Integer.parseInt(items[6]);
-            setHumidityDeviceId(Integer.parseInt(items[7]));
-            setHumiditySubDeviceId(Integer.parseInt(items[8]));
+            humidityDeviceId = items[7];
+            humiditySubDeviceId = Integer.parseInt(items[8]);
             timestamp = System.currentTimeMillis();
             try {
                 saveHistoryData();
@@ -215,7 +218,7 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
                             m.sendCommand(getDeviceId(),"t="+getExpectedThermostatDeviceId());
                             setManageThermostatDeviceIdAuto(false);
                             setThermostatDeviceId(getExpectedThermostatDeviceId());
-                            expectedThermostatDeviceId = 0;
+                            expectedThermostatDeviceId = "";
                             RemoteHomeManager.log.info("New thermostat device ID set: "+getThermostatDeviceId());
                          } catch (Exception e) {                                                         
                              RemoteHomeManager.log.error(232, e);
@@ -247,7 +250,7 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
                             m.sendCommand(getDeviceId(),"h="+getExpectedHumidityDeviceId());
                             setManageHumidityDeviceIdAuto(false);
                             setHumidityDeviceId(getExpectedHumidityDeviceId());
-                            expectedHumidityDeviceId = 0;
+                            expectedHumidityDeviceId = "";
                             RemoteHomeManager.log.info("New humidity device ID set: "+getHumidityDeviceId());
                          } catch (Exception e) {                                                         
                              RemoteHomeManager.log.error(232, e);
@@ -272,7 +275,86 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
                 }).start();
             }
     }
- /**
+    
+    /**
+      * Not used
+      */
+    @Override
+    protected void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {
+        if (requestParameters.get("v").equals("1.0.0")) {
+            temperature = Float.parseFloat(requestParameters.get("t"));
+            humidity = Float.parseFloat(requestParameters.get("h"));
+            setBattery(Float.parseFloat(requestParameters.get("b")));
+            frequency = Integer.parseInt(requestParameters.get("p"));
+            thermostatDeviceId = requestParameters.get("tip");
+            thermostatSubDeviceId = Integer.parseInt(requestParameters.get("ts"));
+            humidityDeviceId = requestParameters.get("vip");
+            humiditySubDeviceId = Integer.parseInt(requestParameters.get("vs"));
+            timestamp = System.currentTimeMillis();
+            try {
+                saveHistoryData();
+            } catch (RemoteHomeManagerException e) {
+                RemoteHomeManager.log.error(58,e);
+            }            
+            m.notifyDeviceChange(this);
+            RemoteHomeManager.log.debug("Values set. Current values: "+toString());
+        }
+        //here manage the parameters which has to be changed. The parameters should be send all together. The example of the query:
+        //GET /ce?cs=192.168.1.103&cp=8080&cr=8081&cd=1&e=6&f=192.168.1.17&g=1&h=192.168.1.18&i=2 HTTP/1.1
+        RemoteHomeManager.log.debug("Manage freq. auto: " + isManageFrequencyAuto()+" manage thermostat device Id auto: " + isManageThermostatDeviceIdAuto() +
+                " manage thermostat sub device Id auto: " + isManageThermostatSubDeviceIdAuto() + " manage humidity device Id auto: " + isManageHumidityDeviceIdAuto() +
+                " manage humidity sub device Id auto: "+isManageHumiditySubDeviceIdAuto());
+        if (isManageFrequencyAuto() || 
+                isManageThermostatDeviceIdAuto() || 
+                isManageThermostatSubDeviceIdAuto() || 
+                isManageHumidityDeviceIdAuto() || 
+                isManageHumiditySubDeviceIdAuto()) {
+            final String remoteAddr = t.getRemoteAddress().getHostString();
+            final HashMap<String, String> rp = requestParameters;
+            new Thread(new Runnable() {
+              public void run() {
+               try {
+                 Thread.sleep(50);
+                 URL obj = new URL("http://"+remoteAddr+"/ce?cs="+rp.get("ip")+"&cp="+
+                        rp.get("sp")+"&cr="+
+                        rp.get("pp")+"&cd="+
+                        rp.get("n")+"&e="+
+                        (isManageFrequencyAuto()?getExpectedFrequency():getFrequency())+"&f="+
+                        (isManageThermostatDeviceIdAuto()?getExpectedThermostatDeviceId():getThermostatDeviceId())+"&g="+
+                        (isManageThermostatSubDeviceIdAuto()?getExpectedThermostatSubDeviceId():getThermostatSubDeviceId())+"&h="+
+                        (isManageHumidityDeviceIdAuto()?getExpectedHumidityDeviceId():getHumidityDeviceId())+"&i="+
+                        (isManageHumiditySubDeviceIdAuto()?getExpectedHumiditySubDeviceId():getHumiditySubDeviceId()));
+                 RemoteHomeManager.log.info("Going to set new values: "+obj.toString());
+                 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                 con.setRequestMethod("GET");
+                 if (con.getResponseCode() == 200) {
+                    //OK, it was configured
+                    setManageThermostatDeviceIdAuto(false); setManageThermostatSubDeviceIdAuto(false); 
+                    setManageHumidityDeviceIdAuto(false); setManageHumiditySubDeviceIdAuto(false);
+                    setManageFrequencyAuto(false);
+                    frequency = getExpectedFrequency();
+                    expectedFrequency = 0;
+                    thermostatDeviceId = getExpectedThermostatDeviceId();
+                    expectedThermostatDeviceId = "";                
+                    thermostatSubDeviceId = getExpectedThermostatSubDeviceId();
+                    expectedThermostatSubDeviceId = 0;                
+                    humidityDeviceId = getExpectedHumidityDeviceId();
+                    expectedHumidityDeviceId = "";               
+                    setHumiditySubDeviceId(getExpectedHumiditySubDeviceId());
+                    expectedHumiditySubDeviceId = 0;                    
+                    con.disconnect();
+                    RemoteHomeManager.log.info("New values has been set: "+TemperatureHumiditySensorDevice.this.toString());
+                    m.getPersistance().saveDevice(TemperatureHumiditySensorDevice.this);
+                 }
+               } catch (Exception e) {
+                   RemoteHomeManager.log.error(1112,e);
+               }
+              }
+            }).start();            
+        }
+    }
+    
+    /**
      * Current temperature
      * @return the temperature
      */
@@ -351,14 +433,14 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
     /**
      * @return the thermostatDeviceId
      */
-    public int getThermostatDeviceId() {
+    public String getThermostatDeviceId() {
         return thermostatDeviceId;
     }
 
     /**
      * @param thermostatDeviceId the thermostatDeviceId to set. To set this value please use setExpectedThermostatDeviceId().
      */
-    protected void setThermostatDeviceId(int thermostatDeviceId) {
+    protected void setThermostatDeviceId(String thermostatDeviceId) {
         this.thermostatDeviceId = thermostatDeviceId;
         m.notifyDeviceChange(this);
     }
@@ -409,14 +491,14 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
     /**
      * @return the expectedThermostatDeviceId
      */
-    public int getExpectedThermostatDeviceId() {
+    public String getExpectedThermostatDeviceId() {
             return expectedThermostatDeviceId;
     }
 
     /**
      * @param expectedThermostatDeviceId the expectedThermostatDeviceId to set
      */
-    public void setExpectedThermostatDeviceId(int expectedThermostatDeviceId) {
+    public void setExpectedThermostatDeviceId(String expectedThermostatDeviceId) {
         this.expectedThermostatDeviceId = expectedThermostatDeviceId;
         setManageThermostatDeviceIdAuto(true);
     }
@@ -481,14 +563,14 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
     /**
      * @return the humidityDeviceId
      */
-    public int getHumidityDeviceId() {
+    public String getHumidityDeviceId() {
         return humidityDeviceId;
     }
 
     /**
      * @param humidityDeviceId the humidityDeviceId to set
      */
-    protected void setHumidityDeviceId(int humidityDeviceId) {
+    protected void setHumidityDeviceId(String humidityDeviceId) {
         this.humidityDeviceId = humidityDeviceId;
         m.notifyDeviceChange(this);
     }
@@ -496,14 +578,14 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
     /**
      * @return the expectedHumidityDeviceId
      */
-    public int getExpectedHumidityDeviceId() {
+    public String getExpectedHumidityDeviceId() {
         return expectedHumidityDeviceId;
     }
 
     /**
      * @param expectedHumidityDeviceId the expectedHumidityDeviceId to set
      */
-    public void setExpectedHumidityDeviceId(int expectedHumidityDeviceId) {
+    public void setExpectedHumidityDeviceId(String expectedHumidityDeviceId) {
         this.expectedHumidityDeviceId = expectedHumidityDeviceId;
         setManageHumidityDeviceIdAuto(true);
     }
@@ -581,9 +663,12 @@ public class TemperatureHumiditySensorDevice extends AbstractDevice implements S
         h.put("thermostatSubDeviceId", thermostatSubDeviceId);
         h.put("expectedThermostatSubDeviceId", expectedThermostatSubDeviceId);
         h.put("manageExpectedThermostatSubDeviceIdAuto", manageThermostatSubDeviceIdAuto);
-        h.put("humiditySubDeviceId", thermostatSubDeviceId);
-        h.put("expectedHumiditySubDeviceId", expectedThermostatSubDeviceId);
-        h.put("manageExpectedHumiditySubDeviceIdAuto", manageThermostatSubDeviceIdAuto);
+        h.put("humidityDeviceId", humidityDeviceId);
+        h.put("expectedHumidityDeviceId", expectedHumidityDeviceId);
+        h.put("manageHumidityDeviceIdAuto", manageHumidityDeviceIdAuto);        
+        h.put("humiditySubDeviceId", humiditySubDeviceId);
+        h.put("expectedHumiditySubDeviceId", expectedHumiditySubDeviceId);
+        h.put("manageHumiditySubDeviceIdAuto", manageHumiditySubDeviceIdAuto);
         return h.toString();
     }
     /*

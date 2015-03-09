@@ -30,15 +30,15 @@ public class TemperatureHumiditySensorDeviceManager  extends AbstractWebService 
                     String nm = requestParameters.get("nm");
                     int tm = Integer.parseInt(requestParameters.get("tm"));
                     String room = requestParameters.get("room");
-                    int thermostatDeviceId = Integer.parseInt(requestParameters.get("sendingDeviceId"));
+                    String thermostatDeviceId = requestParameters.get("sendingDeviceId");
                     int thermostatSubDeviceId = Integer.parseInt(requestParameters.get("sendingSubDeviceId"));
-                    int humidityDeviceId = Integer.parseInt(requestParameters.get("humidDeviceId"));
+                    String humidityDeviceId = requestParameters.get("humidDeviceId");
                     int humiditySubDeviceId = Integer.parseInt(requestParameters.get("humidSubDeviceId"));
                     if (!device.getDeviceName().equals(nm)) device.setDeviceName(nm);
                     if (device.getFrequency() != tm) device.setExpectedFrequency(tm);
-                    if (device.getThermostatDeviceId() != thermostatDeviceId) device.setExpectedThermostatDeviceId(thermostatDeviceId);
+                    if (!device.getThermostatDeviceId().equals(thermostatDeviceId)) device.setExpectedThermostatDeviceId(thermostatDeviceId);
                     if (device.getThermostatSubDeviceId() != thermostatSubDeviceId) device.setExpectedThermostatSubDeviceId(thermostatSubDeviceId);
-                    if (device.getHumidityDeviceId() != humidityDeviceId) device.setExpectedHumidityDeviceId(humidityDeviceId);
+                    if (!device.getHumidityDeviceId().equals(humidityDeviceId)) device.setExpectedHumidityDeviceId(humidityDeviceId);
                     if (device.getHumiditySubDeviceId() != humiditySubDeviceId) device.setExpectedHumiditySubDeviceId(humiditySubDeviceId);
                     if (!device.getRoomName().equals(room)) { device.setRoomName(room); refresh = true; }
                     r.getPersistance().saveDevice(device);

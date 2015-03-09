@@ -1,5 +1,7 @@
 package org.remoteHome;
 
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -185,7 +187,12 @@ public class LightSensorDevice extends AbstractDevice implements Serializable {
                 }).start();
             }
     }
-    
+    /**
+      * Not used
+      */
+    @Override
+    protected void manageAsynchronousCommand(OutputStream o, HttpExchange t, HashMap<String, String> requestParameters) {       
+    }    
     /**
      * Current light
      * @return the light
